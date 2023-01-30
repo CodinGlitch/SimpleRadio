@@ -1,0 +1,15 @@
+{
+  "radio_open": {
+    "subtitle": "subtitles.simpleradio.radio_open",
+    "sounds": [
+      "simpleradio:radio_open"
+    ]
+  },
+  "radio_close": {
+    "subtitle": "subtitles.simpleradio.radio_close",
+    "sounds": [
+      "simpleradio:radio_close"
+    ]
+  }
+}
+

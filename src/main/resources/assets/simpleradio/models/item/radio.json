@@ -1,0 +1,19 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "simpleradio:item/radio"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "using": 1
+      },
+      "model": "simpleradio:item/using_radio"
+    }, {
+      "predicate": {
+        "speaking": 1
+      },
+      "model": "simpleradio:item/speaking_radio"
+    }
+  ]
+}
