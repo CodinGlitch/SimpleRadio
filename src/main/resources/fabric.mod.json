@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "simpleradio",
   "version": "${version}",
-  "name": "SimpleRadio",
-  "description": "",
-  "authors": [],
+  "name": "Simple Radio",
+  "description": "A simple radio item for the Simple Voice Chat mod!",
+  "authors": ["CodinGlitch"],
   "contact": {},
   "license": "MIT",
   "icon": "assets/simpleradio/icon.png",
@@ -18,6 +18,9 @@
     ],
     "voicechat": [
       "codinglit.ch.simpleradio.RadioPlugin"
+    ],
+    "modmenu": [
+      "codinglit.ch.simpleradio.client.SimpleRadioModMenu"
     ]
   },
   "mixins": [
