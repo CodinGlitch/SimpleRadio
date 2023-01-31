@@ -1,6 +1,6 @@
 package codinglit.ch.simpleradio.mixins;
 
-import codinglit.ch.simpleradio.RadioItem;
+import codinglit.ch.simpleradio.registry.RadioItem;
 import codinglit.ch.simpleradio.SimpleRadio;
 import codinglit.ch.simpleradio.client.SimpleRadioClient;
 import com.mojang.authlib.GameProfile;
@@ -32,7 +32,7 @@ import java.util.UUID;
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
     @Shadow public abstract void playSound(SoundEvent sound, float volume, float pitch);
 
-    Map<UUID, Boolean> wasTalking = new HashMap<>();
+
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey) {
         super(world, profile, publicKey);
@@ -52,45 +52,5 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             input.movementForward = value * 5;
         else
             input.movementForward = value;
-    }
-
-    @Inject(method = "tick", at = @At(value = "HEAD"))
-    private void simpleradio$tick(CallbackInfo ci) {
-        ClientVoicechat client = ClientManager.getClient();
-        ClientGroup group = ClientManager.getPlayerStateManager().getGroup();
-        if (client == null || group == null) return;
-
-        SimpleRadioClient.isAnyoneTalking = false;
-
-        for (PlayerState state : ClientManager.getPlayerStateManager().getPlayerStates(false)) {
-            if (state.hasGroup() && state.getGroup().getId().equals(group.getId())) {
-                UUID uuid = state.getUuid();
-
-                if (!wasTalking.containsKey(uuid)) wasTalking.put(uuid, false);
-
-                if (client.getTalkCache().isTalking(uuid)) {
-                    SimpleRadioClient.isAnyoneTalking = true;
-
-
-                    if (!wasTalking.get(uuid)) { // Is currently talking but was not talking last tick
-                        wasTalking.put(uuid, true);
-
-                        SimpleRadio.info("started");
-
-                        // Started talking
-                        clientWorld.playSound(this.getX(), this.getY(), this.getZ(), SimpleRadio.RADIO_OPEN, SoundCategory.PLAYERS,1, 1, false);
-                    }
-                } else {
-                    if (wasTalking.get(uuid)) { // Is not currently talking but was talking last tick
-                        wasTalking.put(uuid, false);
-
-                        SimpleRadio.info("stopped");
-
-                        // Stopped talking
-                        clientWorld.playSound(this.getX(), this.getY(), this.getZ(), SimpleRadio.RADIO_CLOSE, SoundCategory.PLAYERS,1, 1, false);
-                    }
-                }
-            }
-        }
     }
 }

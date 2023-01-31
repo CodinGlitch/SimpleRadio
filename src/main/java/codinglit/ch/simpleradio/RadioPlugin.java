@@ -1,9 +1,9 @@
 package codinglit.ch.simpleradio;
 
+import codinglit.ch.simpleradio.registry.RadioItem;
 import de.maxhenkel.voicechat.Voicechat;
 import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
-import de.maxhenkel.voicechat.plugins.PluginManager;
 import de.maxhenkel.voicechat.plugins.impl.VoicechatConnectionImpl;
 import de.maxhenkel.voicechat.voice.common.*;
 import de.maxhenkel.voicechat.voice.server.ClientConnection;
@@ -12,9 +12,6 @@ import de.maxhenkel.voicechat.voice.server.ServerWorldUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 
 public class RadioPlugin implements VoicechatPlugin {
     @Override
@@ -41,7 +38,7 @@ public class RadioPlugin implements VoicechatPlugin {
                     event.cancel();
                 }
 
-                // Disable if receiver has no radio
+                // Disable if receiver has no radio or if not in range (when applicable)
                 if (!event.isCancelled()) {
                     VoicechatConnection receivingConnection = event.getReceiverConnection();
                     if (receivingConnection instanceof VoicechatConnectionImpl voicechatConnection && receivingConnection.isInGroup()) {
@@ -49,6 +46,10 @@ public class RadioPlugin implements VoicechatPlugin {
                         if (receivingPlayer != null) {
                             if (!receivingPlayer.getInventory().containsAny(itemStack -> itemStack.getItem() instanceof RadioItem)) {
                                 event.cancel();
+                            } else if (SimpleRadio.CONFIG.maxRadioDistance != -1) {
+                                if (!receivingPlayer.getBlockPos().isWithinDistance(player.getBlockPos(), SimpleRadio.CONFIG.maxRadioDistance)) {
+                                    event.cancel();
+                                }
                             }
                         }
                     }
