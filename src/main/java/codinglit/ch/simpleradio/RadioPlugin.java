@@ -13,6 +13,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
+import java.util.Set;
+
 public class RadioPlugin implements VoicechatPlugin {
     @Override
     public String getPluginId() {
@@ -44,7 +46,7 @@ public class RadioPlugin implements VoicechatPlugin {
                     if (receivingConnection instanceof VoicechatConnectionImpl voicechatConnection && receivingConnection.isInGroup()) {
                         PlayerEntity receivingPlayer = (PlayerEntity) voicechatConnection.getPlayer().getPlayer();
                         if (receivingPlayer != null) {
-                            if (!receivingPlayer.getInventory().containsAny(itemStack -> itemStack.getItem() instanceof RadioItem)) {
+                            if (!receivingPlayer.getInventory().containsAny(Set.of(SimpleRadio.RADIO))) {
                                 event.cancel();
                             } else if (SimpleRadio.CONFIG.maxRadioDistance != -1) {
                                 if (!receivingPlayer.getBlockPos().isWithinDistance(player.getBlockPos(), SimpleRadio.CONFIG.maxRadioDistance)) {
@@ -63,23 +65,25 @@ public class RadioPlugin implements VoicechatPlugin {
                     float distance = Utils.getDefaultDistance() * (player.isSneaking() ? Voicechat.SERVER_CONFIG.crouchDistanceMultiplier.get().floatValue() : 1F);
                     SoundPacket<?> soundPacket = new PlayerSoundPacket(player.getUuid(), event.getPacket().getOpusEncodedData(), event.getPacket().getSequenceNumber(), false, distance, null);
 
+                    PlayerState senderState = server.getPlayerStateManager().getState(player.getUuid());
+
                     for (ServerPlayerEntity playerTo : ServerWorldUtils.getPlayersInRange((ServerWorld) player.getWorld(), player.getPos(), server.getBroadcastRange(distance), p -> !p.getUuid().equals(player.getUuid()))) {
-                        PlayerState state = server.getPlayerStateManager().getState(playerTo.getUuid());
-                        if (state == null)
+                        PlayerState stateTo = server.getPlayerStateManager().getState(playerTo.getUuid());
+                        if (stateTo == null)
                             continue;
-                        if (state.isDisabled() || state.isDisconnected())
+                        if (stateTo.isDisabled() || stateTo.isDisconnected())
                             continue;
-                        if (!state.getGroup().getId().equals(connection.getGroup().getId()))
+                        if (!stateTo.getGroup().equals(connection.getGroup().getId()))
                             continue;
                         // yes i literally just had to invert the group check
                         // sad that i can't do that with the api
 
-                        ClientConnection clientConnection = server.getConnection(state.getUuid());
+                        ClientConnection clientConnection = server.getConnection(stateTo.getUuid());
                         if (clientConnection == null)
                             continue;
 
                         try {
-                            server.sendSoundPacket(playerTo, clientConnection, soundPacket);
+                            server.sendSoundPacket((ServerPlayerEntity) player, senderState, playerTo, stateTo, clientConnection, soundPacket, SoundPacketEvent.SOURCE_PROXIMITY);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

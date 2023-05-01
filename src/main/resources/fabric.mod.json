@@ -29,7 +29,9 @@
   "depends": {
     "fabricloader": ">=0.14.13",
     "fabric": "*",
-    "minecraft": "1.19.2",
-    "voicechat": ">1.19.2-2.3.2"
+    "minecraft": "1.18.2",
+    "voicechat": ">=1.18.2-2.4.5",
+    "modmenu": ">=3.2.5",
+    "cloth-config": ">=6.4.90"
   }
 }
