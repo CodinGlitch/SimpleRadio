@@ -34,6 +34,7 @@ public class RadioPlugin implements VoicechatPlugin {
         VoicechatConnection connection = event.getSenderConnection();
         if (connection != null && connection.isInGroup()) {
             PlayerEntity player = (PlayerEntity) connection.getPlayer().getPlayer();
+            Group group = connection.getGroup();
             if (player != null) {
                 // Disable if sender is not using radio
                 if (!(player.getActiveItem().getItem() instanceof RadioItem)) {
@@ -58,7 +59,7 @@ public class RadioPlugin implements VoicechatPlugin {
                 }
 
                 // Broadcast proximity chat if not using radio
-                if (event.isCancelled()) {
+                if (event.isCancelled() && group.getType() == Group.Type.OPEN) {
                     // i cannot send custom sound packet or i'm dumb
                     // wish there was atleast function to generate packet so this is not hard coded
                     Server server = Voicechat.SERVER.getServer();
@@ -73,7 +74,7 @@ public class RadioPlugin implements VoicechatPlugin {
                             continue;
                         if (stateTo.isDisabled() || stateTo.isDisconnected())
                             continue;
-                        if (!stateTo.getGroup().equals(connection.getGroup().getId()))
+                        if (!stateTo.getGroup().equals(group.getId()))
                             continue;
                         // yes i literally just had to invert the group check
                         // sad that i can't do that with the api
