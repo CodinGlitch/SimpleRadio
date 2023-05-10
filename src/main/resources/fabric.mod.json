@@ -31,7 +31,6 @@
     "fabric": "*",
     "minecraft": "1.18.2",
     "voicechat": ">=1.18.2-2.4.7",
-    "modmenu": ">=3.2.5",
     "cloth-config": ">=6.4.90"
   }
 }
