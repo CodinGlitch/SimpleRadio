@@ -8,9 +8,20 @@ group = project.maven_group
 
 repositories {
     maven { url 'https://maven.maxhenkel.de/repository/public' }
-    maven { url "https://cursemaven.com" }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.terraformersmc.com/releases/" }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
@@ -23,7 +34,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    modImplementation "curse.maven:simple-voice-chat-416089:4372221"
+    modImplementation "maven.modrinth:simple-voice-chat:${voicechat_version}"
 
     modApi("me.shedaniel.cloth:cloth-config-fabric:${clothconfig_api_version}") {
         exclude(group: "net.fabricmc.fabric-api")

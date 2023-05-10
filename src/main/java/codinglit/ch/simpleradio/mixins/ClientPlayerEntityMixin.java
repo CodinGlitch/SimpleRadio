@@ -31,9 +31,6 @@ import java.util.UUID;
 @Mixin({ClientPlayerEntity.class})
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
     @Shadow public abstract void playSound(SoundEvent sound, float volume, float pitch);
-
-
-
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey) {
         super(world, profile, publicKey);
     }

@@ -4,7 +4,7 @@ import codinglit.ch.simpleradio.SimpleRadio;
 import codinglit.ch.simpleradio.SimpleRadioNetworking;
 import de.maxhenkel.voicechat.Voicechat;
 import de.maxhenkel.voicechat.voice.server.Group;
-import de.maxhenkel.voicechat.voice.server.GroupManager;
+import de.maxhenkel.voicechat.voice.server.ServerGroupManager;
 import de.maxhenkel.voicechat.voice.server.Server;
 import de.maxhenkel.voicechat.voice.server.ServerWorldUtils;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -34,7 +34,7 @@ public class RadioItem extends Item {
     private void transmit(ServerPlayerEntity player, Identifier packetID) {
         Server server = Voicechat.SERVER.getServer();
         if (server != null) {
-            GroupManager groupManager = server.getGroupManager();
+            ServerGroupManager groupManager = server.getGroupManager();
 
             Collection<ServerPlayerEntity> players = ServerWorldUtils.getPlayersInRange((ServerWorld) player.world, player.getPos(), SimpleRadio.CONFIG.maxRadioDistance, receiver -> {
                 Group groupSender = groupManager.getPlayerGroup(player);
