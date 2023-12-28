@@ -9,8 +9,10 @@ import com.codinglitch.simpleradio.lexiconfig.annotations.LexiconEntry;
 @Lexicon(name = "server-config")
 public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage
-    public LexiconPageData transceiver = new LexiconPageData() {
+    public Transceiver transceiver = new Transceiver();
+
+    public static class Transceiver extends LexiconPageData {
         @LexiconEntry
         public int maxTransceiverDistance = -1;
-    };
+    }
 }

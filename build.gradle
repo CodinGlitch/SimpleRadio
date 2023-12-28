@@ -46,6 +46,20 @@ subprojects {
             name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
             url = 'https://maven.blamejared.com'
         }
+
+        maven { url 'https://maven.maxhenkel.de/repository/public' }
+
+        exclusiveContent {
+            filter {
+                includeGroup "maven.modrinth"
+            }
+            forRepository {
+                maven {
+                    name = "Modrinth"
+                    url = "https://api.modrinth.com/maven"
+                }
+            }
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {

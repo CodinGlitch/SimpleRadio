@@ -1,8 +1,9 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.core.ForgeLoader;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod(Constants.MOD_ID)
+@Mod(CommonSimpleRadio.ID)
 public class SimpleRadio {
     
     public SimpleRadio() {
@@ -12,8 +13,9 @@ public class SimpleRadio {
         // project.
     
         // Use Forge to bootstrap the Common mod.
-        Constants.LOG.info("Hello Forge world!");
+        CommonSimpleRadio.info("Hello Forge world!");
         CommonSimpleRadio.initialize();
-        
+
+        ForgeLoader.load();
     }
 }

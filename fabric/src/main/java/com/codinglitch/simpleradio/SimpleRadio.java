@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.core.FabricLoader;
 import net.fabricmc.api.ModInitializer;
 
 public class SimpleRadio implements ModInitializer {
@@ -12,7 +13,9 @@ public class SimpleRadio implements ModInitializer {
         // project.
 
         // Use Fabric to bootstrap the Common mod.
-        Constants.LOG.info("Hello Fabric world!");
+        CommonSimpleRadio.info("Hello Fabric world!");
         CommonSimpleRadio.initialize();
+
+        FabricLoader.load();
     }
 }

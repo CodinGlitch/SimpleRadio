@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.Constants;
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +15,7 @@ public class MixinTitleScreen {
     private void init(CallbackInfo info) {
 
 
-        Constants.LOG.info("This line is printed by an example mod mixin from NeoForge!");
-        Constants.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
+        CommonSimpleRadio.info("This line is printed by an example mod mixin from NeoForge!");
+        CommonSimpleRadio.info("MC Version: {}", Minecraft.getInstance().getVersionType());
     }
 }
