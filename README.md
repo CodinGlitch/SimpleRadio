@@ -14,6 +14,8 @@ Other functionality like proximity chat (should) remain the same.
 - Switching to frequencies instead of groups to give more control to the players
 - A radio *block* that can listen to frequencies and output the audio from it
 
+<br>
+
 Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more information on the features of the mod.
 
 ## Supported Versions and Mod Loaders
