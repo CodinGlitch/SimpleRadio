@@ -17,6 +17,9 @@
     "entrypoints": {
         "main": [
             "com.codinglitch.simpleradio.SimpleRadio"
+        ],
+        "client": [
+            "com.codinglitch.simpleradio.client.SimpleRadioClient"
         ]
     },
     "mixins": [

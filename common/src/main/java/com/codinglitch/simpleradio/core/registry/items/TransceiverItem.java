@@ -1,35 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
-import codinglit.ch.simpleradio.SimpleRadio;
-import codinglit.ch.simpleradio.SimpleRadioNetworking;
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import de.maxhenkel.voicechat.Voicechat;
-import de.maxhenkel.voicechat.voice.server.Group;
-import de.maxhenkel.voicechat.voice.server.Server;
-import de.maxhenkel.voicechat.voice.server.ServerGroupManager;
-import de.maxhenkel.voicechat.voice.server.ServerWorldUtils;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.dedicated.Settings;
-import net.minecraft.server.level.ServerLevel;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
+import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.World;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -37,29 +14,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
-import java.util.Collection;
-
 public class TransceiverItem extends Item {
-    public TransceiverItem(Settings settings) {
+    public TransceiverItem(Properties settings) {
         super(settings);
     }
 
-    private void transmit(ServerPlayer player, ResourceLocation packetID) {
-        Server server = Voicechat.SERVER.getServer();
-        if (server != null) {
-            ServerGroupManager groupManager = server.getGroupManager();
-
-            Collection<ServerPlayer> players = ServerWorldUtils.getPlayersInRange((ServerLevel) player.level(), player.blockPosition(), CommonSimpleRadio.SERVER_CONFIG.transceiver.maxTransceiverDistance, receiver -> {
-                Group groupSender = groupManager.getPlayerGroup(player);
-                Group groupReceiver = groupManager.getPlayerGroup(receiver);
-                return groupSender != null && groupSender.equals(groupReceiver) && receiver.getUUID() != player.getUUID();
-            });
-
-            PacketByteBuf buffer = PacketByteBufs.create().writeUuid(player.getUUID());
-            for (ServerPlayer receiver : players) {
-                ServerPlayNetworking.send(receiver, packetID, buffer);
-            }
-        }
+    private void transmit(ServerPlayer player, boolean started) {
+        Services.NETWORKING.sendToPlayer(player, new ClientboundRadioPacket(started, player.getUUID()));
     }
 
     @Override
@@ -67,7 +28,7 @@ public class TransceiverItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
         level.playSound(
                 player, player.blockPosition(),
-                CommonSimpleRadio.RADIO_OPEN,
+                SimpleRadioSounds.RADIO_OPEN,
                 SoundSource.PLAYERS,
                 1f,1f
         );
@@ -77,7 +38,7 @@ public class TransceiverItem extends Item {
 
         // Send started using packet
         if (!level.isClientSide) {
-            transmit((ServerPlayer) player, SimpleRadioNetworking.STARTED_USING_RADIO_S2C);
+            transmit((ServerPlayer) player, true);
         }
 
         return InteractionResultHolder.consume(stack);
@@ -98,14 +59,14 @@ public class TransceiverItem extends Item {
         if (user instanceof Player player) {
             level.playSound(
                     player, user.blockPosition(),
-                    CommonSimpleRadio.RADIO_CLOSE,
+                    SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f,1f
             );
 
             // Send stopped using packet
             if (!level.isClientSide) {
-                transmit((ServerPlayer) player, SimpleRadioNetworking.STOPPED_USING_RADIO_S2C);
+                transmit((ServerPlayer) player, false);
             }
 
             player.getCooldowns().addCooldown(this, 20);

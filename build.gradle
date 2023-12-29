@@ -87,7 +87,6 @@ subprojects {
                 "neoforge_version": neoforge_version,
                 "neoforge_loader_version_range": neoforge_loader_version_range,
                 "voicechat_api_version": voicechat_api_version,
-                "voicechat_version": voicechat_version,
                 "night_config_version": night_config_version,
                 "credits": credits
         ]
