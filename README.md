@@ -6,6 +6,15 @@ When holding right click on the radio, you will transmit your voice to other pla
 
 Other functionality like proximity chat (should) remain the same.
 
+## Current Features
+- Craft a radio item that transmits voice over groups
+
+## Planned Features
+- Apply a radio filter over audio transmitted through radio
+- Switching to frequencies instead of groups to give more control to the players
+- A radio *block* that can listen to frequencies and output the audio from it
+
+Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more information on the features of the mod.
 
 ## Supported Versions and Mod Loaders
 ❌ - Unsupported
@@ -17,7 +26,3 @@ Other functionality like proximity chat (should) remain the same.
 | **Quilt**    | ❓ | ❓ | ❓ |
 | **Forge**    | ❌ | ❌ | ✅ |
 | **NeoForge** | ❌ | ❌ | ✅ |
-
-# How to craft
-
-![image](https://user-images.githubusercontent.com/22829873/215884181-fb91cff1-7601-4812-8162-5406d5672833.png)
