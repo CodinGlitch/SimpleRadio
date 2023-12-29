@@ -1,0 +1,6 @@
+{
+  "parent": "simpleradio:item/using_transceiver",
+  "textures": {
+    "layer1": "simpleradio:item/transceiver_glow"
+  }
+}
