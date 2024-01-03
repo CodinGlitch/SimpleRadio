@@ -4,9 +4,11 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacke
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.Frequency;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -37,18 +39,19 @@ public class TransceiverItem extends Item {
         Services.NETWORKING.sendToPlayer(player, new ClientboundRadioPacket(started, player.getUUID()));
     }
 
-    private CompoundTag setFrequency(ItemStack stack, Player player, String frequencyName) {
+    private CompoundTag setFrequency(ItemStack stack, Player player, String frequencyName, Frequency.Modulation modulation) {
         CompoundTag tag = stack.getOrCreateTag();
 
         String oldFrequencyName = tag.getString("frequency");
         if (!oldFrequencyName.equals("")) {
-            Frequency oldFrequency = Frequency.getOrCreateFrequency(oldFrequencyName);
+            Frequency oldFrequency = Frequency.getOrCreateFrequency(oldFrequencyName, modulation);
             oldFrequency.removeListener(player);
         }
 
         tag.putString("frequency", frequencyName);
+        tag.putString("modulation", modulation.shorthand);
 
-        Frequency frequency = Frequency.getOrCreateFrequency(frequencyName);
+        Frequency frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
         frequency.addListener(player);
 
         return tag;
@@ -58,7 +61,7 @@ public class TransceiverItem extends Item {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
 
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && !level.isClientSide) {
             CompoundTag tag = stack.getOrCreateTag();
 
             UUID playerUUID = player.getUUID();
@@ -69,17 +72,18 @@ public class TransceiverItem extends Item {
             }
 
             //setFrequency(stack, player, String.format("%03d", RANDOM.nextInt(0, 999))+"."+String.format("%02d", RANDOM.nextInt(0, 99)));
-            setFrequency(stack, player, "000.00");
+            setFrequency(stack, player, "000.00", Frequency.Modulation.FREQUENCY);
             tag.putUUID("user", playerUUID);
         }
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltip) {
-        components.add(Component.translatable(
-                "tooltip.simpleradio.transceiver_frequency",
-                stack.getOrCreateTag().getString("frequency")
-        ));
+        CompoundTag tag = stack.getOrCreateTag();
+
+        components.add(Component.literal(
+                tag.getString("frequency") + tag.getString("modulation")
+        ).withStyle(ChatFormatting.DARK_GRAY));
 
         super.appendHoverText(stack, level, components, tooltip);
     }

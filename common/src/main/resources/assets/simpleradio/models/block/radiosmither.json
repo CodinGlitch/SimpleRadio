@@ -1,10 +1,11 @@
 {
 	"credit": "Made with Blockbench",
-	"parent": "minecraft:block",
+	"parent": "minecraft:block/block",
+	"render_type": "minecraft:cutout",
 	"textures": {
-		"1": "simpleradio:radiosmither",
-		"2": "simpleradio:radiosmither_tools",
-		"particle": "simpleradio:radiosmither"
+		"1": "simpleradio:block/radiosmither",
+		"2": "simpleradio:block/radiosmither_tools",
+		"particle": "simpleradio:block/radiosmither"
 	},
 	"elements": [
 		{
