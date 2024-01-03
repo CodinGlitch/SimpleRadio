@@ -1,14 +1,17 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import de.maxhenkel.voicechat.api.packets.SoundPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Math;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -61,7 +64,7 @@ public class RadioChannel implements Supplier<short[]> {
         return effect.apply(combinedAudio);
     }
 
-    public void addPacket(UUID sender, Vec3 senderLocation, byte[] opusEncodedData) {
+    public void transmit(UUID sender, Vec3 senderLocation, byte[] data) {
         List<short[]> microphonePackets = packetBuffer.computeIfAbsent(sender, k -> new ArrayList<>());
 
         if (microphonePackets.isEmpty()) {
@@ -71,11 +74,11 @@ public class RadioChannel implements Supplier<short[]> {
         }
 
         OpusDecoder decoder = getDecoder(sender);
-        if (opusEncodedData == null || opusEncodedData.length <= 0) {
+        if (data == null || data.length <= 0) {
             decoder.resetState();
             return;
         }
-        microphonePackets.add(decoder.decode(opusEncodedData));
+        microphonePackets.add(decoder.decode(data));
 
         effect.severity = 5;
 
