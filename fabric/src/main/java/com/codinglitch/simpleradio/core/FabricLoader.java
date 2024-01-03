@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -18,6 +19,10 @@ import java.util.function.Function;
 public class FabricLoader {
     public static void loadItems() {
         SimpleRadioItems.ITEMS.forEach(((location, item) -> Registry.register(BuiltInRegistries.ITEM, location, item)));
+    }
+
+    public static void loadBlocks() {
+        SimpleRadioBlocks.BLOCKS.forEach(((location, block) -> Registry.register(BuiltInRegistries.BLOCK, location, block)));
     }
 
     public static void loadPackets() {
@@ -38,6 +43,7 @@ public class FabricLoader {
 
     public static void load() {
         loadItems();
+        loadBlocks();
         loadPackets();
     }
 }
