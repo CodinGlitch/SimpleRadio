@@ -1,15 +1,16 @@
 {
   "item.simpleradio.transceiver": "Transceiver",
   "block.simpleradio.radio": "Radio",
+  "block.simpleradio.radiosmither": "Radiosmithing Station",
 
   "subtitles.simpleradio.radio_open": "Radio starts broadcasting",
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
 
   "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
 
-  "text.autoconfig.simpleradio.title": "Simple Radio Settings",
+  "lexiconfig.simpleradio.title": "Simple Radio Settings",
 
-  "text.autoconfig.simpleradio.option.maxRadioDistance": "Maximum Radio Distance",
-  "text.autoconfig.simpleradio.option.maxRadioDistance.@Tooltip": "The maximum distance a radio can transmit."
+  "lexiconfig.simpleradio.maxRadioDistance": "Maximum Radio Distance",
+  "lexiconfig.simpleradio.maxRadioDistance_description": "The maximum distance a radio can transmit."
 }
 
