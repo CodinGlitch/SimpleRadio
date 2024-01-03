@@ -5,6 +5,8 @@
   "subtitles.simpleradio.radio_open": "Radio starts broadcasting",
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
 
+  "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
+
   "text.autoconfig.simpleradio.title": "Simple Radio Settings",
 
   "text.autoconfig.simpleradio.option.maxRadioDistance": "Maximum Radio Distance",
