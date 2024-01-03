@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.platform;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.platform.services.NetworkingHelper;
 import com.codinglitch.simpleradio.platform.services.PlatformHelper;
+import com.codinglitch.simpleradio.platform.services.RegistryHelper;
 
 import java.util.ServiceLoader;
 
@@ -16,6 +17,7 @@ public class Services {
     // mod is loaded.
     public static final PlatformHelper PLATFORM = load(PlatformHelper.class);
     public static final NetworkingHelper NETWORKING = load(NetworkingHelper.class);
+    public static final RegistryHelper REGISTRY = load(RegistryHelper.class);
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.

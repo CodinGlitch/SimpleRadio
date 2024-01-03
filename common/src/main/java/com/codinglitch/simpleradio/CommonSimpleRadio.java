@@ -9,6 +9,9 @@ import org.apache.logging.log4j.Logger;
 
 public class CommonSimpleRadio {
     public static final String ID = "simpleradio";
+    public static ResourceLocation id(String id) {
+        return new ResourceLocation(CommonSimpleRadio.ID, id);
+    }
 
     private static Logger LOGGER = LogManager.getLogger(ID);
 

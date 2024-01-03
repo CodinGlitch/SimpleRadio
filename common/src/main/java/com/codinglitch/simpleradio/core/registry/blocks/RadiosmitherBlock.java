@@ -2,13 +2,16 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
-public class RadiosmitherBlock extends Block {
+public class RadiosmitherBlock extends BaseEntityBlock {
 
     public static final VoxelShape SHAPE = Shapes.or(
             Block.box(1, 0, 6, 15, 1, 10),
@@ -27,5 +30,11 @@ public class RadiosmitherBlock extends Block {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
         return SHAPE;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return null;
     }
 }
