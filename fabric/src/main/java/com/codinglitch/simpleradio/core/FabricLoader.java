@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacke
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlockEntity;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -54,5 +55,7 @@ public class FabricLoader {
         loadItems();
         loadBlocks();
         loadPackets();
+
+        SimpleRadioBlockEntities.load();
     }
 }

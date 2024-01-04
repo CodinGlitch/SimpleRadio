@@ -23,4 +23,6 @@ public class SimpleRadioBlockEntities {
     public static BlockEntityType<RadiosmitherBlockEntity> RADIOSMITHER = Services.REGISTRY.registerBlockEntity(
             RadiosmitherBlockEntity::new, id("radiosmither"), SimpleRadioBlocks.RADIOSMITHER
     );
+
+    public static void load() {}
 }

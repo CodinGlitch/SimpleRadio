@@ -35,6 +35,7 @@ public class ForgeLoader {
         event.register(ForgeRegistries.Keys.ITEMS, helper -> SimpleRadioItems.ITEMS.forEach((helper::register)));
         event.register(ForgeRegistries.Keys.BLOCKS, helper -> SimpleRadioBlocks.BLOCKS.forEach((helper::register)));
         event.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, helper -> ForgeRegistryHelper.BLOCK_ENTITIES.forEach(helper::register));
+        event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> ForgeRegistryHelper.MENUS.forEach(helper::register));
     }
 
     public static void loadPackets() {

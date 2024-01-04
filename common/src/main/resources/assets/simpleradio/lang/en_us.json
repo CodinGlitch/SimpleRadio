@@ -3,6 +3,8 @@
   "block.simpleradio.radio": "Radio",
   "block.simpleradio.radiosmither": "Radiosmithing Station",
 
+  "screen.simpleradio.radiosmither": "Radiosmithing Station",
+
   "subtitles.simpleradio.radio_open": "Radio starts broadcasting",
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
 
