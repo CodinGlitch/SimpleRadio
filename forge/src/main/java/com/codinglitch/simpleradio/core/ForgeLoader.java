@@ -2,15 +2,13 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.ForgeRegistryHelper;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,6 +17,7 @@ import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
+import org.apache.commons.lang3.function.TriConsumer;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -39,13 +38,16 @@ public class ForgeLoader {
     }
 
     public static void loadPackets() {
+        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
+                .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle));
+
         CHANNEL.messageBuilder(ClientboundRadioPacket.class).decoder(ClientboundRadioPacket::decode).encoder(ClientboundRadioPacket::encode)
                 .consumerMainThread(clientbound(ClientboundRadioPacket::handle)).add();
     }
 
-    public static <P> BiConsumer<P, CustomPayloadEvent.Context> serverbound(Consumer<P> consumer) {
+    private static <P> BiConsumer<P, CustomPayloadEvent.Context> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
         return (packet, context) -> {
-            consumer.accept(packet);
+            consumer.accept(packet, context.getSender().getServer(), context.getSender());
             context.setPacketHandled(true);
         };
     }

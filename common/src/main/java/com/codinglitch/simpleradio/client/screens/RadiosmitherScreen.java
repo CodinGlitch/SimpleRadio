@@ -168,13 +168,15 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         this.INCREASE_BUTTON = new FrequencyButton(this.leftPos + 143, this.topPos + 45, true, this);
         this.DECREASE_BUTTON = new FrequencyButton(this.leftPos + 143, this.topPos + 54, false, this);
 
-        this.APPLY_BUTTON = new ApplyButton(this.leftPos + 25, this.topPos + 25, this);
+        this.APPLY_BUTTON = new ApplyButton(this.leftPos + 15, this.topPos + 25, this);
 
         this.addRenderableWidget(AM_BUTTON);
         this.addRenderableWidget(FM_BUTTON);
 
         this.addRenderableWidget(INCREASE_BUTTON);
         this.addRenderableWidget(DECREASE_BUTTON);
+
+        this.addRenderableWidget(APPLY_BUTTON);
     }
 
     public static class ApplyButton extends AbstractButton {
@@ -222,7 +224,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
             screen.increment = isIncrease ? 1 : -1;
             screen.holdingFor = 0;
-            screen.incrementFrequency();
+            screen.incrementFrequency(screen.increment);
         }
 
         public void onReleased() {

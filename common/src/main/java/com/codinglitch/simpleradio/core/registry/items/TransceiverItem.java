@@ -69,8 +69,7 @@ public class TransceiverItem extends Item implements Transceiving {
                 if (currentUUID.equals(playerUUID)) return;
             }
 
-            //setFrequency(stack, player, String.format("%03d", RANDOM.nextInt(0, 999))+"."+String.format("%02d", RANDOM.nextInt(0, 99)));
-            setFrequency(stack, player, "000.00", Frequency.Modulation.FREQUENCY);
+            setFrequency(stack, player, String.format("%03d", RANDOM.nextInt(0, 999))+"."+String.format("%02d", RANDOM.nextInt(0, 99)), Frequency.Modulation.FREQUENCY);
             tag.putUUID("user", playerUUID);
         }
     }

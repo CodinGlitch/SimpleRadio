@@ -2,11 +2,14 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.NeoForgeRegistryHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -16,6 +19,7 @@ import net.neoforged.neoforge.network.simple.MessageFunctions;
 import net.neoforged.neoforge.network.simple.SimpleChannel;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import org.apache.commons.lang3.function.TriConsumer;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -45,13 +49,16 @@ public class NeoforgeLoader {
     public static void loadPackets() {
         int incrementer = 1;
 
+        CHANNEL.registerMessage(incrementer++, ServerboundRadioUpdatePacket.class, ServerboundRadioUpdatePacket::encode, ServerboundRadioUpdatePacket::decode,
+                serverbound(ServerboundRadioUpdatePacket::handle));
+
         CHANNEL.registerMessage(incrementer++, ClientboundRadioPacket.class, ClientboundRadioPacket::encode, ClientboundRadioPacket::decode,
                 clientbound(ClientboundRadioPacket::handle));
     }
 
-    public static <P> MessageFunctions.MessageConsumer<P> serverbound(Consumer<P> consumer) {
+    public static <P> MessageFunctions.MessageConsumer<P> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
         return (packet, context) -> {
-            consumer.accept(packet);
+            consumer.accept(packet, context.getSender().getServer(), context.getSender());
             context.setPacketHandled(true);
         };
     }
