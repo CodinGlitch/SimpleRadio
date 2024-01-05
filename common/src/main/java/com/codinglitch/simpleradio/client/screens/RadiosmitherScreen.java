@@ -1,17 +1,112 @@
 package com.codinglitch.simpleradio.client.screens;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.central.Transceiving;
+import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
+import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.platform.ClientServices;
+import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+
+import java.awt.*;
 
 public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("minecraft", "textures/gui/container/dispenser.png");
+
+    // -- Resources -- \\
+    public static final ResourceLocation FM_NORMAL_SPRITE = CommonSimpleRadio.id("container/radiosmither/fm/normal");
+    public static final ResourceLocation FM_SELECTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/fm/selected");
+    public static final ResourceLocation FM_HIGHLIGHTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/fm/highlighted");
+    public static final ResourceLocation AM_NORMAL_SPRITE = CommonSimpleRadio.id("container/radiosmither/am/normal");
+    public static final ResourceLocation AM_SELECTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/am/selected");
+    public static final ResourceLocation AM_HIGHLIGHTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/am/highlighted");
+
+    public static final ResourceLocation INCREASE_NORMAL_SPRITE = CommonSimpleRadio.id("container/radiosmither/increase/normal");
+    public static final ResourceLocation INCREASE_HELD_SPRITE = CommonSimpleRadio.id("container/radiosmither/increase/held");
+    public static final ResourceLocation INCREASE_HIGHLIGHTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/increase/highlighted");
+    public static final ResourceLocation DECREASE_NORMAL_SPRITE = CommonSimpleRadio.id("container/radiosmither/decrease/normal");
+    public static final ResourceLocation DECREASE_HELD_SPRITE = CommonSimpleRadio.id("container/radiosmither/decrease/held");
+    public static final ResourceLocation DECREASE_HIGHLIGHTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/decrease/highlighted");
+
+    public static final ResourceLocation APPLY_NORMAL_SPRITE = CommonSimpleRadio.id("container/radiosmither/wrench/normal");
+    public static final ResourceLocation APPLY_HIGHLIGHTED_SPRITE = CommonSimpleRadio.id("container/radiosmither/wrench/highlighted");
+
+    private static final ResourceLocation TEXTURE = CommonSimpleRadio.id("textures/gui/container/radiosmither.png");
+
+    private static final Component AM = Component.translatable("screen.simpleradio.radiosmither.am");
+    private static final Component FM = Component.translatable("screen.simpleradio.radiosmither.fm");
+    private static final Component AM_DESCRIPTION = Component.translatable("screen.simpleradio.radiosmither.am_description");
+    private static final Component FM_DESCRIPTION = Component.translatable("screen.simpleradio.radiosmither.fm_description");
+
+    // -- Constants -- \\
+    private static final int INCREMENT_THRESHOLD = 10;
+
+    // -- Fields -- \\
+
+    public ModulationButton FM_BUTTON;
+    public ModulationButton AM_BUTTON;
+
+    public FrequencyButton INCREASE_BUTTON;
+    public FrequencyButton DECREASE_BUTTON;
+
+    public ApplyButton APPLY_BUTTON;
+
+    public String frequency = "";
+    public Frequency.Modulation modulation;
+
+    protected int holdingFor = 0;
+    protected int increment = 0;
 
     public RadiosmitherScreen(RadiosmitherMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
+    }
+
+    private void reloadFrequency() {
+        if (!frequency.isEmpty()) return;
+
+        ItemStack tinkering = menu.getTinkering();
+        if (tinkering != null && tinkering.getItem() instanceof Transceiving) {
+            CompoundTag tag = tinkering.getOrCreateTag();
+            frequency = tag.getString("frequency");
+            modulation = Frequency.modulationOf(tag.getString("modulation"));
+
+            if (modulation != null) {
+                if (modulation == Frequency.Modulation.FREQUENCY) {
+                    FM_BUTTON.selected(true);
+                } else if (modulation == Frequency.Modulation.AMPLITUDE) {
+                    AM_BUTTON.selected(true);
+                }
+            }
+        }
+    }
+
+    protected void incrementFrequency() { incrementFrequency(1); }
+    protected void incrementFrequency(int increment) {
+        if (!frequency.isEmpty()) {
+            frequency = Frequency.incrementFrequency(frequency, increment);
+        }
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+
+        reloadFrequency();
+
+        if (increment != 0) holdingFor++;
+
+        if (holdingFor > INCREMENT_THRESHOLD)
+            incrementFrequency(increment * (1 + Math.round(holdingFor / 5f)));
     }
 
     @Override
@@ -23,8 +118,177 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        renderTransparentBackground(graphics);
         super.render(graphics, mouseX, mouseY, delta);
         renderTooltip(graphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        super.renderLabels(graphics, mouseX, mouseY);
+
+        ItemStack tinkering = this.menu.getTinkering();
+        if (tinkering != null && tinkering.getItem() instanceof Transceiving) {
+            if (!frequency.isEmpty() && modulation != null) {
+                graphics.drawString(this.font,
+                        Component.literal(frequency)
+                                .append(modulation == Frequency.Modulation.FREQUENCY ? FM : AM), 94, 50, Color.DARK_GRAY.getRGB(), false
+                );
+            }
+        }
+    }
+
+    @Override
+    public boolean mouseReleased(double $$0, double $$1, int $$2) {
+        if (INCREASE_BUTTON.isHoveredOrFocused())
+            INCREASE_BUTTON.onReleased();
+        else if (DECREASE_BUTTON.isHoveredOrFocused())
+            DECREASE_BUTTON.onReleased();
+
+        return super.mouseReleased($$0, $$1, $$2);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+
+        this.AM_BUTTON = new ModulationButton(this.leftPos + 89, this.topPos + 23, false, () -> {
+            AM_BUTTON.selected(true);
+            FM_BUTTON.selected(false);
+
+            modulation = Frequency.Modulation.AMPLITUDE;
+        });
+
+        this.FM_BUTTON = new ModulationButton(this.leftPos + 126, this.topPos + 23, true, () -> {
+            FM_BUTTON.selected(true);
+            AM_BUTTON.selected(false);
+
+            modulation = Frequency.Modulation.FREQUENCY;
+        });
+
+        this.INCREASE_BUTTON = new FrequencyButton(this.leftPos + 143, this.topPos + 45, true, this);
+        this.DECREASE_BUTTON = new FrequencyButton(this.leftPos + 143, this.topPos + 54, false, this);
+
+        this.APPLY_BUTTON = new ApplyButton(this.leftPos + 25, this.topPos + 25, this);
+
+        this.addRenderableWidget(AM_BUTTON);
+        this.addRenderableWidget(FM_BUTTON);
+
+        this.addRenderableWidget(INCREASE_BUTTON);
+        this.addRenderableWidget(DECREASE_BUTTON);
+    }
+
+    public static class ApplyButton extends AbstractButton {
+        private RadiosmitherScreen screen;
+
+        public ApplyButton(int x, int y, RadiosmitherScreen screen) {
+            super(x, y, 34, 34, CommonComponents.EMPTY);
+
+            this.screen = screen;
+        }
+
+        @Override
+        public void onPress() {
+            ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(screen.frequency, screen.modulation));
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            ResourceLocation texture = this.isHoveredOrFocused() ? APPLY_HIGHLIGHTED_SPRITE : APPLY_NORMAL_SPRITE;
+            graphics.blitSprite(texture, this.getX(), this.getY(), this.width, this.height);
+        }
+
+        @Override
+        public void updateWidgetNarration(NarrationElementOutput output) {
+            this.defaultButtonNarrationText(output);
+        }
+    }
+
+    public static class FrequencyButton extends AbstractButton {
+        public boolean selected;
+        private boolean isIncrease;
+        private RadiosmitherScreen screen;
+
+        public FrequencyButton(int x, int y, boolean isIncrease, RadiosmitherScreen screen) {
+            super(x, y, 18, 9, CommonComponents.EMPTY);
+
+            this.screen = screen;
+
+            this.isIncrease = isIncrease;
+        }
+
+        @Override
+        public void onPress() {
+            this.selected = true;
+
+            screen.increment = isIncrease ? 1 : -1;
+            screen.holdingFor = 0;
+            screen.incrementFrequency();
+        }
+
+        public void onReleased() {
+            this.selected = false;
+
+            screen.increment = 0;
+            screen.holdingFor = 0;
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            ResourceLocation texture = isIncrease ? INCREASE_NORMAL_SPRITE : DECREASE_NORMAL_SPRITE;
+            if (this.selected) {
+                texture = isIncrease ? INCREASE_HELD_SPRITE : DECREASE_HELD_SPRITE;
+            } else if (this.isHoveredOrFocused()) {
+                texture = isIncrease ? INCREASE_HIGHLIGHTED_SPRITE : DECREASE_HIGHLIGHTED_SPRITE;
+            }
+
+            graphics.blitSprite(texture, this.getX(), this.getY(), this.width, this.height);
+        }
+
+        @Override
+        public void updateWidgetNarration(NarrationElementOutput output) {
+            this.defaultButtonNarrationText(output);
+        }
+    }
+
+    public static class ModulationButton extends AbstractButton {
+        private boolean selected;
+        private boolean isFM;
+
+        private final Runnable onPress;
+
+        public ModulationButton(int x, int y, boolean isFM, Runnable onPress) {
+            super(x, y, 35, 18, CommonComponents.EMPTY);
+
+            this.isFM = isFM;
+            this.onPress = onPress;
+
+            this.setTooltip(Tooltip.create(isFM ? FM_DESCRIPTION : AM_DESCRIPTION, null));
+        }
+
+        @Override
+        public void onPress() {
+            this.onPress.run();
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            ResourceLocation texture = isFM ? FM_NORMAL_SPRITE : AM_NORMAL_SPRITE;
+            if (this.selected) {
+                texture = isFM ? FM_SELECTED_SPRITE : AM_SELECTED_SPRITE;
+            } else if (this.isHoveredOrFocused()) {
+                texture = isFM ? FM_HIGHLIGHTED_SPRITE : AM_HIGHLIGHTED_SPRITE;
+            }
+
+            graphics.blitSprite(texture, this.getX(), this.getY(), this.width, this.height);
+        }
+
+        public void selected(boolean selected) {
+            this.selected = selected;
+        }
+
+        @Override
+        public void updateWidgetNarration(NarrationElementOutput output) {
+            this.defaultButtonNarrationText(output);
+        }
     }
 }
