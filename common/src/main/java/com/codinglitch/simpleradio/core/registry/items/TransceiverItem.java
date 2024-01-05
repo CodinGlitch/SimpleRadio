@@ -1,15 +1,13 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
+import com.codinglitch.simpleradio.core.central.Transceiving;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.Frequency;
+import com.codinglitch.simpleradio.core.central.Frequency;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -28,7 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public class TransceiverItem extends Item {
+public class TransceiverItem extends Item implements Transceiving {
     public static Random RANDOM = new Random();
 
     public TransceiverItem(Properties settings) {

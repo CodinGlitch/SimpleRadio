@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;

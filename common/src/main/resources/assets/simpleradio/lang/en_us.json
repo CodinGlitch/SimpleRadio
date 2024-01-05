@@ -4,6 +4,10 @@
   "block.simpleradio.radiosmither": "Radiosmithing Station",
 
   "screen.simpleradio.radiosmither": "Radiosmithing Station",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "More range, worse sound quality",
+  "screen.simpleradio.radiosmither.fm_description": "Better sound quality, less range",
 
   "subtitles.simpleradio.radio_open": "Radio starts broadcasting",
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",

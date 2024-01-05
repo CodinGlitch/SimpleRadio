@@ -5,7 +5,9 @@ import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +37,7 @@ public class RadiosmitherBlockEntity extends BlockEntity implements MenuProvider
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new RadiosmitherMenu(i, inventory);
+        return new RadiosmitherMenu(i, inventory, this);
     }
 
     public ItemStack tinkering() {
@@ -49,5 +51,17 @@ public class RadiosmitherBlockEntity extends BlockEntity implements MenuProvider
     @Override
     public NonNullList<ItemStack> getItems() {
         return items;
+    }
+
+    @Override
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        ContainerHelper.loadAllItems(tag, items);
+    }
+
+    @Override
+    public void saveAdditional(CompoundTag tag) {
+        ContainerHelper.saveAllItems(tag, items);
+        super.saveAdditional(tag);
     }
 }
