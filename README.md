@@ -6,13 +6,19 @@ When holding right click on the radio, you will transmit your voice to other pla
 
 Other functionality like proximity chat (should) remain the same.
 
-## Current Features
-- Craft a radio item that transmits voice over groups
-
-## Planned Features
-- Apply a radio filter over audio transmitted through radio
-- Switching to frequencies instead of groups to give more control to the players
-- A radio *block* that can listen to frequencies and output the audio from it
+## Features
+❌ - Unimplemented
+✅ - Implemented
+❓ - In Progress
+|    Status     |    Feature    |
+| ------------- | ------------- |
+| ✅ | Radio item that transmit voice packets |
+| ❓ | Radio block that can listen to frequencies and output audio from it |
+| ✅ | Packet transmission over frequencies instead of groups |
+| ❓ | Radiosmithing Station where the player can customize a radio |
+| ❓ | FM and AM transmission with benefits to each one |
+| ❓ | Dynamic audio filters for audio over radio, wherein audio gets less intelligible as it nears the range |
+| ❌ | Radio upgrades that can increase range, improve audio quality, etc. |
 
 <br>
 
