@@ -1,7 +1,8 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.networking.Packeter;
+import com.codinglitch.simpleradio.client.CommonSimpleRadioClient;
+import com.codinglitch.simpleradio.core.central.Packeter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +30,7 @@ public record ClientboundRadioPacket(boolean started, UUID player) implements Pa
         UUID player = packet.player();
 
         Minecraft.getInstance().execute(() -> {
-            CommonSimpleRadio.info("received! started is {}! player uuid is {}!", started, player);
+            CommonSimpleRadioClient.isTransmitting.put(player, started);
         });
     }
 }

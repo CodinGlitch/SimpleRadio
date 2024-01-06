@@ -27,8 +27,6 @@ import java.util.Random;
 import java.util.UUID;
 
 public class TransceiverItem extends Item implements Transceiving {
-    public static Random RANDOM = new Random();
-
     public TransceiverItem(Properties settings) {
         super(settings);
     }
@@ -37,51 +35,34 @@ public class TransceiverItem extends Item implements Transceiving {
         Services.NETWORKING.sendToPlayer(player, new ClientboundRadioPacket(started, player.getUUID()));
     }
 
-    private CompoundTag setFrequency(ItemStack stack, Player player, String frequencyName, Frequency.Modulation modulation) {
-        CompoundTag tag = stack.getOrCreateTag();
-
-        String oldFrequencyName = tag.getString("frequency");
-        if (!oldFrequencyName.equals("")) {
-            Frequency oldFrequency = Frequency.getOrCreateFrequency(oldFrequencyName, modulation);
-            oldFrequency.removeListener(player);
-        }
-
-        tag.putString("frequency", frequencyName);
-        tag.putString("modulation", modulation.shorthand);
-
-        Frequency frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
-        frequency.addListener(player);
-
-        return tag;
-    }
-
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
+        tick(stack, level, entity);
 
         if (entity instanceof Player player && !level.isClientSide) {
             CompoundTag tag = stack.getOrCreateTag();
 
+            String frequency = tag.getString("frequency");
+            String modulation = tag.getString("modulation");
+
             UUID playerUUID = player.getUUID();
             if (tag.contains("user")) {
                 UUID currentUUID = tag.getUUID("user");
-
                 if (currentUUID.equals(playerUUID)) return;
+
+                stopListening(frequency, Frequency.modulationOf(modulation), currentUUID);
             }
 
-            setFrequency(stack, player, String.format("%03d", RANDOM.nextInt(0, 999))+"."+String.format("%02d", RANDOM.nextInt(0, 99)), Frequency.Modulation.FREQUENCY);
+            listen(frequency, Frequency.modulationOf(modulation), playerUUID);
             tag.putUUID("user", playerUUID);
         }
+
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltip) {
-        CompoundTag tag = stack.getOrCreateTag();
-
-        components.add(Component.literal(
-                tag.getString("frequency") + tag.getString("modulation")
-        ).withStyle(ChatFormatting.DARK_GRAY));
-
+        appendTooltip(stack, components);
         super.appendHoverText(stack, level, components, tooltip);
     }
 

@@ -1,13 +1,16 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.core.central.StaticPosition;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.packets.SoundPacket;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -18,13 +21,17 @@ import java.util.function.Supplier;
 
 public class RadioChannel implements Supplier<short[]> {
     public UUID owner;
+    public StaticPosition location;
     public AudioPlayer audioPlayer;
     private final Map<UUID, List<short[]>> packetBuffer;
     private final Map<UUID, OpusDecoder> decoders;
     private final AudioEffect effect;
 
     public RadioChannel(Player owner) {
-        this.owner = owner.getUUID();
+        this(owner.getUUID());
+    }
+    public RadioChannel(UUID owner) {
+        this.owner = owner;
 
         packetBuffer = new HashMap<>();
         decoders = new HashMap<>();
@@ -94,7 +101,17 @@ public class RadioChannel implements Supplier<short[]> {
     private AudioPlayer getAudioPlayer() {
         if (audioPlayer == null) {
             VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(owner);
-            EntityAudioChannel channel = CommonRadioPlugin.serverApi.createEntityAudioChannel(this.owner, connection.getPlayer());
+            AudioChannel channel;
+            if (connection == null) {
+                channel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.owner,
+                        CommonRadioPlugin.serverApi.fromServerLevel(location.level),
+                        CommonRadioPlugin.serverApi.createPosition(location.getX(), location.getY(), location.getZ())
+                );
+            } else {
+                channel = CommonRadioPlugin.serverApi.createEntityAudioChannel(this.owner, connection.getPlayer());
+            }
+
+
             audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(channel, CommonRadioPlugin.serverApi.createEncoder(), this);
         }
         return audioPlayer;

@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.core.networking;
+package com.codinglitch.simpleradio.core.central;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;

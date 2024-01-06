@@ -42,12 +42,8 @@ public class RadiosmitherMenu extends AbstractContainerMenu {
 
     public void updateTinkering(String frequency, Frequency.Modulation modulation) {
         ItemStack tinkering = this.getTinkering();
-        if (!tinkering.isEmpty() && tinkering.getItem() instanceof Transceiving) {
-            CompoundTag tag = tinkering.getOrCreateTag();
-
-            tag.putString("frequency", frequency);
-            tag.putString("modulation", modulation.shorthand);
-        }
+        if (!tinkering.isEmpty() && tinkering.getItem() instanceof Transceiving transceiving)
+            transceiving.setFrequency(tinkering, frequency, modulation);
     }
 
     @Override

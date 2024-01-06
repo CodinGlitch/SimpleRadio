@@ -2,23 +2,13 @@ package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Transceiving;
-import com.codinglitch.simpleradio.core.networking.Packeter;
-import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlockEntity;
+import com.codinglitch.simpleradio.core.central.Packeter;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.BeaconMenu;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-
-import java.util.UUID;
 
 public record ServerboundRadioUpdatePacket(String frequency, Frequency.Modulation modulation) implements Packeter {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "radio_update_packet");

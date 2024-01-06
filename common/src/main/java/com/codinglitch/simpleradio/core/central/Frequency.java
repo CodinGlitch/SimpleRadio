@@ -22,11 +22,11 @@ public class Frequency {
     private static final List<Frequency> frequencies = new ArrayList<>();
 
     //TODO: move this to a config
-    private static final int FREQUENCY_WHOLE_PLACES = 3;
-    private static final int FREQUENCY_DECIMAL_PLACES = 2;
-    private static final int FREQUENCY_DIGITS = FREQUENCY_WHOLE_PLACES+FREQUENCY_DECIMAL_PLACES;
-    private static final int MAX_FREQUENCY = (int) java.lang.Math.pow(10, FREQUENCY_DIGITS);
-    private static final String FREQUENCY_PATTERN = "^\\d{"+FREQUENCY_WHOLE_PLACES+"}.\\d{"+FREQUENCY_DECIMAL_PLACES+"}$";
+    public static final int FREQUENCY_WHOLE_PLACES = 3;
+    public static final int FREQUENCY_DECIMAL_PLACES = 2;
+    public static final int FREQUENCY_DIGITS = FREQUENCY_WHOLE_PLACES+FREQUENCY_DECIMAL_PLACES;
+    public static final int MAX_FREQUENCY = (int) java.lang.Math.pow(10, FREQUENCY_DIGITS);
+    public static final String FREQUENCY_PATTERN = "^\\d{"+FREQUENCY_WHOLE_PLACES+"}.\\d{"+FREQUENCY_DECIMAL_PLACES+"}$";
 
     public final Modulation modulation;
     public final String frequency;
@@ -70,8 +70,24 @@ public class Frequency {
         return -1;
     }
 
-    public void addListener(Player player) {
-        RadioChannel channel = new RadioChannel(player);
+    public RadioChannel getChannel(Player player) {
+        return getChannel(player.getUUID());
+    }
+    public RadioChannel getChannel(UUID player) {
+        for (RadioChannel listener : listeners)
+            if (listener.owner.equals(player)) return listener;
+
+        return null;
+    }
+
+    public void tryAddListener(UUID owner) {
+        if (getChannel(owner) == null) {
+            RadioChannel channel = new RadioChannel(owner);
+            listeners.add(channel);
+        }
+    }
+    public void addListener(UUID owner) {
+        RadioChannel channel = new RadioChannel(owner);
         listeners.add(channel);
     }
 

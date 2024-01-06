@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.registry.items.RadioItem;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -18,6 +19,7 @@ public class SimpleRadioItems {
 
     public static Item TRANSCEIVER = register(id("transceiver"), new TransceiverItem(new Item.Properties()));
     public static Item RADIOSMITHER = register(id("radiosmither"), new BlockItem(SimpleRadioBlocks.RADIOSMITHER, new Item.Properties()));
+    public static Item RADIO = register(id("radio"), new RadioItem(new Item.Properties()));
 
     private static Item register(ResourceLocation location, Item item) {
         ITEMS.put(location, item);

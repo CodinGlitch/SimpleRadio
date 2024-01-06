@@ -1,9 +1,11 @@
 package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlockEntity;
 import com.codinglitch.simpleradio.platform.Services;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -22,6 +24,10 @@ import static com.codinglitch.simpleradio.CommonSimpleRadio.id;
 public class SimpleRadioBlockEntities {
     public static BlockEntityType<RadiosmitherBlockEntity> RADIOSMITHER = Services.REGISTRY.registerBlockEntity(
             RadiosmitherBlockEntity::new, id("radiosmither"), SimpleRadioBlocks.RADIOSMITHER
+    );
+
+    public static BlockEntityType<RadioBlockEntity> RADIO = Services.REGISTRY.registerBlockEntity(
+            RadioBlockEntity::new, id("radio"), SimpleRadioBlocks.RADIO
     );
 
     public static void load() {}

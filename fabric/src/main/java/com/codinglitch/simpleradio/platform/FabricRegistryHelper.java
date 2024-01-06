@@ -1,15 +1,10 @@
 package com.codinglitch.simpleradio.platform;
 
-import com.codinglitch.simpleradio.core.networking.Packeter;
-import com.codinglitch.simpleradio.platform.services.NetworkingHelper;
 import com.codinglitch.simpleradio.platform.services.RegistryHelper;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
