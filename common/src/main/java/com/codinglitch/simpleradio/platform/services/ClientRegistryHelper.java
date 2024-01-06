@@ -24,6 +24,4 @@ public interface ClientRegistryHelper {
     }
 
     <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerScreen(MenuType<? extends M> menuType, ScreenConstructor<M, U> screenConstructor);
-
-    <BE extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends BE> blockEntity, BlockEntityRendererProvider<BE> rendererConstructor);
 }

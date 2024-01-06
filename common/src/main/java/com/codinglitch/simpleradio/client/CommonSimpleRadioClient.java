@@ -7,17 +7,18 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
+import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.codinglitch.simpleradio.platform.ClientServices;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.logging.log4j.util.BiConsumer;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -48,17 +49,19 @@ public class CommonSimpleRadioClient {
     }
 
     // -- Block Entity Renderers -- \\
-    public static void loadBlockEntityRenderers() {
-        ClientServices.REGISTRY.registerBlockEntityRenderer(SimpleRadioBlockEntities.RADIO, RadioRenderer::new);
+    public interface BlockEntityRendererRegistry {
+        <BE extends BlockEntity> void register(BlockEntityType<BE> type, BlockEntityRendererProvider<? super BE> factory);
+    }
+    public static void loadBlockEntityRenderers(BlockEntityRendererRegistry registry) {
+        registry.register(SimpleRadioBlockEntities.RADIO, RadioRenderer::new);
     }
 
     // -- Screens -- \\
-    public static <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void loadScreens() {
+    public static void loadScreens() {
         ClientServices.REGISTRY.registerScreen(SimpleRadioMenus.RADIOSMITHER_MENU, RadiosmitherScreen::new);
     }
 
     public static void initialize() {
-        loadScreens();
-        loadBlockEntityRenderers();
+
     }
 }

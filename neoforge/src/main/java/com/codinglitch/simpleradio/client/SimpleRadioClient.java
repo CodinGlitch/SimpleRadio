@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.platform.NeoForgeClientRegistryHelper;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -15,8 +16,15 @@ public class SimpleRadioClient {
     }
 
     @SubscribeEvent
+    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        CommonSimpleRadioClient.loadBlockEntityRenderers(event::registerBlockEntityRenderer);
+    }
+
+    @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         CommonSimpleRadioClient.initialize();
         CommonSimpleRadioClient.loadProperties(ItemProperties::register);
+
+        event.enqueueWork(CommonSimpleRadioClient::loadScreens);
     }
 }

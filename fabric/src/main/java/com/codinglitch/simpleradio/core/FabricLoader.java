@@ -47,7 +47,5 @@ public class FabricLoader {
         loadItems();
         loadBlocks();
         loadPackets();
-
-        SimpleRadioBlockEntities.load();
     }
 }

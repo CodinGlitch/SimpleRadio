@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.platform.ForgeClientRegistryHelper;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -20,8 +21,15 @@ public class SimpleRadioClient {
     }
 
     @SubscribeEvent
+    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        CommonSimpleRadioClient.loadBlockEntityRenderers(event::registerBlockEntityRenderer);
+    }
+
+    @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         CommonSimpleRadioClient.initialize();
         CommonSimpleRadioClient.loadProperties(ItemProperties::register);
+
+        event.enqueueWork(CommonSimpleRadioClient::loadScreens);
     }
 }

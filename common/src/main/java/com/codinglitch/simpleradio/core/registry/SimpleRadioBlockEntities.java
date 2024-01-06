@@ -18,15 +18,18 @@ import org.apache.logging.log4j.util.BiConsumer;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static com.codinglitch.simpleradio.CommonSimpleRadio.id;
 
 public class SimpleRadioBlockEntities {
-    public static BlockEntityType<RadiosmitherBlockEntity> RADIOSMITHER = Services.REGISTRY.registerBlockEntity(
+    public static Map<ResourceLocation, BlockEntityType<?>> BLOCK_ENTITIES = new HashMap<>();
+
+    public static final BlockEntityType<RadiosmitherBlockEntity> RADIOSMITHER = Services.REGISTRY.registerBlockEntity(
             RadiosmitherBlockEntity::new, id("radiosmither"), SimpleRadioBlocks.RADIOSMITHER
     );
 
-    public static BlockEntityType<RadioBlockEntity> RADIO = Services.REGISTRY.registerBlockEntity(
+    public static final BlockEntityType<RadioBlockEntity> RADIO = Services.REGISTRY.registerBlockEntity(
             RadioBlockEntity::new, id("radio"), SimpleRadioBlocks.RADIO
     );
 

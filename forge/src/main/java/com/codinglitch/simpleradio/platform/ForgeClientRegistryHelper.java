@@ -11,14 +11,14 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ForgeClientRegistryHelper implements ClientRegistryHelper {
+    public static final Map<BlockEntityType<? extends BlockEntity>, BlockEntityRendererProvider<BlockEntity>> BLOCK_ENTITY_RENDERERS = new HashMap<>();
+
     @Override
     public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerScreen(MenuType<? extends M> menuType, ScreenConstructor<M, U> screenConstructor) {
         MenuScreens.register(menuType, screenConstructor::create);
-    }
-
-    @Override
-    public <BE extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends BE> blockEntity, BlockEntityRendererProvider<BE> rendererConstructor) {
-        BlockEntityRenderers.register(blockEntity, rendererConstructor);
     }
 }

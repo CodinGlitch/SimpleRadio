@@ -3,9 +3,11 @@ package com.codinglitch.simpleradio.core;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.ForgeRegistryHelper;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,7 +35,7 @@ public class ForgeLoader {
     public static void register(RegisterEvent event) {
         event.register(ForgeRegistries.Keys.ITEMS, helper -> SimpleRadioItems.ITEMS.forEach((helper::register)));
         event.register(ForgeRegistries.Keys.BLOCKS, helper -> SimpleRadioBlocks.BLOCKS.forEach((helper::register)));
-        event.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, helper -> ForgeRegistryHelper.BLOCK_ENTITIES.forEach(helper::register));
+        event.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, helper -> SimpleRadioBlockEntities.BLOCK_ENTITIES.forEach((helper::register)));
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> ForgeRegistryHelper.MENUS.forEach(helper::register));
     }
 

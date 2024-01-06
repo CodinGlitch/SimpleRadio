@@ -11,14 +11,12 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NeoForgeClientRegistryHelper implements ClientRegistryHelper {
     @Override
     public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerScreen(MenuType<? extends M> menuType, ScreenConstructor<M, U> screenConstructor) {
         MenuScreens.register(menuType, screenConstructor::create);
-    }
-
-    @Override
-    public <BE extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends BE> blockEntity, BlockEntityRendererProvider<BE> rendererConstructor) {
-        BlockEntityRenderers.register(blockEntity, rendererConstructor);
     }
 }
