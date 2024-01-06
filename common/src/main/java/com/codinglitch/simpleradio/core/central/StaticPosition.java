@@ -18,4 +18,8 @@ public class StaticPosition extends BlockPos {
         super(x, y, z);
         this.level = level;
     }
+
+    public static StaticPosition of(BlockPos pos, ServerLevel level) {
+        return new StaticPosition(pos.getX(), pos.getY(), pos.getZ(), level);
+    }
 }

@@ -1,10 +1,16 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -57,6 +63,30 @@ public class RadioBlock extends BaseEntityBlock {
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
         return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), MAX_ROTATIONS));
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState $$0) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return 0;
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, entity, stack);
+
+        level.getBlockEntity(pos, SimpleRadioBlockEntities.RADIO).ifPresent(blockEntity -> blockEntity.loadFromItem(stack));
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
+        ItemStack stack = super.getCloneItemStack(getter, pos, state);
+        getter.getBlockEntity(pos, SimpleRadioBlockEntities.RADIO).ifPresent(blockEntity -> blockEntity.saveToItem(stack));
+        return stack;
     }
 
     @Nullable

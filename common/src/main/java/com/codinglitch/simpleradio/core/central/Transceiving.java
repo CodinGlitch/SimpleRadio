@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.radio.RadioChannel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -25,9 +26,9 @@ public interface Transceiving {
         return tag;
     }
 
-    default void listen(String frequencyName, Frequency.Modulation modulation, UUID owner) {
+    default RadioChannel listen(String frequencyName, Frequency.Modulation modulation, UUID owner) {
         Frequency frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
-        frequency.tryAddListener(owner);
+        return frequency.tryAddListener(owner);
     }
 
     default void stopListening(String frequencyName, Frequency.Modulation modulation, UUID owner) {

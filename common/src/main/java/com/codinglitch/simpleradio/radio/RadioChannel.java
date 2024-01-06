@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.StaticPosition;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
@@ -8,7 +9,9 @@ import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
+import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import de.maxhenkel.voicechat.api.opus.OpusEncoderMode;
 import de.maxhenkel.voicechat.api.packets.SoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,9 +45,9 @@ public class RadioChannel implements Supplier<short[]> {
     public short[] get() {
         short[] audio = generatePacket();
         if (audio == null) {
-            if (audioPlayer != null) {
+            if (audioPlayer != null)
                 audioPlayer.stopPlaying();
-            }
+
             audioPlayer = null;
             return null;
         }
@@ -54,17 +57,13 @@ public class RadioChannel implements Supplier<short[]> {
     public short[] generatePacket() {
         List<short[]> packetsToCombine = new ArrayList<>();
         for (Map.Entry<UUID, List<short[]>> packets : packetBuffer.entrySet()) {
-            if (packets.getValue().isEmpty()) {
-                continue;
-            }
+            if (packets.getValue().isEmpty()) continue;
             short[] audio = packets.getValue().remove(0);
             packetsToCombine.add(audio);
         }
         packetBuffer.values().removeIf(List::isEmpty);
 
-        if (packetsToCombine.isEmpty()) {
-            return null;
-        }
+        if (packetsToCombine.isEmpty()) return null;
 
         short[] combinedAudio = CommonRadioPlugin.combineAudio(packetsToCombine);
 
@@ -87,11 +86,10 @@ public class RadioChannel implements Supplier<short[]> {
         }
         microphonePackets.add(decoder.decode(data));
 
-        effect.severity = 5;
+        this.effect.severity = 5;
 
-        if (audioPlayer == null) {
+        if (this.audioPlayer == null)
             getAudioPlayer().startPlaying();
-        }
     }
 
     private OpusDecoder getDecoder(UUID sender) {
@@ -99,21 +97,25 @@ public class RadioChannel implements Supplier<short[]> {
     }
 
     private AudioPlayer getAudioPlayer() {
-        if (audioPlayer == null) {
+        if (this.audioPlayer == null) {
             VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(owner);
             AudioChannel channel;
             if (connection == null) {
-                channel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.owner,
+                LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.owner,
                         CommonRadioPlugin.serverApi.fromServerLevel(location.level),
-                        CommonRadioPlugin.serverApi.createPosition(location.getX(), location.getY(), location.getZ())
+                        CommonRadioPlugin.serverApi.createPosition(location.getX() + 0.5, location.getY() + 0.5, location.getZ() + 0.5)
                 );
+                locationalChannel.setDistance(32f);
+                locationalChannel.setCategory(CommonRadioPlugin.RADIOS_CATEGORY);
+
+                channel = locationalChannel;
             } else {
                 channel = CommonRadioPlugin.serverApi.createEntityAudioChannel(this.owner, connection.getPlayer());
+                channel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
             }
 
-
-            audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(channel, CommonRadioPlugin.serverApi.createEncoder(), this);
+            this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(channel, CommonRadioPlugin.serverApi.createEncoder(), this);
         }
-        return audioPlayer;
+        return this.audioPlayer;
     }
 }

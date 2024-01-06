@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.radio.RadioChannel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -80,15 +81,17 @@ public class Frequency {
         return null;
     }
 
-    public void tryAddListener(UUID owner) {
-        if (getChannel(owner) == null) {
-            RadioChannel channel = new RadioChannel(owner);
-            listeners.add(channel);
-        }
+    @Nullable
+    public RadioChannel tryAddListener(UUID owner) {
+        if (getChannel(owner) == null)
+            return addListener(owner);
+
+        return null;
     }
-    public void addListener(UUID owner) {
+    public RadioChannel addListener(UUID owner) {
         RadioChannel channel = new RadioChannel(owner);
         listeners.add(channel);
+        return channel;
     }
 
     public void removeListener(Player player) {
@@ -106,5 +109,15 @@ public class Frequency {
         if (index != -1) return frequencies.get(index);
 
         return new Frequency(frequency, modulation);
+    }
+
+    @Nullable
+    public static Frequency fromTag(CompoundTag tag) {
+        if (!tag.contains("frequency") || !tag.contains("modulation")) return null;
+
+        Modulation modulation = modulationOf(tag.getString("modulation"));
+        if (modulation == null) return null;
+
+        return Frequency.getOrCreateFrequency(tag.getString("frequency"), modulation);
     }
 }

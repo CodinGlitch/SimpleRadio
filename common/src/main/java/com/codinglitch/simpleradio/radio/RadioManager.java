@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +32,8 @@ public class RadioManager {
 
         ItemStack transceiver = sender.getUseItem();
         if (!(transceiver.getItem() instanceof TransceiverItem)) return;
-        Frequency frequency = Frequency.getOrCreateFrequency(transceiver.getOrCreateTag().getString("frequency"), Frequency.Modulation.FREQUENCY);
+        CompoundTag tag = transceiver.getOrCreateTag();
+        Frequency frequency = Frequency.getOrCreateFrequency(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
 
         transmit(level, frequency, sender.getUUID(), sender.position(), event.getPacket().getOpusEncodedData());
     }

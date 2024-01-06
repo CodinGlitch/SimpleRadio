@@ -18,6 +18,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CommonRadioPlugin {
+    public static String RADIOS_CATEGORY = "radios";
+    public static String TRANSCEIVERS_CATEGORY = "transceivers";
+
     @Nullable
     public static VoicechatServerApi serverApi;
     @Nullable
@@ -66,22 +69,20 @@ public class CommonRadioPlugin {
 
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(VoicechatServerStartedEvent.class, this::onServerStarted);
-        registration.registerEvent(MicrophonePacketEvent.class, microphonePacketEvent -> {
-            executor.submit(() -> RadioManager.getInstance().onMicPacket(microphonePacketEvent));
-        });
+        registration.registerEvent(MicrophonePacketEvent.class, microphonePacketEvent -> executor.submit(() -> RadioManager.getInstance().onMicPacket(microphonePacketEvent)));
     }
 
     public void onServerStarted(VoicechatServerStartedEvent event) {
         serverApi = event.getVoicechat();
 
         radios = serverApi.volumeCategoryBuilder()
-                .setId(CommonSimpleRadio.ID)
+                .setId(RADIOS_CATEGORY)
                 .setName("Radios")
                 .setDescription("The volume of radios")
                 .setIcon(getIcon("radio_icon.png"))
                 .build();
         transceivers = serverApi.volumeCategoryBuilder()
-                .setId(CommonSimpleRadio.ID)
+                .setId(TRANSCEIVERS_CATEGORY)
                 .setName("Transceivers")
                 .setDescription("The volume of transceivers")
                 .setIcon(getIcon("transceiver_icon.png"))
