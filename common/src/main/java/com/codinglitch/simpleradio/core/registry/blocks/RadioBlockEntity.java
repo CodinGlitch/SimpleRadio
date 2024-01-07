@@ -13,12 +13,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
 public class RadioBlockEntity extends BlockEntity implements Transceiving {
+    public boolean isListening = false;
     public Frequency frequency;
     public UUID listenerID;
 
@@ -63,21 +65,16 @@ public class RadioBlockEntity extends BlockEntity implements Transceiving {
         super.saveToItem(stack);
     }
 
-    public void loadFromItem(ItemStack stack) {
-        loadTag(stack.getOrCreateTag());
+    public static void tick(Level level, BlockPos pos, BlockState blockState, RadioBlockEntity blockEntity) {
+        if (!level.isClientSide) {
+            if (blockEntity.frequency != null && !blockEntity.isListening) {
+                blockEntity.listen();
+            }
+        }
     }
 
-    public void loadTag(CompoundTag tag) {
-        if (this.level == null || this.level.isClientSide) return;
-
-        if (this.frequency != null)
-            stopListening(frequency.frequency, frequency.modulation, listenerID);
-
-        String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-        RadioChannel channel = listen(frequencyName, modulation, listenerID);
-        this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
-
+    public void listen() {
+        RadioChannel channel = listen(frequency.frequency, frequency.modulation, listenerID);
         channel.location = StaticPosition.of(this.worldPosition, (ServerLevel) this.level);
 
         level.playSound(
@@ -86,6 +83,23 @@ public class RadioBlockEntity extends BlockEntity implements Transceiving {
                 SoundSource.PLAYERS,
                 1f,1f
         );
+
+        this.isListening = true;
+    }
+
+    public void loadFromItem(ItemStack stack) {
+        loadTag(stack.getOrCreateTag());
+    }
+
+    public void loadTag(CompoundTag tag) {
+        if (this.frequency != null) {
+            stopListening(frequency.frequency, frequency.modulation, listenerID);
+            this.isListening = false;
+        }
+
+        String frequencyName = tag.getString("frequency");
+        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
+        this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
     }
 
     public void saveTag(CompoundTag tag) {

@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
+import com.codinglitch.simpleradio.lexiconfig.Lexiconfig;
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -41,5 +43,9 @@ public class CommonSimpleRadio {
     public static SimpleRadioServerConfig SERVER_CONFIG;
     public static void initialize() {
         SERVER_CONFIG = new SimpleRadioServerConfig();
+
+        Lexiconfig.registerListener(Lexiconfig.Event.RELOAD, Frequency::onLexiconReload);
+
+        Lexiconfig.reload();
     }
 }

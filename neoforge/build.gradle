@@ -42,7 +42,7 @@ dependencies {
     compileOnly project(":common")
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    runtimeOnly "maven.modrinth:simple-voice-chat:neoforge-${voicechat_version}"
+    runtimeOnly "maven.modrinth:simple-voice-chat:neoforge-${minecraft_version}-${voicechat_version}"
 }
 
 // NeoGradle compiles the game, but we don't want to add our common code to the game's code

@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdat
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
@@ -47,5 +48,8 @@ public class FabricLoader {
         loadItems();
         loadBlocks();
         loadPackets();
+
+        SimpleRadioBlockEntities.load();
+        SimpleRadioMenus.load();
     }
 }

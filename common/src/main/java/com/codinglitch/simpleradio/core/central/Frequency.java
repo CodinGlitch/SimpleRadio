@@ -1,5 +1,7 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.lexiconfig.annotations.Lexicon;
 import com.codinglitch.simpleradio.radio.RadioChannel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -22,12 +24,9 @@ public class Frequency {
 
     private static final List<Frequency> frequencies = new ArrayList<>();
 
-    //TODO: move this to a config
-    public static final int FREQUENCY_WHOLE_PLACES = 3;
-    public static final int FREQUENCY_DECIMAL_PLACES = 2;
-    public static final int FREQUENCY_DIGITS = FREQUENCY_WHOLE_PLACES+FREQUENCY_DECIMAL_PLACES;
-    public static final int MAX_FREQUENCY = (int) java.lang.Math.pow(10, FREQUENCY_DIGITS);
-    public static final String FREQUENCY_PATTERN = "^\\d{"+FREQUENCY_WHOLE_PLACES+"}.\\d{"+FREQUENCY_DECIMAL_PLACES+"}$";
+    public static int FREQUENCY_DIGITS;
+    public static int MAX_FREQUENCY;
+    public static String FREQUENCY_PATTERN;
 
     public final Modulation modulation;
     public final String frequency;
@@ -44,6 +43,12 @@ public class Frequency {
         frequencies.add(this);
     }
 
+    public static void onLexiconReload() {
+        FREQUENCY_DIGITS = CommonSimpleRadio.SERVER_CONFIG.frequency.wholePlaces +CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces;
+        MAX_FREQUENCY = (int) java.lang.Math.pow(10, FREQUENCY_DIGITS);
+        FREQUENCY_PATTERN = "^\\d{"+CommonSimpleRadio.SERVER_CONFIG.frequency.wholePlaces+"}.\\d{"+CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces+"}$";
+    }
+
     @Nullable
     public static Modulation modulationOf(String shorthand) {
         for (Modulation modulation : Modulation.values())
@@ -58,7 +63,7 @@ public class Frequency {
     public static String incrementFrequency(String frequency, int amount) {
         int rawFrequency = Integer.parseInt(frequency.replaceAll("[.]", ""));
         String str = String.format("%0"+FREQUENCY_DIGITS+"d", Math.clamp(rawFrequency + amount, 0, MAX_FREQUENCY-1));
-        return new StringBuilder(str).insert(str.length() - FREQUENCY_DECIMAL_PLACES, ".").toString();
+        return new StringBuilder(str).insert(str.length() - CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces, ".").toString();
     }
 
     public static int getFrequency(String string, Modulation modulation) {

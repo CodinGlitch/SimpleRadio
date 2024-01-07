@@ -49,15 +49,11 @@ subprojects {
 
         maven { url 'https://maven.maxhenkel.de/repository/public' }
 
-        exclusiveContent {
-            filter {
+        maven {
+            name = "Modrinth"
+            url = "https://api.modrinth.com/maven"
+            content {
                 includeGroup "maven.modrinth"
-            }
-            forRepository {
-                maven {
-                    name = "Modrinth"
-                    url = "https://api.modrinth.com/maven"
-                }
             }
         }
     }

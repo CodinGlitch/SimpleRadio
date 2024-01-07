@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdat
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.platform.ForgeRegistryHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -36,7 +37,7 @@ public class ForgeLoader {
         event.register(ForgeRegistries.Keys.ITEMS, helper -> SimpleRadioItems.ITEMS.forEach((helper::register)));
         event.register(ForgeRegistries.Keys.BLOCKS, helper -> SimpleRadioBlocks.BLOCKS.forEach((helper::register)));
         event.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, helper -> SimpleRadioBlockEntities.BLOCK_ENTITIES.forEach((helper::register)));
-        event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> ForgeRegistryHelper.MENUS.forEach(helper::register));
+        event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
     }
 
     public static void loadPackets() {

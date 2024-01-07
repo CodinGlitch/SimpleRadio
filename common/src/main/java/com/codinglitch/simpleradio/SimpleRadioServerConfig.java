@@ -11,8 +11,22 @@ public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage
     public Transceiver transceiver = new Transceiver();
 
+    @LexiconPage
+    public Frequency frequency = new Frequency();
+
     public static class Transceiver extends LexiconPageData {
         @LexiconEntry
-        public int maxTransceiverDistance = -1;
+        public int maxDistance = 256;
+
+        @LexiconEntry
+        public int falloff = 224;
+    }
+
+    public static class Frequency extends LexiconPageData {
+        @LexiconEntry
+        public int wholePlaces = 3;
+
+        @LexiconEntry
+        public int decimalPlaces = 2;
     }
 }

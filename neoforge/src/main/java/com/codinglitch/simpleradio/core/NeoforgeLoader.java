@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdat
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.platform.NeoForgeRegistryHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +41,7 @@ public class NeoforgeLoader {
         event.register(Registries.ITEM, helper -> SimpleRadioItems.ITEMS.forEach((helper::register)));
         event.register(Registries.BLOCK, helper -> SimpleRadioBlocks.BLOCKS.forEach((helper::register)));
         event.register(Registries.BLOCK_ENTITY_TYPE, helper -> SimpleRadioBlockEntities.BLOCK_ENTITIES.forEach(helper::register));
-        event.register(Registries.MENU, helper -> NeoForgeRegistryHelper.MENUS.forEach(helper::register));
+        event.register(Registries.MENU, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
     }
 
     public static void loadItems() {

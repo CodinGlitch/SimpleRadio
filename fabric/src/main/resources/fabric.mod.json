@@ -32,9 +32,9 @@
     "depends": {
         "fabricloader": ">=0.14",
         "fabric-api": "*",
-        "minecraft": "1.20.2",
+        "minecraft": "${minecraft_version}",
         "java": ">=17",
-        "voicechat": ">=${voicechat_version}"
+        "voicechat": ">=${minecraft_version}-${voicechat_version}"
     },
     "suggests": {
         "another-mod": "*"

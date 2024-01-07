@@ -21,7 +21,7 @@ dependencies {
     include "com.electronwill.night-config:toml:${night_config_version}"
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_version}"
+    modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}"
 }
 
 loom {

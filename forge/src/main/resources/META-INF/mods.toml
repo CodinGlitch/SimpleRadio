@@ -24,3 +24,9 @@ mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.${mod_id}]]
+modId="voicechat"
+mandatory=true
+versionRange="[${minecraft_version}-${voicechat_version},)"
+ordering="AFTER"
+side="BOTH"

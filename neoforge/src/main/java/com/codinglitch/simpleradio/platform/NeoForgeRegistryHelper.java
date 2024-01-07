@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.platform.services.RegistryHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlags;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NeoForgeRegistryHelper implements RegistryHelper {
-    public static Map<ResourceLocation, MenuType<?>> MENUS = new HashMap<>();
 
     @Override
     public <BE extends BlockEntity> BlockEntityType<BE> registerBlockEntity(BlockEntityFactory<BE> factory, ResourceLocation resource, Block... blocks) {
@@ -26,7 +26,7 @@ public class NeoForgeRegistryHelper implements RegistryHelper {
     @Override
     public <M extends AbstractContainerMenu> MenuType<M> registerMenu(ResourceLocation resource, MenuSupplier<M> supplier) {
         MenuType<M> menu = new MenuType<>((supplier::create), FeatureFlags.DEFAULT_FLAGS);
-        MENUS.put(resource, menu);
+        SimpleRadioMenus.MENUS.put(resource, menu);
         return menu;
     }
 }
