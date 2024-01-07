@@ -19,6 +19,7 @@ Other functionality like proximity chat (should) remain the same.
 | ❓ | Radiosmithing Station where the player can customize a radio |
 | ❓ | FM and AM transmission with benefits to each one |
 | ❓ | Dynamic audio filters for audio over radio, wherein audio gets less intelligible as it nears the range |
+| ❌ | Rechargable battery for transceivers |
 | ❌ | Radio upgrades that can increase range, improve audio quality, etc. |
 
 <br>
