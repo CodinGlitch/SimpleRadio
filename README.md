@@ -24,6 +24,7 @@ Other functionality like proximity chat (should) remain the same.
 | ❌ | Transmitter block that transmits audio in conjunction with an antenna |
 | ❌ | Speaker block that can receive and play audio in conjunction with an antenna |
 | ❌ | Antennae that can increase transmitting/receiving range of a block |
+| ❌ | Weather interference |
 
 <br>
 
