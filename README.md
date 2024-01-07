@@ -14,13 +14,16 @@ Other functionality like proximity chat (should) remain the same.
 | ------------- | ------------- |
 | ✅ | Radio item that transmits voice packets |
 | ✅ | Radio block that can listen to frequencies and output audio from it |
-| ❓ | Transmitter block that transmits audio of every player nearby |
+| ❌ | Microphone block that transmits audio of every player nearby |
 | ✅ | Packet transmission over frequencies instead of groups |
 | ✅ | Radiosmithing Station where the player can customize a radio |
 | ❓ | FM and AM transmission with benefits to each one |
 | ✅ | Dynamic audio filters for audio over radio, wherein audio gets less intelligible as it nears the range |
 | ❌ | Rechargable battery for transceivers |
 | ❌ | Radio upgrades that can increase range, improve audio quality, etc. |
+| ❌ | Transmitter block that transmits audio in conjunction with an antenna |
+| ❌ | Speaker block that can receive and play audio in conjunction with an antenna |
+| ❌ | Antennae that can increase transmitting/receiving range of a block |
 
 <br>
 
