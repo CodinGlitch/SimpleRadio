@@ -9,6 +9,7 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 |    Status     |    Feature    |
 | ------------- | ------------- |
 | ✅ | Radio item that transmits voice packets |
+| ❌ | Let other players speak into the transceiver by right clicking on them |
 | ✅ | Radio block that can listen to frequencies and output audio from it |
 | ❌ | Microphone block that transmits audio of every player nearby |
 | ✅ | Packet transmission over frequencies instead of groups |
