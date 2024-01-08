@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -28,5 +29,11 @@ public class NeoForgeRegistryHelper implements RegistryHelper {
         MenuType<M> menu = new MenuType<>((supplier::create), FeatureFlags.DEFAULT_FLAGS);
         SimpleRadioMenus.MENUS.put(resource, menu);
         return menu;
+    }
+
+    @Override
+    public CreativeModeTab registerCreativeTab(ResourceLocation resource, CreativeModeTab creativeModeTab) {
+        SimpleRadioMenus.CREATIVE_TABS.put(resource, creativeModeTab);
+        return creativeModeTab;
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -34,26 +35,45 @@ public class TransceiverItem extends Item implements Receiving {
     }
 
     @Override
+    public void verifyTagAfterLoad(CompoundTag tag) {
+        super.verifyTagAfterLoad(tag);
+
+        if (tag.contains("user"))
+            tag.remove("user");
+    }
+
+    @Override
+    public void onDestroyed(ItemEntity itemEntity) {
+        super.onDestroyed(itemEntity);
+        CompoundTag tag = itemEntity.getItem().getOrCreateTag();
+        if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("user"))
+            stopListening(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")), tag.getUUID("user"));
+    }
+
+    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
-        tick(stack, level, entity);
 
-        if (entity instanceof Player player && !level.isClientSide) {
+        if (!level.isClientSide) {
             CompoundTag tag = stack.getOrCreateTag();
 
             String frequency = tag.getString("frequency");
             String modulation = tag.getString("modulation");
+            tick(stack, level, entity);
 
-            UUID playerUUID = player.getUUID();
+            UUID uuid = entity.getUUID();
             if (tag.contains("user")) {
                 UUID currentUUID = tag.getUUID("user");
-                if (currentUUID.equals(playerUUID)) return;
+                if (currentUUID.equals(uuid)) return;
 
-                stopListening(frequency, Frequency.modulationOf(modulation), currentUUID);
+                if (!frequency.isEmpty() && !modulation.isEmpty())
+                    stopListening(frequency, Frequency.modulationOf(modulation), currentUUID);
             }
 
-            listen(frequency, Frequency.modulationOf(modulation), playerUUID);
-            tag.putUUID("user", playerUUID);
+            frequency = tag.getString("frequency");
+            modulation = tag.getString("modulation");
+            listen(frequency, Frequency.modulationOf(modulation), uuid);
+            tag.putUUID("user", uuid);
         }
 
     }

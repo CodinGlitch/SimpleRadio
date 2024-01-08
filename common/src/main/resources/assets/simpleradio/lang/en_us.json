@@ -1,4 +1,6 @@
 {
+  "item_group.simpleradio": "Simple Radio",
+
   "item.simpleradio.transmitting_module": "Transmitting Module",
   "item.simpleradio.receiving_module": "Receiving Module",
   "item.simpleradio.speaker_module": "Speaker Module",

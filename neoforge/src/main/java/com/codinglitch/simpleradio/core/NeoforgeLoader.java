@@ -26,7 +26,7 @@ import org.apache.commons.lang3.function.TriConsumer;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-@Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NeoforgeLoader {
     private static final String PROTOCOL_VERSION = "1.0";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
@@ -42,6 +42,7 @@ public class NeoforgeLoader {
         event.register(Registries.BLOCK, helper -> SimpleRadioBlocks.BLOCKS.forEach((helper::register)));
         event.register(Registries.BLOCK_ENTITY_TYPE, helper -> SimpleRadioBlockEntities.BLOCK_ENTITIES.forEach(helper::register));
         event.register(Registries.MENU, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
+        event.register(Registries.CREATIVE_MODE_TAB, helper -> SimpleRadioMenus.CREATIVE_TABS.forEach(helper::register));
     }
 
     public static void loadItems() {
