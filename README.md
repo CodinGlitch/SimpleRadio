@@ -17,7 +17,7 @@ Other functionality like proximity chat (should) remain the same.
 | ❌ | Microphone block that transmits audio of every player nearby |
 | ✅ | Packet transmission over frequencies instead of groups |
 | ✅ | Radiosmithing Station where the player can customize a radio |
-| ❓ | FM and AM transmission with benefits to each one |
+| ✅ | FM and AM transmission with benefits to each one |
 | ✅ | Dynamic audio filters for audio over radio, wherein audio gets less intelligible as it nears the range |
 | ❌ | Rechargable battery for transceivers |
 | ❌ | Radio upgrades that can increase range, improve audio quality, etc. |
