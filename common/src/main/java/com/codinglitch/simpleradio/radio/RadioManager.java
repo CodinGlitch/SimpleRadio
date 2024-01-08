@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
@@ -8,9 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
-
-import java.util.UUID;
 
 public class RadioManager {
     private static RadioManager INSTANCE;
@@ -31,18 +29,26 @@ public class RadioManager {
         ServerLevel level = sender.serverLevel();
 
         ItemStack transceiver = sender.getUseItem();
-        if (!(transceiver.getItem() instanceof TransceiverItem)) return;
-        CompoundTag tag = transceiver.getOrCreateTag();
-        Frequency frequency = Frequency.getOrCreateFrequency(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+        if (transceiver.getItem() instanceof TransceiverItem) {
+            CompoundTag tag = transceiver.getOrCreateTag();
+            Frequency frequency = Frequency.getOrCreateFrequency(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
 
-        transmit(level, frequency, sender.getUUID(), sender.position(), event.getPacket().getOpusEncodedData());
+            this.transmit(new RadioSource(
+                    RadioSource.Type.TRANSCEIVER,
+                    sender.getUUID(),
+                    WorldlyPosition.of(sender.position().toVector3f(), level),
+                    event.getPacket().getOpusEncodedData()
+            ), frequency);
+        }
+
+
     }
 
-    private void transmit(ServerLevel serverLevel, Frequency frequency, UUID sender, Vec3 senderLocation, byte[] opusEncodedData) {
+    private void transmit(RadioSource source, Frequency frequency) {
         for (RadioChannel channel : frequency.listeners) {
-            if (sender.equals(channel.owner)) continue;
+            if (source.owner.equals(channel.owner)) continue;
 
-            channel.transmit(sender, senderLocation, opusEncodedData);
+            channel.transmit(source, frequency);
         }
     }
 }

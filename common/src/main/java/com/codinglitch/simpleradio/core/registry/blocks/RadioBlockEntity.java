@@ -1,17 +1,15 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.StaticPosition;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.central.Transceiving;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.RadioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -75,7 +73,7 @@ public class RadioBlockEntity extends BlockEntity implements Transceiving {
 
     public void listen() {
         RadioChannel channel = listen(frequency.frequency, frequency.modulation, listenerID);
-        channel.location = StaticPosition.of(this.worldPosition, (ServerLevel) this.level);
+        channel.location = WorldlyPosition.of(this.worldPosition, (ServerLevel) this.level);
 
         level.playSound(
                 null, this.worldPosition,

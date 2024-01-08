@@ -1,30 +1,27 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.StaticPosition;
-import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
+import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
-import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
-import de.maxhenkel.voicechat.api.opus.OpusEncoderMode;
-import de.maxhenkel.voicechat.api.packets.SoundPacket;
-import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
+import org.lwjgl.openal.EXTEfx;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 public class RadioChannel implements Supplier<short[]> {
     public UUID owner;
-    public StaticPosition location;
+    public WorldlyPosition location;
     public AudioPlayer audioPlayer;
     private final Map<UUID, List<short[]>> packetBuffer;
     private final Map<UUID, OpusDecoder> decoders;
@@ -70,23 +67,47 @@ public class RadioChannel implements Supplier<short[]> {
         return effect.apply(combinedAudio);
     }
 
-    public void transmit(UUID sender, Vec3 senderLocation, byte[] data) {
-        List<short[]> microphonePackets = packetBuffer.computeIfAbsent(sender, k -> new ArrayList<>());
+    public void transmit(RadioSource source, Frequency frequency) {
+        // Severity calculation
+        ServerLevel level = null;
+        Vector3f position = null;
+        if (location != null) {
+            level = (ServerLevel) location.level;
+            position = location.position();
+        } else {
+            VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(owner);
+            if (connection != null) {
+                ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
+                if (player != null) {
+                    level = player.serverLevel();
+                    position = player.position().toVector3f();
+                }
+            }
+        }
+        if (level == null || position == null) return;
 
+        if (!CommonSimpleRadio.SERVER_CONFIG.frequency.crossDimensional && level != source.location.level) return;
+
+        this.effect.severity = source.computeSeverity(WorldlyPosition.of(position, level), frequency);
+        if (this.effect.severity >= 100) return;
+
+        // Packet buffer
+        List<short[]> microphonePackets = packetBuffer.computeIfAbsent(source.owner, k -> new ArrayList<>());
         if (microphonePackets.isEmpty()) {
-            for (int i = 0; i < 6; i++) { //TODO: move to config when added
+            for (int i = 0; i < CommonSimpleRadio.SERVER_CONFIG.frequency.packetBuffer; i++) {
                 microphonePackets.add(null);
             }
         }
 
-        OpusDecoder decoder = getDecoder(sender);
+        // Decoding
+        byte[] data = source.data;
+
+        OpusDecoder decoder = getDecoder(source.owner);
         if (data == null || data.length <= 0) {
             decoder.resetState();
             return;
         }
         microphonePackets.add(decoder.decode(data));
-
-        this.effect.severity = 5;
 
         if (this.audioPlayer == null)
             getAudioPlayer().startPlaying();
@@ -103,9 +124,9 @@ public class RadioChannel implements Supplier<short[]> {
             if (connection == null) {
                 LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.owner,
                         CommonRadioPlugin.serverApi.fromServerLevel(location.level),
-                        CommonRadioPlugin.serverApi.createPosition(location.getX() + 0.5, location.getY() + 0.5, location.getZ() + 0.5)
+                        CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
                 );
-                locationalChannel.setDistance(32f);
+                locationalChannel.setDistance(CommonSimpleRadio.SERVER_CONFIG.radio.range);
                 locationalChannel.setCategory(CommonRadioPlugin.RADIOS_CATEGORY);
 
                 channel = locationalChannel;

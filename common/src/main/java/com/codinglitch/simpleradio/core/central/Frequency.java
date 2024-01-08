@@ -62,7 +62,7 @@ public class Frequency {
 
     public static String incrementFrequency(String frequency, int amount) {
         int rawFrequency = Integer.parseInt(frequency.replaceAll("[.]", ""));
-        String str = String.format("%0"+FREQUENCY_DIGITS+"d", Math.clamp(rawFrequency + amount, 0, MAX_FREQUENCY-1));
+        String str = String.format("%0"+FREQUENCY_DIGITS+"d", Math.clamp(0, MAX_FREQUENCY-1, rawFrequency + amount));
         return new StringBuilder(str).insert(str.length() - CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces, ".").toString();
     }
 
