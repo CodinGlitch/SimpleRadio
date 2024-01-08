@@ -17,9 +17,14 @@ import static com.codinglitch.simpleradio.CommonSimpleRadio.id;
 public class SimpleRadioItems {
     public static final HashMap<ResourceLocation, Item> ITEMS = new HashMap<>();
 
-    public static Item TRANSCEIVER = register(id("transceiver"), new TransceiverItem(new Item.Properties()));
+    public static Item TRANSCEIVER = register(id("transceiver"), new TransceiverItem(new Item.Properties().stacksTo(1)));
     public static Item RADIOSMITHER = register(id("radiosmither"), new BlockItem(SimpleRadioBlocks.RADIOSMITHER, new Item.Properties()));
-    public static Item RADIO = register(id("radio"), new RadioItem(new Item.Properties()));
+    public static Item RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(1)));
+
+
+    public static Item TRANSMITTING_MODULE = register(id("transmitting_module"), new Item(new Item.Properties()));
+    public static Item RECEIVING_MODULE = register(id("receiving_module"), new Item(new Item.Properties()));
+    public static Item SPEAKER_MODULE = register(id("speaker_module"), new Item(new Item.Properties()));
 
     private static Item register(ResourceLocation location, Item item) {
         ITEMS.put(location, item);

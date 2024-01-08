@@ -1,4 +1,8 @@
 {
+  "item.simpleradio.transmitting_module": "Transmitting Module",
+  "item.simpleradio.receiving_module": "Receiving Module",
+  "item.simpleradio.speaker_module": "Speaker Module",
+
   "item.simpleradio.transceiver": "Transceiver",
   "block.simpleradio.radio": "Radio",
   "block.simpleradio.radiosmither": "Radiosmithing Station",

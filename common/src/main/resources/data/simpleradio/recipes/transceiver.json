@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "IIT",
-    "XYR",
-    "III"
+    "TII",
+    "XRZ",
+    "IYI"
   ],
   "key": {
     "I": {
@@ -15,6 +15,9 @@
     "T": {
       "item": "minecraft:redstone_torch"
     },
+    "X": {
+      "item": "simpleradio:transmitting_module"
+    },
     "Y": {
       "item": "simpleradio:speaker_module"
     },
@@ -23,7 +26,7 @@
     }
   },
   "result": {
-    "item": "simpleradio:radio",
+    "item": "simpleradio:transceiver",
     "count": 1
   }
 }
