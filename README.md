@@ -15,6 +15,7 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 | ✅ | Radiosmithing Station where the player can customize a radio |
 | ✅ | FM and AM transmission with benefits to each one |
 | ✅ | Dynamic audio filters for audio over radio, wherein audio gets less intelligible as it nears the range |
+| ❓ | Fully customizable config compatible with cloth config, etc. |
 | ❌ | Rechargable battery for transceivers |
 | ❌ | Radio upgrades that can increase range, improve audio quality, etc. |
 | ❌ | Transmitter block that transmits audio in conjunction with an antenna |
