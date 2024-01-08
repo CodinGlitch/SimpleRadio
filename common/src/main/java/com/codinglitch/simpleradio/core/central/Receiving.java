@@ -5,16 +5,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public interface Transceiving {
+public interface Receiving {
     Random RANDOM = new Random();
 
     default CompoundTag setFrequency(ItemStack stack, String frequencyName, Frequency.Modulation modulation) {

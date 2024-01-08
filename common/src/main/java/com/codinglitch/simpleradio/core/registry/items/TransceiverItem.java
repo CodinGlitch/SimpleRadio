@@ -1,11 +1,10 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
-import com.codinglitch.simpleradio.core.central.Transceiving;
+import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.core.central.Frequency;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,10 +22,9 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
-public class TransceiverItem extends Item implements Transceiving {
+public class TransceiverItem extends Item implements Receiving {
     public TransceiverItem(Properties settings) {
         super(settings);
     }

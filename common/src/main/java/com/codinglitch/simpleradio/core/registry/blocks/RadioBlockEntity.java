@@ -1,8 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
-import com.codinglitch.simpleradio.core.central.Transceiving;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.RadioChannel;
@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
-public class RadioBlockEntity extends BlockEntity implements Transceiving {
+public class RadioBlockEntity extends BlockEntity implements Receiving {
     public boolean isListening = false;
     public Frequency frequency;
     public UUID listenerID;
