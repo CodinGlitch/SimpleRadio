@@ -75,6 +75,7 @@ subprojects {
                 "minecraft_version_range": minecraft_version_range,
                 "fabric_version": fabric_version,
                 "fabric_loader_version": fabric_loader_version,
+                "fabric_minecraft_version_range": fabric_minecraft_version_range,
                 "mod_name": mod_name,
                 "mod_author": mod_author,
                 "mod_id": mod_id,
