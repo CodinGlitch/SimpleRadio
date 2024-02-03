@@ -9,6 +9,6 @@ import net.minecraftforge.network.PacketDistributor;
 public class ForgeNetworkingHelper implements NetworkingHelper {
     @Override
     public void sendToPlayer(ServerPlayer player, Packeter packet) {
-        ForgeLoader.CHANNEL.send(packet, PacketDistributor.PLAYER.with(player));
+        ForgeLoader.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 }
