@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.client.central;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -8,8 +8,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class BaseButton extends AbstractButton {
-    private final int iconX;
-    private final int iconY;
+    public final int iconX;
+    public final int iconY;
+    public int hoverIconX = -1;
+    public int hoverIconY = -1;
+    public int selectedIconX = -1;
+    public int selectedIconY = -1;
+
+    public boolean selected;
+
     private final ResourceLocation texture;
     private final Runnable onPress;
 
@@ -49,9 +56,23 @@ public class BaseButton extends AbstractButton {
         return texture;
     }
 
+    public void blit(GuiGraphics graphics, int iconX, int iconY) {
+        graphics.blit(this.getTexture(), this.getX(), this.getY(), iconX, iconY, this.width, this.height);
+    }
+
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        graphics.blit(this.getTexture(), this.getX(), this.getY(), this.iconX, this.iconY, this.width, this.height);
+        int x = this.iconX;
+        int y = this.iconY;
+        if (selected && (selectedIconX != -1 && selectedIconY != -1)) {
+            x = selectedIconX;
+            y = selectedIconY;
+        } else if (this.isHoveredOrFocused() && (hoverIconX != -1 && hoverIconY != -1)) {
+            x = hoverIconX;
+            y = hoverIconY;
+        }
+
+        this.blit(graphics, x, y);
     }
 
     @Override

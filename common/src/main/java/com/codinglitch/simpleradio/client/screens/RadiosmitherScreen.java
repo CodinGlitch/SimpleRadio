@@ -1,16 +1,14 @@
 package com.codinglitch.simpleradio.client.screens;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.BaseButton;
+import com.codinglitch.simpleradio.client.central.BaseButton;
 import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
@@ -93,7 +91,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mousey) {
+    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
         graphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
@@ -154,7 +152,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         this.APPLY_BUTTON = new BaseButton(
                 this.leftPos + 15, this.topPos + 25,
                 34, 34,
-                0, 0,
+                88, 166,
                 TEXTURE, CommonComponents.EMPTY, () -> {
             ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
         });
@@ -169,12 +167,15 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     }
 
     public static class FrequencyButton extends BaseButton {
-        public boolean selected;
         private final boolean isIncrease;
         private final RadiosmitherScreen screen;
 
         public FrequencyButton(int x, int y, boolean isIncrease, RadiosmitherScreen screen) {
-            super(x, y, 18, 9, 0, 0, TEXTURE);
+            super(x, y, 18, 9, 70, isIncrease ? 166 : 175, TEXTURE);
+            this.selectedIconX = this.iconX;
+            this.selectedIconY = isIncrease ? 184 : 193;
+            this.hoverIconX = this.iconX;
+            this.hoverIconY = isIncrease ? 202 : 211;
 
             this.screen = screen;
             this.isIncrease = isIncrease;
@@ -191,6 +192,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
         public void onReleased() {
             this.selected = false;
+            this.setFocused(false);
 
             screen.increment = 0;
             screen.holdingFor = 0;
@@ -198,11 +200,14 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     }
 
     public static class ModulationButton extends BaseButton {
-        private boolean selected;
         private boolean isFM;
 
         public ModulationButton(int x, int y, boolean isFM, Runnable onPress) {
-            super(x, y, 35, 18, 0, 0, TEXTURE, CommonComponents.EMPTY, onPress);
+            super(x, y, 35, 18, isFM ? 0 : 35, 166, TEXTURE, CommonComponents.EMPTY, onPress);
+            this.selectedIconX = this.iconX;
+            this.selectedIconY = 184;
+            this.hoverIconX = this.iconX;
+            this.hoverIconY = 202;
 
             this.isFM = isFM;
 
