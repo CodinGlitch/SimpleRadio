@@ -11,25 +11,27 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.SimpleChannel;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
-    public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(CommonSimpleRadio.ID,"channel"))
-            .optional()
-            .networkProtocolVersion(0)
-            .simpleChannel();
+    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation(CommonSimpleRadio.ID,"channel"),
+            () -> "0",
+            "0"::equals,
+            "0"::equals
+    );
 
     @SubscribeEvent
     public static void register(RegisterEvent event) {
@@ -41,21 +43,25 @@ public class ForgeLoader {
     }
 
     public static void loadPackets() {
-        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
+        int index = 0;
+
+        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index++).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
                 .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle)).add();
 
-        CHANNEL.messageBuilder(ClientboundRadioPacket.class).decoder(ClientboundRadioPacket::decode).encoder(ClientboundRadioPacket::encode)
+        CHANNEL.messageBuilder(ClientboundRadioPacket.class, index++).decoder(ClientboundRadioPacket::decode).encoder(ClientboundRadioPacket::encode)
                 .consumerMainThread(clientbound(ClientboundRadioPacket::handle)).add();
     }
 
-    private static <P> BiConsumer<P, CustomPayloadEvent.Context> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (packet, context) -> {
+    private static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
+        return (packet, supplier) -> {
+            NetworkEvent.Context context = supplier.get();
             consumer.accept(packet, context.getSender().getServer(), context.getSender());
             context.setPacketHandled(true);
         };
     }
-    public static <P> BiConsumer<P, CustomPayloadEvent.Context> clientbound(Consumer<P> consumer) {
-        return (packet, context) -> {
+    public static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> clientbound(Consumer<P> consumer) {
+        return (packet, supplier) -> {
+            NetworkEvent.Context context = supplier.get();
             consumer.accept(packet);
             context.setPacketHandled(true);
         };
