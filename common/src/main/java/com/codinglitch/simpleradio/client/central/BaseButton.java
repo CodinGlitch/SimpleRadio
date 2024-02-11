@@ -52,7 +52,7 @@ public class BaseButton extends AbstractButton {
     }
 
     public void blit(GuiGraphics graphics, int iconX, int iconY) {
-        graphics.blit(this.getTexture(), this.getX(), this.getY(), iconX, iconY, this.width, this.height);
+        graphics.blitSprite(this.getTexture(), this.getX(), this.getY(), this.width, this.height);
     }
 
     @Override

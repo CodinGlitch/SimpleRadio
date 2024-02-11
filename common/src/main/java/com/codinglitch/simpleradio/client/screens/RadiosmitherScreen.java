@@ -171,9 +171,10 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         this.APPLY_BUTTON = new BaseButton(
                 this.leftPos + 15, this.topPos + 25,
                 34, 34,
-                TEXTURE, CommonComponents.EMPTY, () -> {
+                APPLY_NORMAL_SPRITE, CommonComponents.EMPTY, () -> {
             ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
         });
+        this.APPLY_BUTTON.hoverSprite = APPLY_HIGHLIGHTED_SPRITE;
 
         this.addRenderableWidget(AM_BUTTON);
         this.addRenderableWidget(FM_BUTTON);
@@ -189,7 +190,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         private final RadiosmitherScreen screen;
 
         public FrequencyButton(int x, int y, boolean isIncrease, RadiosmitherScreen screen) {
-            super(x, y, 35, 18, isIncrease ? INCREASE_NORMAL_SPRITE : DECREASE_NORMAL_SPRITE, CommonComponents.EMPTY);
+            super(x, y, 18, 9, isIncrease ? INCREASE_NORMAL_SPRITE : DECREASE_NORMAL_SPRITE, CommonComponents.EMPTY);
             this.hoverSprite = isIncrease ? INCREASE_HIGHLIGHTED_SPRITE : DECREASE_HIGHLIGHTED_SPRITE;
             this.selectedSprite = isIncrease ? INCREASE_HELD_SPRITE : DECREASE_HELD_SPRITE;
 
