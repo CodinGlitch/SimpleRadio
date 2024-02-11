@@ -91,11 +91,15 @@ public class Frequency {
         if (getChannel(owner) == null)
             return addListener(owner);
 
+        CommonSimpleRadio.info("Failed to add listener {} to frequency {} as they already exist", owner, this.frequency);
         return null;
     }
     public RadioChannel addListener(UUID owner) {
         RadioChannel channel = new RadioChannel(owner);
         listeners.add(channel);
+
+        CommonSimpleRadio.info("Added listener {} to frequency {}", owner, this.frequency);
+
         return channel;
     }
 
