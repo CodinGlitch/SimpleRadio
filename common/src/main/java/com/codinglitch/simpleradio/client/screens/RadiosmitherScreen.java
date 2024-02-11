@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client.screens;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.central.BaseButton;
 import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
@@ -58,7 +59,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     public FrequencyButton INCREASE_BUTTON;
     public FrequencyButton DECREASE_BUTTON;
 
-    public ApplyButton APPLY_BUTTON;
+    public BaseButton APPLY_BUTTON;
 
     public String frequency = "";
     public Frequency.Modulation modulation;
@@ -167,7 +168,12 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         this.INCREASE_BUTTON = new FrequencyButton(this.leftPos + 143, this.topPos + 45, true, this);
         this.DECREASE_BUTTON = new FrequencyButton(this.leftPos + 143, this.topPos + 54, false, this);
 
-        this.APPLY_BUTTON = new ApplyButton(this.leftPos + 15, this.topPos + 25, this);
+        this.APPLY_BUTTON = new BaseButton(
+                this.leftPos + 15, this.topPos + 25,
+                34, 34,
+                TEXTURE, CommonComponents.EMPTY, () -> {
+            ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
+        });
 
         this.addRenderableWidget(AM_BUTTON);
         this.addRenderableWidget(FM_BUTTON);
@@ -178,43 +184,19 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         this.addRenderableWidget(APPLY_BUTTON);
     }
 
-    public static class ApplyButton extends AbstractButton {
-        private RadiosmitherScreen screen;
-
-        public ApplyButton(int x, int y, RadiosmitherScreen screen) {
-            super(x, y, 34, 34, CommonComponents.EMPTY);
-
-            this.screen = screen;
-        }
-
-        @Override
-        public void onPress() {
-            ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(screen.frequency, screen.modulation));
-        }
-
-        @Override
-        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            ResourceLocation texture = this.isHoveredOrFocused() ? APPLY_HIGHLIGHTED_SPRITE : APPLY_NORMAL_SPRITE;
-            graphics.blitSprite(texture, this.getX(), this.getY(), this.width, this.height);
-        }
-
-        @Override
-        public void updateWidgetNarration(NarrationElementOutput output) {
-            this.defaultButtonNarrationText(output);
-        }
-    }
-
-    public static class FrequencyButton extends AbstractButton {
-        public boolean selected;
-        private boolean isIncrease;
-        private RadiosmitherScreen screen;
+    public static class FrequencyButton extends BaseButton {
+        private final boolean isIncrease;
+        private final RadiosmitherScreen screen;
 
         public FrequencyButton(int x, int y, boolean isIncrease, RadiosmitherScreen screen) {
-            super(x, y, 18, 9, CommonComponents.EMPTY);
+            super(x, y, 35, 18, isIncrease ? INCREASE_NORMAL_SPRITE : DECREASE_NORMAL_SPRITE, CommonComponents.EMPTY);
+            this.hoverSprite = isIncrease ? INCREASE_HIGHLIGHTED_SPRITE : DECREASE_HIGHLIGHTED_SPRITE;
+            this.selectedSprite = isIncrease ? INCREASE_HELD_SPRITE : DECREASE_HELD_SPRITE;
 
             this.screen = screen;
-
             this.isIncrease = isIncrease;
+
+            this.setTooltip(Tooltip.create(isIncrease ? FM_DESCRIPTION : AM_DESCRIPTION, null));
         }
 
         @Override
@@ -228,68 +210,24 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
         public void onReleased() {
             this.selected = false;
+            this.setFocused(false);
 
             screen.increment = 0;
             screen.holdingFor = 0;
         }
-
-        @Override
-        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            ResourceLocation texture = isIncrease ? INCREASE_NORMAL_SPRITE : DECREASE_NORMAL_SPRITE;
-            if (this.selected) {
-                texture = isIncrease ? INCREASE_HELD_SPRITE : DECREASE_HELD_SPRITE;
-            } else if (this.isHoveredOrFocused()) {
-                texture = isIncrease ? INCREASE_HIGHLIGHTED_SPRITE : DECREASE_HIGHLIGHTED_SPRITE;
-            }
-
-            graphics.blitSprite(texture, this.getX(), this.getY(), this.width, this.height);
-        }
-
-        @Override
-        public void updateWidgetNarration(NarrationElementOutput output) {
-            this.defaultButtonNarrationText(output);
-        }
     }
 
-    public static class ModulationButton extends AbstractButton {
-        private boolean selected;
-        private boolean isFM;
-
-        private final Runnable onPress;
-
+    public static class ModulationButton extends BaseButton {
         public ModulationButton(int x, int y, boolean isFM, Runnable onPress) {
-            super(x, y, 35, 18, CommonComponents.EMPTY);
-
-            this.isFM = isFM;
-            this.onPress = onPress;
+            super(x, y, 35, 18, isFM ? FM_NORMAL_SPRITE : AM_NORMAL_SPRITE, CommonComponents.EMPTY, onPress);
+            this.hoverSprite = isFM ? FM_HIGHLIGHTED_SPRITE : AM_HIGHLIGHTED_SPRITE;
+            this.selectedSprite = isFM ? FM_SELECTED_SPRITE : AM_SELECTED_SPRITE;
 
             this.setTooltip(Tooltip.create(isFM ? FM_DESCRIPTION : AM_DESCRIPTION, null));
         }
 
-        @Override
-        public void onPress() {
-            this.onPress.run();
-        }
-
-        @Override
-        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            ResourceLocation texture = isFM ? FM_NORMAL_SPRITE : AM_NORMAL_SPRITE;
-            if (this.selected) {
-                texture = isFM ? FM_SELECTED_SPRITE : AM_SELECTED_SPRITE;
-            } else if (this.isHoveredOrFocused()) {
-                texture = isFM ? FM_HIGHLIGHTED_SPRITE : AM_HIGHLIGHTED_SPRITE;
-            }
-
-            graphics.blitSprite(texture, this.getX(), this.getY(), this.width, this.height);
-        }
-
         public void selected(boolean selected) {
             this.selected = selected;
-        }
-
-        @Override
-        public void updateWidgetNarration(NarrationElementOutput output) {
-            this.defaultButtonNarrationText(output);
         }
     }
 }
