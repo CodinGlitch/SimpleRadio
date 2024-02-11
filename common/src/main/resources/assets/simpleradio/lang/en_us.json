@@ -19,6 +19,7 @@
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
 
   "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
+  "tooltip.simpleradio.receiver_user": "User: %s",
 
   "lexiconfig.simpleradio.title": "Simple Radio Settings",
 

@@ -54,28 +54,28 @@ public class TransceiverItem extends Item implements Receiving {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
 
-        if (!level.isClientSide) {
-            CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
 
-            String frequency = tag.getString("frequency");
-            String modulation = tag.getString("modulation");
-            tick(stack, level, entity);
+        String frequency = tag.getString("frequency");
+        String modulation = tag.getString("modulation");
+        tick(stack, level, entity);
 
-            UUID uuid = entity.getUUID();
-            if (tag.contains("user")) {
-                UUID currentUUID = tag.getUUID("user");
-                if (currentUUID.equals(uuid)) return;
-
-                if (!frequency.isEmpty() && !modulation.isEmpty())
+        UUID uuid = entity.getUUID();
+        if (tag.contains("user")) {
+            UUID currentUUID = tag.getUUID("user");
+            if (currentUUID.equals(uuid)) {
+                if (validate(frequency, Frequency.modulationOf(modulation), currentUUID)) return;
+            } else {
+                if (!frequency.isEmpty() && !modulation.isEmpty() && !level.isClientSide)
                     stopListening(frequency, Frequency.modulationOf(modulation), currentUUID);
             }
-
-            frequency = tag.getString("frequency");
-            modulation = tag.getString("modulation");
-            listen(frequency, Frequency.modulationOf(modulation), uuid);
-            tag.putUUID("user", uuid);
         }
 
+        frequency = tag.getString("frequency");
+        modulation = tag.getString("modulation");
+        if (!level.isClientSide)
+            listen(frequency, Frequency.modulationOf(modulation), uuid);
+        tag.putUUID("user", uuid);
     }
 
     @Override
