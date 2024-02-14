@@ -172,7 +172,8 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
                 this.leftPos + 15, this.topPos + 25,
                 34, 34,
                 APPLY_NORMAL_SPRITE, CommonComponents.EMPTY, () -> {
-            ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
+                    if (this.frequency == null || this.modulation == null) return;
+                    ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
         });
         this.APPLY_BUTTON.hoverSprite = APPLY_HIGHLIGHTED_SPRITE;
 
