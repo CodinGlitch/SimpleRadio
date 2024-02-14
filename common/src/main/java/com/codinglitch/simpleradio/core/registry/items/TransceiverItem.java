@@ -59,6 +59,7 @@ public class TransceiverItem extends Item implements Receiving {
         String frequency = tag.getString("frequency");
         String modulation = tag.getString("modulation");
         tick(stack, level, entity);
+        if (frequency.isEmpty() || modulation.isEmpty()) return;
 
         UUID uuid = entity.getUUID();
         if (tag.contains("user")) {
@@ -66,7 +67,7 @@ public class TransceiverItem extends Item implements Receiving {
             if (currentUUID.equals(uuid)) {
                 if (validate(frequency, Frequency.modulationOf(modulation), currentUUID)) return;
             } else {
-                if (!frequency.isEmpty() && !modulation.isEmpty() && !level.isClientSide)
+                if (!level.isClientSide)
                     stopListening(frequency, Frequency.modulationOf(modulation), currentUUID);
             }
         }
