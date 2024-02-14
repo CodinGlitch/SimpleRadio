@@ -40,6 +40,8 @@ public interface Receiving {
      * @return Whether it is present in the frequency.
      */
     default boolean validate(String frequency, Frequency.Modulation modulation, UUID owner) {
+        if (frequency == null) return false;
+        if (modulation == null) return false;
         return this.validate(Frequency.getOrCreateFrequency(frequency, modulation), owner);
     }
     default boolean validate(Frequency frequency, UUID owner) {
@@ -73,10 +75,7 @@ public interface Receiving {
         if (level.isClientSide) return;
         CompoundTag tag = stack.getOrCreateTag();
         if (!tag.contains("frequency") || tag.getString("frequency").isEmpty())
-            setFrequency(stack,
-                    "000.00",
-                    Frequency.Modulation.FREQUENCY
-            );
+            setFrequency(stack, Frequency.DEFAULT_FREQUENCY, Frequency.DEFAULT_MODULATION);
     }
 
     default void appendTooltip(ItemStack stack, List<Component> components) {
