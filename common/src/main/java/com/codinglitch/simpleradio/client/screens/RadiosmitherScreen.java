@@ -154,7 +154,8 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
                 34, 34,
                 88, 166,
                 TEXTURE, CommonComponents.EMPTY, () -> {
-            ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
+                    if (this.frequency == null || this.modulation == null) return;
+                    ClientServices.NETWORKING.sendToServer(new ServerboundRadioUpdatePacket(this.frequency, this.modulation));
         });
 
         this.addRenderableWidget(AM_BUTTON);
