@@ -24,6 +24,8 @@ public class Frequency {
 
     private static final List<Frequency> frequencies = new ArrayList<>();
 
+    public static String DEFAULT_FREQUENCY = "000.00";
+    public static Modulation DEFAULT_MODULATION = Modulation.FREQUENCY;
     public static int FREQUENCY_DIGITS;
     public static int MAX_FREQUENCY;
     public static String FREQUENCY_PATTERN;
@@ -114,6 +116,9 @@ public class Frequency {
     }
 
     public static Frequency getOrCreateFrequency(String frequency, Modulation modulation) {
+        if (frequency.isEmpty()) frequency = DEFAULT_FREQUENCY;
+        if (modulation == null) modulation = DEFAULT_MODULATION;
+
         int index = getFrequency(frequency, modulation);
         if (index != -1) return frequencies.get(index);
 
