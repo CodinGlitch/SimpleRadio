@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "T": {
+      "item": "minecraft:redstone_torch"
+    },
+    "X": {
+      "item": "simpleradio:transmitting_module"
+    },
+    "Y": {
+      "item": "simpleradio:speaker_module"
+    },
+    "Z": {
+      "item": "simpleradio:receiving_module"
+    }
+  },
+  "pattern": [
+    "TII",
+    "XRZ",
+    "IYI"
+  ],
+  "result": {
+    "item": "simpleradio:transceiver"
+  },
+  "show_notification": true
+}
