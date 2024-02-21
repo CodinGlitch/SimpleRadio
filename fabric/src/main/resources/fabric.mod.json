@@ -15,6 +15,9 @@
     "icon": "assets/${mod_id}/${mod_id}.png",
     "environment": "*",
     "entrypoints": {
+        "fabric-datagen": [
+            "com.codinglitch.simpleradio.datagen.SimpleRadioDataGenerator"
+        ],
         "main": [
             "com.codinglitch.simpleradio.SimpleRadio"
         ],
