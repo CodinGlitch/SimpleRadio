@@ -9,5 +9,6 @@ public class SimpleRadioDataGenerator implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = generator.createPack();
 
         pack.addProvider(SimpleRadioRecipeProvider::new);
+        pack.addProvider(SimpleRadioLootTableProvider::new);
     }
 }
