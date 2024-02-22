@@ -1,0 +1,29 @@
+{
+  "item_group.simpleradio": "Simple Radio",
+
+  "item.simpleradio.transmitting_module": "Модуль передачи радиосигнала",
+  "item.simpleradio.receiving_module": "Модуль приёма радиосигнала",
+  "item.simpleradio.speaker_module": "Модуль динамика",
+
+  "item.simpleradio.transceiver": "Рация",
+  "block.simpleradio.radio": "Радио",
+  "block.simpleradio.radiosmither": "Радиотехнический стол",
+
+  "screen.simpleradio.radiosmither": "Радиотехнический стол",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "Больший радиус передачи сигнала, при более плохом качестве звучания.",
+  "screen.simpleradio.radiosmither.fm_description": "Меньший радиус передачи сигнала, но с более лучшим качеством звучания.",
+
+  "subtitles.simpleradio.radio_open": "Радио начинает вещание",
+  "subtitles.simpleradio.radio_close": "Радио прекращает вещание",
+
+  "tooltip.simpleradio.transceiver_frequency": "Частота: %s",
+  "tooltip.simpleradio.receiver_user": "User: %s",
+
+  "lexiconfig.simpleradio.title": "Конфигурация Simple Radio",
+
+  "lexiconfig.simpleradio.maxRadioDistance": "Максимальная дистанция радиосигнала",
+  "lexiconfig.simpleradio.maxRadioDistance_description": "Максимальное расстояние, на которое может вещать радио."
+}
+
