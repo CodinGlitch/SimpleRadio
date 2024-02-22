@@ -26,7 +26,7 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 | ❌ | Altitude influences interference amount |
 
 <br>
-
+See the [roadmap](https://github.com/CodinGlitch/SimpleRadio/wiki/Roadmap) to find out each features' progress and development priority!
 Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more information on the features of the mod.
 
 ## Supported Versions and Mod Loaders
