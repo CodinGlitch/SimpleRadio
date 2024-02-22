@@ -3,12 +3,13 @@ package com.codinglitch.simpleradio.datagen;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+
+import java.util.function.Consumer;
 
 public class SimpleRadioRecipeProvider extends FabricRecipeProvider {
 
@@ -17,7 +18,7 @@ public class SimpleRadioRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    public void buildRecipes(RecipeOutput output) {
+    public void buildRecipes(Consumer<FinishedRecipe> output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, SimpleRadioItems.TRANSCEIVER)
                 .define('I', Items.IRON_INGOT)
                 .define('R', Items.REDSTONE)
