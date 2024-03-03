@@ -1,5 +1,7 @@
 ![simpleradio](https://github.com/CodinGlitch/SimpleRadio/assets/22829873/30156ede-b1dd-4842-9b26-0f0dfadf9360)
 
+## Overview
+
 This mod is a plugin of Simple Voice Chat which adds radio communication over frequencies you can use to communicate with your friends while far away!
 
 ## Features
@@ -41,3 +43,12 @@ Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more infor
 | **Quilt**    | ❓ | ❓ | ❓ |
 | **Forge**    | ❌ | ❌ | ✅ |
 | **NeoForge** | ❌ | ❌ | ✅ |
+
+<br>
+
+# Related Projects
+
+## [Simple Create Radios](https://modrinth.com/resourcepack/simple-create-radios)
+![Simple Create Radios](https://github.com/CodinGlitch/SimpleRadio/assets/22829873/a602e295-2de6-42e5-b182-71404b7625de)
+
+This amazing resource pack aims to make the blocks and items fit aesthetically with the Create mod!
