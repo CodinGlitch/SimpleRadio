@@ -33,13 +33,12 @@ public abstract class LexiconData {
                 String fieldPath = entry.path().equals("") ? field.getName() : entry.path();
                 String fullPath = path.equals("") ? fieldPath : path+"."+fieldPath;
 
-                System.out.println(fullPath);
-
                 try {
+                    Object value = field.get(object);
                     if (writing)
-                        config.set(fullPath, field.get(object));
+                        config.set(fullPath, value);
                     else
-                        field.set(object, config.getOrElse(fullPath, field.get(object)));
+                        field.set(object, config.getOrElse(fullPath, value));
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException("Unable to access field! " + e);
                 }
@@ -47,8 +46,6 @@ public abstract class LexiconData {
                 LexiconPage page = field.getAnnotation(LexiconPage.class);
                 String fieldPath = page.path().equals("") ? field.getName() : page.path();
                 String fullPath = path.equals("") ? fieldPath : path+"."+fieldPath;
-
-                System.out.println(fullPath);
 
                 try {
                     parse(field.get(object), fullPath, config, writing);
@@ -71,10 +68,10 @@ public abstract class LexiconData {
     public void load() {
         Path path = getPath();
         FileConfig config = FileConfig.of(path);
+        config.load();
 
         parse(this, "", config, false);
 
-        config.save();
         config.close();
     }
 

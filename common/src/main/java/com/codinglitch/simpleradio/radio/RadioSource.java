@@ -26,6 +26,8 @@ public class RadioSource {
     }
 
     public int getMaxDistance(Frequency.Modulation modulation) {
+        CommonSimpleRadio.info(CommonSimpleRadio.SERVER_CONFIG.transceiver.maxFMDistance);
+
         if (type == Type.TRANSCEIVER)
             return modulation == Frequency.Modulation.FREQUENCY ?
                     CommonSimpleRadio.SERVER_CONFIG.transceiver.maxFMDistance :
