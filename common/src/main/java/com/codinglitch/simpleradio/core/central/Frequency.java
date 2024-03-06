@@ -24,7 +24,7 @@ public class Frequency {
 
     private static final List<Frequency> frequencies = new ArrayList<>();
 
-    public static String DEFAULT_FREQUENCY = "000.00";
+    public static String DEFAULT_FREQUENCY;
     public static Modulation DEFAULT_MODULATION = Modulation.FREQUENCY;
     public static int FREQUENCY_DIGITS;
     public static int MAX_FREQUENCY;
@@ -49,6 +49,12 @@ public class Frequency {
         FREQUENCY_DIGITS = CommonSimpleRadio.SERVER_CONFIG.frequency.wholePlaces +CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces;
         MAX_FREQUENCY = (int) java.lang.Math.pow(10, FREQUENCY_DIGITS);
         FREQUENCY_PATTERN = "^\\d{"+CommonSimpleRadio.SERVER_CONFIG.frequency.wholePlaces+"}.\\d{"+CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces+"}$";
+
+        if (CommonSimpleRadio.SERVER_CONFIG.frequency.defaultFrequency.equals("auto-generate")) {
+            DEFAULT_FREQUENCY = "0".repeat(CommonSimpleRadio.SERVER_CONFIG.frequency.wholePlaces)+"."+"0".repeat(CommonSimpleRadio.SERVER_CONFIG.frequency.decimalPlaces);
+        } else {
+            DEFAULT_FREQUENCY = CommonSimpleRadio.SERVER_CONFIG.frequency.defaultFrequency;
+        }
     }
 
     @Nullable
