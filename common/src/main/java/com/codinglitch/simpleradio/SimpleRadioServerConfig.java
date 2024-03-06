@@ -61,6 +61,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer decimalPlaces = 2;
 
         @LexiconEntry
+        public String defaultFrequency = "auto-generate";
+
+        @LexiconEntry
         public Boolean crossDimensional = false;
 
         @LexiconEntry
