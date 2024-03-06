@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface LexiconEntry {
     String lang() default "";
+    String path() default "";
 }
