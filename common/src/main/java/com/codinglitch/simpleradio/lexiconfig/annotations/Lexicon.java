@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Lexicon {
     String name() default "";
+    String path() default "config";
 }

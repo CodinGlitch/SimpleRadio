@@ -22,51 +22,51 @@ public class SimpleRadioServerConfig extends LexiconData {
 
     public static class Transceiver extends LexiconPageData {
         @LexiconEntry
-        public int maxFMDistance = 350;
+        public Integer maxFMDistance = 350;
 
         @LexiconEntry
-        public int falloffFM = 300;
+        public Integer falloffFM = 300;
 
         @LexiconEntry
-        public int maxAMDistance = 550;
+        public Integer maxAMDistance = 550;
 
         @LexiconEntry
-        public int falloffAM = 500;
+        public Integer falloffAM = 500;
     }
 
     public static class Transmitter extends LexiconPageData {
         @LexiconEntry
-        public int maxFMDistance = 1100;
+        public Integer maxFMDistance = 1100;
 
         @LexiconEntry
-        public int falloffFM = 1000;
+        public Integer falloffFM = 1000;
 
         @LexiconEntry
-        public int maxAMDistance = 2200;
+        public Integer maxAMDistance = 2200;
 
         @LexiconEntry
-        public int falloffAM = 2000;
+        public Integer falloffAM = 2000;
     }
 
     public static class Radio extends LexiconPageData {
         @LexiconEntry
-        public int range = 24;
+        public Integer range = 24;
     }
 
     public static class Frequency extends LexiconPageData {
         @LexiconEntry
-        public int wholePlaces = 3;
+        public Integer wholePlaces = 3;
 
         @LexiconEntry
-        public int decimalPlaces = 2;
+        public Integer decimalPlaces = 2;
 
         @LexiconEntry
-        public boolean crossDimensional = false;
+        public Boolean crossDimensional = false;
 
         @LexiconEntry
-        public int dimensionalInterference = 10;
+        public Integer dimensionalInterference = 10;
 
         @LexiconEntry
-        public int packetBuffer = 2;
+        public Integer packetBuffer = 2;
     }
 }

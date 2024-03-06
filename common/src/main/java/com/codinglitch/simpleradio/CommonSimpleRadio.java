@@ -44,7 +44,8 @@ public class CommonSimpleRadio {
     public static void initialize() {
         SERVER_CONFIG = new SimpleRadioServerConfig();
 
-        Lexiconfig.registerListener(Lexiconfig.Event.RELOAD, Frequency::onLexiconReload);
+        Lexiconfig.register(SERVER_CONFIG);
+        //Lexiconfig.registerListener(Lexiconfig.Event.RELOAD, Frequency::onLexiconReload);
 
         Lexiconfig.reload();
     }
