@@ -6,7 +6,7 @@ import com.codinglitch.simpleradio.lexiconfig.classes.LexiconData;
 import com.codinglitch.simpleradio.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.lexiconfig.annotations.LexiconEntry;
 
-@Lexicon(name = CommonSimpleRadio.ID+"-server-config")
+@Lexicon(name = CommonSimpleRadio.ID+"-server")
 public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage
     public Transceiver transceiver = new Transceiver();

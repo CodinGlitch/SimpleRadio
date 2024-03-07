@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -60,6 +61,12 @@ public class TransceiverItem extends Item implements Receiving {
         String modulation = tag.getString("modulation");
         tick(stack, level, entity);
         if (frequency.isEmpty() || modulation.isEmpty()) return;
+
+        if (!Frequency.validate(frequency)) {
+            CommonSimpleRadio.info("Invalid frequency {}, replacing with default", frequency);
+            frequency = Frequency.DEFAULT_FREQUENCY;
+            tag.putString("frequency", Frequency.DEFAULT_FREQUENCY);
+        }
 
         UUID uuid = entity.getUUID();
         if (tag.contains("user")) {
