@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.lexiconfig.annotations.Lexicon;
 import com.codinglitch.simpleradio.lexiconfig.annotations.LexiconEntry;
 import com.codinglitch.simpleradio.lexiconfig.annotations.LexiconPage;
 import com.electronwill.nightconfig.core.ConfigFormat;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlWriter;
 import net.minecraft.client.Minecraft;
@@ -24,7 +25,7 @@ public abstract class LexiconData {
         return Paths.get(annotation.path() + "/" + annotation.name() + ".toml");
     }
 
-    private void parse(Object object, String path, FileConfig config, boolean writing) {
+    private void parse(Object object, String path, CommentedFileConfig config, boolean writing) {
         Class<?> clazz = object.getClass();
 
         for (Field field : clazz.getDeclaredFields()) {
@@ -35,10 +36,13 @@ public abstract class LexiconData {
 
                 try {
                     Object value = field.get(object);
-                    if (writing)
+                    if (writing) {
                         config.set(fullPath, value);
-                    else
+                        config.setComment(fullPath, entry.comment());
+                    } else {
                         field.set(object, config.getOrElse(fullPath, value));
+                    }
+
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException("Unable to access field! " + e);
                 }
@@ -58,7 +62,7 @@ public abstract class LexiconData {
 
     public void save() {
         Path path = getPath();
-        FileConfig config = FileConfig.of(path);
+        CommentedFileConfig config = CommentedFileConfig.of(path);
 
         parse(this, "", config, true);
 
@@ -67,7 +71,7 @@ public abstract class LexiconData {
     }
     public void load() {
         Path path = getPath();
-        FileConfig config = FileConfig.of(path);
+        CommentedFileConfig config = CommentedFileConfig.of(path);
         config.load();
 
         parse(this, "", config, false);

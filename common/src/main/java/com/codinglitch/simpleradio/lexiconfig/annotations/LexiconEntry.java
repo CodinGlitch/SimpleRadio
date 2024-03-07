@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 public @interface LexiconEntry {
     String lang() default "";
     String path() default "";
+
+    String comment() default "";
 }

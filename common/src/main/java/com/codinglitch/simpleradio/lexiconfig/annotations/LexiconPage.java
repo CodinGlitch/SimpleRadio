@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 public @interface LexiconPage {
     String lang() default "";
     String path() default "";
+
+    String comment() default "";
 }
