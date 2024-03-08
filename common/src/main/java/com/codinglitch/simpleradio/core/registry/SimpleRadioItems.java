@@ -3,11 +3,9 @@ package com.codinglitch.simpleradio.core.registry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.items.RadioItem;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
+import com.codinglitch.simpleradio.core.registry.items.UpgradeModuleItem;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 
 import java.util.*;
@@ -23,9 +21,16 @@ public class SimpleRadioItems {
     public static Item RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(1)));
 
 
+    // ---- Modules ---- \\
     public static Item TRANSMITTING_MODULE = register(id("transmitting_module"), new Item(new Item.Properties()));
     public static Item RECEIVING_MODULE = register(id("receiving_module"), new Item(new Item.Properties()));
     public static Item SPEAKER_MODULE = register(id("speaker_module"), new Item(new Item.Properties()));
+
+    // -- Upgrades -- \\
+    public static Item IRON_RANGE_UPGRADE_MODULE = register(id("iron_range_upgrade_module"), new UpgradeModuleItem(Tiers.IRON, UpgradeModuleItem.Type.RANGE, new Item.Properties()));
+    public static Item GOLD_RANGE_UPGRADE_MODULE = register(id("gold_range_upgrade_module"), new UpgradeModuleItem(Tiers.GOLD, UpgradeModuleItem.Type.RANGE, new Item.Properties()));
+    public static Item DIAMOND_RANGE_UPGRADE_MODULE = register(id("diamond_range_upgrade_module"), new UpgradeModuleItem(Tiers.DIAMOND, UpgradeModuleItem.Type.RANGE, new Item.Properties()));
+    public static Item NETHERITE_RANGE_UPGRADE_MODULE = register(id("netherite_range_upgrade_module"), new UpgradeModuleItem(Tiers.NETHERITE, UpgradeModuleItem.Type.RANGE, new Item.Properties()));
 
     private static Item register(ResourceLocation location, Item item) {
         return register(location, item, SimpleRadioMenus.RADIO_TAB_LOCATION);
