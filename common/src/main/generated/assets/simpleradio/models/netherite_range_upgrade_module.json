@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "simpleradio:netherite_upgrade_module",
+    "layer1": "simpleradio:range_upgrade"
+  }
+}

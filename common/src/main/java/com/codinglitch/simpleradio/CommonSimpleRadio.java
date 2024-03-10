@@ -13,8 +13,12 @@ import java.util.ServiceLoader;
 
 public class CommonSimpleRadio {
     public static final String ID = "simpleradio";
-    public static ResourceLocation id(String id) {
-        return new ResourceLocation(CommonSimpleRadio.ID, id);
+    public static ResourceLocation id(String... arguments) {
+        return id("", arguments);
+    }
+
+    public static ResourceLocation id(CharSequence delimiter, String... arguments) {
+        return new ResourceLocation(CommonSimpleRadio.ID, String.join(delimiter, arguments));
     }
 
     public static <T> T loadService(Class<T> clazz) {
