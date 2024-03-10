@@ -14,6 +14,7 @@ public class UpgradeModuleItem extends TieredItem {
     public enum Type {
         RANGE,
         CLARITY,
+        BATTERY,
 
     }
 

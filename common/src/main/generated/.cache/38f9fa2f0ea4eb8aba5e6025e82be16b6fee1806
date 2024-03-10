@@ -1,5 +1,9 @@
-// 1.20.2	2024-03-10T00:32:22.6263092	SimpleRadio/Model Definitions
+// 1.20.2	2024-03-10T01:07:20.8292083	SimpleRadio/Model Definitions
+6680d7478faad86215eec9db7c9db86b18b7a233 assets\simpleradio\models\item\gold_battery_upgrade_module.json
+a4b6b213c1ca896ef7067422d1d28d3e22a64d7b assets\simpleradio\models\item\netherite_battery_upgrade_module.json
 4043ce808d79ebedc6360d533b89ae20a2e33419 assets\simpleradio\models\item\netherite_range_upgrade_module.json
 517017c6c27033dd6465e8e0ffe68a04643b5e5a assets\simpleradio\models\item\diamond_range_upgrade_module.json
+c0f2cee21ecf590beda23b7349e7cc4819300d4b assets\simpleradio\models\item\diamond_battery_upgrade_module.json
 6a4cc52738b64b3f8c1a7bdfcf859a81205fb4f0 assets\simpleradio\models\item\gold_range_upgrade_module.json
+46ed88150fa9900834f5acd5f3e99ea5faa3fb01 assets\simpleradio\models\item\iron_battery_upgrade_module.json
 ba0eeee49dfde06e85f959bd64118178f990d12e assets\simpleradio\models\item\iron_range_upgrade_module.json

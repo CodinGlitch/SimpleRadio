@@ -32,6 +32,12 @@ public class SimpleRadioItems {
     public static Item DIAMOND_RANGE_UPGRADE_MODULE = register(id("diamond_range_upgrade_module"), new UpgradeModuleItem(Tiers.DIAMOND, UpgradeModuleItem.Type.RANGE, new Item.Properties()));
     public static Item NETHERITE_RANGE_UPGRADE_MODULE = register(id("netherite_range_upgrade_module"), new UpgradeModuleItem(Tiers.NETHERITE, UpgradeModuleItem.Type.RANGE, new Item.Properties()));
 
+    public static Item IRON_BATTERY_UPGRADE_MODULE = register(id("iron_battery_upgrade_module"), new UpgradeModuleItem(Tiers.IRON, UpgradeModuleItem.Type.BATTERY, new Item.Properties()));
+    public static Item GOLD_BATTERY_UPGRADE_MODULE = register(id("gold_battery_upgrade_module"), new UpgradeModuleItem(Tiers.GOLD, UpgradeModuleItem.Type.BATTERY, new Item.Properties()));
+    public static Item DIAMOND_BATTERY_UPGRADE_MODULE = register(id("diamond_battery_upgrade_module"), new UpgradeModuleItem(Tiers.DIAMOND, UpgradeModuleItem.Type.BATTERY, new Item.Properties()));
+    public static Item NETHERITE_BATTERY_UPGRADE_MODULE = register(id("netherite_battery_upgrade_module"), new UpgradeModuleItem(Tiers.NETHERITE, UpgradeModuleItem.Type.BATTERY, new Item.Properties()));
+
+
     private static Item register(ResourceLocation location, Item item) {
         return register(location, item, SimpleRadioMenus.RADIO_TAB_LOCATION);
     }
