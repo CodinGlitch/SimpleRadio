@@ -63,7 +63,7 @@ public class SimpleRadioRecipeProvider extends FabricRecipeProvider {
                 .define('C', Items.COPPER_INGOT)
                 .define('L', Items.LAPIS_LAZULI)
                 .pattern("R")
-                .pattern("I")
+                .pattern("C")
                 .pattern("L")
                 .unlockedBy("has_copper_ingot", has(Items.COPPER_INGOT))
                 .unlockedBy("has_lapis_lazuli", has(Items.LAPIS_LAZULI))

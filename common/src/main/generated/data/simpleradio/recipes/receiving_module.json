@@ -5,8 +5,8 @@
     "A": {
       "item": "minecraft:amethyst_shard"
     },
-    "I": {
-      "item": "minecraft:iron_ingot"
+    "C": {
+      "item": "minecraft:copper_ingot"
     },
     "R": {
       "item": "minecraft:redstone_torch"
@@ -14,7 +14,7 @@
   },
   "pattern": [
     "R",
-    "I",
+    "C",
     "A"
   ],
   "result": {

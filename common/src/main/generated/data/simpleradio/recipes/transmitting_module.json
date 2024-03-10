@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
+    "C": {
+      "item": "minecraft:copper_ingot"
     },
     "L": {
       "item": "minecraft:lapis_lazuli"
@@ -14,7 +14,7 @@
   },
   "pattern": [
     "R",
-    "I",
+    "C",
     "L"
   ],
   "result": {

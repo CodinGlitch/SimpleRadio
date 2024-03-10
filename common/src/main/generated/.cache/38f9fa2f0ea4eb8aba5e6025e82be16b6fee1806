@@ -1,5 +1,5 @@
-// 1.20.2	2024-03-09T22:14:54.3463279	SimpleRadio/Model Definitions
-0164bd0a505a1ec5b36b98299e923a1389b46c9f assets\simpleradio\models\diamond_range_upgrade_module.json
-35754ba7b7c246f9a06e1576b55c3665e0244219 assets\simpleradio\models\netherite_range_upgrade_module.json
-f3c7ea4327c37ab0bc7499ddb5d2162fcdb8bc06 assets\simpleradio\models\iron_range_upgrade_module.json
-6317154855a5a4ec020b220a9bfe6dc67ec21895 assets\simpleradio\models\gold_range_upgrade_module.json
+// 1.20.2	2024-03-10T00:32:22.6263092	SimpleRadio/Model Definitions
+4043ce808d79ebedc6360d533b89ae20a2e33419 assets\simpleradio\models\item\netherite_range_upgrade_module.json
+517017c6c27033dd6465e8e0ffe68a04643b5e5a assets\simpleradio\models\item\diamond_range_upgrade_module.json
+6a4cc52738b64b3f8c1a7bdfcf859a81205fb4f0 assets\simpleradio\models\item\gold_range_upgrade_module.json
+ba0eeee49dfde06e85f959bd64118178f990d12e assets\simpleradio\models\item\iron_range_upgrade_module.json
