@@ -4,11 +4,14 @@ import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.central.Upgradable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -29,6 +32,11 @@ public class RadioItem extends BlockItem implements Receiving, Upgradable {
         super.inventoryTick(stack, level, entity, slot, b);
 
         tick(stack, level, entity);
+    }
+
+    @Override
+    public InteractionResult place(BlockPlaceContext context) {
+        return super.place(context);
     }
 
     @Override

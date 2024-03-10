@@ -2,16 +2,20 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,9 +24,15 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RadioBlock extends BaseEntityBlock {
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
@@ -76,18 +86,23 @@ public class RadioBlock extends BaseEntityBlock {
         return 0;
     }
 
-    @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
-        super.setPlacedBy(level, pos, state, entity, stack);
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        ItemStack stack = new ItemStack(this);
+        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (blockEntity instanceof RadioBlockEntity radioBlockEntity)
+            radioBlockEntity.saveToItem(stack);
 
-        level.getBlockEntity(pos, SimpleRadioBlockEntities.RADIO).ifPresent(blockEntity -> blockEntity.loadFromItem(stack));
+        return List.of(stack);
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
-        ItemStack stack = super.getCloneItemStack(getter, pos, state);
-        getter.getBlockEntity(pos, SimpleRadioBlockEntities.RADIO).ifPresent(blockEntity -> blockEntity.saveToItem(stack));
-        return stack;
+    public void setPlacedBy(Level level, BlockPos blockPos, BlockState blockState, @Nullable LivingEntity entity, ItemStack stack) {
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
+        if (blockEntity instanceof RadioBlockEntity radioBlockEntity) {
+            radioBlockEntity.loadFromItem(stack);
+        }
+
+        super.setPlacedBy(level, blockPos, blockState, entity, stack);
     }
 
     @Nullable
