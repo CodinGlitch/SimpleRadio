@@ -1,19 +1,57 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface Frequencing {
+    static boolean validate(WorldlyPosition position, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+        BlockPos pos = position.realLocation();
+
+        if (!position.level.isLoaded(pos)) return false;
+
+        BlockState state = position.level.getBlockState(pos);
+        if (state.isAir()) return false;
+
+        BlockEntity blockEntity = position.level.getBlockEntity(pos);
+
+        if (clazz.isInstance(state.getBlock().asItem()))
+            return frequency == null || ((Frequencing) state.getBlock().asItem()).getFrequency(blockEntity) == frequency;
+        return false;
+    }
+    static boolean validate(UUID uuid, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+        VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(uuid);
+        if (connection != null) return validate(connection, clazz, frequency);
+        return false;
+    }
+    static boolean validate(VoicechatConnection connection, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+        ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
+        if (player == null) return false;
+        return validate(player, clazz, frequency);
+    }
+    static boolean validate(Entity entity, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) { //TODO: find way to support entities
+        return CommonRadioPlugin.verifyInventory(entity, stack -> {
+            if (stack.getItem().getClass().isInstance(clazz))
+                return frequency == null || ((Frequencing) stack.getItem()).getFrequency(stack) == frequency;
+            return false;
+        });
+    }
 
     /**
      * Sets the frequency for an ItemStack.
@@ -45,7 +83,7 @@ public interface Frequencing {
      * @param frequency the frequency to set it to
      */
     default void setFrequency(BlockEntity blockEntity, Frequency frequency) {
-        if (blockEntity instanceof FrequencyBlockEntity frequencyBlockEntity)
+        if (blockEntity instanceof CentralBlockEntity frequencyBlockEntity)
             frequencyBlockEntity.frequency = frequency;
     }
 
@@ -69,7 +107,7 @@ public interface Frequencing {
      * @return The frequency, or null if it doesn't have one.
      */
     default Frequency getFrequency(BlockEntity blockEntity) {
-        if (blockEntity instanceof FrequencyBlockEntity frequencyBlockEntity)
+        if (blockEntity instanceof CentralBlockEntity frequencyBlockEntity)
             return frequencyBlockEntity.frequency;
         return null;
     }
@@ -95,7 +133,8 @@ public interface Frequencing {
         return this.validate(Frequency.getOrCreateFrequency(frequency, modulation), owner);
     }
     default boolean validate(Frequency frequency, UUID owner) {
-        return frequency.getChannel(owner) != null;
+        RadioReceiver receiver = frequency.getReceiver(owner);
+        return receiver != null;
     }
 
     default void tick(ItemStack stack, Level level) {

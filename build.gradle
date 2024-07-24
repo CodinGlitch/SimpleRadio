@@ -70,6 +70,11 @@ subprojects {
             url = 'https://maven.valkyrienskies.org'
         }
 
+        maven {
+            name = 'tterrag maven'
+            url = 'https://maven.tterrag.com/'
+        }
+
         exclusiveContent {
             forRepository {
                 maven {

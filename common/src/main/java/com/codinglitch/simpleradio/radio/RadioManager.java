@@ -33,23 +33,26 @@ public class RadioManager {
         List<Frequency> frequencies = Frequency.getFrequencies();
         for (Frequency frequency : frequencies) {
             frequency.serverTick(tickCount);
-            for (RadioListener transmitter : frequency.transmitters) {
-                //transmitter.serverTick(tickCount); transmitter class not implemented yet
+            for (RadioTransmitter transmitter : frequency.transmitters) {
+                transmitter.serverTick(tickCount);
             }
-            for (RadioChannel receiver : frequency.receivers) {
+            for (RadioReceiver receiver : frequency.receivers) {
                 receiver.serverTick(tickCount);
             }
         }
 
-        List<RadioListener> listeners = RadioListener.getListeners();
-        for (RadioListener listener : listeners) {
+        for (RadioListener listener : RadioListener.getListeners()) {
             listener.serverTick(tickCount);
+        }
+        for (RadioSpeaker speaker : RadioSpeaker.getSpeakers()) {
+            speaker.serverTick(tickCount);
         }
     }
 
     public static void garbageCollect() {
         Frequency.garbageCollect();
         RadioListener.garbageCollect();
+        RadioSpeaker.garbageCollect();
     }
 
     public void onMicPacket(MicrophonePacketEvent event) {
@@ -102,13 +105,6 @@ public class RadioManager {
                     WorldlyPosition.of(sender.position().toVector3f(), level),
                     event.getPacket().getOpusEncodedData()
             ), frequency);*/
-        }
-    }
-    public static void transmit(RadioSource source, Frequency frequency) {
-        for (RadioChannel channel : frequency.receivers) {
-            if (source.owner.equals(channel.owner)) continue;
-
-            channel.transmit(source, frequency);
         }
     }
 }

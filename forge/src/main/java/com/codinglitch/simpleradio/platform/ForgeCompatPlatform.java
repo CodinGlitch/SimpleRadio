@@ -4,12 +4,12 @@ import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
 
 public class ForgeCompatPlatform implements CompatPlatform {
     @Override
-    public void onData(RadioChannel channel, RadioSource source, short[] decoded) {
+    public void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
 
     }
 

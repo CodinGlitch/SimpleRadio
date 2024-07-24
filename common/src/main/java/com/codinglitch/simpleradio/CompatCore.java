@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
 
 public class CompatCore {
@@ -54,7 +54,7 @@ public class CompatCore {
         spoutCompatibilities();
     }
 
-    public static void onData(RadioChannel channel, RadioSource source, short[] decoded) {
+    public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE) {
             VibrativeCompat.onData(channel, source, decoded);

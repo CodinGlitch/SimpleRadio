@@ -1,16 +1,14 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.Receiving;
-import com.codinglitch.simpleradio.core.central.Transmitting;
+import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -29,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class TransceiverItem extends Item implements Receiving, Transmitting {
+public class TransceiverItem extends Item implements Listening, Speaking, Receiving, Transmitting {
     public TransceiverItem(Properties settings) {
         super(settings);
     }
@@ -38,41 +36,51 @@ public class TransceiverItem extends Item implements Receiving, Transmitting {
         Services.NETWORKING.sendToPlayer(player, new ClientboundRadioPacket(started, player.getUUID(), this.getClass().getName()));
     }
 
-    private void startTransceiving(Level level, ItemStack stack, String frequencyName, String modulation, UUID owner) {
-        RadioChannel channel = startReceiving(frequencyName, Frequency.modulationOf(modulation), owner);
+    private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
+        if (!level.isClientSide) {
+            RadioListener listener = startListening(entity, owner);
+            RadioSpeaker speaker = startSpeaking(entity, owner);
+            RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
+            RadioTransmitter transmitter = startTransmitting(entity, frequencyName, Frequency.modulationOf(modulation), owner);
 
-        Player player = level.getPlayerByUUID(owner);
-        RadioListener listener = startListening(player);
+            /*if (this.getClass() == TransceiverItem.class) {
+                channel.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
+                listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
+                channel.category = CommonRadioPlugin.TRANSCEIVERS_CATEGORY;
+            } else if (this.getClass() == WalkieTalkieItem.class) {
+                channel.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
+                listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
+                channel.category = CommonRadioPlugin.WALKIES_CATEGORY;
+            }*/
 
-        if (this.getClass() == TransceiverItem.class) {
-            channel.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
-            listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
-            channel.category = CommonRadioPlugin.TRANSCEIVERS_CATEGORY;
-        } else if (this.getClass() == WalkieTalkieItem.class) {
-            channel.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
-            listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
-            channel.category = CommonRadioPlugin.WALKIES_CATEGORY;
+            transmitter.transmitCriteria((source, router) -> {
+                if (entity instanceof Player player) {
+                    ItemStack using = player.getUseItem();
+                    CompoundTag usingTag = using.getOrCreateTag();
+
+                    if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return false;
+                    if (!usingTag.getString("frequency").equals(frequencyName) || !usingTag.getString("modulation").equals(modulation)) return false;
+                }
+
+                //if (this.getClass() == TransceiverItem.class) source.type = RadioSource.Type.TRANSCEIVER;
+                //else if (this.getClass() == WalkieTalkieItem.class) source.type = RadioSource.Type.WALKIE_TALKIE;
+
+                Frequency frequency = getFrequency(stack);
+                if (frequency == null) return false;
+
+                return true;
+            });
         }
-
-        listener.acceptor(source -> {
-            ItemStack using = player.getUseItem();
-            CompoundTag usingTag = using.getOrCreateTag();
-
-            if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return;
-            if (!usingTag.getString("frequency").equals(frequencyName) || !usingTag.getString("modulation").equals(modulation)) return;
-
-            if (this.getClass() == TransceiverItem.class) source.type = RadioSource.Type.TRANSCEIVER;
-            else if (this.getClass() == WalkieTalkieItem.class) source.type = RadioSource.Type.WALKIE_TALKIE;
-
-            Frequency frequency = getFrequency(stack);
-            if (frequency != null) RadioManager.transmit(source, frequency);
-        });
     }
-    private void stopTransceiving(Level level, String frequencyName, String modulation, UUID owner) {
-        stopReceiving(frequencyName, Frequency.modulationOf(modulation), owner);
+    private void inactivate(Level level, String frequencyName, String modulation, UUID owner) {
+        if (!level.isClientSide) {
+            Entity entity = ((ServerLevel) level).getEntity(owner);
 
-        Entity entity = level.getPlayerByUUID(owner);
-        stopListening(entity);
+            stopListening(entity);
+            stopSpeaking(entity);
+            stopReceiving(frequencyName, Frequency.modulationOf(modulation), owner);
+            stopTransmitting(frequencyName, Frequency.modulationOf(modulation), owner);
+        }
     }
 
     public int getCooldown() {
@@ -92,7 +100,7 @@ public class TransceiverItem extends Item implements Receiving, Transmitting {
         super.onDestroyed(itemEntity);
         CompoundTag tag = itemEntity.getItem().getOrCreateTag();
         if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("user")) {
-            stopTransceiving(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("user"));
+            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("user"));
         }
     }
 
@@ -120,7 +128,7 @@ public class TransceiverItem extends Item implements Receiving, Transmitting {
                 if (validate(frequency, Frequency.modulationOf(modulation), currentUUID)) return;
             } else {
                 if (!level.isClientSide) {
-                    stopTransceiving(level, frequency, modulation, currentUUID);
+                    inactivate(level, frequency, modulation, currentUUID);
                 }
             }
         }
@@ -128,7 +136,7 @@ public class TransceiverItem extends Item implements Receiving, Transmitting {
         frequency = tag.getString("frequency");
         modulation = tag.getString("modulation");
         if (!level.isClientSide) {
-            startTransceiving(level, stack, frequency, modulation, uuid);
+            activate(level, stack, frequency, modulation, entity, uuid);
         }
 
         tag.putUUID("user", uuid);

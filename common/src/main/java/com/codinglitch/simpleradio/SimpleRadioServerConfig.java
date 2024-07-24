@@ -8,6 +8,9 @@ import com.codinglitch.lexiconfig.classes.LexiconPageData;
 
 @Lexicon(name = CommonSimpleRadio.ID+"-server")
 public class SimpleRadioServerConfig extends LexiconData {
+    @LexiconPage(comment = "These are the configurations for the cables.")
+    public Cable cable = new Cable();
+
     @LexiconPage(comment = "These are the configurations for the transceiver item.")
     public Transceiver transceiver = new Transceiver();
 
@@ -35,18 +38,26 @@ public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage(comment = "These are the general configurations for compatibilities.")
     public Compatibilities compatibilities = new Compatibilities();
 
-    public static class Transceiver extends LexiconPageData {
-        @LexiconEntry(comment = "This is the range after which players can no longer be heard for frequency modulation. Defaults to 1000.")
-        public Integer maxFMDistance = 1000;
+    public static class Cable extends LexiconPageData {
+        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.1.")
+        public Double transmissionDiminishment = 0.1d;
+    }
 
-        @LexiconEntry(comment = "This is the range after which audio begins to decay for frequency modulation. Defaults to 900.")
-        public Integer falloffFM = 900;
+    public static class Transceiver extends LexiconPageData {
+        @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 1000.")
+        public Integer transmissionPowerFM = 1000;
+
+        @LexiconEntry(comment = "This is the threshold of transmission power in frequency modulation at which it begins to have an auditory effect. Defaults to 200.")
+        public Integer diminishThresholdFM = 200;
 
         @LexiconEntry(comment = "This is the range after which players can no longer be heard for amplitude modulation. Defaults to 1800.")
-        public Integer maxAMDistance = 1800;
+        public Integer transmissionPowerAM = 1800;
 
-        @LexiconEntry(comment = "This is the range after which audio begins to decay for amplitude modulation. Defaults to 1700.")
-        public Integer falloffAM = 1700;
+        @LexiconEntry(comment = "This is the threshold of transmission power in amplitude modulation at which it begins to have an auditory effect. Defaults to 300.")
+        public Integer diminishThresholdAM = 300;
+
+        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
+        public Double transmissionDiminishment = 1d;
 
         @LexiconEntry(comment = "This is the range for the transceiver that it can hear from. Defaults to 4.")
         public Integer listeningRange = 4;
@@ -61,17 +72,20 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class WalkieTalkie extends LexiconPageData {
-        @LexiconEntry(comment = "This is the range after which players can no longer be heard for frequency modulation. Defaults to 500.")
-        public Integer maxFMDistance = 500;
+        @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 500.")
+        public Integer transmissionPowerFM = 500;
 
-        @LexiconEntry(comment = "This is the range after which audio begins to decay for frequency modulation. Defaults to 400.")
-        public Integer falloffFM = 400;
+        @LexiconEntry(comment = "This is the threshold of transmission power in frequency modulation at which it begins to have an auditory effect. Defaults to 100.")
+        public Integer diminishThresholdFM = 100;
 
         @LexiconEntry(comment = "This is the range after which players can no longer be heard for amplitude modulation. Defaults to 900.")
-        public Integer maxAMDistance = 900;
+        public Integer transmissionPowerAM = 900;
 
-        @LexiconEntry(comment = "This is the range after which audio begins to decay for amplitude modulation. Defaults to 800.")
-        public Integer falloffAM = 800;
+        @LexiconEntry(comment = "This is the threshold of transmission power in amplitude modulation at which it begins to have an auditory effect. Defaults to 200.")
+        public Integer diminishThresholdAM = 200;
+
+        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
+        public Integer transmissionDiminishment = 1;
 
         @LexiconEntry(comment = "This is the range for the walkie that it can hear from. Defaults to 4.")
         public Integer listeningRange = 4;
@@ -89,17 +103,20 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class Transmitter extends LexiconPageData {
-        @LexiconEntry(comment = "This is the range after which players can no longer be heard for frequency modulation. Defaults to 2200.")
-        public Integer maxFMDistance = 2200;
+        @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 3000.")
+        public Integer transmissionPowerFM = 3300;
 
-        @LexiconEntry(comment = "This is the range after which audio begins to decay for frequency modulation. Defaults to 2000.")
-        public Integer falloffFM = 2000;
+        @LexiconEntry(comment = "This is the threshold of transmission power in frequency modulation at which it begins to have an auditory effect. Defaults to 300.")
+        public Integer diminishThresholdFM = 300;
 
         @LexiconEntry(comment = "This is the range after which players can no longer be heard for amplitude modulation. Defaults to 4400.")
-        public Integer maxAMDistance = 4400;
+        public Integer transmissionPowerAM = 4400;
 
-        @LexiconEntry(comment = "This is the range after which audio begins to decay for amplitude modulation. Defaults to 4000.")
-        public Integer falloffAM = 4000;
+        @LexiconEntry(comment = "This is the threshold of transmission power in amplitude modulation at which it begins to have an auditory effect. Defaults to 500.")
+        public Integer diminishThresholdAM = 500;
+
+        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
+        public Double transmissionDiminishment = 1d;
 
         @LexiconEntry(comment = "When false, removes the transmitter (will not disable speaker) recipe. Defaults to true.")
         public Boolean enabled = true;
@@ -107,7 +124,7 @@ public class SimpleRadioServerConfig extends LexiconData {
 
     public static class Radio extends LexiconPageData {
         @LexiconEntry(comment = "This is the range for the radio in which the audio played from it can be heard. Defaults to 24.")
-        public Integer range = 24;
+        public Integer speakingRange = 24;
 
         @LexiconEntry(comment = "When false, removes the radio recipe. Defaults to true.")
         public Boolean enabled = true;
@@ -115,7 +132,7 @@ public class SimpleRadioServerConfig extends LexiconData {
 
     public static class Microphone extends LexiconPageData {
         @LexiconEntry(comment = "This is the range for the microphone that it can hear from. Defaults to 8.")
-        public Integer range = 8;
+        public Integer listeningRange = 8;
 
         @LexiconEntry(comment = "When false, removes the microphone recipe. Defaults to true.")
         public Boolean enabled = true;
@@ -123,7 +140,7 @@ public class SimpleRadioServerConfig extends LexiconData {
 
     public static class Speaker extends LexiconPageData {
         @LexiconEntry(comment = "This is the range for the radio in which the audio transmitted from it can be heard. Defaults to 32.")
-        public Integer range = 32;
+        public Integer speakingRange = 32;
 
         @LexiconEntry(comment = "When false, removes the speaker recipe. Defaults to true.")
         public Boolean enabled = true;
@@ -147,8 +164,8 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "Whether or not the radios work across dimensions. Defaults to false.")
         public Boolean crossDimensional = false;
 
-        @LexiconEntry(comment = "The base amount of interference to give to radio transmission across dimensions. Defaults to 10.")
-        public Integer dimensionalInterference = 10;
+        @LexiconEntry(comment = "The base amount of interference to give to radio transmission per block across dimensions. Defaults to 4.")
+        public Double dimensionalInterference = 4d;
 
         @LexiconEntry(comment = "The packet buffer for packet transmission. You likely won't need to worry about this. Defaults to 2.")
         public Integer packetBuffer = 2;

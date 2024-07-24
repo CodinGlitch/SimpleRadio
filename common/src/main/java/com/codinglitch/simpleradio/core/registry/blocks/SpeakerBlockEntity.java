@@ -1,51 +1,40 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.FrequencyBlockEntity;
-import com.codinglitch.simpleradio.core.central.Receiving;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
 
 import java.util.UUID;
 
-public class SpeakerBlockEntity extends FrequencyBlockEntity implements Receiving {
-    public boolean isListening = false;
-    public UUID listenerID;
-
-    private RadioChannel channel;
+public class SpeakerBlockEntity extends CentralBlockEntity implements Receiving, Speaking {
+    public boolean isActive = false;
 
     public SpeakerBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.SPEAKER, pos, state);
 
-        this.listenerID = UUID.randomUUID();
+        this.id = UUID.randomUUID();
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !level.isClientSide && this.channel != null) {
+        if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, channel.location.x, channel.location.y, channel.location.z,
+                    null, speaker.location.x, speaker.location.y, speaker.location.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
             );
         }
 
-        if (this.frequency != null)
-            stopReceiving(frequency.frequency, frequency.modulation, listenerID);
+        inactivate();
+
         super.setRemoved();
     }
 
@@ -69,26 +58,37 @@ public class SpeakerBlockEntity extends FrequencyBlockEntity implements Receivin
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, SpeakerBlockEntity blockEntity) {
         if (!level.isClientSide) {
-            if (blockEntity.frequency != null && !blockEntity.isListening) {
-                blockEntity.listen();
+            if (blockEntity.frequency != null && !blockEntity.isActive) {
+                blockEntity.activate();
             }
         }
     }
 
-    public void listen() {
-        channel = startReceiving(frequency.frequency, frequency.modulation, listenerID);
-        channel.location = Services.COMPAT.modifyPosition(Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition)));
-        channel.range = SimpleRadioLibrary.SERVER_CONFIG.speaker.range;
-        channel.category = CommonRadioPlugin.SPEAKERS_CATEGORY;
+    public void inactivate() {
+        if (this.frequency != null) {
+            stopSpeaking();
+            stopReceiving(frequency.frequency, frequency.modulation, id);
+        }
+
+        this.isActive = false;
+    }
+
+    public void activate() {
+        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+
+        speaker = startSpeaking(location, id);
+        receiver = startReceiving(location, this.frequency, id);
+
+        receiver.routers.add(speaker);
 
         level.playSound(
-                null, channel.location.x, channel.location.y, channel.location.z,
+                null, speaker.location.x, speaker.location.y, speaker.location.z,
                 SimpleRadioSounds.RADIO_OPEN,
                 SoundSource.PLAYERS,
                 1f, 1f
         );
 
-        this.isListening = true;
+        this.isActive = true;
     }
 
     public void loadFromItem(ItemStack stack) {
@@ -96,10 +96,7 @@ public class SpeakerBlockEntity extends FrequencyBlockEntity implements Receivin
     }
 
     public void loadTag(CompoundTag tag) {
-        if (this.frequency != null) {
-            stopReceiving(frequency.frequency, frequency.modulation, listenerID);
-            this.isListening = false;
-        }
+        inactivate();
 
         String frequencyName = tag.getString("frequency");
         Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));

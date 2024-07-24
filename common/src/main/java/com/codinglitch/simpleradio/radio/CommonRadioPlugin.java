@@ -7,6 +7,10 @@ import de.maxhenkel.voicechat.api.VolumeCategory;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
@@ -16,6 +20,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 public class CommonRadioPlugin {
     public static String RADIOS_CATEGORY = "radios";
@@ -45,6 +51,18 @@ public class CommonRadioPlugin {
             thread.setDaemon(true);
             return thread;
         });
+    }
+
+    public static boolean verifyInventory(Entity entity, Predicate<ItemStack> criteria) {
+        if (entity instanceof Player player) {
+            return player.getInventory().hasAnyMatching(criteria);
+        } else {
+            AtomicBoolean result = new AtomicBoolean(false);
+            entity.getHandSlots().forEach(stack -> {
+                if (criteria.test(stack)) result.set(true);
+            });
+            return result.get();
+        }
     }
 
     public static short[] combineAudio(List<short[]> audioParts) {

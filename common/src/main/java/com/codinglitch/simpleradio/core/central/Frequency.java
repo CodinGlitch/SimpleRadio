@@ -2,9 +2,9 @@ package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.radio.RadioChannel;
-import com.codinglitch.simpleradio.radio.RadioListener;
+import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -36,8 +36,8 @@ public class Frequency {
 
     public final Modulation modulation;
     public final String frequency;
-    public final List<RadioChannel> receivers;
-    public final List<RadioListener> transmitters; //TODO: create transmitter class and replace this
+    public final List<RadioReceiver> receivers;
+    public final List<RadioTransmitter> transmitters; //TODO: create transmitter class and replace this
 
     public Frequency(String frequency, Modulation modulation) {
         if (!check(frequency)) {
@@ -70,11 +70,14 @@ public class Frequency {
         }
     }
 
+    static {
+        onLexiconRevision(); // stupid
+    }
+
     public static void garbageCollect() {
-        for (int i = 0; i < frequencies.size(); i++) {
-            Frequency frequency = frequencies.get(i);
-            frequency.receivers.removeIf(Predicate.not(RadioChannel::validate));
-            frequency.transmitters.removeIf(Predicate.not(RadioListener::validate));
+        for (Frequency frequency : frequencies) {
+            frequency.receivers.removeIf(Predicate.not(RadioReceiver::validate));
+            frequency.transmitters.removeIf(Predicate.not(RadioTransmitter::validate));
         }
 
         frequencies.removeIf(Predicate.not(Frequency::validate));
@@ -121,62 +124,132 @@ public class Frequency {
         return null;
     }
 
-    public RadioChannel getChannel(Player player) {
-        return getChannel(player.getUUID());
+    //---- Receivers ----\\
+
+    public RadioReceiver getReceiver(Predicate<RadioReceiver> criteria) {
+        return receivers.stream().filter(criteria).findFirst().orElse(null);
     }
-    public RadioChannel getChannel(UUID player) {
-        for (RadioChannel listener : receivers)
-            if (listener.owner.equals(player)) return listener;
-
-        return null;
+    public RadioReceiver getReceiver(WorldlyPosition location) {
+        return getReceiver(receiver -> receiver.location == location);
     }
-
-    @Nullable
-    public RadioChannel tryAddReceiver(UUID owner) {
-        if (getChannel(owner) == null)
-            return addReceiver(owner);
-
-        CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", owner, this.frequency);
-        return null;
+    public RadioReceiver getReceiver(Entity owner) {
+        return getReceiver(receiver -> receiver.owner == owner);
     }
-    public RadioChannel addReceiver(UUID owner) {
-        RadioChannel channel = new RadioChannel(owner, this);
-        receivers.add(channel);
-
-        CommonSimpleRadio.info("Added receiver {} to frequency {}", owner, this.frequency);
-
-        return channel;
+    public RadioReceiver getReceiver(UUID id) {
+        return getReceiver(receiver -> receiver.id.equals(id));
     }
 
-    public void removeReceiver(Player player) {
-        removeReceiver(player.getUUID());
+    public RadioReceiver addReceiver(RadioReceiver receiver) {
+        receivers.add(receiver);
+        CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.id, this.frequency);
+        return receiver;
     }
-    public void removeReceiver(UUID player) {
-        receivers.removeIf(channel -> channel.owner.equals(player));
+
+    public RadioReceiver tryAddReceiver(UUID id, WorldlyPosition location) {
+        RadioReceiver receiver = getReceiver(id);
+        if (receiver == null)
+            return addReceiver(id, location);
+
+        CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", id, this.frequency);
+        return receiver;
+    }
+    public RadioReceiver addReceiver(UUID id, WorldlyPosition location) {
+        return addReceiver(new RadioReceiver(this,  location, id));
+    }
+
+    public RadioReceiver tryAddReceiver(UUID id, Entity entity) {
+        RadioReceiver receiver = getReceiver(id);
+        if (receiver == null)
+            return addReceiver(id, entity);
+
+        CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", id, this.frequency);
+        return receiver;
+    }
+    public RadioReceiver addReceiver(UUID id, Entity entity) {
+        return addReceiver(new RadioReceiver(this,  entity, id));
+    }
+
+    public void removeReceiver(RadioReceiver transmitter) {
+        receivers.remove(transmitter);
 
         if (!this.validate())
             frequencies.remove(this);
     }
-
-    @Nullable
-    public RadioListener tryAddTransmitter(RadioListener transmitter) {
-        return addTransmitter(transmitter);
+    public void removeReceiver(Predicate<RadioReceiver> criteria) {
+        receivers.stream().filter(criteria).findFirst().ifPresent(this::removeReceiver);
     }
-    public RadioListener addTransmitter(RadioListener transmitter) {
-        transmitters.add(transmitter);
+    public void removeReceiver(Entity owner) {
+        removeReceiver(receiver -> receiver.owner == owner);
+    }
+    public void removeReceiver(WorldlyPosition location) {
+        removeReceiver(receiver -> receiver.location == location);
+    }
+    public void removeReceiver(UUID id) {
+        removeReceiver(receiver -> receiver.id == id);
+    }
 
+    //---- Transmitters ----\\
+
+    public RadioTransmitter getTransmitter(Predicate<RadioTransmitter> criteria) {
+        return transmitters.stream().filter(criteria).findFirst().orElse(null);
+    }
+    public RadioTransmitter getTransmitter(WorldlyPosition location) {
+        return getTransmitter(transmitter -> transmitter.location == location);
+    }
+    public RadioTransmitter getTransmitter(Entity owner) {
+        return getTransmitter(transmitter -> transmitter.owner == owner);
+    }
+    public RadioTransmitter getTransmitter(UUID id) {
+        return getTransmitter(transmitter -> transmitter.id == id);
+    }
+
+    public RadioTransmitter addTransmitter(RadioTransmitter transmitter) {
+        transmitters.add(transmitter);
+        CommonSimpleRadio.debug("Added transmitter {} to frequency {}", transmitter.id, this.frequency);
         return transmitter;
     }
 
-    public void removeTransmitter(RadioListener transmitter) {
-        transmitters.removeIf(otherTransmitter -> {
-            return otherTransmitter.owner == null ?
-                    otherTransmitter.location.equals(transmitter.location) :
-                    otherTransmitter.owner.equals(transmitter.owner);
-        });
+    public RadioTransmitter tryAddTransmitter(UUID id, WorldlyPosition location) {
+        RadioTransmitter transmitter = getTransmitter(id);
+        if (transmitter == null)
+            return addTransmitter(id, location);
+
+        CommonSimpleRadio.info("Failed to add transmitter {} to frequency {} as they already exist", id, this.frequency);
+        return transmitter;
+    }
+    public RadioTransmitter addTransmitter(UUID id, WorldlyPosition location) {
+        return addTransmitter(new RadioTransmitter(this, location, id));
+    }
+
+    public RadioTransmitter tryAddTransmitter(UUID id, Entity entity) {
+        RadioTransmitter transmitter = getTransmitter(id);
+        if (transmitter == null)
+            return addTransmitter(id, entity);
+
+        CommonSimpleRadio.info("Failed to add transmitter {} to frequency {} as they already exist", id, this.frequency);
+        return transmitter;
+    }
+    public RadioTransmitter addTransmitter(UUID id, Entity entity) {
+        return addTransmitter(new RadioTransmitter(this, entity, id));
+    }
+
+    public void removeTransmitter(RadioTransmitter transmitter) {
+        transmitters.remove(transmitter);
 
         if (!this.validate())
             frequencies.remove(this);
+    }
+    public void removeTransmitter(Predicate<RadioTransmitter> criteria) {
+        transmitters.stream().filter(criteria).findFirst().ifPresent(this::removeTransmitter);
+    }
+    public void removeTransmitter(Entity owner) {
+        removeTransmitter(transmitter -> transmitter.owner == owner);
+    }
+    public void removeTransmitter(WorldlyPosition location) {
+        removeTransmitter(transmitter -> transmitter.location == location);
+    }
+    public void removeTransmitter(UUID id) {
+        removeTransmitter(transmitter -> transmitter.id == id);
     }
 
     public void serverTick(int tickCount) {}

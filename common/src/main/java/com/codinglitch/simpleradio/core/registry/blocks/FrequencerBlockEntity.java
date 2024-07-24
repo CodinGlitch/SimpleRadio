@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -11,7 +11,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -62,9 +61,8 @@ public class FrequencerBlockEntity extends BlockEntity {
 
             if (blockEntity.frequency != null) {
                 //---- Receiver gathering and parsing ----\\
-                for (RadioChannel receiver : blockEntity.frequency.receivers) {
-                    Player player = level.getPlayerByUUID(receiver.owner);
-                    String name = parse(player, receiver.location);
+                for (RadioReceiver receiver : blockEntity.frequency.receivers) {
+                    String name = parse(null, receiver.location);
                     if (name != null) blockEntity.receivers.add(name);
                 }
 

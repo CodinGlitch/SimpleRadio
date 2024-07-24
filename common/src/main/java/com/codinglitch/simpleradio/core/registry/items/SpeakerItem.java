@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.central.Alterable;
 import com.codinglitch.simpleradio.core.central.Module;
+import com.codinglitch.simpleradio.core.central.Speaking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioModules;
 import net.minecraft.network.chat.Component;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SpeakerItem extends BlockItem implements Receiving, Alterable {
+public class SpeakerItem extends BlockItem implements Receiving, Speaking, Alterable {
     public SpeakerItem(Properties settings) {
         super(SimpleRadioBlocks.SPEAKER, settings);
     }

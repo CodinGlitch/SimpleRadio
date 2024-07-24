@@ -1,9 +1,6 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioChannel;
-import com.codinglitch.simpleradio.radio.RadioListener;
+import com.codinglitch.simpleradio.radio.*;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,79 +14,64 @@ import java.util.UUID;
 
 public interface Transmitting extends Frequencing {
 
-    static boolean validateTransmitter(WorldlyPosition position, @Nullable Frequency frequency) {
-        BlockPos pos = position.realLocation();
-
-        if (!position.level.isLoaded(pos)) return false;
-
-        BlockState state = position.level.getBlockState(pos);
-        if (state.isAir()) return false;
-
-        BlockEntity blockEntity = position.level.getBlockEntity(pos);
-
-        if (state.getBlock().asItem() instanceof Transmitting transmitting)
-            return frequency == null || transmitting.getFrequency(blockEntity) == frequency;
-        return false;
+    /**
+     * Start transmitting in a certain frequency.
+     * @param location the location to transmit from
+     * @param frequencyName the frequency to listen to
+     * @param modulation the modulation type of the frequency
+     * @param id the UUID that will listen
+     * @return The channel created from the listener.
+     */
+    default RadioTransmitter startTransmitting(WorldlyPosition location, String frequencyName, Frequency.Modulation modulation, UUID id) {
+        return startTransmitting(location, Frequency.getOrCreateFrequency(frequencyName, modulation), id);
     }
-    static boolean validateTransmitter(UUID uuid, @Nullable Frequency frequency) {
-        VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(uuid);
-        if (connection != null) return validateTransmitter(connection, frequency);
-        return false;
+    default RadioTransmitter startTransmitting(WorldlyPosition location, Frequency frequency, UUID id) {
+        return frequency.tryAddTransmitter(id, location);
     }
-    static boolean validateTransmitter(VoicechatConnection connection, @Nullable Frequency frequency) {
-        ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
-        if (player == null) return false;
-        return validateTransmitter(player, frequency);
-    }
-    static boolean validateTransmitter(ServerPlayer player, @Nullable Frequency frequency) { //TODO: find way to support entities
-        return player.getInventory().hasAnyMatching(stack -> {
-            if (stack.getItem() instanceof Transmitting transmitting)
-                return frequency == null || transmitting.getFrequency(stack) == frequency;
-            return false;
-        });
+    default RadioTransmitter startTransmitting(WorldlyPosition location, Frequency frequency) {
+        return startTransmitting(location, frequency, UUID.randomUUID());
     }
 
     /**
-     * Start listening in the world.
-     * @param owner the Entity that will listen
-     * @return The listener created.
+     * Start transmitting in a certain frequency.
+     * @param entity the Entity to transmit from
+     * @param frequencyName the frequency to listen to
+     * @param modulation the modulation type of the frequency
+     * @param id the UUID that will listen
+     * @return The channel created from the listener.
      */
-    default RadioListener startListening(Entity owner) {
-        return RadioListener.getOrCreateListener(owner);
+    default RadioTransmitter startTransmitting(Entity entity, String frequencyName, Frequency.Modulation modulation, UUID id) {
+        return startTransmitting(entity, Frequency.getOrCreateFrequency(frequencyName, modulation), id);
     }
-    /**
-     * Start listening in the world.
-     * @param location the location to listen to
-     * @return The listener created.
-     */
-    default RadioListener startListening(WorldlyPosition location) {
-        return RadioListener.getOrCreateListener(location);
+    default RadioTransmitter startTransmitting(Entity entity, Frequency frequency, UUID id) {
+        return frequency.tryAddTransmitter(id, entity);
     }
-
-    /**
-     * Stop listening in the world.
-     * @param owner the Entity that will stop listening
-     */
-    default void stopListening(Entity owner) {
-        RadioListener.removeListener(owner);
-    }
-    /**
-     * Stop listening in the world.
-     * @param location the location of the listener to remove
-     */
-    default void stopListening(WorldlyPosition location) {
-        RadioListener.removeListener(location);
+    default RadioTransmitter startTransmitting(Entity entity, Frequency frequency) {
+        return startTransmitting(entity, frequency, UUID.randomUUID());
     }
 
-    default void setState(Entity entity, State state) {
-        switch (state) {
-            case TRANSMITTING -> entity.addTag("transmissionActive");
-            case INACTIVE -> entity.removeTag("transmissionActive");
+    /**
+     * Stop listening in a certain frequency
+     * @param frequencyName the frequency to stop listening to
+     * @param modulation the modulation type of the frequency
+     * @param owner the UUID to remove
+     */
+    default void stopTransmitting(String frequencyName, Frequency.Modulation modulation, UUID owner) {
+        Frequency frequency = Frequency.getFrequency(frequencyName, modulation);
+        if (frequency != null) {
+            frequency.removeTransmitter(owner);
         }
     }
 
-    enum State {
-        TRANSMITTING,
-        INACTIVE
+    /**
+     * Stop receiving. Infers information from itself.
+     */
+    default void stopTransmitting() {
+        if (this instanceof CentralBlockEntity blockEntity) {
+            if (blockEntity.transmitter != null && blockEntity.transmitter.frequency != null) {
+                stopTransmitting(blockEntity.transmitter.frequency.frequency, blockEntity.transmitter.frequency.modulation, blockEntity.id);
+                blockEntity.transmitter.invalidate();
+            }
+        }
     }
 }

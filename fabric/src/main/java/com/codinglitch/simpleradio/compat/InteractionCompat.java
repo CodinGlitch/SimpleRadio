@@ -3,13 +3,11 @@ package com.codinglitch.simpleradio.compat;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import de.maxhenkel.vcinteraction.AudioUtils;
 import de.maxhenkel.vcinteraction.VoicechatInteraction;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
-import de.maxhenkel.voicechat.api.opus.OpusDecoder;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InteractionCompat {
     private static ConcurrentHashMap<UUID, Long> cooldowns = new ConcurrentHashMap<>();;
 
-    public static void onData(RadioChannel channel, RadioSource source, short[] decodedData) {
+    public static void onData(RadioSpeaker channel, RadioSource source, short[] decodedData) {
         UUID sourceOwner = source.getRealOwner();
         VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(sourceOwner);
 

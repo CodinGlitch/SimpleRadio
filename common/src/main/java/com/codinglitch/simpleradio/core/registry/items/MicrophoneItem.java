@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
+import com.codinglitch.simpleradio.core.central.Listening;
 import com.codinglitch.simpleradio.core.central.Module;
 import com.codinglitch.simpleradio.core.central.Transmitting;
 import com.codinglitch.simpleradio.core.central.Alterable;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MicrophoneItem extends BlockItem implements Transmitting, Alterable {
+public class MicrophoneItem extends BlockItem implements Transmitting, Listening, Alterable {
     public MicrophoneItem(Properties settings) {
         super(SimpleRadioBlocks.MICROPHONE, settings);
     }

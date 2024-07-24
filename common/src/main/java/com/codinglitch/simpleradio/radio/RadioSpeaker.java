@@ -3,54 +3,110 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
-import de.maxhenkel.voicechat.api.VoicechatConnection;
-import de.maxhenkel.voicechat.api.VolumeCategory;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-/**
- * This class currently serves as both the receiver as well as the sound-playing class.
- */
-public class RadioChannel implements Supplier<short[]> {
-    public UUID owner;
-    public WorldlyPosition location;
+public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
+    private static final List<RadioSpeaker> speakers = new ArrayList<>();
 
-    public float range;
-    public String category;
+    public static List<RadioSpeaker> getSpeakers() {
+        return speakers;
+    }
+
+    public static void removeSpeaker(RadioSpeaker speaker) {
+        speakers.remove(speaker);
+    }
+    public static void removeSpeaker(Entity owner) {
+        speakers.removeIf(speaker -> speaker.owner == owner);
+    }
+    public static void removeSpeaker(WorldlyPosition location) {
+        speakers.removeIf(speaker -> speaker.location != null && speaker.location.equals(location));
+    }
+    public static void removeSpeaker(UUID id) {
+        speakers.removeIf(speaker -> speaker.id == id);
+    }
+
+    public static RadioSpeaker getSpeaker(Entity owner) {
+        return speakers.stream().filter(speaker -> speaker.owner == owner)
+                .findFirst().orElse(null);
+    }
+    public static RadioSpeaker getSpeaker(WorldlyPosition location) {
+        return speakers.stream().filter(speaker -> speaker.location == location)
+                .findFirst().orElse(null);
+    }
+    public static RadioSpeaker getSpeaker(UUID id) {
+        return speakers.stream().filter(speaker -> speaker.id == id)
+                .findFirst().orElse(null);
+    }
+
+    public static RadioSpeaker getOrCreateSpeaker(Entity owner, @Nullable UUID id) {
+        RadioSpeaker speaker = getSpeaker(owner);
+        if (speaker == null) speaker = getSpeaker(id);
+
+        return speaker != null ? speaker : new RadioSpeaker(owner);
+    }
+    public static RadioSpeaker getOrCreateSpeaker(Entity owner) { return getOrCreateSpeaker(owner, null); }
+
+    public static RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, @Nullable UUID id) {
+        RadioSpeaker speaker = getSpeaker(location);
+        if (speaker == null) speaker = getSpeaker(id);
+
+        return speaker != null ? speaker : new RadioSpeaker(location);
+    }
+    public static RadioSpeaker getOrCreateSpeaker(WorldlyPosition location) { return getOrCreateSpeaker(location, null); }
+
+    public static void garbageCollect() {
+        speakers.removeIf(Predicate.not(RadioSpeaker::validate));
+        speakers.removeIf(speaker -> speaker.owner == null && speaker.location == null);
+    }
 
     public AudioChannel audioChannel;
     public AudioPlayer audioPlayer;
     private final Map<UUID, List<short[]>> packetBuffer;
     private final Map<UUID, OpusDecoder> decoders;
     private final AudioEffect effect;
-    private final Frequency frequency;
 
-    public boolean isValid = true;
+    public float range = 8;
 
-    public RadioChannel(Player owner, Frequency frequency) {
-        this(owner.getUUID(), frequency);
-    }
-    public RadioChannel(UUID owner, Frequency frequency) {
-        this.owner = owner;
-        this.frequency = frequency;
+    protected RadioSpeaker(UUID id) {
+        super(id);
+        speakers.add(this);
 
         packetBuffer = new HashMap<>();
         decoders = new HashMap<>();
         effect = new BaseAudioEffect();
+    }
+    protected RadioSpeaker() {
+        this(UUID.randomUUID());
+    }
+
+    public RadioSpeaker(Entity owner) {
+        this(owner, UUID.randomUUID());
+    }
+    public RadioSpeaker(Entity owner, UUID uuid) {
+        this(uuid);
+        this.owner = owner;
+    }
+    public RadioSpeaker(WorldlyPosition location) {
+        this(location, UUID.randomUUID());
+    }
+    public RadioSpeaker(WorldlyPosition location, UUID uuid) {
+        this(uuid);
+        this.location = location;
     }
 
     @Override
@@ -83,19 +139,19 @@ public class RadioChannel implements Supplier<short[]> {
     }
 
     public void updateLocation(WorldlyPosition location) {
+        super.updateLocation(location);
         if (this.audioChannel instanceof LocationalAudioChannel locationalAudioChannel) {
             locationalAudioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x, location.y, location.z));
         }
     }
 
-    public void serverTick(int tickCount) {
-        if (location != null) {
-            Services.COMPAT.modifyPosition(location);
-            this.updateLocation(location);
-        }
+    @Override
+    public void accept(RadioSource source) {
+        super.accept(source);
+        speak(source);
     }
 
-    public void transmit(RadioSource source, Frequency frequency) {
+    public void speak(RadioSource source) {
         // Severity calculation
         ServerLevel level = null;
         Vector3f position = null;
@@ -103,20 +159,14 @@ public class RadioChannel implements Supplier<short[]> {
             level = (ServerLevel) location.level;
             position = location.position();
         } else {
-            VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(owner);
-            if (connection != null) {
-                ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
-                if (player != null) {
-                    level = player.serverLevel();
-                    position = player.position().toVector3f();
-                }
-            }
+            level = (ServerLevel) owner.level();
+            position = owner.position().toVector3f();
         }
         if (level == null || position == null) return;
 
-        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != source.location.level) return;
+        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != source.origin.level) return;
 
-        this.effect.severity = source.computeSeverity(WorldlyPosition.of(position, level), frequency);
+        this.effect.severity = (float) source.computeSeverity();
         this.effect.volume = source.volume;
         if (this.effect.severity >= 100) return;
 
@@ -149,52 +199,37 @@ public class RadioChannel implements Supplier<short[]> {
             getAudioPlayer().startPlaying();
     }
 
-    public boolean validate() {
-        VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(owner);
-        if (connection == null) {
-            if (location == null || !Receiving.validateReceiver(location, frequency)) {
-                invalidate();
-                return false;
-            }
-        } else {
-            if (!Receiving.validateReceiver(connection, frequency)) {
-                invalidate();
-                return false;
-            }
-        }
-
-        return true;
-    }
-    public void invalidate() {
-        if (this.audioPlayer != null)
-            this.audioPlayer.stopPlaying();
-
-        this.isValid = false;
-    }
-
     public OpusDecoder getDecoder(UUID sender) {
         return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
     }
 
     private AudioPlayer getAudioPlayer() {
         if (this.audioPlayer == null) {
-            VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(owner);
-            if (connection == null) {
-                LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.owner,
+            if (this.owner == null) {
+                LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.id,
                         CommonRadioPlugin.serverApi.fromServerLevel(location.level),
                         CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
                 );
-                locationalChannel.setDistance(this.range);
-                locationalChannel.setCategory(this.category);
+                locationalChannel.setDistance(range);
+                locationalChannel.setCategory(CommonRadioPlugin.RADIOS_CATEGORY);
 
                 this.audioChannel = locationalChannel;
             } else {
-                this.audioChannel = CommonRadioPlugin.serverApi.createEntityAudioChannel(this.owner, connection.getPlayer());
-                audioChannel.setCategory(this.category);
+                this.audioChannel = CommonRadioPlugin.serverApi.createEntityAudioChannel(this.id, (de.maxhenkel.voicechat.api.Entity) this.owner);
+                audioChannel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
             }
 
             this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this);
         }
         return this.audioPlayer;
     }
+
+    @Override
+    public void invalidate() {
+        if (this.audioPlayer != null)
+            this.audioPlayer.stopPlaying();
+
+        super.invalidate();
+    }
+
 }

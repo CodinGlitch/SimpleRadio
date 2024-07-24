@@ -1,10 +1,13 @@
 package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
+import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -13,48 +16,42 @@ import java.util.UUID;
 
 public interface Receiving extends Frequencing {
 
-    static boolean validateReceiver(WorldlyPosition position, @Nullable Frequency frequency) {
-        BlockPos pos = position.realLocation();
-        if (!position.level.isLoaded(pos)) return false;
-
-        BlockState state = position.level.getBlockState(pos);
-        if (state.isAir()) return false;
-
-        BlockEntity blockEntity = position.level.getBlockEntity(pos);
-
-        if (state.getBlock().asItem() instanceof Receiving receiving)
-            return frequency == null || receiving.getFrequency(blockEntity) == frequency;
-        return false;
+    /**
+     * Start receiving in a certain frequency.
+     * @param location the location to receive at
+     * @param frequencyName the frequency to listen to
+     * @param modulation the modulation type of the frequency
+     * @param id the UUID that will listen
+     * @return The channel created from the listener.
+     */
+    default RadioReceiver startReceiving(WorldlyPosition location, String frequencyName, Frequency.Modulation modulation, UUID id) {
+        return startReceiving(location, Frequency.getOrCreateFrequency(frequencyName, modulation), id);
     }
-    static boolean validateReceiver(UUID uuid, @Nullable Frequency frequency) {
-        VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(uuid);
-        if (connection != null) return validateReceiver(connection, frequency);
-        return false;
+    default RadioReceiver startReceiving(WorldlyPosition location, Frequency frequency) {
+        return startReceiving(location, frequency, UUID.randomUUID());
     }
-    static boolean validateReceiver(VoicechatConnection connection, @Nullable Frequency frequency) {
-        ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
-        if (player == null) return false;
-        return validateReceiver(player, frequency);
-    }
-    static boolean validateReceiver(ServerPlayer player, @Nullable Frequency frequency) {
-        return player.getInventory().hasAnyMatching(stack -> {
-            if (stack.getItem() instanceof Receiving receiving)
-                return frequency == null || receiving.getFrequency(stack) == frequency;
-            return false;
-        });
+    default RadioReceiver startReceiving(WorldlyPosition location, Frequency frequency, UUID id) {
+        return frequency.tryAddReceiver(id, location);
     }
 
     /**
      * Start receiving in a certain frequency.
+     * @param entity the Entity to receive at
      * @param frequencyName the frequency to listen to
      * @param modulation the modulation type of the frequency
-     * @param owner the UUID that will listen
+     * @param id the UUID that will listen
      * @return The channel created from the listener.
      */
-    default RadioChannel startReceiving(String frequencyName, Frequency.Modulation modulation, UUID owner) {
-        Frequency frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
-        return frequency.tryAddReceiver(owner);
+    default RadioReceiver startReceiving(Entity entity, String frequencyName, Frequency.Modulation modulation, UUID id) {
+        return startReceiving(entity, Frequency.getOrCreateFrequency(frequencyName, modulation), id);
     }
+    default RadioReceiver startReceiving(Entity entity, Frequency frequency) {
+        return startReceiving(entity, frequency, UUID.randomUUID());
+    }
+    default RadioReceiver startReceiving(Entity entity, Frequency frequency, UUID id) {
+        return frequency.tryAddReceiver(id, entity);
+    }
+
 
     /**
      * Stop listening in a certain frequency
@@ -63,7 +60,21 @@ public interface Receiving extends Frequencing {
      * @param owner the UUID to remove
      */
     default void stopReceiving(String frequencyName, Frequency.Modulation modulation, UUID owner) {
-        Frequency frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
-        frequency.removeReceiver(owner);
+        Frequency frequency = Frequency.getFrequency(frequencyName, modulation);
+        if (frequency != null) {
+            frequency.removeReceiver(owner);
+        }
+    }
+
+    /**
+     * Stop receiving. Infers information from itself.
+     */
+    default void stopReceiving() {
+        if (this instanceof CentralBlockEntity blockEntity) {
+            if (blockEntity.receiver != null && blockEntity.receiver.frequency != null) {
+                stopReceiving(blockEntity.receiver.frequency.frequency, blockEntity.receiver.frequency.modulation, blockEntity.id);
+                blockEntity.receiver.invalidate();
+            }
+        }
     }
 }

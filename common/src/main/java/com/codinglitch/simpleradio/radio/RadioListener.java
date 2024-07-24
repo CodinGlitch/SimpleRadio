@@ -1,30 +1,20 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Receiving;
 import com.codinglitch.simpleradio.core.central.Transmitting;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.Services;
-import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import org.joml.Math;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
-/**
- * This class provides functionality for allowing sounds transmitted by players to be gathered around it.
- */
-public class RadioListener {
+public class RadioListener extends RadioRouter {
     private static final List<RadioListener> listeners = new ArrayList<>();
 
     public static List<RadioListener> getListeners() {
@@ -40,83 +30,80 @@ public class RadioListener {
     public static void removeListener(WorldlyPosition location) {
         listeners.removeIf(listener -> listener.location != null && listener.location.equals(location));
     }
+    public static void removeListener(UUID id) {
+        listeners.removeIf(listener -> listener.id == id);
+    }
 
     public static RadioListener getListener(Entity owner) {
-        Optional<RadioListener> radioListener = listeners.stream().filter(listener -> listener.owner == owner).findFirst();
-        return radioListener.orElse(null);
+        return listeners.stream().filter(listener -> listener.owner == owner)
+                .findFirst().orElse(null);
     }
     public static RadioListener getListener(WorldlyPosition location) {
-        Optional<RadioListener> radioListener = listeners.stream().filter(listener -> listener.location == location).findFirst();
-        return radioListener.orElse(null);
+        return listeners.stream().filter(listener -> listener.location == location)
+                .findFirst().orElse(null);
+    }
+    public static RadioListener getListener(UUID id) {
+        return listeners.stream().filter(listener -> listener.id == id)
+                .findFirst().orElse(null);
     }
 
-    public static RadioListener getOrCreateListener(Entity owner) {
+    public static RadioListener getOrCreateListener(Entity owner, @Nullable UUID id) {
         RadioListener listener = getListener(owner);
+        if (listener == null) listener = getListener(id);
+
         return listener != null ? listener : new RadioListener(owner);
     }
-    public static RadioListener getOrCreateListener(WorldlyPosition location) {
+    public static RadioListener getOrCreateListener(Entity owner) { return getOrCreateListener(owner, null); }
+
+    public static RadioListener getOrCreateListener(WorldlyPosition location, @Nullable UUID id) {
         RadioListener listener = getListener(location);
+        if (listener == null) listener = getListener(id);
+
         return listener != null ? listener : new RadioListener(location);
     }
+    public static RadioListener getOrCreateListener(WorldlyPosition location) { return getOrCreateListener(location, null); }
 
     public static void garbageCollect() {
         listeners.removeIf(Predicate.not(RadioListener::validate));
         listeners.removeIf(listener -> listener.owner == null && listener.location == null);
     }
 
-    public Entity owner;
-    public WorldlyPosition location;
-
-    private Consumer<RadioSource> dataAcceptor;
+    private UnaryOperator<RadioSource> dataTransformer;
 
     public float range = 8;
 
+    protected RadioListener(UUID id) {
+        super(id);
+        listeners.add(this);
+    }
+    protected RadioListener() {
+        this(UUID.randomUUID());
+    }
+
     public RadioListener(Entity owner) {
+        this(owner, UUID.randomUUID());
+    }
+    public RadioListener(Entity owner, UUID uuid) {
+        this(uuid);
         this.owner = owner;
-
-        listeners.add(this);
     }
-
     public RadioListener(WorldlyPosition location) {
+        this(location, UUID.randomUUID());
+    }
+    public RadioListener(WorldlyPosition location, UUID uuid) {
+        this(uuid);
         this.location = location;
-
-        listeners.add(this);
     }
 
-    public void acceptor(Consumer<RadioSource> acceptor) {
-        this.dataAcceptor = acceptor;
+    public void transformer(UnaryOperator<RadioSource> transformer) {
+        this.dataTransformer = transformer;
     }
 
     public void onData(RadioSource source) {
-        dataAcceptor.accept(source);
-    }
-
-    public void updateLocation(WorldlyPosition location) {
-    }
-
-    public void serverTick(int tickCount) {
-        if (location != null) {
-            Services.COMPAT.modifyPosition(location);
-            this.updateLocation(location);
+        if (dataTransformer != null) {
+            source = dataTransformer.apply(source);
         }
-    }
 
-    public boolean validate() {
-        if (owner == null) {
-            if (location == null || !Transmitting.validateTransmitter(location, null)) {
-                invalidate();
-                return false;
-            }
-        } else {
-            if (!Transmitting.validateTransmitter((ServerPlayer) owner, null)) {
-                invalidate();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void invalidate() {
-        //removeListener(this);
+        this.route(source);
     }
 }

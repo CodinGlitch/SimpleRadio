@@ -1,33 +1,26 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioListener;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
 
-import java.util.UUID;
+public class MicrophoneBlockEntity extends CentralBlockEntity implements Transmitting, Listening {
+    public boolean isActive = false;
 
-public class MicrophoneBlockEntity extends FrequencyBlockEntity implements Transmitting {
-    public boolean isListening = false;
-    public UUID listenerID;
-
-    private RadioListener listener;
+    public RadioTransmitter transmitter;
+    public RadioListener listener;
 
     public MicrophoneBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.MICROPHONE, pos, state);
-
-        this.listenerID = UUID.randomUUID();
     }
 
     @Override
@@ -41,9 +34,8 @@ public class MicrophoneBlockEntity extends FrequencyBlockEntity implements Trans
             );
         }
 
+        inactivate();
 
-        if (this.frequency != null)
-            stopListening(WorldlyPosition.of(getBlockPos(), level));
         super.setRemoved();
     }
 
@@ -67,34 +59,36 @@ public class MicrophoneBlockEntity extends FrequencyBlockEntity implements Trans
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, MicrophoneBlockEntity blockEntity) {
         if (!level.isClientSide) {
-            if (blockEntity.frequency != null && !blockEntity.isListening) {
-                blockEntity.listen();
+            if (blockEntity.frequency != null && !blockEntity.isActive) {
+                blockEntity.activate();
             }
         }
     }
 
-    public void listen() {
-        listener = startListening(Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition)));
+    public void inactivate() {
+        if (this.frequency != null) {
+            stopListening();
+            stopTransmitting();
+        }
 
-        listener.range = 12;
-        listener.acceptor(source -> {
-            source.type = RadioSource.Type.TRANSMITTER;
-            source.delegate(listenerID);
+        this.isActive = false;
+    }
+    public void activate() {
+        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
-            Frequency frequency = getFrequency(this);
-            if (frequency != null) RadioManager.transmit(source, frequency);
-        });
+        listener = startListening(location, id);
+        transmitter = startTransmitting(location, this.frequency, id);
 
-        this.frequency.tryAddTransmitter(listener);
+        listener.routers.add(transmitter);
 
         level.playSound(
-                null, listener.location.x, listener.location.y, listener.location.z,
+                null, location.x, location.y, location.z,
                 SimpleRadioSounds.RADIO_OPEN,
                 SoundSource.PLAYERS,
                 1f, 1f
         );
 
-        this.isListening = true;
+        this.isActive = true;
     }
 
     public void loadFromItem(ItemStack stack) {
@@ -102,10 +96,7 @@ public class MicrophoneBlockEntity extends FrequencyBlockEntity implements Trans
     }
 
     public void loadTag(CompoundTag tag) {
-        if (this.frequency != null) {
-            stopListening(WorldlyPosition.of(getBlockPos(), level));
-            this.isListening = false;
-        }
+        inactivate();
 
         String frequencyName = tag.getString("frequency");
         Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
