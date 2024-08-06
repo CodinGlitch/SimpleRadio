@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.core.central.WorldTicking;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
@@ -14,7 +15,7 @@ import net.minecraft.world.level.gameevent.EntityPositionSource;
 
 import java.util.Random;
 
-public class WalkieTalkieItem extends TransceiverItem {
+public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     public WalkieTalkieItem(Properties settings) {
         super(settings);
     }
@@ -36,6 +37,7 @@ public class WalkieTalkieItem extends TransceiverItem {
         return frequency.toString();
     }
 
+    @Override
     public void worldTick(ItemEntity item, Level level) {
         ItemStack myStack = item.getItem();
         this.tick(myStack, level);

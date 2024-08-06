@@ -37,6 +37,13 @@ public class SimpleRadioBlockEntities {
             MicrophoneBlockEntity::new, id("microphone"), SimpleRadioBlocks.MICROPHONE
     );
 
+    public static final BlockEntityType<TransmitterBlockEntity> TRANSMITTER = Services.REGISTRY.registerBlockEntity(
+            TransmitterBlockEntity::new, id("transmitter"), SimpleRadioBlocks.TRANSMITTER
+    );
+    public static final BlockEntityType<ReceiverBlockEntity> RECEIVER = Services.REGISTRY.registerBlockEntity(
+            ReceiverBlockEntity::new, id("receiver"), SimpleRadioBlocks.RECEIVER
+    );
+
     public static final BlockEntityType<FrequencerBlockEntity> FREQUENCER = Services.REGISTRY.registerBlockEntity(
             FrequencerBlockEntity::new, id("frequencer"), SimpleRadioBlocks.FREQUENCER
     );

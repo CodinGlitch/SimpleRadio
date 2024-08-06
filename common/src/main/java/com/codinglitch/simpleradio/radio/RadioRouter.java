@@ -40,6 +40,17 @@ public class RadioRouter {
         return null;
     }
 
+    public RadioRouter tryAddRouter(RadioRouter router) {
+        RadioRouter existingRouter = getRouter(router.id);
+        if (existingRouter != null) return existingRouter;
+
+        routers.add(router);
+        return router;
+    }
+    public RadioRouter getRouter(UUID id) {
+        return routers.stream().filter(router -> router.id.equals(id)).findFirst().orElse(null);
+    }
+
     public void updateLocation(WorldlyPosition location) {
     }
 
@@ -99,9 +110,9 @@ public class RadioRouter {
 
             boolean flag = true;
             if (this instanceof RadioSpeaker) {
-                flag = Auditory.validate(location, Speaking.class);
+                flag = Auricular.validate(location, Speaking.class);
             } else if (this instanceof RadioListener) {
-                flag = Auditory.validate(location, Listening.class);
+                flag = Auricular.validate(location, Listening.class);
             } else if (this instanceof RadioReceiver) {
                 flag = Frequencing.validate(location, Receiving.class, null);
             } else if (this instanceof RadioTransmitter) {
@@ -115,9 +126,9 @@ public class RadioRouter {
         } else {
             boolean flag = true;
             if (this instanceof RadioSpeaker) {
-                flag = Auditory.validate(owner, Speaking.class);
+                flag = Auricular.validate(owner, Speaking.class);
             } else if (this instanceof RadioListener) {
-                flag = Auditory.validate(owner, Listening.class);
+                flag = Auricular.validate(owner, Listening.class);
             } else if (this instanceof RadioReceiver) {
                 flag = Frequencing.validate(owner, Receiving.class, null);
             } else if (this instanceof RadioTransmitter) {

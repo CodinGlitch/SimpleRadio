@@ -1,13 +1,12 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public interface Speaking extends Auditory {
+public interface Speaking extends Auricular {
     /**
      * Start speaking in the world.
      * @param owner the Entity that will speak
@@ -28,7 +27,7 @@ public interface Speaking extends Auditory {
     }
 
     default RadioSpeaker setupSpeaker(RadioSpeaker speaker) {
-        if (this instanceof CentralBlockEntity blockEntity) {
+        if (this instanceof AuditoryBlockEntity blockEntity) {
             speaker.range = 12;
         }
 
@@ -55,7 +54,7 @@ public interface Speaking extends Auditory {
      * Stop speaking in the world. Infers information from itself.
      */
     default void stopSpeaking() {
-        if (this instanceof CentralBlockEntity blockEntity) {
+        if (this instanceof AuditoryBlockEntity blockEntity) {
             if (blockEntity.speaker != null) {
                 stopSpeaking(blockEntity.speaker.location);
                 blockEntity.speaker.invalidate();

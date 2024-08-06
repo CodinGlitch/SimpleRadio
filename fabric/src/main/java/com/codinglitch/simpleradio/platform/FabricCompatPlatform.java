@@ -5,8 +5,13 @@ import com.codinglitch.simpleradio.compat.InteractionCompat;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.function.Predicate;
 
 public class FabricCompatPlatform implements CompatPlatform {
     @Override
@@ -27,5 +32,20 @@ public class FabricCompatPlatform implements CompatPlatform {
         }
 
         return position;
+    }
+
+    @Override
+    public void postCompatibilityLoad() {
+
+    }
+
+    @Override
+    public RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz) {
+        return RadioManager.CollectionResult.PASS;
+    }
+
+    @Override
+    public RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria) {
+        return RadioManager.CollectionResult.PASS;
     }
 }

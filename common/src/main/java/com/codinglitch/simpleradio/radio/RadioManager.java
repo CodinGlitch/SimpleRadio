@@ -1,18 +1,26 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 public class RadioManager {
     private static RadioManager INSTANCE;
@@ -55,6 +63,56 @@ public class RadioManager {
         RadioSpeaker.garbageCollect();
     }
 
+    public enum CollectionResult {
+        PASS,
+        IGNORE,
+        COLLECT
+    }
+
+    public static boolean verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {
+        BlockPos pos = position.realLocation();
+
+        CollectionResult result = CompatCore.verifyLocationCollection(position, clazz);
+        if (result == CollectionResult.IGNORE) {
+            return true;
+        } else if (result == CollectionResult.COLLECT) {
+            return false;
+        }
+
+        if (!position.level.isLoaded(pos)) return false;
+
+        BlockState state = position.level.getBlockState(pos);
+        if (state.isAir()) return false;
+
+        return clazz.isInstance(state.getBlock().asItem());
+    }
+
+    public static boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria) {
+        CollectionResult result = CompatCore.verifyEntityCollection(entity, inventoryCriteria);
+        if (result == CollectionResult.IGNORE) {
+            return true;
+        } else if (result == CollectionResult.COLLECT) {
+            return false;
+        }
+
+        if (entity instanceof Player player) {
+            return player.getInventory().hasAnyMatching(inventoryCriteria);
+        } else {
+            for (ItemStack stack : entity.getHandSlots()) {
+                if (inventoryCriteria.test(stack)) return true;
+            }
+            return false;
+        }
+    }
+
+    @Nullable
+    public static ItemStack isEntityHolding(Entity entity, Predicate<ItemStack> handCriteria) {
+        for (ItemStack stack : entity.getHandSlots()) {
+            if (handCriteria.test(stack)) return stack;
+        }
+        return null;
+    }
+
     public void onMicPacket(MicrophonePacketEvent event) {
         VoicechatConnection senderConnection = event.getSenderConnection();
         if (senderConnection == null) return;
@@ -66,10 +124,10 @@ public class RadioManager {
         TreeMap<Float, RadioListener> qualified = new TreeMap<>();
         for (RadioListener listener : RadioListener.getListeners()) {
             Vector3f position;
-            if (listener.owner != null) {
-                position = listener.owner.position().toVector3f();
-            } else if (listener.location != null) {
+            if (listener.location != null) {
                 position = listener.location.position();
+            } else if (listener.owner != null) {
+                position = listener.owner.position().toVector3f();
             } else continue;
 
             float distance = position.distanceSquared((float) sender.getX(), (float) sender.getY(), (float) sender.getZ());

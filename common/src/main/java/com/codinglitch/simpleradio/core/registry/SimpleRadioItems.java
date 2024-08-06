@@ -15,6 +15,8 @@ import static com.codinglitch.simpleradio.CommonSimpleRadio.id;
 public class SimpleRadioItems {
     public static final Map<ResourceLocation, ItemHolder<Item>> ITEMS = new LinkedHashMap<>();
 
+    public static WireItem COPPER_WIRE = register(id("copper_wire"), new WireItem(new Item.Properties().stacksTo(16)));
+
     public static TransceiverItem TRANSCEIVER = register(id("transceiver"), new TransceiverItem(new Item.Properties().stacksTo(1)));
     public static WalkieTalkieItem WALKIE_TALKIE = register(id("walkie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
     public static WalkieTalkieItem SPUDDIE_TALKIE = register(id("spuddie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
@@ -22,6 +24,9 @@ public class SimpleRadioItems {
     public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(1)));
     public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(1)));
     public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(1)));
+
+    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(1)));
+    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(1)));
 
     public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)));
 

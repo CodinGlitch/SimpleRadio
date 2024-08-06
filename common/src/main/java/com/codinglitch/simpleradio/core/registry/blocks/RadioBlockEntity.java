@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class RadioBlockEntity extends CentralBlockEntity implements Receiving, Speaking {
+public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking {
     public boolean isActive = false;
 
     public RadioBlockEntity(BlockPos pos, BlockState state) {
@@ -87,22 +87,9 @@ public class RadioBlockEntity extends CentralBlockEntity implements Receiving, S
         this.isActive = true;
     }
 
-    public void loadFromItem(ItemStack stack) {
-        loadTag(stack.getOrCreateTag());
-    }
-
+    @Override
     public void loadTag(CompoundTag tag) {
         inactivate();
-
-        String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-        this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
-    }
-
-    public void saveTag(CompoundTag tag) {
-        if (this.frequency == null) return;
-
-        tag.putString("frequency", this.frequency.frequency);
-        tag.putString("modulation", this.frequency.modulation.shorthand);
+        super.loadTag(tag);
     }
 }

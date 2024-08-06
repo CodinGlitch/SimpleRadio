@@ -35,15 +35,15 @@ public class RadioListener extends RadioRouter {
     }
 
     public static RadioListener getListener(Entity owner) {
-        return listeners.stream().filter(listener -> listener.owner == owner)
+        return listeners.stream().filter(listener -> listener.owner.equals(owner))
                 .findFirst().orElse(null);
     }
     public static RadioListener getListener(WorldlyPosition location) {
-        return listeners.stream().filter(listener -> listener.location == location)
+        return listeners.stream().filter(listener -> listener.location.equals(location))
                 .findFirst().orElse(null);
     }
     public static RadioListener getListener(UUID id) {
-        return listeners.stream().filter(listener -> listener.id == id)
+        return listeners.stream().filter(listener -> listener.id.equals(id))
                 .findFirst().orElse(null);
     }
 
@@ -51,7 +51,7 @@ public class RadioListener extends RadioRouter {
         RadioListener listener = getListener(owner);
         if (listener == null) listener = getListener(id);
 
-        return listener != null ? listener : new RadioListener(owner);
+        return listener != null ? listener : new RadioListener(owner, id);
     }
     public static RadioListener getOrCreateListener(Entity owner) { return getOrCreateListener(owner, null); }
 
@@ -59,7 +59,7 @@ public class RadioListener extends RadioRouter {
         RadioListener listener = getListener(location);
         if (listener == null) listener = getListener(id);
 
-        return listener != null ? listener : new RadioListener(location);
+        return listener != null ? listener : new RadioListener(location, id);
     }
     public static RadioListener getOrCreateListener(WorldlyPosition location) { return getOrCreateListener(location, null); }
 

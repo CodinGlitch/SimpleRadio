@@ -12,22 +12,6 @@ import java.util.function.BiPredicate;
 public class RadioTransmitter extends RadioRouter {
     public BiPredicate<RadioSource, RadioRouter> transmitCriteria;
 
-    public static RadioTransmitter getOrCreateTransmitter(Frequency frequency, Entity owner, @Nullable UUID id) {
-        RadioTransmitter transmitter = frequency.getTransmitter(owner);
-        if (transmitter == null) transmitter = frequency.getTransmitter(id);
-
-        return transmitter != null ? transmitter : new RadioTransmitter(frequency, owner);
-    }
-    public static RadioTransmitter getOrCreateTransmitter(Frequency frequency, Entity owner) { return getOrCreateTransmitter(frequency, owner, null); }
-
-    public static RadioTransmitter getOrCreateTransmitter(Frequency frequency, WorldlyPosition location, @Nullable UUID id) {
-        RadioTransmitter transmitter = frequency.getTransmitter(location);
-        if (transmitter == null) transmitter = frequency.getTransmitter(id);
-
-        return transmitter != null ? transmitter : new RadioTransmitter(frequency);
-    }
-    public static RadioTransmitter getOrCreateTransmitter(Frequency frequency, WorldlyPosition location) { return getOrCreateTransmitter(frequency, location, null); }
-
     public Frequency frequency;
 
     protected RadioTransmitter(Frequency frequency, UUID id) {

@@ -26,6 +26,13 @@ public class SimpleRadioBlocks {
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
     ));
 
+    public static Block TRANSMITTER = register(id("transmitter"), new TransmitterBlock(
+            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
+    ));
+    public static Block RECEIVER = register(id("receiver"), new ReceiverBlock(
+            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
+    ));
+
     public static Block FREQUENCER = register(id("frequencer"), new FrequencerBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
     ));

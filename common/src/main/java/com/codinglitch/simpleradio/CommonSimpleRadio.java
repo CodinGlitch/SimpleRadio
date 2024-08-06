@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio;
 
-import com.codinglitch.lexiconfig.LexiconfigApi;
-import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

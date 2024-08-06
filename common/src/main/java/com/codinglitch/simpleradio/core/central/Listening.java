@@ -1,19 +1,12 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioListener;
-import com.codinglitch.simpleradio.radio.RadioSource;
-import de.maxhenkel.voicechat.api.VoicechatConnection;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public interface Listening extends Auditory {
+public interface Listening extends Auricular {
 
     /**
      * Start listening in the world.
@@ -35,7 +28,7 @@ public interface Listening extends Auditory {
     }
 
     default RadioListener setupListener(RadioListener listener) {
-        if (this instanceof CentralBlockEntity blockEntity) {
+        if (this instanceof AuditoryBlockEntity blockEntity) {
             listener.range = 12;
             listener.transformer(source -> {
                 source.delegate(blockEntity.id);
@@ -67,7 +60,7 @@ public interface Listening extends Auditory {
      * Stop listening in the world. Infers information from itself.
      */
     default void stopListening() {
-        if (this instanceof CentralBlockEntity blockEntity) {
+        if (this instanceof AuditoryBlockEntity blockEntity) {
             if (blockEntity.listener != null) {
                 stopListening(blockEntity.listener.location);
                 blockEntity.listener.invalidate();

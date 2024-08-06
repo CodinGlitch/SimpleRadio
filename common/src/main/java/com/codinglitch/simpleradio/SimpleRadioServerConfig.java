@@ -202,5 +202,15 @@ public class SimpleRadioServerConfig extends LexiconData {
             @LexiconEntry(comment = "When false, removes compatibility for Valkyrien Skies. Defaults to true.")
             public Boolean enabled = true;
         }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency Create.")
+        public Create create = new Create();
+
+        public static class Create extends LexiconPageData {
+            @LexiconEntry(comment = "When false, removes compatibility for Create. Defaults to true.")
+            public Boolean enabled = true;
+        }
     }
 }

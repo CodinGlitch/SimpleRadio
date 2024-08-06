@@ -1,9 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
-import com.codinglitch.simpleradio.core.central.Listening;
-import com.codinglitch.simpleradio.core.central.Module;
-import com.codinglitch.simpleradio.core.central.Transmitting;
 import com.codinglitch.simpleradio.core.central.Alterable;
+import com.codinglitch.simpleradio.core.central.Module;
+import com.codinglitch.simpleradio.core.central.Receiving;
+import com.codinglitch.simpleradio.core.central.Transmitting;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioModules;
 import net.minecraft.network.chat.Component;
@@ -18,14 +18,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MicrophoneItem extends BlockItem implements Listening, Alterable {
-    public MicrophoneItem(Properties settings) {
-        super(SimpleRadioBlocks.MICROPHONE, settings);
+public class ReceiverItem extends BlockItem implements Receiving, Alterable {
+    public ReceiverItem(Properties settings) {
+        super(SimpleRadioBlocks.RECEIVER, settings);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltip) {
-        //appendTooltip(stack, components);
+        appendTooltip(stack, components);
         super.appendHoverText(stack, level, components, tooltip);
     }
 
@@ -33,7 +33,7 @@ public class MicrophoneItem extends BlockItem implements Listening, Alterable {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
 
-        //tick(stack, level);
+        tick(stack, level);
     }
 
     @Override
