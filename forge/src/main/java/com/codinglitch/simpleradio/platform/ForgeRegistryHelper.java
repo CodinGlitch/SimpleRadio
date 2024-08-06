@@ -1,9 +1,15 @@
 package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.platform.services.RegistryHelper;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -16,6 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ForgeRegistryHelper implements RegistryHelper {
+
+    @Override
+    public <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, ResourceLocation resource) {
+        EntityType<E> entityType = EntityType.Builder.of(factory, spawnGroup).build(null);
+        SimpleRadioEntities.ENTITIES.put(resource, entityType);
+        return entityType;
+    }
 
     @Override
     public <BE extends BlockEntity> BlockEntityType<BE> registerBlockEntity(BlockEntityFactory<BE> factory, ResourceLocation resource, Block... blocks) {

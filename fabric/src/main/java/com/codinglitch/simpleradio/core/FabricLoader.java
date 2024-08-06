@@ -4,10 +4,7 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
+import com.codinglitch.simpleradio.core.registry.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -99,6 +96,7 @@ public class FabricLoader {
         loadBlocks();
         loadPackets();
 
+        SimpleRadioEntities.load();
         SimpleRadioBlockEntities.load();
         SimpleRadioMenus.load();
     }
