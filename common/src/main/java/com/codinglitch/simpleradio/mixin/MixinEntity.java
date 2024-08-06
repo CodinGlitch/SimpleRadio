@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio.mixin;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.central.WorldTicking;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.core.registry.items.WalkieTalkieItem;
 import com.mojang.authlib.GameProfile;
@@ -32,9 +34,13 @@ public abstract class MixinEntity implements CommandSource, Nameable, EntityAcce
     @Inject(method = "baseTick()V", at = @At(value = "TAIL"))
     private void simpleradio$baseTick(CallbackInfo ci) {
         if ((Entity)(Object)this instanceof ItemEntity item) {
-            if (item.getItem().getItem() instanceof WalkieTalkieItem walkieTalkieItem) {
-                walkieTalkieItem.worldTick(item, this.level);
-            }
+            SimpleRadioItems.ITEMS.forEach(((location, itemHolder) -> {
+                if (itemHolder.get() instanceof WorldTicking) {
+                    if (item.getItem().getItem() instanceof WorldTicking worldTicking) {
+                        worldTicking.worldTick(item, this.level);
+                    }
+                }
+            }));
         }
     }
 }

@@ -14,7 +14,8 @@
     "MixinItemRenderer",
     "MixinLocalPlayer",
     "MixinMinecraft",
-    "MixinModelManager"
+    "MixinModelManager",
+    "MixinPlayerRenderer"
   ],
   "server": [
   ],

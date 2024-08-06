@@ -130,7 +130,7 @@ public class Frequency {
         return receivers.stream().filter(criteria).findFirst().orElse(null);
     }
     public RadioReceiver getReceiver(WorldlyPosition location) {
-        return getReceiver(receiver -> receiver.location == location);
+        return getReceiver(receiver -> receiver.location.equals(location));
     }
     public RadioReceiver getReceiver(Entity owner) {
         return getReceiver(receiver -> receiver.owner == owner);
@@ -154,7 +154,7 @@ public class Frequency {
         return receiver;
     }
     public RadioReceiver addReceiver(UUID id, WorldlyPosition location) {
-        return addReceiver(new RadioReceiver(this,  location, id));
+        return addReceiver(new RadioReceiver(this, location, id));
     }
 
     public RadioReceiver tryAddReceiver(UUID id, Entity entity) {
@@ -166,7 +166,7 @@ public class Frequency {
         return receiver;
     }
     public RadioReceiver addReceiver(UUID id, Entity entity) {
-        return addReceiver(new RadioReceiver(this,  entity, id));
+        return addReceiver(new RadioReceiver(this, entity, id));
     }
 
     public void removeReceiver(RadioReceiver transmitter) {
@@ -194,10 +194,10 @@ public class Frequency {
         return transmitters.stream().filter(criteria).findFirst().orElse(null);
     }
     public RadioTransmitter getTransmitter(WorldlyPosition location) {
-        return getTransmitter(transmitter -> transmitter.location == location);
+        return getTransmitter(transmitter -> transmitter.location.equals(location));
     }
     public RadioTransmitter getTransmitter(Entity owner) {
-        return getTransmitter(transmitter -> transmitter.owner == owner);
+        return getTransmitter(transmitter -> transmitter.owner.equals(owner));
     }
     public RadioTransmitter getTransmitter(UUID id) {
         return getTransmitter(transmitter -> transmitter.id == id);

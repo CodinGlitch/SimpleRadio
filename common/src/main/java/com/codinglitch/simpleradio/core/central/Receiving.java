@@ -1,16 +1,7 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import com.codinglitch.simpleradio.radio.RadioTransmitter;
-import de.maxhenkel.voicechat.api.VoicechatConnection;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -70,7 +61,7 @@ public interface Receiving extends Frequencing {
      * Stop receiving. Infers information from itself.
      */
     default void stopReceiving() {
-        if (this instanceof CentralBlockEntity blockEntity) {
+        if (this instanceof AuditoryBlockEntity blockEntity) {
             if (blockEntity.receiver != null && blockEntity.receiver.frequency != null) {
                 stopReceiving(blockEntity.receiver.frequency.frequency, blockEntity.receiver.frequency.modulation, blockEntity.id);
                 blockEntity.receiver.invalidate();

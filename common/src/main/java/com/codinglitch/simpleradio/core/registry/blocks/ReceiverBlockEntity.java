@@ -1,6 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.core.central.*;
+import com.codinglitch.simpleradio.core.central.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.core.central.Receiving;
+import com.codinglitch.simpleradio.core.central.Transmitting;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
@@ -13,20 +16,20 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
-public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking {
+public class ReceiverBlockEntity extends AuditoryBlockEntity implements Receiving {
     public boolean isActive = false;
 
-    public SpeakerBlockEntity(BlockPos pos, BlockState state) {
-        super(SimpleRadioBlockEntities.SPEAKER, pos, state);
+    public ReceiverBlockEntity(BlockPos pos, BlockState state) {
+        super(SimpleRadioBlockEntities.RECEIVER, pos, state);
 
         this.id = UUID.randomUUID();
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !level.isClientSide && this.speaker != null) {
+        if (level != null && !level.isClientSide && this.receiver != null) {
             level.playSound(
-                    null, speaker.location.x, speaker.location.y, speaker.location.z,
+                    null, receiver.location.x, receiver.location.y, receiver.location.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -56,7 +59,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         super.saveToItem(stack);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState blockState, SpeakerBlockEntity blockEntity) {
+    public static void tick(Level level, BlockPos pos, BlockState blockState, ReceiverBlockEntity blockEntity) {
         if (!level.isClientSide) {
             if (blockEntity.frequency != null && !blockEntity.isActive) {
                 blockEntity.activate();
@@ -66,8 +69,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
     public void inactivate() {
         if (this.frequency != null) {
-            stopSpeaking();
-            //stopReceiving(frequency.frequency, frequency.modulation, id);
+            stopReceiving(frequency.frequency, frequency.modulation, id);
         }
 
         this.isActive = false;
@@ -76,10 +78,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
-        this.speaker = startSpeaking(location, id);
-        //receiver = startReceiving(location, this.frequency, id);
-
-        //receiver.routers.add(speaker);
+        this.receiver = startReceiving(location, this.frequency, id);
 
         level.playSound(
                 null, location.x, location.y, location.z,

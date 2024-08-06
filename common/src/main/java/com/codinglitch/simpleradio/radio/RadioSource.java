@@ -26,7 +26,7 @@ public class RadioSource {
     public float volume;
 
     public Frequency travelledAcross;
-    public double transmissionPower = -1;
+    public double transmissionPower = 50;
 
     private RadioSource() {}
 
@@ -100,10 +100,6 @@ public class RadioSource {
         return copy;
     }
 
-    public void route(RadioRouter to) {
-
-    }
-
     public void travel(WorldlyPosition from, WorldlyPosition to, @Nullable Frequency across) {
         double distance = from.distance(to);
         double transmissionFactor;
@@ -121,26 +117,27 @@ public class RadioSource {
                     transmissionFactor = 0;
                 }
             }
+
+            this.travelledAcross = across;
         }
 
-        this.travelledAcross = across;
         this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionFactor));
     }
 
     public double computeSeverity() {
-
-        double diminishThreshold = this.getDiminishThreshold(travelledAcross.modulation);
         float base = 0;
 
+        double severity = 0;
         if (travelledAcross != null) {
-            base = travelledAcross.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
-        }
+            double diminishThreshold = this.getDiminishThreshold(travelledAcross.modulation);
 
-        double power = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
+            base = travelledAcross.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
+            severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
+        }
 
         return Math.clamp(
                 0, 100,
-                base + power * (100 - base)
+                base + severity * (100 - base)
         );
     }
 }

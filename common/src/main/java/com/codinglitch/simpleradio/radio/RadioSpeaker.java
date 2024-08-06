@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
     private static final List<RadioSpeaker> speakers = new ArrayList<>();
@@ -41,23 +42,23 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
     }
 
     public static RadioSpeaker getSpeaker(Entity owner) {
-        return speakers.stream().filter(speaker -> speaker.owner == owner)
+        return speakers.stream().filter(speaker -> speaker.owner.equals(owner))
                 .findFirst().orElse(null);
     }
     public static RadioSpeaker getSpeaker(WorldlyPosition location) {
-        return speakers.stream().filter(speaker -> speaker.location == location)
+        return speakers.stream().filter(speaker -> speaker.location.equals(location))
                 .findFirst().orElse(null);
     }
     public static RadioSpeaker getSpeaker(UUID id) {
-        return speakers.stream().filter(speaker -> speaker.id == id)
-                .findFirst().orElse(null);
+        RadioSpeaker s = speakers.stream().filter(speaker -> speaker.id.equals(id)).findFirst().orElse(null);
+        return s;
     }
 
     public static RadioSpeaker getOrCreateSpeaker(Entity owner, @Nullable UUID id) {
         RadioSpeaker speaker = getSpeaker(owner);
         if (speaker == null) speaker = getSpeaker(id);
 
-        return speaker != null ? speaker : new RadioSpeaker(owner);
+        return speaker != null ? speaker : new RadioSpeaker(owner, id);
     }
     public static RadioSpeaker getOrCreateSpeaker(Entity owner) { return getOrCreateSpeaker(owner, null); }
 
@@ -65,7 +66,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         RadioSpeaker speaker = getSpeaker(location);
         if (speaker == null) speaker = getSpeaker(id);
 
-        return speaker != null ? speaker : new RadioSpeaker(location);
+        return speaker != null ? speaker : new RadioSpeaker(location, id);
     }
     public static RadioSpeaker getOrCreateSpeaker(WorldlyPosition location) { return getOrCreateSpeaker(location, null); }
 
@@ -138,6 +139,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         return effect.apply(combinedAudio);
     }
 
+    @Override
     public void updateLocation(WorldlyPosition location) {
         super.updateLocation(location);
         if (this.audioChannel instanceof LocationalAudioChannel locationalAudioChannel) {
@@ -205,7 +207,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
     private AudioPlayer getAudioPlayer() {
         if (this.audioPlayer == null) {
-            if (this.owner == null) {
+            if (this.location != null) {
                 LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.id,
                         CommonRadioPlugin.serverApi.fromServerLevel(location.level),
                         CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)

@@ -18,14 +18,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SpeakerItem extends BlockItem implements Receiving, Speaking, Alterable {
+public class SpeakerItem extends BlockItem implements Speaking, Alterable {
     public SpeakerItem(Properties settings) {
         super(SimpleRadioBlocks.SPEAKER, settings);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltip) {
-        appendTooltip(stack, components);
+        //appendTooltip(stack, components);
         super.appendHoverText(stack, level, components, tooltip);
     }
 
@@ -33,7 +33,7 @@ public class SpeakerItem extends BlockItem implements Receiving, Speaking, Alter
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
 
-        tick(stack, level);
+        //tick(stack, level);
     }
 
     @Override
