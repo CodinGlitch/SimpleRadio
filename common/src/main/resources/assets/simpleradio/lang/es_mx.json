@@ -1,0 +1,60 @@
+{
+  "item_group.simpleradio": "Simple Radio",
+
+  "item.simpleradio.transmitting_module": "Módulo de Transmisión",
+  "item.simpleradio.receiving_module": "Módulo de Recepción",
+  "item.simpleradio.speaker_module": "Módulo de Altavoz",
+  "item.simpleradio.listener_module": "Módulo de Escucha",
+
+  "item.simpleradio.iron_module": "Módulo de Hierro %1$s",
+  "item.simpleradio.gold_module": "Módulo de Oro %1$s",
+  "item.simpleradio.diamond_module": "Módulo de Diamante %1$s",
+  "item.simpleradio.netherite_module": "Módulo de Netherita %1$s",
+
+  "module.simpleradio.empty": "Vacío",
+
+  "module.simpleradio.clarity": "Claridad",
+  "module.simpleradio.clarity.effects": "Proporciona un audio más claro",
+
+  "module.simpleradio.range": "Rango",
+  "module.simpleradio.range.transmitting.effects": "Aumenta el rango de transmisión",
+  "module.simpleradio.range.receiving.effects": "Aumenta el rango de recepción",
+
+  "module.simpleradio.latch": "Cierre",
+  "module.simpleradio.latch.effects": "Permite alternar el estado de escucha",
+
+  "module.simpleradio.battery": "Batería",
+  "module.simpleradio.battery.effects": "Almacena más energía en la batería",
+
+  "module.simpleradio.solar": "Solar",
+  "module.simpleradio.solar.effects": "Carga la batería con la luz solar",
+
+  "item.modifiers.transmitting": "Cuando está en el item de transmisión:",
+  "item.modifiers.receiving": "Cuando está en el item de recepción:",
+  "item.modifiers.emitting": "Cuando está en el item de emisión:",
+  "item.modifiers.listening": "Cuando está en el item de escucha:",
+  "item.modifiers.powering": "Cuando está en el item de alimentación:",
+
+  "item.simpleradio.transceiver": "Transceptor",
+  "item.simpleradio.walkie_talkie": "Walkie Talkie",
+  "item.simpleradio.spuddie_talkie": "Spuddie Talkie",
+  "block.simpleradio.radio": "Radio",
+  "block.simpleradio.antenna": "Antena",
+  "block.simpleradio.speaker": "Altavoz",
+  "block.simpleradio.microphone": "Micrófono",
+  "block.simpleradio.radiosmither": "Estación de Radio",
+  "block.simpleradio.frequencer": "Frecuenciador",
+
+  "screen.simpleradio.radiosmither": "Estación de Radio",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "Más rango, peor calidad de sonido",
+  "screen.simpleradio.radiosmither.fm_description": "Mejor calidad de sonido, menos rango",
+
+  "subtitles.simpleradio.radio_open": "La radio comienza a transmitir",
+  "subtitles.simpleradio.radio_close": "La radio deja de transmitir",
+
+  "tooltip.simpleradio.transceiver_frequency": "Frecuencia: %s",
+  "tooltip.simpleradio.receiver_user": "Usuario: %s"
+}
+
