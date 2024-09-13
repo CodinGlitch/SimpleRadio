@@ -22,20 +22,6 @@
 			}
 		},
 		{
-			"name": "catalyst",
-			"from": [4, 3, 6],
-			"to": [12, 11, 14],
-			"rotation": {"angle": 0, "axis": "y", "origin": [4, 2, 1]},
-			"faces": {
-				"north": {"uv": [12, 4, 4, 12], "texture": "#3"},
-				"east": {"uv": [12, 4, 4, 12], "texture": "#3"},
-				"south": {"uv": [12, 4, 4, 12], "texture": "#3"},
-				"west": {"uv": [12, 4, 4, 12], "texture": "#3"},
-				"up": {"uv": [12, 4, 4, 12], "texture": "#3"},
-				"down": {"uv": [12, 4, 4, 12], "texture": "#3"}
-			}
-		},
-		{
 			"from": [11, 3, 4],
 			"to": [14, 9, 7],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 1, -1]},
