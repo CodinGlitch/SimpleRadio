@@ -1,6 +1,7 @@
 {
 	"credit": "Made with Blockbench",
 	"parent": "minecraft:block/block",
+	"render_type": "cutout",
 	"textures": {
 		"0": "simpleradio:block/antenna",
 		"particle": "minecraft:block/iron_block"
