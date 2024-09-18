@@ -21,7 +21,7 @@ public class MixinMinecraftServer {
     @Shadow private int tickCount;
 
     @Inject(at = @At("TAIL"), method = "tickServer(Ljava/util/function/BooleanSupplier;)V")
-    private void simpleradio$tickServer(CallbackInfo info) {
+    private void simpleradio$tickServer_radioTicking(CallbackInfo info) {
         RadioManager.serverTick(this.tickCount);
     }
 }

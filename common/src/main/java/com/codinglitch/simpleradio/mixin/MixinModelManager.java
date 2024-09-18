@@ -27,7 +27,7 @@ public abstract class MixinModelManager implements PreparableReloadListener, Aut
                     target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"
             ), method = "apply(Lnet/minecraft/client/resources/model/ModelManager$ReloadState;Lnet/minecraft/util/profiling/ProfilerFiller;)V"
     )
-    private void simpleradio$apply(ModelManager.ReloadState state, ProfilerFiller filler, CallbackInfo ci) {
+    private void simpleradio$apply_loadModels(ModelManager.ReloadState state, ProfilerFiller filler, CallbackInfo ci) {
         SimpleRadioModels.onModelsLoad(this.bakedRegistry);
     }
 }

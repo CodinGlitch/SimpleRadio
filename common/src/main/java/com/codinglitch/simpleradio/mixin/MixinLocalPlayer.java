@@ -29,7 +29,7 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer {
     @Shadow @Nullable private InteractionHand usingItemHand;
 
     @Unique
-    private boolean simpleradio$willSlow(LocalPlayer player, Operation<Boolean> original) {
+    private boolean simpleradio$willSlow_transceiverSlowing(LocalPlayer player, Operation<Boolean> original) {
         if (this.isUsingItem()) {
             ItemStack stack = player.getItemInHand(player.getUsedItemHand());
             if (stack.getItem().getClass() == TransceiverItem.class) {
@@ -45,14 +45,14 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer {
             method = "aiStep",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z")
     )
-    private boolean simpleradio$aiStep(LocalPlayer instance, Operation<Boolean> original) {
-        return simpleradio$willSlow(instance, original);
+    private boolean simpleradio$aiStep_transceiverSlowing(LocalPlayer instance, Operation<Boolean> original) {
+        return simpleradio$willSlow_transceiverSlowing(instance, original);
     }
     @WrapOperation(
             method = "canStartSprinting",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z")
     )
-    private boolean simpleradio$canStartSprinting(LocalPlayer instance, Operation<Boolean> original) {
-        return simpleradio$willSlow(instance, original);
+    private boolean simpleradio$canStartSprinting_transceiverSlowing(LocalPlayer instance, Operation<Boolean> original) {
+        return simpleradio$willSlow_transceiverSlowing(instance, original);
     }
 }
