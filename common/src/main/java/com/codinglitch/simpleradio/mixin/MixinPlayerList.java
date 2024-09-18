@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 public class MixinPlayerList {
 
     @Inject(at = @At("TAIL"), method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Ljava/util/function/Predicate;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V")
-    private void simpleradio$logChatMessage(PlayerChatMessage message, Predicate<ServerPlayer> playerPredicate, ServerPlayer player, ChatType.Bound bound, CallbackInfo info) {
+    private void simpleradio$logChatMessage_frequencerSetting(PlayerChatMessage message, Predicate<ServerPlayer> playerPredicate, ServerPlayer player, ChatType.Bound bound, CallbackInfo info) {
         String content = message.signedContent();
         if (content.startsWith("frequency")) {
             Frequency frequency = Frequency.tryParse(content.substring(10));

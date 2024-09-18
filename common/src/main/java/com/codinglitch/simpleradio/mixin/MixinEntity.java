@@ -32,7 +32,7 @@ public abstract class MixinEntity implements CommandSource, Nameable, EntityAcce
     @Shadow private Level level;
 
     @Inject(method = "baseTick()V", at = @At(value = "TAIL"))
-    private void simpleradio$baseTick(CallbackInfo ci) {
+    private void simpleradio$baseTick_itemInWorldTicking(CallbackInfo ci) {
         if ((Entity)(Object)this instanceof ItemEntity item) {
             SimpleRadioItems.ITEMS.forEach(((location, itemHolder) -> {
                 if (itemHolder.get() instanceof WorldTicking) {

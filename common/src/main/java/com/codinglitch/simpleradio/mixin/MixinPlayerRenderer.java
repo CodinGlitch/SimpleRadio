@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 public class MixinPlayerRenderer {
 
     @Inject(at = @At("TAIL"), method = "render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V")
-    private void simpleradio$renderPlayer(AbstractClientPlayer player, float f, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, CallbackInfo ci) {
+    private void simpleradio$renderPlayer_wireRendering(AbstractClientPlayer player, float f, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, CallbackInfo ci) {
         WireRenderer.renderPlayer(player, multiBufferSource, poseStack, partialTick);
     }
 }
