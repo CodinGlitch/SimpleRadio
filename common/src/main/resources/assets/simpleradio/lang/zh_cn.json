@@ -48,7 +48,7 @@
   "screen.simpleradio.radiosmither": "无线电调试台",
   "screen.simpleradio.radiosmither.am": "AM",
   "screen.simpleradio.radiosmither.fm": "FM",
-  "screen.simpleradio.radiosmither.am_description": "AM调幅信号，范围较低音质",
+  "screen.simpleradio.radiosmither.am_description": "AM调幅信号，大范围低音质",
   "screen.simpleradio.radiosmither.fm_description": "FM调频信号，小范围高音质",
 
   "subtitles.simpleradio.radio_open": "收音机开始广播",
