@@ -1,0 +1,75 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"render_type": "cutout",
+	"textures": {
+		"2": "simpleradio:block/antenna",
+		"particle": "simpleradio:block/antenna"
+	},
+	"elements": [
+		{
+			"from": [4.5, 11.75, 5],
+			"to": [18.5, 11.75, 12],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [8, -2, 8]},
+			"faces": {
+				"up": {"uv": [0, 0, 16, 7], "texture": "#2"},
+				"down": {"uv": [0, 0, 16, 7], "texture": "#2"}
+			}
+		},
+		{
+			"from": [9.26777, 0, 10.06066],
+			"to": [14.26777, 6, 10.06066],
+			"rotation": {"angle": 45, "axis": "y", "origin": [11.76777, 8, 10.06066]},
+			"faces": {
+				"north": {"uv": [0, 13, 6, 7], "rotation": 90, "texture": "#2"},
+				"south": {"uv": [0, 7, 6, 13], "rotation": 90, "texture": "#2"}
+			}
+		},
+		{
+			"from": [4.5, 0, 4],
+			"to": [10.5, 9, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 0, 6]},
+			"faces": {
+				"north": {"uv": [0, 13, 9, 7], "rotation": 90, "texture": "#2"},
+				"south": {"uv": [0, 7, 9, 13], "rotation": 90, "texture": "#2"}
+			}
+		},
+		{
+			"from": [7.5, 0, 1],
+			"to": [7.5, 9, 7],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.5, 0, 3.5]},
+			"faces": {
+				"east": {"uv": [0, 13, 9, 7], "rotation": 90, "texture": "#2"},
+				"west": {"uv": [0, 7, 9, 13], "rotation": 90, "texture": "#2"}
+			}
+		},
+		{
+			"from": [11.76777, 0, 7.56066],
+			"to": [11.76777, 6, 12.56066],
+			"rotation": {"angle": 45, "axis": "y", "origin": [11.76777, 8, 10.06066]},
+			"faces": {
+				"east": {"uv": [0, 7, 6, 13], "rotation": 90, "texture": "#2"},
+				"west": {"uv": [0, 13, 6, 7], "rotation": 90, "texture": "#2"}
+			}
+		},
+		{
+			"from": [2.5, 0, 9],
+			"to": [8.5, 12, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [5.5, 0, 11]},
+			"faces": {
+				"north": {"uv": [0, 13, 16, 7], "rotation": 90, "texture": "#2"},
+				"south": {"uv": [0, 7, 12, 13], "rotation": 90, "texture": "#2"}
+			}
+		},
+		{
+			"from": [5.5, 0, 6],
+			"to": [5.5, 12, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [5.5, 0, 8.5]},
+			"faces": {
+				"east": {"uv": [0, 7, 12, 13], "rotation": 90, "texture": "#2"},
+				"west": {"uv": [0, 13, 12, 7], "rotation": 90, "texture": "#2"}
+			}
+		}
+	],
+	"display": {}
+}
