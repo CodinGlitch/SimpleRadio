@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -18,6 +19,7 @@ public class SimpleRadioClient {
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         CommonSimpleRadioClient.loadBlockEntityRenderers(event::registerBlockEntityRenderer);
+        CommonSimpleRadioClient.loadEntityRenderers(event::registerEntityRenderer);
     }
 
     @SubscribeEvent
