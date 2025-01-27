@@ -50,6 +50,7 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 | ❌      | Altitude influences interference amount                                                                |
 | ❌      | Relay towers                                                                                           |
 | ❌      | Transmission mapping                                                                                   |
+| ❌      | VR compatibility                                                                                   |
 
 <br>
 
