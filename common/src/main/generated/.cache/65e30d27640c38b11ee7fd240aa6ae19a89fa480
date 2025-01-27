@@ -1,7 +1,0 @@
-// 1.20.2	2024-05-14T06:59:08.9880192	SimpleRadio/Block Loot Tables
-1c9c7375c73f06557be62414af0b43644305d7c8 data\simpleradio\loot_tables\blocks\microphone.json
-d65dc5714300e2c9ea3b73d493d9ca917b6137ec data\simpleradio\loot_tables\blocks\speaker.json
-d99b387eb15812b45c29a8d1b21b2fcfcb9690fc data\simpleradio\loot_tables\blocks\radio.json
-47d87553418216275c6446658378403267bda653 data\simpleradio\loot_tables\blocks\frequencer.json
-fcb5f22350cd9583971558399aeb9a271eebbcf2 data\simpleradio\loot_tables\blocks\radiosmither.json
-d4524f1759400234ba4f37a4bffd0f99365901e3 data\simpleradio\loot_tables\blocks\antenna.json
