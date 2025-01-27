@@ -33,7 +33,7 @@ dependencies {
 
     implementation "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.6"))
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 
     // Compatibilities
 

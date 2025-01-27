@@ -20,6 +20,11 @@ mixin {
     config("${mod_id}.forge.mixins.json")
 }
 
+jarJar.enable()
+jarJar {
+    //archiveClassifier = "slim"
+}
+
 minecraft {
     mappings channel: 'official', version: minecraft_version
 
@@ -91,9 +96,9 @@ dependencies {
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     runtimeOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.6"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.6")) {
-        jarJar.ranged(it, "[0.3.6,)")
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}")) {
+        jarJar.ranged(it, "[${mixin_extras_version},)")
     }
 
     // -- Compatibilities -- \\
@@ -104,7 +109,7 @@ dependencies {
     // Valkyrien Skies
     compileOnly fg.deobf("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}")
     runtimeOnly fg.deobf("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}")
-    compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}") // forge wont inherit the api from common for some reason
+    implementation("org.valkyrienskies.core:api:${valkyrien_skies_api_version}") // forge wont inherit the api from common for some reason
 
     // Create
     implementation fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
@@ -132,12 +137,22 @@ tasks.withType(Javadoc).configureEach {
 tasks.named("sourcesJar", Jar) {
     from(project(":common").sourceSets.main.allSource)
 }
+tasks.named('jarJar') {
+    archiveClassifier = ''
+}
+jar {
+    archiveClassifier = "slim"
+    manifest {
+        attributes 'ContainedDeps': "mixinextras-forge-${mixin_extras_version}.jar"
+    }
+}
+jar.finalizedBy('reobfJar')
 
 processResources {
     from project(":common").sourceSets.main.resources
+    from project(":forge").sourceSets.main.resources
 }
 
-jar.finalizedBy('reobfJar')
 
 java {
     withSourcesJar()
