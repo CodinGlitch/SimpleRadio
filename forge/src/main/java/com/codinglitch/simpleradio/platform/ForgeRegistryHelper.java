@@ -20,12 +20,16 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ForgeRegistryHelper implements RegistryHelper {
 
     @Override
-    public <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, ResourceLocation resource) {
-        EntityType<E> entityType = EntityType.Builder.of(factory, spawnGroup).build(null);
+    public <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, Consumer<EntityType.Builder<E>> modifier, ResourceLocation resource) {
+        EntityType.Builder<E> builder = EntityType.Builder.of(factory, spawnGroup);
+        modifier.accept(builder);
+
+        EntityType<E> entityType = builder.build(resource.getPath());
         SimpleRadioEntities.ENTITIES.put(resource, entityType);
         return entityType;
     }

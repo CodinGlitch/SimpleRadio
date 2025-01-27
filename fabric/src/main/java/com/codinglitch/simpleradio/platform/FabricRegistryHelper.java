@@ -20,13 +20,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.function.Consumer;
+
 public class FabricRegistryHelper implements RegistryHelper {
 
     @Override
-    public <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, ResourceLocation resource) {
+    public <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, Consumer<EntityType.Builder<E>> modifier, ResourceLocation resource) {
+        EntityType.Builder<E> builder = EntityType.Builder.of(factory, spawnGroup);
+        modifier.accept(builder);
+
         EntityType<E> entityType = Registry.register(
                 BuiltInRegistries.ENTITY_TYPE, resource,
-                FabricEntityTypeBuilder.create(spawnGroup, factory).build()
+                builder.build(resource.getPath())
         );
         SimpleRadioEntities.ENTITIES.put(resource, entityType);
         return entityType;

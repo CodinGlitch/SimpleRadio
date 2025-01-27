@@ -1,22 +1,32 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import com.codinglitch.simpleradio.radio.RadioListener;
-import com.codinglitch.simpleradio.radio.RadioTransmitter;
+import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.Socket;
+import com.codinglitch.simpleradio.core.registry.entities.Wire;
+import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
-public abstract class AuditoryBlockEntity extends BlockEntity {
+/**
+ * A block entity which interacts with audio in some way;
+ */
+public abstract class AuditoryBlockEntity extends BlockEntity implements Socket {
     public Frequency frequency;
 
     public UUID id;
@@ -35,43 +45,20 @@ public abstract class AuditoryBlockEntity extends BlockEntity {
 
     public AuditoryBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
-        this.id = UUID.randomUUID();
     }
 
-    public boolean canConnect() {
-        return true;
-    }
-    public boolean canConnectTo(AuditoryBlockEntity other) {
-        return true;
-    }
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
 
-    public static void connectRouters(AuditoryBlockEntity from, AuditoryBlockEntity to) {
-        if (from.listener != null) {
-            if (to.transmitter != null) {
-                from.listener.tryAddRouter(to.transmitter);
-                CommonSimpleRadio.info("Connected: Listener -> Transmitter");
-            }
-            if (to.speaker != null) {
-                from.listener.tryAddRouter(to.speaker);
-                CommonSimpleRadio.info("Connected: Listener -> Speaker");
-            }
-        }
-
-        if (from.receiver != null) {
-            if (to.speaker != null) {
-                from.receiver.tryAddRouter(to.speaker);
-                CommonSimpleRadio.info("Connected: Receiver -> Speaker");
-            }
+        if (this.id == null && !level.isClientSide) {
+            this.id = UUID.randomUUID();
         }
     }
-    public void connectTo(AuditoryBlockEntity other) {
-        if (!this.canConnectTo(other)) return;
-        if (!other.canConnectTo(this)) return;
 
-        connectRouters(this, other);
-        connectRouters(other, this);
-
-        CommonSimpleRadio.info("connection made");
+    @Override
+    public RadioRouter getRouter() {
+        return Stream.of(listener, speaker, transmitter, receiver).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     public Vec3 getConnectionPosition() {
@@ -100,6 +87,21 @@ public abstract class AuditoryBlockEntity extends BlockEntity {
             tag.putString("modulation", this.frequency.modulation.shorthand);
         }
 
-        tag.putUUID("uuid", this.id);
+        if (this.id != null) {
+            tag.putUUID("uuid", this.id);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = new CompoundTag();
+        this.saveAdditional(tag);
+        return tag;
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 }

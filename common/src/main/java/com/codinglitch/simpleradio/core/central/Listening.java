@@ -1,6 +1,9 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.radio.RadioListener;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -15,7 +18,7 @@ public interface Listening extends Auricular {
      * @return The listener created.
      */
     default RadioListener startListening(Entity owner, @Nullable UUID id) {
-        return setupListener(RadioListener.getOrCreateListener(owner, id));
+        return setupListener(RadioManager.getOrCreateListener(owner, id));
     }
     /**
      * Start listening in the world.
@@ -24,18 +27,19 @@ public interface Listening extends Auricular {
      * @return The listener created.
      */
     default RadioListener startListening(WorldlyPosition location, @Nullable UUID id) {
-        return setupListener(RadioListener.getOrCreateListener(location, id));
+        return setupListener(RadioManager.getOrCreateListener(location, id));
     }
 
     default RadioListener setupListener(RadioListener listener) {
         if (this instanceof AuditoryBlockEntity blockEntity) {
-            listener.range = 12;
             listener.transformer(source -> {
                 source.delegate(blockEntity.id);
 
                 return source;
             });
         }
+
+        //RadioManager.registerListener(listener);
 
         return listener;
     }
@@ -45,7 +49,11 @@ public interface Listening extends Auricular {
      * @param owner the Entity that will stop listening
      */
     default void stopListening(Entity owner) {
-        RadioListener.removeListener(owner);
+        if (owner.level().isClientSide) {
+            ClientRadioManager.removeRouter(owner);
+        } else {
+            RadioManager.removeListener(owner);
+        }
     }
 
     /**
@@ -53,11 +61,15 @@ public interface Listening extends Auricular {
      * @param location the location of the listener to remove
      */
     default void stopListening(WorldlyPosition location) {
-        RadioListener.removeListener(location);
+        if (location.isClientSide()) {
+            ClientRadioManager.removeRouter(location);
+        } else {
+            RadioManager.removeListener(location);
+        }
     }
 
     /**
-     * Stop listening in the world. Infers information from itself.
+     * Stop listening in the world. Infers information from itself. <b>Only call this on the server.</b>
      */
     default void stopListening() {
         if (this instanceof AuditoryBlockEntity blockEntity) {

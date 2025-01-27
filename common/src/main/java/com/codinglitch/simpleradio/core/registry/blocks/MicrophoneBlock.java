@@ -1,6 +1,13 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.SimpleRadioServerConfig;
+import com.codinglitch.simpleradio.core.central.Listening;
+import com.codinglitch.simpleradio.core.central.Routing;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -26,8 +33,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
-public class MicrophoneBlock extends BaseEntityBlock {
+public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listening {
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
@@ -41,6 +49,18 @@ public class MicrophoneBlock extends BaseEntityBlock {
 
     public float getYRotationDegrees(BlockState state) {
         return RotationSegment.convertToDegrees(state.getValue(ROTATION));
+    }
+
+    @Override
+    public RadioListener getOrCreateListener(WorldlyPosition location, UUID id, BlockState state) {
+        RadioListener listener = startListening(location, id);
+
+        listener.range = SimpleRadioLibrary.SERVER_CONFIG.microphone.listeningRange;
+
+        // Allow distribution through wires
+        listener.allowDistribution();
+
+        return listener;
     }
 
     @Override

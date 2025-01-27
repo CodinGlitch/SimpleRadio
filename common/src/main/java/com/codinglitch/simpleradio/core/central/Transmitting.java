@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.world.entity.Entity;
 

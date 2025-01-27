@@ -2,7 +2,8 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.google.gson.JsonArray;
@@ -43,8 +44,10 @@ public class FabricLoader {
     }
 
     public static void loadClientPackets() {
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundRadioPacket.ID,
-                clientbound(ClientboundRadioPacket::decode, ClientboundRadioPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundTransceiverPacket.ID,
+                clientbound(ClientboundTransceiverPacket::decode, ClientboundTransceiverPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundWireEffectPacket.ID,
+                clientbound(ClientboundWireEffectPacket::decode, ClientboundWireEffectPacket::handle));
     }
 
     public static <P> ServerPlayNetworking.PlayChannelHandler serverbound(Function<FriendlyByteBuf, P> decoder, TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
@@ -99,5 +102,7 @@ public class FabricLoader {
         SimpleRadioEntities.load();
         SimpleRadioBlockEntities.load();
         SimpleRadioMenus.load();
+
+        SimpleRadioCatalysts.load();
     }
 }

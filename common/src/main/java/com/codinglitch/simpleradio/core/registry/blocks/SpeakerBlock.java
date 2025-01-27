@@ -1,6 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.core.central.Routing;
+import com.codinglitch.simpleradio.core.central.Speaking;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
+import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,13 +31,22 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
-public class SpeakerBlock extends BaseEntityBlock {
+public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public SpeakerBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
+        RadioSpeaker speaker = startSpeaking(location, id);
+        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange;
+
+        return speaker;
     }
 
     @Override

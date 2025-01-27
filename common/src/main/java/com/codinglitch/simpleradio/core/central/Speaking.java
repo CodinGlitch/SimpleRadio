@@ -1,5 +1,8 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
 
@@ -14,22 +17,20 @@ public interface Speaking extends Auricular {
      * @return The speaker created.
      */
     default RadioSpeaker startSpeaking(Entity owner, @Nullable UUID id) {
-        return setupSpeaker(RadioSpeaker.getOrCreateSpeaker(owner, id));
+        return setupSpeaker(RadioManager.getOrCreateSpeaker(owner, id));
     }
     /**
-     * Start speaker in the world.
+     * Start speaking in the world.
      * @param location the location to speak at
      * @param id the UUID of the speaker
      * @return The speaker created.
      */
     default RadioSpeaker startSpeaking(WorldlyPosition location, @Nullable UUID id) {
-        return setupSpeaker(RadioSpeaker.getOrCreateSpeaker(location, id));
+        return setupSpeaker(RadioManager.getOrCreateSpeaker(location, id));
     }
 
     default RadioSpeaker setupSpeaker(RadioSpeaker speaker) {
-        if (this instanceof AuditoryBlockEntity blockEntity) {
-            speaker.range = 12;
-        }
+        //RadioManager.registerSpeaker(speaker);
 
         return speaker;
     }
@@ -39,7 +40,11 @@ public interface Speaking extends Auricular {
      * @param owner the Entity that will stop speaking
      */
     default void stopSpeaking(Entity owner) {
-        RadioSpeaker.removeSpeaker(owner);
+        if (owner.level().isClientSide) {
+            ClientRadioManager.removeRouter(owner);
+        } else {
+            RadioManager.removeSpeaker(owner);
+        }
     }
 
     /**
@@ -47,7 +52,11 @@ public interface Speaking extends Auricular {
      * @param location the location of the speaker to remove
      */
     default void stopSpeaking(WorldlyPosition location) {
-        RadioSpeaker.removeSpeaker(location);
+        if (location.isClientSide()) {
+            ClientRadioManager.removeRouter(location);
+        } else {
+            RadioManager.removeSpeaker(location);
+        }
     }
 
     /**

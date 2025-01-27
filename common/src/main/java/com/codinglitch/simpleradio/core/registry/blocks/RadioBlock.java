@@ -1,7 +1,10 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.core.central.Receiving;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -34,8 +37,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
-public class RadioBlock extends BaseEntityBlock {
+public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Receiving {
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
@@ -45,6 +49,24 @@ public class RadioBlock extends BaseEntityBlock {
     public RadioBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(ROTATION, 0));
+    }
+
+    @Override
+    public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
+        RadioSpeaker speaker = startSpeaking(location, id);
+        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.radio.speakingRange;
+
+        return speaker;
+    }
+
+    @Override
+    public RadioReceiver getOrCreateReceiver(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
+        RadioReceiver receiver = startReceiving(location, frequency, id);
+
+        // Allow distribution through wires
+        receiver.allowDistribution();
+
+        return receiver;
     }
 
     public float getYRotationDegrees(BlockState state) {
