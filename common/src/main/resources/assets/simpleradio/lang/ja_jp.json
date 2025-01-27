@@ -1,0 +1,63 @@
+{
+  "item_group.simpleradio": "Simple Radio",
+
+  "item.simpleradio.transmitting_module": "送信モジュール",
+  "item.simpleradio.receiving_module": "受信モジュール",
+  "item.simpleradio.speaker_module": "スピーカーモジュール",
+  "item.simpleradio.listener_module": "リスナーモジュール",
+
+  "item.simpleradio.iron_module": "鉄製%1$sモジュール",
+  "item.simpleradio.gold_module": "金製%1$sモジュール",
+  "item.simpleradio.diamond_module": "ダイヤモンド製%1$sモジュール",
+  "item.simpleradio.netherite_module": "ネザライト製%1$sモジュール",
+
+  "module.simpleradio.empty": "空",
+
+  "module.simpleradio.clarity": "明瞭度",
+  "module.simpleradio.clarity.effects": "音声をより明瞭にします",
+
+  "module.simpleradio.range": "範囲",
+  "module.simpleradio.range.transmitting.effects": "送信範囲を拡大します",
+  "module.simpleradio.range.receiving.effects": "受信範囲を拡大します",
+
+  "module.simpleradio.latch": "ラッチ",
+  "module.simpleradio.latch.effects": "リスニング状態の切り替えを可能にします",
+
+  "module.simpleradio.battery": "バッテリー",
+  "module.simpleradio.battery.effects": "バッテリーの蓄電量を増加させます",
+
+  "module.simpleradio.solar": "ソーラー",
+  "module.simpleradio.solar.effects": "日光でバッテリーを充電します",
+
+  "item.modifiers.transmitting": "送信アイテムで使用時:",
+  "item.modifiers.receiving": "受信アイテムで使用時:",
+  "item.modifiers.emitting": "発信アイテムで使用時:",
+  "item.modifiers.listening": "リスニングアイテムで使用時:",
+  "item.modifiers.powering": "電力供給アイテムで使用時:",
+
+  "item.simpleradio.transceiver": "トランシーバー",
+  "item.simpleradio.walkie_talkie": "トランシーバー",
+  "item.simpleradio.spuddie_talkie": "スポッディートーク",
+  "item.simpleradio.copper_wire": "銅線",
+  "block.simpleradio.radio": "ラジオ",
+  "block.simpleradio.antenna": "アンテナ",
+  "block.simpleradio.speaker": "スピーカー",
+  "block.simpleradio.microphone": "マイク",
+  "block.simpleradio.radiosmither": "ラジオ作成ステーション",
+  "block.simpleradio.frequencer": "周波数設定装置",
+  "block.simpleradio.receiver": "受信機",
+  "block.simpleradio.transmitter": "送信機",
+  "block.simpleradio.socket": "ソケット",
+
+  "screen.simpleradio.radiosmither": "ラジオ作成ステーション",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "範囲が広いが音質が悪い",
+  "screen.simpleradio.radiosmither.fm_description": "音質が良いが範囲が狭い",
+
+  "subtitles.simpleradio.radio_open": "ラジオが放送を開始",
+  "subtitles.simpleradio.radio_close": "ラジオが放送を終了",
+
+  "tooltip.simpleradio.transceiver_frequency": "周波数: %s",
+  "tooltip.simpleradio.receiver_user": "ユーザー: %s"
+}
