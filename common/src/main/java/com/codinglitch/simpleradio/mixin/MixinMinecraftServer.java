@@ -24,4 +24,9 @@ public class MixinMinecraftServer {
     private void simpleradio$tickServer_radioTicking(CallbackInfo info) {
         RadioManager.serverTick(this.tickCount);
     }
+
+    @Inject(at = @At("TAIL"), method = "close", remap = false)
+    private void simpleradio$close(CallbackInfo info) {
+        RadioManager.close();
+    }
 }
