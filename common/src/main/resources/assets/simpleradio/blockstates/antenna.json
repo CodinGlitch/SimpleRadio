@@ -1,5 +1,104 @@
 {
-  "variants": {
-    "": { "model": "simpleradio:block/antenna" }
-  }
+  "multipart": [
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_column"
+      },
+      "when": {
+        "up": "true",
+        "down": "true",
+        "column": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_column"
+      },
+      "when": {
+        "up": "true",
+        "axis": "x",
+        "column": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_column"
+      },
+      "when": {
+        "up": "true",
+        "axis": "z",
+        "column": "true"
+      }
+    },
+
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_vertical"
+      },
+      "when": {
+        "up": "true",
+        "down": "true",
+        "column": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_vertical"
+      },
+      "when": {
+        "up": "true",
+        "axis": "x",
+        "column": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_vertical"
+      },
+      "when": {
+        "up": "true",
+        "axis": "z",
+        "column": "false"
+      }
+    },
+
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_column_top"
+      },
+      "when": {
+        "up": "false",
+        "down": "true",
+        "column": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_top"
+      },
+      "when": {
+        "up": "false",
+        "down": "true",
+        "column": "false"
+      }
+    },
+
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_horizontal"
+      },
+      "when": {
+        "axis": "x"
+      }
+    },
+    {
+      "apply": {
+        "model": "simpleradio:block/antenna/antenna_horizontal",
+        "y": 90
+      },
+      "when": {
+        "axis": "z"
+      }
+    }
+  ]
 }

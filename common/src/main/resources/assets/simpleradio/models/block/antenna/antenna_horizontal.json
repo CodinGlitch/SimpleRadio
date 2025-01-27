@@ -1,0 +1,30 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"render_type": "cutout",
+	"textures": {
+		"2": "simpleradio:block/antenna",
+		"particle": "simpleradio:block/antenna"
+	},
+	"elements": [
+		{
+			"from": [-0.00981, 9.94968, 6],
+			"to": [15.99019, 9.94968, 13],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 10, 10]},
+			"faces": {
+				"up": {"uv": [0, 0, 16, 7], "texture": "#2"},
+				"down": {"uv": [0, 7, 16, 0], "texture": "#2"}
+			}
+		},
+		{
+			"from": [0.00981, 5.94968, 3],
+			"to": [16.00981, 5.94968, 10],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 6, 6]},
+			"faces": {
+				"up": {"uv": [0, 0, 16, 7], "texture": "#2"},
+				"down": {"uv": [0, 7, 16, 0], "texture": "#2"}
+			}
+		}
+	],
+	"display": {}
+}
