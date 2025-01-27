@@ -31,6 +31,7 @@ public class SimpleRadioItems {
     public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)));
 
     public static Item ANTENNA = register(id("antenna"), new BlockItem(SimpleRadioBlocks.ANTENNA, new Item.Properties().stacksTo(16)));
+    public static Item SOCKET = register(id("socket"), new BlockItem(SimpleRadioBlocks.SOCKET, new Item.Properties().stacksTo(16)));
 
     // ---- Modules ---- \\
     public static Item TRANSMITTING_MODULE = register(id("transmitting_module"), new Item(new Item.Properties()));

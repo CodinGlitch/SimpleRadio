@@ -4,12 +4,17 @@ import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.Medium;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.registry.entities.Wire;
+import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
 
+/**
+ * A source containing the audio data as well as other data collected while travelling.
+ */
 public class RadioSource {
     public enum Type {
         TRANSCEIVER,
@@ -20,21 +25,36 @@ public class RadioSource {
     public UUID owner;
     public UUID originalOwner;
     public WorldlyPosition origin;
-    public byte[] data;
     public Type type;
 
+    public byte[] data;
+
+    public SoundEvent soundEvent;
+
+    public float pitch = 1;
     public float volume;
 
-    public Frequency travelledAcross;
+    public Frequency frequencyMedium;
+    public Wire wireMedium;
+
     public double transmissionPower = 50;
 
-    private RadioSource() {}
+    protected RadioSource() {}
 
     public RadioSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
         this.owner = owner;
         this.origin = location;
-        this.data = data;
         this.volume = volume;
+
+        this.data = data;
+    }
+
+    public RadioSource(UUID owner, WorldlyPosition location, SoundEvent soundEvent, float volume) {
+        this.owner = owner;
+        this.origin = location;
+        this.volume = volume;
+
+        this.soundEvent = soundEvent;
     }
 
     public UUID getRealOwner() {
@@ -64,9 +84,7 @@ public class RadioSource {
         LexiconPageData pageData = getPage();
         if (pageData == null) return 0;
 
-        return modulation == Frequency.Modulation.FREQUENCY ?
-                (int) pageData.getEntry(configName+"FM") :
-                (int) pageData.getEntry(configName+"AM");
+        return pageData.getEntry(configName + modulation.shorthand);
     }
 
     public int getTransmissionPower(Frequency.Modulation modulation) {
@@ -89,37 +107,44 @@ public class RadioSource {
         copy.owner = this.owner;
         copy.originalOwner = this.originalOwner;
         copy.origin = this.origin;
-        copy.data = this.data;
         copy.type = this.type;
+
+        copy.data = this.data;
+        copy.soundEvent = this.soundEvent;
 
         copy.volume = this.volume;
 
-        copy.travelledAcross = this.travelledAcross;
+        copy.frequencyMedium = this.frequencyMedium;
+        copy.wireMedium = this.wireMedium;
         copy.transmissionPower = this.transmissionPower;
 
         return copy;
     }
 
-    public void travel(WorldlyPosition from, WorldlyPosition to, @Nullable Frequency across) {
+    public void travel(WorldlyPosition from, WorldlyPosition to, Medium medium) {
         double distance = from.distance(to);
-        double transmissionFactor;
-        if (across == null) {
-            transmissionFactor = SimpleRadioLibrary.SERVER_CONFIG.cable.transmissionDiminishment;
-        } else {
+        double transmissionFactor = 0;
+        if (medium instanceof Wire wire) {
+            transmissionFactor = SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionDiminishment;
+
+            this.wireMedium = wire;
+        } else if (medium instanceof Frequency frequency) {
             transmissionFactor = getTransmissionDiminishment();
 
             if (from.level.dimensionType() != to.level.dimensionType()) {
                 if (SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional) {
                     double interference = SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalInterference;
-                    transmissionFactor += across.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
+                    transmissionFactor += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
                 } else {
                     this.transmissionPower = 0;
                     transmissionFactor = 0;
                 }
             }
 
-            this.travelledAcross = across;
+            this.frequencyMedium = frequency;
         }
+
+        //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
 
         this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionFactor));
     }
@@ -128,10 +153,10 @@ public class RadioSource {
         float base = 0;
 
         double severity = 0;
-        if (travelledAcross != null) {
-            double diminishThreshold = this.getDiminishThreshold(travelledAcross.modulation);
+        if (this.frequencyMedium != null) {
+            double diminishThreshold = this.getDiminishThreshold(frequencyMedium.modulation);
 
-            base = travelledAcross.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
+            base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
             severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
         }
 
@@ -139,5 +164,9 @@ public class RadioSource {
                 0, 100,
                 base + severity * (100 - base)
         );
+    }
+
+    public boolean isValid() {
+        return this.origin != null;
     }
 }
