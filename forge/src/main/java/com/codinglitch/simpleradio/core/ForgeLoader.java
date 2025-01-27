@@ -1,43 +1,61 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.SimpleChannel;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
-    public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(CommonSimpleRadio.ID,"channel"))
-            .optional()
-            .networkProtocolVersion(0)
-            .simpleChannel();
+    private static final String PROTOCOL_VERSION = "0";
+    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation(CommonSimpleRadio.ID,"channel"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
+    );
 
     @SubscribeEvent
-    public void gatherData(GatherDataEvent event) {
+    public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
 
         generator.addProvider(
                 event.includeServer(),
                 new SimpleRadioRecipeProvider(generator.getPackOutput())
+        );
+
+        generator.addProvider(
+                event.includeServer(),
+                new LootTableProvider(generator.getPackOutput(), Set.of(), List.of(
+                        new LootTableProvider.SubProviderEntry(SimpleRadioBlockLootTableProvider::new, LootContextParamSets.BLOCK)
+                ))
         );
     }
 
@@ -52,27 +70,35 @@ public class ForgeLoader {
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
         event.register(Registries.CREATIVE_MODE_TAB, helper -> SimpleRadioMenus.CREATIVE_TABS.forEach(helper::register));
 
-        event.register(ForgeRegistries.Keys.CONDITION_SERIALIZERS, helper -> {
-            helper.register(CommonSimpleRadio.id("items_enabled"), ItemsEnabledCondition.CODEC);
+        event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
+            CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
         });
+
+        SimpleRadioCatalysts.load();
     }
 
     public static void loadPackets() {
-        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
+        int index = 0;
+
+        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index++).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
                 .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle)).add();
 
-        CHANNEL.messageBuilder(ClientboundRadioPacket.class).decoder(ClientboundRadioPacket::decode).encoder(ClientboundRadioPacket::encode)
-                .consumerMainThread(clientbound(ClientboundRadioPacket::handle)).add();
+        CHANNEL.messageBuilder(ClientboundTransceiverPacket.class, index++).decoder(ClientboundTransceiverPacket::decode).encoder(ClientboundTransceiverPacket::encode)
+                .consumerMainThread(clientbound(ClientboundTransceiverPacket::handle)).add();
+        CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index++).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)
+                .consumerMainThread(clientbound(ClientboundWireEffectPacket::handle)).add();
     }
 
-    private static <P> BiConsumer<P, CustomPayloadEvent.Context> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (packet, context) -> {
+    private static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
+        return (packet, supplier) -> {
+            NetworkEvent.Context context = supplier.get();
             consumer.accept(packet, context.getSender().getServer(), context.getSender());
             context.setPacketHandled(true);
         };
     }
-    public static <P> BiConsumer<P, CustomPayloadEvent.Context> clientbound(Consumer<P> consumer) {
-        return (packet, context) -> {
+    public static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> clientbound(Consumer<P> consumer) {
+        return (packet, supplier) -> {
+            NetworkEvent.Context context = supplier.get();
             consumer.accept(packet);
             context.setPacketHandled(true);
         };
