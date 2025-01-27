@@ -1,9 +1,13 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -18,8 +22,6 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
     public SpeakerBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.SPEAKER, pos, state);
-
-        this.id = UUID.randomUUID();
     }
 
     @Override
@@ -57,15 +59,13 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, SpeakerBlockEntity blockEntity) {
-        if (!level.isClientSide) {
-            if (blockEntity.frequency != null && !blockEntity.isActive) {
-                blockEntity.activate();
-            }
+        if (!blockEntity.isActive && blockEntity.id != null) {
+            blockEntity.activate();
         }
     }
 
     public void inactivate() {
-        if (this.frequency != null) {
+        if (this.isActive) {
             stopSpeaking();
             //stopReceiving(frequency.frequency, frequency.modulation, id);
         }
@@ -76,17 +76,15 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
-        this.speaker = startSpeaking(location, id);
-        //receiver = startReceiving(location, this.frequency, id);
-
-        //receiver.routers.add(speaker);
-
-        level.playSound(
-                null, location.x, location.y, location.z,
-                SimpleRadioSounds.RADIO_OPEN,
-                SoundSource.PLAYERS,
-                1f, 1f
-        );
+        this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
+        if (!level.isClientSide) {
+            level.playSound(
+                    null, location.x, location.y, location.z,
+                    SimpleRadioSounds.RADIO_OPEN,
+                    SoundSource.PLAYERS,
+                    1f, 1f
+            );
+        }
 
         this.isActive = true;
     }

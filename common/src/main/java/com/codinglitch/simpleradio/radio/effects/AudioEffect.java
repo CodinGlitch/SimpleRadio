@@ -6,7 +6,8 @@ public abstract class AudioEffect {
 
     public short[] apply(short[] data) {
         for (int i = 0; i < data.length; i++) {
-            data[i] *= volume;
+            short audio = data[i];
+            data[i] = (short) (audio * volume);
         }
 
         return data;
