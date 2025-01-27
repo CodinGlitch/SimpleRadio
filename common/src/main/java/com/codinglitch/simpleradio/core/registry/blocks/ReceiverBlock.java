@@ -1,10 +1,17 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.core.central.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.Receiving;
+import com.codinglitch.simpleradio.core.central.Routing;
+import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -15,17 +22,18 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
-public class ReceiverBlock extends BaseEntityBlock {
+public class ReceiverBlock extends BaseEntityBlock implements Routing, Receiving {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     private static final VoxelShape SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 7.0, 14.0);
@@ -33,6 +41,16 @@ public class ReceiverBlock extends BaseEntityBlock {
     public ReceiverBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    public RadioReceiver getOrCreateReceiver(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
+        RadioReceiver receiver = startReceiving(location, frequency, id);
+
+        // Allow distribution through wires
+        receiver.allowDistribution();
+
+        return receiver;
     }
 
     @Override
@@ -90,6 +108,19 @@ public class ReceiverBlock extends BaseEntityBlock {
         }
 
         super.setPlacedBy(level, blockPos, blockState, entity, stack);
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity == null) return super.use(state, level, pos, player, hand, result);
+
+        if (blockEntity instanceof CatalyzingBlockEntity catalyzingBlock)  {
+            InteractionResult interactionResult = catalyzingBlock.trySwapCatalyst(state, level, pos, player, hand, result);
+            if (interactionResult != null) return interactionResult;
+        }
+
+        return super.use(state, level, pos, player, hand, result);
     }
 
     @Nullable

@@ -1,12 +1,14 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.core.central.AuditoryBlockEntity;
-import com.codinglitch.simpleradio.core.central.Receiving;
-import com.codinglitch.simpleradio.core.central.Transmitting;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -16,13 +18,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
-public class ReceiverBlockEntity extends AuditoryBlockEntity implements Receiving {
+public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiving {
     public boolean isActive = false;
 
     public ReceiverBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.RECEIVER, pos, state);
+    }
 
-        this.id = UUID.randomUUID();
+    @Override
+    public BlockPos getAdaptorLocation() {
+        return getBlockPos().relative(getBlockState().getValue(ReceiverBlock.FACING).getOpposite());
     }
 
     @Override
@@ -40,6 +45,17 @@ public class ReceiverBlockEntity extends AuditoryBlockEntity implements Receivin
 
         super.setRemoved();
     }
+
+    @Override
+    public void loadTag(CompoundTag tag) {
+        //inactivate();
+        super.loadTag(tag);
+    }
+    @Override
+    public void saveTag(CompoundTag tag) {
+        super.saveTag(tag);
+    }
+
 
     @Override
     public void load(CompoundTag tag) {
@@ -60,16 +76,16 @@ public class ReceiverBlockEntity extends AuditoryBlockEntity implements Receivin
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, ReceiverBlockEntity blockEntity) {
-        if (!level.isClientSide) {
-            if (blockEntity.frequency != null && !blockEntity.isActive) {
-                blockEntity.activate();
-            }
+        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
+            blockEntity.activate();
         }
+
+        CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
     }
 
     public void inactivate() {
         if (this.frequency != null) {
-            stopReceiving(frequency.frequency, frequency.modulation, id);
+            stopReceiving(frequency.frequency, frequency.modulation, this.id);
         }
 
         this.isActive = false;
@@ -78,21 +94,20 @@ public class ReceiverBlockEntity extends AuditoryBlockEntity implements Receivin
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
-        this.receiver = startReceiving(location, this.frequency, id);
+        if (!level.isClientSide) {
+            this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());
 
-        level.playSound(
-                null, location.x, location.y, location.z,
-                SimpleRadioSounds.RADIO_OPEN,
-                SoundSource.PLAYERS,
-                1f, 1f
-        );
+            level.playSound(
+                    null, location.x, location.y, location.z,
+                    SimpleRadioSounds.RADIO_OPEN,
+                    SoundSource.PLAYERS,
+                    1f, 1f
+            );
+        } else {
+            this.receiver = new RadioReceiver(frequency, location, id);
+            ClientRadioManager.registerRouter(receiver);
+        }
 
         this.isActive = true;
-    }
-
-    @Override
-    public void loadTag(CompoundTag tag) {
-        inactivate();
-        super.loadTag(tag);
     }
 }
