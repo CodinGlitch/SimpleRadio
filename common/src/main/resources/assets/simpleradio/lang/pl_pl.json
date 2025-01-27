@@ -1,0 +1,64 @@
+{
+  "item_group.simpleradio": "Simple Radio",
+
+  "item.simpleradio.transmitting_module": "Moduł Transmitera",
+  "item.simpleradio.receiving_module": "Moduł Odbiornika",
+  "item.simpleradio.speaker_module": "Moduł Głośnika",
+  "item.simpleradio.listener_module": "Moduł Nasłuch",
+
+  "item.simpleradio.iron_module": "Żelazny Moduł %1$1",
+  "item.simpleradio.gold_module": "Złoty Moduł %1$s",
+  "item.simpleradio.diamond_module": "Diamentowy Moduł %1$s",
+  "item.simpleradio.netherite_module": "Netherytowy Moduł %1$s",
+
+  "module.simpleradio.empty": "Bez Zawartości",
+
+  "module.simpleradio.clarity": "Przejrzystości Dzwięku",
+  "module.simpleradio.clarity.effects": "Dostarcza czystszy dzwięk",
+
+  "module.simpleradio.range": "Zasięgu",
+  "module.simpleradio.range.transmitting.effects": "Zwiększa zasięg",
+  "module.simpleradio.range.receiving.effects": "Zwiększa zasięg",
+
+  "module.simpleradio.latch": "Przełącznika",
+  "module.simpleradio.latch.effects": "Pozwala na przełączanie stanu nasłuchu",
+
+  "module.simpleradio.battery": "Baterii",
+  "module.simpleradio.battery.effects": "Przechowuje więcej energii w baterii",
+
+  "module.simpleradio.solar": "Solarny",
+  "module.simpleradio.solar.effects": "Ładuje baterię w świetle słonecznym",
+
+  "item.modifiers.transmitting": "Kiedy w przedmiocie Nadającym: ",
+  "item.modifiers.receiving": "Kiedy w przedmiocie Odbierającym: ",
+  "item.modifiers.emitting": "Kiedy w przedmiocie Emitującym: ",
+  "item.modifiers.listening": "Kiedy w przedmiocie Nasłuchującym ",
+  "item.modifiers.powering": "Kiedy w przedmiocie Zasilającym: ",
+
+  "item.simpleradio.transceiver": "Transceiver",
+  "item.simpleradio.walkie_talkie": "Krótkofalówka",
+  "item.simpleradio.spuddie_talkie": "Kartoflofalówka",
+  "item.simpleradio.copper_wire": "Drut Miedziany",
+  "block.simpleradio.radio": "Radio",
+  "block.simpleradio.antenna": "Antena",
+  "block.simpleradio.speaker": "Głośnik",
+  "block.simpleradio.microphone": "Microfon",
+  "block.simpleradio.radiosmither": "Stacja Radiomechaniczna",
+  "block.simpleradio.frequencer": "Skaner Częstotliwości",
+  "block.simpleradio.receiver": "Odbiornik",
+  "block.simpleradio.transmitter": "Nadajnik",
+  "block.simpleradio.socket": "Gniazdko",
+
+  "screen.simpleradio.radiosmither": "Stacja Radiomechaniczna",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "Większy Zasięg, gorsza jakość dzwięku",
+  "screen.simpleradio.radiosmither.fm_description": "Lepsza jakość dzwięku, mniejszy zasięg",
+
+  "subtitles.simpleradio.radio_open": "Radio rozpoczyna rozgłaśnianie",
+  "subtitles.simpleradio.radio_close": "Radio kończy rozgłaśnianie",
+
+  "tooltip.simpleradio.transceiver_frequency": "Częstotliwość: %s",
+  "tooltip.simpleradio.receiver_user": "Użytkownik: %s"
+}
+
