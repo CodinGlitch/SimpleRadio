@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +35,7 @@ public class CommonSimpleRadio {
         LOGGER.debug(String.valueOf(object), substitutions);
     }
     public static void warn(Object object, Object... substitutions) {
-            LOGGER.warn(String.valueOf(object), substitutions);
+        LOGGER.warn(String.valueOf(object), substitutions);
     }
     public static void error(Object object, Object... substitutions) {
         LOGGER.error(String.valueOf(object), substitutions);

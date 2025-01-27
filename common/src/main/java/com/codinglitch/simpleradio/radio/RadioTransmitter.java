@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;
 
+/**
+ * A type of {@link RadioRouter} that accepts {@link RadioSource}s and transmits them along its connected {@link Frequency}.
+ * <br>
+ * <b>Does route further.</b>
+ */
 public class RadioTransmitter extends RadioRouter {
     public BiPredicate<RadioSource, RadioRouter> transmitCriteria;
 
@@ -67,13 +72,12 @@ public class RadioTransmitter extends RadioRouter {
 
     @Override
     public void accept(RadioSource source) {
-        super.accept(source);
         this.route(source, router -> {
             if (transmitCriteria != null && !transmitCriteria.test(source, router)) {
                 return false;
             }
 
-            return !source.owner.equals(router.id);
+            return source.owner == null || !source.owner.equals(router.id);
         });
     }
 }
