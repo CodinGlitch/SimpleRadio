@@ -9,10 +9,12 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 @LexiconLibrary
 public class SimpleRadioLibrary extends Library {
     public static SimpleRadioServerConfig SERVER_CONFIG = new SimpleRadioServerConfig();
+    public static SimpleRadioClientConfig CLIENT_CONFIG = new SimpleRadioClientConfig();
 
     @Override
     public void shelveLexicons() {
         LexiconfigApi.shelveLexicon(SERVER_CONFIG);
+        LexiconfigApi.shelveLexicon(CLIENT_CONFIG);
 
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> Frequency.onLexiconRevision());
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> Frequency.onLexiconRevision());

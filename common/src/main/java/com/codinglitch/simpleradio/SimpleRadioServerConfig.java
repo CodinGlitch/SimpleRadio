@@ -8,8 +8,8 @@ import com.codinglitch.lexiconfig.classes.LexiconPageData;
 
 @Lexicon(name = CommonSimpleRadio.ID+"-server")
 public class SimpleRadioServerConfig extends LexiconData {
-    @LexiconPage(comment = "These are the configurations for the cables.")
-    public Cable cable = new Cable();
+    @LexiconPage(comment = "These are the configurations for the wires.")
+    public Wire wire = new Wire();
 
     @LexiconPage(comment = "These are the configurations for the transceiver item.")
     public Transceiver transceiver = new Transceiver();
@@ -37,11 +37,6 @@ public class SimpleRadioServerConfig extends LexiconData {
 
     @LexiconPage(comment = "These are the general configurations for compatibilities.")
     public Compatibilities compatibilities = new Compatibilities();
-
-    public static class Cable extends LexiconPageData {
-        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.1.")
-        public Double transmissionDiminishment = 0.1d;
-    }
 
     public static class Transceiver extends LexiconPageData {
         @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 1000.")
@@ -100,6 +95,25 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "When false, removes both the spuddie and walkie recipe. Defaults to true.")
         public Boolean enabled = true;
+    }
+
+    public static class Wire extends LexiconPageData {
+        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.1.")
+        public Double transmissionDiminishment = 0.1d;
+        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire takes to relay data. Defaults to 5.")
+        public Double transmissionTime = 4d;
+
+        @LexiconEntry(comment = "This is the amount of time (in ticks) between each header sent. Defaults to 5.")
+        public Integer headerInterval = 5;
+
+        @LexiconEntry(comment = "This is the range a wire can reach before breaking. Defaults to 12.")
+        public Double range = 12d;
+
+        @LexiconEntry(comment = "This is the amount of time (in ticks) a wire can survive while being invalid (no connections or out of range) before breaking. Defaults to 5.")
+        public Integer invalidDeathTime = 5;
+
+        @LexiconEntry(comment = "This is the amount of time (in ticks) between each effect for a wire. Can be disabled by setting to -1. Defaults to 5.")
+        public Integer effectInterval = 5;
     }
 
     public static class Transmitter extends LexiconPageData {
@@ -171,7 +185,10 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer packetBuffer = 2;
 
         @LexiconEntry(comment = "How many listeners should be able to receive a single players audio? Defaults to 2.")
-        public Integer listenerBuffer = 2;
+        public Integer listenerBuffer = 20;
+
+        @LexiconEntry(comment = "[EXPERIMENTAL] Pick up audio from the world, not just players. Defaults to false.")
+        public Boolean soundListening = false;
     }
 
     public static class Compatibilities extends LexiconPageData {
