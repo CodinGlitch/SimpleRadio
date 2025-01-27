@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.function.Consumer;
+
 public interface RegistryHelper {
     @FunctionalInterface
     interface BlockEntityFactory<BE extends BlockEntity> {
@@ -25,7 +27,7 @@ public interface RegistryHelper {
         M create(int var1, Inventory var2);
     }
 
-    <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, ResourceLocation resource);
+    <E extends Entity> EntityType<E> registerEntity(EntityType.EntityFactory<E> factory, MobCategory spawnGroup, Consumer<EntityType.Builder<E>> builder, ResourceLocation resource);
     <BE extends BlockEntity> BlockEntityType<BE> registerBlockEntity(BlockEntityFactory<BE> factory, ResourceLocation resource, Block... blocks);
     <M extends AbstractContainerMenu> MenuType<M> registerMenu(ResourceLocation resource, MenuSupplier<M> supplier);
     CreativeModeTab registerCreativeTab(ResourceLocation resource, CreativeModeTab creativeModeTab);

@@ -6,7 +6,6 @@
 	"textures": {
 		"1": "simpleradio:block/receiver",
 		"2": "simpleradio:block/frequency_frame",
-		"3": "block/gilded_blackstone",
 		"particle": "simpleradio:block/frequency_frame"
 	},
 	"elements": [
@@ -68,30 +67,6 @@
 				"west": {"uv": [7, 1.5, 14, 3], "texture": "#1"},
 				"up": {"uv": [7, 7, 0, 0], "texture": "#1"},
 				"down": {"uv": [7, 7, 0, 14], "texture": "#1"}
-			}
-		},
-		{
-			"from": [3, 12.15, 8.75],
-			"to": [13, 13.15, 10.75],
-			"rotation": {"angle": -22.5, "axis": "x", "origin": [9.67934, 10.61266, 8]},
-			"faces": {
-				"north": {"uv": [8.5, 5, 13.5, 5.5], "texture": "#1"},
-				"east": {"uv": [9.5, 8, 10.5, 8.5], "texture": "#1"},
-				"south": {"uv": [8.5, 5, 13.5, 5.5], "texture": "#1"},
-				"west": {"uv": [9.5, 8, 10.5, 8.5], "texture": "#1"},
-				"up": {"uv": [12, 5, 7, 4], "texture": "#1"}
-			}
-		},
-		{
-			"from": [3, 12.15, 11.75],
-			"to": [13, 13.15, 13.75],
-			"rotation": {"angle": -22.5, "axis": "x", "origin": [9.67934, 10.61266, 8]},
-			"faces": {
-				"north": {"uv": [8.5, 5, 13.5, 5.5], "texture": "#1"},
-				"east": {"uv": [9.5, 7.5, 10.5, 8], "texture": "#1"},
-				"south": {"uv": [8.5, 5, 13.5, 5.5], "texture": "#1"},
-				"west": {"uv": [9.5, 7.5, 10.5, 8], "texture": "#1"},
-				"up": {"uv": [12, 4, 7, 3], "texture": "#1"}
 			}
 		},
 		{

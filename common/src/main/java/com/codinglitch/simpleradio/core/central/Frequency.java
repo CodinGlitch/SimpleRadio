@@ -2,17 +2,17 @@ package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Frequency {
+public class Frequency implements Medium {
     public enum Modulation {
         FREQUENCY("FM"),
         AMPLITUDE("AM");
@@ -24,6 +24,7 @@ public class Frequency {
         }
     }
 
+    private static final Queue<Runnable> pendingFrequencyModifications = new LinkedList<>();
     private static final List<Frequency> frequencies = new ArrayList<>();
 
     public static String DEFAULT_FREQUENCY;
@@ -36,8 +37,11 @@ public class Frequency {
 
     public final Modulation modulation;
     public final String frequency;
+
+    public final Queue<Runnable> pendingModifications = new LinkedList<>();
+
     public final List<RadioReceiver> receivers;
-    public final List<RadioTransmitter> transmitters; //TODO: create transmitter class and replace this
+    public final List<RadioTransmitter> transmitters;
 
     public Frequency(String frequency, Modulation modulation) {
         if (!check(frequency)) {
@@ -50,7 +54,7 @@ public class Frequency {
         this.receivers = new ArrayList<>();
         this.transmitters = new ArrayList<>();
 
-        frequencies.add(this);
+        pendingFrequencyModifications.add(() -> frequencies.add(this));
     }
 
     public static Frequency tryParse(String string) {
@@ -81,6 +85,10 @@ public class Frequency {
         }
 
         frequencies.removeIf(Predicate.not(Frequency::validate));
+    }
+
+    public static void close() {
+        frequencies.clear();
     }
 
     @Nullable
@@ -130,27 +138,40 @@ public class Frequency {
         return receivers.stream().filter(criteria).findFirst().orElse(null);
     }
     public RadioReceiver getReceiver(WorldlyPosition location) {
-        return getReceiver(receiver -> receiver.location.equals(location));
+        return getReceiver(receiver -> location.equals(receiver.location));
     }
     public RadioReceiver getReceiver(Entity owner) {
-        return getReceiver(receiver -> receiver.owner == owner);
+        return getReceiver(receiver -> owner.equals(receiver.owner));
     }
     public RadioReceiver getReceiver(UUID id) {
-        return getReceiver(receiver -> receiver.id.equals(id));
+        return getReceiver(receiver -> id.equals(receiver.id));
+    }
+
+    public void queueReceiver(RadioReceiver receiver) {
+        pendingModifications.add(() -> receivers.add(receiver));
     }
 
     public RadioReceiver addReceiver(RadioReceiver receiver) {
-        receivers.add(receiver);
+        boolean isClient = false;
+        if (receiver.location != null) isClient = receiver.location.isClientSide();
+        else if (receiver.owner != null) isClient = receiver.owner.level().isClientSide;
+
+        RadioManager.registerRouterSided(receiver, isClient, this);
+
         CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.id, this.frequency);
         return receiver;
     }
 
     public RadioReceiver tryAddReceiver(UUID id, WorldlyPosition location) {
-        RadioReceiver receiver = getReceiver(id);
+        boolean isClient = location.isClientSide();
+
+        RadioReceiver receiver = isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
+        if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
+
         if (receiver == null)
             return addReceiver(id, location);
 
-        CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", id, this.frequency);
+        //CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", id, this.frequency);
         return receiver;
     }
     public RadioReceiver addReceiver(UUID id, WorldlyPosition location) {
@@ -158,34 +179,38 @@ public class Frequency {
     }
 
     public RadioReceiver tryAddReceiver(UUID id, Entity entity) {
-        RadioReceiver receiver = getReceiver(id);
+        boolean isClient = entity.level().isClientSide;
+
+        RadioReceiver receiver = isClient ? ClientRadioManager.getReceiver(entity) : getReceiver(entity);
+        if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
+
         if (receiver == null)
             return addReceiver(id, entity);
 
-        CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", id, this.frequency);
+        //CommonSimpleRadio.info("Failed to add receiver {} to frequency {} as they already exist", id, this.frequency);
         return receiver;
     }
     public RadioReceiver addReceiver(UUID id, Entity entity) {
         return addReceiver(new RadioReceiver(this, entity, id));
     }
 
-    public void removeReceiver(RadioReceiver transmitter) {
-        receivers.remove(transmitter);
+    public void removeReceiver(RadioReceiver receiver) {
+        pendingModifications.add(() -> receivers.remove(receiver));
 
         if (!this.validate())
-            frequencies.remove(this);
+            pendingFrequencyModifications.add(() -> frequencies.remove(this));
     }
     public void removeReceiver(Predicate<RadioReceiver> criteria) {
-        receivers.stream().filter(criteria).findFirst().ifPresent(this::removeReceiver);
+        receivers.stream().filter(criteria).findFirst().ifPresent(receiver -> this.removeReceiver(receiver));
     }
     public void removeReceiver(Entity owner) {
-        removeReceiver(receiver -> receiver.owner == owner);
+        removeReceiver(receiver -> owner.equals(receiver.owner));
     }
     public void removeReceiver(WorldlyPosition location) {
-        removeReceiver(receiver -> receiver.location == location);
+        removeReceiver(receiver -> location.equals(receiver.location));
     }
     public void removeReceiver(UUID id) {
-        removeReceiver(receiver -> receiver.id == id);
+        removeReceiver(receiver -> id.equals(receiver.id));
     }
 
     //---- Transmitters ----\\
@@ -194,27 +219,40 @@ public class Frequency {
         return transmitters.stream().filter(criteria).findFirst().orElse(null);
     }
     public RadioTransmitter getTransmitter(WorldlyPosition location) {
-        return getTransmitter(transmitter -> transmitter.location.equals(location));
+        return getTransmitter(transmitter -> location.equals(transmitter.location));
     }
     public RadioTransmitter getTransmitter(Entity owner) {
-        return getTransmitter(transmitter -> transmitter.owner.equals(owner));
+        return getTransmitter(transmitter -> owner.equals(transmitter.owner));
     }
     public RadioTransmitter getTransmitter(UUID id) {
-        return getTransmitter(transmitter -> transmitter.id == id);
+        return getTransmitter(transmitter -> id.equals(transmitter.id));
+    }
+
+    public void queueTransmitter(RadioTransmitter transmitter) {
+        pendingModifications.add(() -> transmitters.add(transmitter));
     }
 
     public RadioTransmitter addTransmitter(RadioTransmitter transmitter) {
-        transmitters.add(transmitter);
+        boolean isClient = false;
+        if (transmitter.location != null) isClient = transmitter.location.isClientSide();
+        else if (transmitter.owner != null) isClient = transmitter.owner.level().isClientSide;
+
+        RadioManager.registerRouterSided(transmitter, isClient, this);
+
         CommonSimpleRadio.debug("Added transmitter {} to frequency {}", transmitter.id, this.frequency);
         return transmitter;
     }
 
     public RadioTransmitter tryAddTransmitter(UUID id, WorldlyPosition location) {
-        RadioTransmitter transmitter = getTransmitter(id);
+        boolean isClient = location.isClientSide();
+
+        RadioTransmitter transmitter = isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
+        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);
+
         if (transmitter == null)
             return addTransmitter(id, location);
 
-        CommonSimpleRadio.info("Failed to add transmitter {} to frequency {} as they already exist", id, this.frequency);
+        //CommonSimpleRadio.info("Failed to add transmitter {} to frequency {} as they already exist", id, this.frequency);
         return transmitter;
     }
     public RadioTransmitter addTransmitter(UUID id, WorldlyPosition location) {
@@ -222,11 +260,15 @@ public class Frequency {
     }
 
     public RadioTransmitter tryAddTransmitter(UUID id, Entity entity) {
-        RadioTransmitter transmitter = getTransmitter(id);
+        boolean isClient = entity.level().isClientSide;
+
+        RadioTransmitter transmitter = isClient ? ClientRadioManager.getTransmitter(entity) : getTransmitter(entity);
+        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);
+
         if (transmitter == null)
             return addTransmitter(id, entity);
 
-        CommonSimpleRadio.info("Failed to add transmitter {} to frequency {} as they already exist", id, this.frequency);
+        //CommonSimpleRadio.info("Failed to add transmitter {} to frequency {} as they already exist", id, this.frequency);
         return transmitter;
     }
     public RadioTransmitter addTransmitter(UUID id, Entity entity) {
@@ -234,25 +276,48 @@ public class Frequency {
     }
 
     public void removeTransmitter(RadioTransmitter transmitter) {
-        transmitters.remove(transmitter);
+        pendingModifications.add(() -> transmitters.remove(transmitter));
 
         if (!this.validate())
-            frequencies.remove(this);
+            pendingFrequencyModifications.add(() -> frequencies.remove(this));
     }
     public void removeTransmitter(Predicate<RadioTransmitter> criteria) {
         transmitters.stream().filter(criteria).findFirst().ifPresent(this::removeTransmitter);
     }
     public void removeTransmitter(Entity owner) {
-        removeTransmitter(transmitter -> transmitter.owner == owner);
+        removeTransmitter(transmitter -> owner.equals(transmitter.owner));
     }
     public void removeTransmitter(WorldlyPosition location) {
-        removeTransmitter(transmitter -> transmitter.location == location);
+        removeTransmitter(transmitter -> location.equals(transmitter.location));
     }
     public void removeTransmitter(UUID id) {
-        removeTransmitter(transmitter -> transmitter.id == id);
+        removeTransmitter(transmitter -> id.equals(transmitter.id));
     }
 
-    public void serverTick(int tickCount) {}
+    public void serverTick(int tickCount) {
+        for (RadioTransmitter transmitter : transmitters) {
+            transmitter.tick(tickCount);
+        }
+        for (RadioReceiver receiver : receivers) {
+            receiver.tick(tickCount);
+        }
+
+        // now that its done iterating the transmitters and receivers we can apply the modifications without any problems 😊
+
+        for (int i = 0; i < pendingModifications.size(); i++) {
+            Runnable modification = pendingModifications.poll(); // i sure hope this is safe!!!
+            if (modification == null) break;
+            modification.run();
+        }
+    }
+
+    public static void applyModifications() {
+        for (int i = 0; i < pendingFrequencyModifications.size(); i++) {
+            Runnable modification = pendingFrequencyModifications.poll();
+            if (modification == null) break;
+            modification.run();
+        }
+    }
 
     public boolean validate() {
         if (this.receivers.isEmpty() && this.transmitters.isEmpty()) {
@@ -289,5 +354,10 @@ public class Frequency {
         if (modulation == null) return null;
 
         return Frequency.getOrCreateFrequency(tag.getString("frequency"), modulation);
+    }
+
+    @Override
+    public String toString() {
+        return this.frequency + this.modulation.shorthand;
     }
 }
