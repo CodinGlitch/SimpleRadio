@@ -3,7 +3,9 @@ package com.codinglitch.simpleradio.core.central;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import org.joml.Math;
 import org.joml.Vector3f;
+import org.lwjgl.system.MathUtil;
 
 import javax.annotation.Nullable;
 
@@ -25,13 +27,13 @@ public class WorldlyPosition extends Vector3f {
         this(0, 0, 0, null, null);
     }
 
-    public static WorldlyPosition of(BlockPos pos, Level level, BlockPos realLocation) {
-        return new WorldlyPosition(pos.getX(), pos.getY(), pos.getZ(), level, realLocation);
+    public static WorldlyPosition of(BlockPos pos, Level level, BlockPos realLocation) { // use this upon creation to save the 'real' location
+        return WorldlyPosition.of(pos.getCenter().toVector3f(), level, realLocation);
     }
     public static WorldlyPosition of(BlockPos pos, Level level) {
-        return new WorldlyPosition(pos.getX(), pos.getY(), pos.getZ(), level);
+        return WorldlyPosition.of(pos.getCenter().toVector3f(), level);
     }
-    public static WorldlyPosition of(Vector3f pos, Level level, BlockPos realLocation) {
+    public static WorldlyPosition of(Vector3f pos, Level level, BlockPos realLocation) { // use this upon creation to save the 'real' location
         return new WorldlyPosition(pos.x, pos.y, pos.z, level, realLocation);
     }
     public static WorldlyPosition of(Vector3f pos, Level level) {
@@ -43,21 +45,29 @@ public class WorldlyPosition extends Vector3f {
     }
 
     public boolean equals(WorldlyPosition location) {
+        if (location == null) return false;
+        if (location.level == null) return false;
+        if (this.level == null) return false;
+
         return location.level == this.level && location.position() == this.position();
     }
 
     public BlockPos blockPos() {
-        return new BlockPos(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+        return new BlockPos((int) Math.floor(this.x), (int) Math.floor(this.y), (int) Math.floor(this.z));
     }
     public BlockPos realLocation() { // used in garbage collection pretty much exclusively for VS and maybe Create: Aeronautics when released
         return this.realLocation == null ? this.blockPos() : this.realLocation;
     }
 
     public Vector3f dimensionScaled() {
-        return this.position().mul((float) level.dimensionType().coordinateScale());
+        return this.position().mul((float) level.dimensionType().coordinateScale(), new Vector3f());
     }
 
     public float distance(WorldlyPosition other) {
         return this.dimensionScaled().distance(other.dimensionScaled());
+    }
+
+    public boolean isClientSide() {
+        return this.level.isClientSide;
     }
 }
