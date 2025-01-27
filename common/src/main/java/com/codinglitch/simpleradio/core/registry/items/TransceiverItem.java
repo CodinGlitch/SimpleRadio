@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.*;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
@@ -33,7 +33,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void transmit(ServerPlayer player, boolean started) {
-        Services.NETWORKING.sendToPlayer(player, new ClientboundRadioPacket(started, player.getUUID(), this.getClass().getName()));
+        Services.NETWORKING.sendToPlayer(player, new ClientboundTransceiverPacket(started, player.getUUID(), this.getClass().getName()));
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
@@ -42,6 +42,9 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             RadioSpeaker speaker = startSpeaking(entity, owner);
             RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
             RadioTransmitter transmitter = startTransmitting(entity, frequencyName, Frequency.modulationOf(modulation), owner);
+
+            listener.tryAddRouter(transmitter);
+            receiver.tryAddRouter(speaker);
 
             /*if (this.getClass() == TransceiverItem.class) {
                 channel.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
@@ -56,6 +59,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             transmitter.transmitCriteria((source, router) -> {
                 if (entity instanceof Player player) {
                     ItemStack using = player.getUseItem();
+                    if (!(using.getItem() instanceof TransceiverItem)) return false;
+
                     CompoundTag usingTag = using.getOrCreateTag();
 
                     if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return false;

@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -52,26 +53,59 @@ public class CommonRadioPlugin {
     }
 
     public static short[] combineAudio(List<short[]> audioParts) {
+        if (audioParts.size() == 1) {
+            return audioParts.get(0);
+        }
+
         short[] result = new short[960];
+
         int sample;
         for (int i = 0; i < result.length; i++) {
             sample = 0;
-            for (short[] audio : audioParts) {
-                if (audio == null) {
-                    sample += 0;
-                } else {
-                    sample += audio[i];
+
+            // Combining all the audio parts
+            if (!audioParts.isEmpty()) {
+                for (short[] audio : audioParts) {
+                    if (audio == null) {
+                        sample += 0;
+                    } else {
+                        sample += audio[i];
+                    }
                 }
+
+                // Averaging the audio
+                sample /= audioParts.size();
             }
-            if (sample > Short.MAX_VALUE) {
-                result[i] = Short.MAX_VALUE;
-            } else if (sample < Short.MIN_VALUE) {
-                result[i] = Short.MIN_VALUE;
-            } else {
-                result[i] = (short) sample;
-            }
+
+            result[i] = (short) Math.max(Short.MIN_VALUE, Math.min(sample, Short.MAX_VALUE));
         }
+
         return result;
+    }
+
+    public static double getFalloff(float distance, float range) {
+        return Math.max(0, 1 - (Math.log(1 + distance) / Math.log(1 + range)));
+    }
+
+    public static double getDoppler(Vector3f sourcePosition, Vector3f sourceVelocity, Vector3f observerPosition, Vector3f observerVelocity) {
+        Vector3f sourceToObserver = new Vector3f(
+                observerPosition.x - sourcePosition.x,
+                observerPosition.y - sourcePosition.y,
+                observerPosition.z - sourcePosition.z
+        ).normalize();
+
+        float observerFactor = 0;
+        if (observerVelocity.x != 0 || observerVelocity.y != 0 || observerVelocity.z != 0) {
+            observerFactor = observerVelocity.normalize().dot(sourceToObserver);
+        }
+
+        float sourceFactor = 0;
+        if (sourceVelocity.x != 0 || sourceVelocity.y != 0 || sourceVelocity.z != 0) {
+            sourceFactor = sourceVelocity.normalize().dot(sourceToObserver);
+        }
+
+        return (1000 + observerVelocity.length()*-observerFactor) /
+                (1000 + sourceVelocity.length()*-sourceFactor);
     }
 
     public String getPluginId() {

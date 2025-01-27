@@ -8,6 +8,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdat
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.platform.ClientServices;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;

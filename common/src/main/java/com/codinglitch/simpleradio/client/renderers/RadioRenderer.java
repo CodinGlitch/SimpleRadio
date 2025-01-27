@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client.renderers;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.models.RadioModel;
 import com.codinglitch.simpleradio.core.registry.blocks.RadioBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
@@ -21,6 +22,10 @@ public class RadioRenderer implements BlockEntityRenderer<RadioBlockEntity> {
 
     @Override
     public void render(RadioBlockEntity blockEntity, float tickDelta, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
+        float time = blockEntity.time + (tickDelta/20f);
+
+        this.model.setupAnim(blockEntity, time);
+
         BlockState state = blockEntity.getBlockState();
         Block block = state.getBlock();
 

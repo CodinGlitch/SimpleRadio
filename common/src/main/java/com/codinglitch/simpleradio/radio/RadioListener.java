@@ -1,80 +1,30 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.core.central.Transmitting;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
-import com.codinglitch.simpleradio.platform.Services;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
+/**
+ * A type of {@link RadioRouter} that accepts {@link RadioSource}s.
+ * <br>
+ * Often serves as the beginning of the audio pipeline.
+ * <br>
+ * <b>Does route further.</b>
+ */
 public class RadioListener extends RadioRouter {
-    private static final List<RadioListener> listeners = new ArrayList<>();
-
-    public static List<RadioListener> getListeners() {
-        return listeners;
-    }
-
-    public static void removeListener(RadioListener listener) {
-        listeners.remove(listener);
-    }
-    public static void removeListener(Entity owner) {
-        listeners.removeIf(listener -> listener.owner == owner);
-    }
-    public static void removeListener(WorldlyPosition location) {
-        listeners.removeIf(listener -> listener.location != null && listener.location.equals(location));
-    }
-    public static void removeListener(UUID id) {
-        listeners.removeIf(listener -> listener.id == id);
-    }
-
-    public static RadioListener getListener(Entity owner) {
-        return listeners.stream().filter(listener -> listener.owner.equals(owner))
-                .findFirst().orElse(null);
-    }
-    public static RadioListener getListener(WorldlyPosition location) {
-        return listeners.stream().filter(listener -> listener.location.equals(location))
-                .findFirst().orElse(null);
-    }
-    public static RadioListener getListener(UUID id) {
-        return listeners.stream().filter(listener -> listener.id.equals(id))
-                .findFirst().orElse(null);
-    }
-
-    public static RadioListener getOrCreateListener(Entity owner, @Nullable UUID id) {
-        RadioListener listener = getListener(owner);
-        if (listener == null) listener = getListener(id);
-
-        return listener != null ? listener : new RadioListener(owner, id);
-    }
-    public static RadioListener getOrCreateListener(Entity owner) { return getOrCreateListener(owner, null); }
-
-    public static RadioListener getOrCreateListener(WorldlyPosition location, @Nullable UUID id) {
-        RadioListener listener = getListener(location);
-        if (listener == null) listener = getListener(id);
-
-        return listener != null ? listener : new RadioListener(location, id);
-    }
-    public static RadioListener getOrCreateListener(WorldlyPosition location) { return getOrCreateListener(location, null); }
-
-    public static void garbageCollect() {
-        listeners.removeIf(Predicate.not(RadioListener::validate));
-        listeners.removeIf(listener -> listener.owner == null && listener.location == null);
-    }
 
     private UnaryOperator<RadioSource> dataTransformer;
+    private static final Queue<RadioSource> pendingSources = new LinkedList<>();
 
     public float range = 8;
+    public long lastHeader = 0;
 
     protected RadioListener(UUID id) {
         super(id);
-        listeners.add(this);
+
     }
     protected RadioListener() {
         this(UUID.randomUUID());
@@ -86,6 +36,9 @@ public class RadioListener extends RadioRouter {
     public RadioListener(Entity owner, UUID uuid) {
         this(uuid);
         this.owner = owner;
+
+        boolean isClient = owner.level().isClientSide();
+        RadioManager.registerRouterSided(this, isClient, null);
     }
     public RadioListener(WorldlyPosition location) {
         this(location, UUID.randomUUID());
@@ -93,6 +46,26 @@ public class RadioListener extends RadioRouter {
     public RadioListener(WorldlyPosition location, UUID uuid) {
         this(uuid);
         this.location = location;
+
+
+        boolean isClient = location.isClientSide();
+        RadioManager.registerRouterSided(this, isClient, null);
+    }
+
+    public void setRange(float range) {
+        this.range = range;
+    }
+
+    public void tryRouteHeader() {
+        if (this.location == null) return;
+
+        long currentTime = this.location.level.getGameTime();
+        if (currentTime - lastHeader < SimpleRadioLibrary.SERVER_CONFIG.wire.headerInterval) return;
+
+        RadioHeader header = new RadioHeader(this.location);
+        this.route(header);
+
+        this.lastHeader = currentTime;
     }
 
     public void transformer(UnaryOperator<RadioSource> transformer) {
@@ -104,6 +77,14 @@ public class RadioListener extends RadioRouter {
             source = dataTransformer.apply(source);
         }
 
+        source.delegate(this.id);
+
+        this.tryRouteHeader();
         this.route(source);
+    }
+
+    @Override
+    public void tick(int tickCount) {
+        super.tick(tickCount);
     }
 }

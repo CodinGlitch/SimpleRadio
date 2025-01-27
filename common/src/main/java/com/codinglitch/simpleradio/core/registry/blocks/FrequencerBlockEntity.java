@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.core.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;
@@ -62,7 +63,7 @@ public class FrequencerBlockEntity extends BlockEntity {
             if (blockEntity.frequency != null) {
                 //---- Receiver gathering and parsing ----\\
                 for (RadioReceiver receiver : blockEntity.frequency.receivers) {
-                    String name = parse(null, receiver.location);
+                    String name = parse(receiver.owner, receiver.location);
                     if (name != null) blockEntity.receivers.add(name);
                 }
 
@@ -70,7 +71,7 @@ public class FrequencerBlockEntity extends BlockEntity {
             } else {
                 if (level.getBlockState(blockEntity.getBlockPos().below()).is(Blocks.DIAMOND_BLOCK)) {
                     //---- Listener gathering ----\\
-                    List<RadioListener> listeners = RadioListener.getListeners();
+                    List<RadioListener> listeners = RadioManager.getListeners();
                     for (RadioListener listener : listeners) {
                         String name = parse(listener.owner, listener.location);
                         if (name != null) blockEntity.listeners.add(name);
