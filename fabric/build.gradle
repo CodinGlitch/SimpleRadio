@@ -27,7 +27,7 @@ dependencies {
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}"
 
-    compileOnly annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")
+    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
 
     // -- Compatibilities -- \\
 
@@ -102,7 +102,10 @@ tasks.named("sourcesJar", Jar) {
 
 processResources {
     from project(":common").sourceSets.main.resources
+    from project(":fabric").sourceSets.main.resources
 }
+
+sourceSets.main.resources.srcDir 'src/main/generated'
 
 java {
     withSourcesJar()
