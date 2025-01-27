@@ -1,74 +1,129 @@
 package com.codinglitch.simpleradio.compat.create;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.core.central.Routing;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.*;
+import com.jozufozu.flywheel.api.MaterialManager;
+import com.jozufozu.flywheel.core.virtual.VirtualRenderWorld;
+import com.mojang.math.Axis;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.behaviour.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
-import com.simibubi.create.foundation.utility.VecHelper;
+import com.simibubi.create.content.contraptions.render.ActorInstance;
+import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-import java.util.Map;
+import javax.swing.text.html.CSS;
 import java.util.UUID;
 
 public class CentralMovementBehaviour implements MovementBehaviour {
-    @Override
-    public void startMoving(MovementContext context) {
-        MovementBehaviour.super.startMoving(context);
-
-        CommonSimpleRadio.info("start moving");
-    }
-
-    public void updateRouter(RadioRouter router, WorldlyPosition newLocation, AbstractContraptionEntity contraption) {
+    public void updateRouter(MovementContext context, RadioRouter router, WorldlyPosition newLocation, AbstractContraptionEntity contraption) {
         if (router == null) return;
 
         if (router.owner != contraption) {
             router.owner = contraption;
         }
 
-        router.location = newLocation;
+        if (context.world.isClientSide) {
+            Vector3f translatedNorth = context.rotation.apply(new Vec3(0, 0, -1)).toVector3f();
+            if (router.rotation == null) router.rotation = new Quaternionf();
+
+            // theres probably a better way to do this but im stupid so this works for now
+            router.rotation.setAngleAxis(translatedNorth.angle(new Vector3f(0, 0, -1)) * -Math.signum(translatedNorth.x), 0, 1, 0);
+        }
+
+        router.location.x = newLocation.x;
+        router.location.y = newLocation.y;
+        router.location.z = newLocation.z;
         router.updateLocation(newLocation);
+    }
+
+    public void update(MovementContext context) {
+        AbstractContraptionEntity contraptionEntity = context.contraption.entity;
+        if (contraptionEntity == null) return;
+
+        if (!(context.state.getBlock() instanceof Routing routing)) return;
+
+        if (context.blockEntityData.contains("uuid")) {
+            UUID id = context.blockEntityData.getUUID("uuid");
+
+            WorldlyPosition newLocation;
+            if (context.world.isClientSide) {
+                double partialTick = Minecraft.getInstance().getPartialTick();
+
+                Vec3 position = context.position;
+                position = position.add(context.motion.scale(partialTick));
+
+                newLocation  = WorldlyPosition.of(position.toVector3f(), context.world);
+            } else {
+                newLocation = WorldlyPosition.of(context.position.toVector3f(), context.world);
+            }
+
+
+            Frequency frequency = Frequency.fromTag(context.blockEntityData);
+            if (frequency != null) {
+                updateRouter(context, routing.getOrCreateReceiver(newLocation, frequency, id, context.state), newLocation, contraptionEntity);
+                updateRouter(context, routing.getOrCreateTransmitter(newLocation, frequency, id, context.state), newLocation, contraptionEntity);
+            }
+
+            updateRouter(context, routing.getOrCreateSpeaker(newLocation, id, context.state), newLocation, contraptionEntity);
+            updateRouter(context, routing.getOrCreateListener(newLocation, id, context.state), newLocation, contraptionEntity);
+
+            updateRouter(context, routing.getOrCreateRouter(newLocation, id, context.state), newLocation, contraptionEntity);
+        }
     }
 
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         MovementBehaviour.super.visitNewPosition(context, pos);
+
+        if (context.world.isClientSide()) return;
+        update(context);
     }
 
     @Override
     public void tick(MovementContext context) {
         MovementBehaviour.super.tick(context);
 
+        if (context.world.isClientSide()) return;
+        update(context);
+    }
+
+    @Override
+    public void startMoving(MovementContext context) {
+        MovementBehaviour.super.startMoving(context);
+    }
+
+    @Override
+    public void renderInContraption(MovementContext context, VirtualRenderWorld renderWorld, ContraptionMatrices matrices, MultiBufferSource buffer) {
+        MovementBehaviour.super.renderInContraption(context, renderWorld, matrices, buffer);
+
         AbstractContraptionEntity contraptionEntity = context.contraption.entity;
         if (contraptionEntity == null) return;
-        if (context.world.isClientSide()) return;
 
-        if (context.motion.length() <= 0d) return;
-
-        if (context.blockEntityData.contains("uuid")) {
-            UUID id = context.blockEntityData.getUUID("uuid");
-            WorldlyPosition newLocation = WorldlyPosition.of(context.position.toVector3f(), context.world);
-
-            Frequency frequency = Frequency.fromTag(context.blockEntityData);
-            if (frequency != null) {
-                updateRouter(frequency.getReceiver(id), newLocation, contraptionEntity);
-                updateRouter(frequency.getTransmitter(id), newLocation, contraptionEntity);
-            }
-
-            updateRouter(RadioSpeaker.getSpeaker(id), newLocation, contraptionEntity);
-            updateRouter(RadioListener.getListener(id), newLocation, contraptionEntity);
-        }
+        update(context);
     }
 
     @Override
     public boolean renderAsNormalBlockEntity() {
         return true;
     }
+
+    @Nullable
+    @Override
+    public ActorInstance createInstance(MaterialManager materialManager, VirtualRenderWorld simulationWorld, MovementContext context) {
+        return MovementBehaviour.super.createInstance(materialManager, simulationWorld, context);
+    }
+
+
 }
