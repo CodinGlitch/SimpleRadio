@@ -13,31 +13,35 @@ import static com.codinglitch.simpleradio.CommonSimpleRadio.id;
 public class SimpleRadioBlocks {
     public static final HashMap<ResourceLocation, Block> BLOCKS = new HashMap<>();
 
-    public static Block RADIOSMITHER = register(id("radiosmither"), new RadiosmitherBlock(
+    public static RadiosmitherBlock RADIOSMITHER = (RadiosmitherBlock) register(id("radiosmither"), new RadiosmitherBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.DEEPSLATE)
     ));
-    public static Block RADIO = register(id("radio"), new RadioBlock(
+    public static RadioBlock RADIO = (RadioBlock) register(id("radio"), new RadioBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
     ));
-    public static Block SPEAKER = register(id("speaker"), new SpeakerBlock(
+    public static SpeakerBlock SPEAKER = (SpeakerBlock) register(id("speaker"), new SpeakerBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
     ));
-    public static Block MICROPHONE = register(id("microphone"), new MicrophoneBlock(
-            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
-    ));
-
-    public static Block TRANSMITTER = register(id("transmitter"), new TransmitterBlock(
-            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
-    ));
-    public static Block RECEIVER = register(id("receiver"), new ReceiverBlock(
+    public static MicrophoneBlock MICROPHONE = (MicrophoneBlock) register(id("microphone"), new MicrophoneBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
     ));
 
-    public static Block FREQUENCER = register(id("frequencer"), new FrequencerBlock(
+    public static TransmitterBlock TRANSMITTER = (TransmitterBlock) register(id("transmitter"), new TransmitterBlock(
+            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
+    ));
+    public static ReceiverBlock RECEIVER = (ReceiverBlock) register(id("receiver"), new ReceiverBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
     ));
 
-    public static Block ANTENNA = register(id("antenna"), new AntennaBlock(
+    public static FrequencerBlock FREQUENCER = (FrequencerBlock) register(id("frequencer"), new FrequencerBlock(
+            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)
+    ));
+
+    public static AntennaBlock ANTENNA = (AntennaBlock) register(id("antenna"), new AntennaBlock(
+            Block.Properties.of().strength(2.0F, 4.0F).sound(SoundType.METAL).instabreak()
+    ));
+
+    public static SocketBlock SOCKET = (SocketBlock) register(id("socket"), new SocketBlock(
             Block.Properties.of().strength(2.0F, 4.0F).sound(SoundType.METAL).instabreak()
     ));
 

@@ -44,6 +44,10 @@ public class SimpleRadioBlockEntities {
             ReceiverBlockEntity::new, id("receiver"), SimpleRadioBlocks.RECEIVER
     );
 
+    public static final BlockEntityType<SocketBlockEntity> SOCKET = Services.REGISTRY.registerBlockEntity(
+            SocketBlockEntity::new, id("socket"), SimpleRadioBlocks.SOCKET
+    );
+
     public static final BlockEntityType<FrequencerBlockEntity> FREQUENCER = Services.REGISTRY.registerBlockEntity(
             FrequencerBlockEntity::new, id("frequencer"), SimpleRadioBlocks.FREQUENCER
     );
