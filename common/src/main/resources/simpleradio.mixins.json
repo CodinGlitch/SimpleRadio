@@ -7,13 +7,17 @@
   "mixins": [
     "MixinEntity",
     "MixinMinecraftServer",
-    "MixinPlayerList"
+    "MixinPlayerList",
+    "MixinServerLevel",
+    "MixinLevel"
   ],
   "client": [
+    "MixinClientLevel",
+    "MixinDebugRenderer",
     "MixinItemBlockRenderTypes",
+    "MixinItemInHandRenderer",
     "MixinItemRenderer",
     "MixinLocalPlayer",
-    "MixinMinecraft",
     "MixinModelManager",
     "MixinPlayerRenderer"
   ],

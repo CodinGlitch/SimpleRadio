@@ -15,6 +15,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+/**
+ * A type of {@link RadioRouter} that accepts {@link RadioSource}s from its connected {@link Frequency}.
+ * <br>
+ * <b>Does route further.</b>
+ */
 public class RadioReceiver extends RadioRouter {
     public Frequency frequency;
 
@@ -53,7 +58,7 @@ public class RadioReceiver extends RadioRouter {
             return;
         }
 
-        super.accept(source);
+        //super.accept(source);
         this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));
     }
 }
