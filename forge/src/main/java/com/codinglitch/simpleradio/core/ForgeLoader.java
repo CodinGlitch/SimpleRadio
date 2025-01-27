@@ -1,15 +1,20 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,6 +26,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -36,12 +43,19 @@ public class ForgeLoader {
     );
 
     @SubscribeEvent
-    public void gatherData(GatherDataEvent event) {
+    public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
 
         generator.addProvider(
                 event.includeServer(),
                 new SimpleRadioRecipeProvider(generator.getPackOutput())
+        );
+
+        generator.addProvider(
+                event.includeServer(),
+                new LootTableProvider(generator.getPackOutput(), Set.of(), List.of(
+                        new LootTableProvider.SubProviderEntry(SimpleRadioBlockLootTableProvider::new, LootContextParamSets.BLOCK)
+                ))
         );
     }
 
@@ -59,6 +73,8 @@ public class ForgeLoader {
         event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
             CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
         });
+
+        SimpleRadioCatalysts.load();
     }
 
     public static void loadPackets() {
@@ -67,8 +83,10 @@ public class ForgeLoader {
         CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index++).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
                 .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle)).add();
 
-        CHANNEL.messageBuilder(ClientboundRadioPacket.class, index++).decoder(ClientboundRadioPacket::decode).encoder(ClientboundRadioPacket::encode)
-                .consumerMainThread(clientbound(ClientboundRadioPacket::handle)).add();
+        CHANNEL.messageBuilder(ClientboundTransceiverPacket.class, index++).decoder(ClientboundTransceiverPacket::decode).encoder(ClientboundTransceiverPacket::encode)
+                .consumerMainThread(clientbound(ClientboundTransceiverPacket::handle)).add();
+        CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index++).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)
+                .consumerMainThread(clientbound(ClientboundWireEffectPacket::handle)).add();
     }
 
     private static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
