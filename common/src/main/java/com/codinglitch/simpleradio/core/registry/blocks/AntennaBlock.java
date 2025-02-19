@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -25,6 +24,9 @@ import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class AntennaBlock extends Block {
     public static final BooleanProperty UP = BlockStateProperties.UP;
@@ -95,7 +97,7 @@ public class AntennaBlock extends Block {
         }
 
         BlockState newState = update(pos, state, accessor, null);
-        Pair<Integer, Boolean> result = this.surveyGround(pos, newState, accessor);
+        Pair<Integer, Boolean> result = this.crawlAntenna(pos, newState, accessor);
 
         if (result.getA() == -1) {
             return state.setValue(ATTACHED, false).setValue(UNSTABLE, true);
@@ -212,21 +214,21 @@ public class AntennaBlock extends Block {
         return state;
     }
 
-    public Pair<Integer, Boolean> surveyGround(BlockPos pos, BlockState state, LevelAccessor accessor) {
+    public Pair<Integer, Boolean> crawlAntenna(BlockPos pos, BlockState state, LevelAccessor accessor) {
         if (state.getValue(ATTACHED)) return new Pair<>(0, true);
 
         int columnDistance = -1;
         boolean wasDirect = false;
         if (state.getValue(DOWN)) {
-            Pair<Integer, Boolean> result = checkColumn(pos.mutable().move(Direction.DOWN), accessor, 1);
+            Pair<Integer, Boolean> result = crawlColumn(pos.mutable().move(Direction.DOWN), accessor, 1);
             columnDistance = result.getA();
             wasDirect = result.getB();
         }
 
-        Integer axisDistance = -1;
+        int axisDistance = -1;
         Direction.Axis axis = state.getValue(AXIS);
         if (!axis.isVertical()) {
-            axisDistance = checkAxis(pos.mutable(), axis, accessor, 0);
+            axisDistance = crawlAxis(pos.mutable(), axis, accessor, 0);
         }
 
         if (columnDistance == -1) return new Pair<>(axisDistance, wasDirect);
@@ -239,12 +241,28 @@ public class AntennaBlock extends Block {
         }
     }
 
-    public int checkAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, int distance) {
+    public int climbAntenna(BlockPos pos, LevelAccessor accessor) {
+        AtomicInteger score = new AtomicInteger();
+        climbColumn(pos.mutable(), accessor, score, 0);
+
+        return score.get();
+    }
+
+    // ---- Crawling/Climbing Methods ---- \\
+
+    public void climbAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, AtomicInteger score, int distance) {
         Direction positiveDirection = Direction.get(Direction.AxisDirection.POSITIVE, axis);
         Direction negativeDirection = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
 
-        int positiveDistance = checkRow(currentPos.mutable().move(positiveDirection), positiveDirection, accessor, distance+1);
-        int negativeDistance = checkRow(currentPos.mutable().move(negativeDirection), negativeDirection, accessor, distance+1);
+        climbRow(currentPos.mutable().move(positiveDirection), positiveDirection, accessor, score, distance+1);
+        climbRow(currentPos.mutable().move(negativeDirection), negativeDirection, accessor, score, distance+1);
+    }
+    public int crawlAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, int distance) {
+        Direction positiveDirection = Direction.get(Direction.AxisDirection.POSITIVE, axis);
+        Direction negativeDirection = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
+
+        int positiveDistance = crawlRow(currentPos.mutable().move(positiveDirection), positiveDirection, accessor,  distance+1);
+        int negativeDistance = crawlRow(currentPos.mutable().move(negativeDirection), negativeDirection, accessor, distance+1);
 
         if (positiveDistance == -1) return negativeDistance;
         if (negativeDistance == -1) return positiveDistance;
@@ -252,65 +270,108 @@ public class AntennaBlock extends Block {
         return Math.min(positiveDistance, negativeDistance);
     }
 
-    public int checkRow(BlockPos.MutableBlockPos currentPos, Direction direction, LevelAccessor accessor, int distance) {
-        ArrayList<Integer> distances = new ArrayList<>();
+    public void climbRow(BlockPos.MutableBlockPos currentPos, Direction direction, LevelAccessor accessor, AtomicInteger score, int distance) {
+        AtomicInteger dist = new AtomicInteger(distance);
 
-        BlockState currentState = accessor.getBlockState(currentPos);
-        while (currentState.getBlock() instanceof AntennaBlock) {
-            if (distance > MAX_DISTANCE) break;
-            if (currentState.getValue(ATTACHED)) {
-                distances.add(distance);
-                break;
+        this.iterateDirection(currentPos, accessor, direction, state -> {
+            if (dist.get() > MAX_DISTANCE) return false;
+            if (state.getValue(UP)) {
+                climbColumn(currentPos.mutable().move(Direction.UP), accessor,  score, distance+1);
             }
 
-            if (currentState.getValue(DOWN)) {
-                int otherDistance = checkColumn(currentPos.mutable().move(Direction.DOWN), accessor, distance+1).getA();
+            score.getAndIncrement();
+            dist.getAndIncrement();
+            return true;
+        });
+    }
+    public int crawlRow(BlockPos.MutableBlockPos currentPos, Direction direction, LevelAccessor accessor, int distance) {
+        ArrayList<Integer> distances = new ArrayList<>();
+        AtomicInteger dist = new AtomicInteger(distance);
+
+        this.iterateDirection(currentPos, accessor, direction, state -> {
+            if (dist.get() > MAX_DISTANCE) return false;
+            if (state.getValue(ATTACHED)) {
+                distances.add(dist.get());
+                return false;
+            }
+
+            if (state.getValue(DOWN)) {
+                int otherDistance = crawlColumn(currentPos.mutable().move(Direction.DOWN), accessor, dist.get()+1).getA();
                 if (otherDistance != -1) {
                     distances.add(otherDistance);
                 }
             }
 
-            currentPos.move(direction);
-            currentState = accessor.getBlockState(currentPos);
-
-            distance++;
-        }
+            dist.getAndIncrement();
+            return true;
+        });
 
         if (distances.isEmpty()) return -1;
         return Collections.min(distances);
     }
 
-    public Pair<Integer, Boolean> checkColumn(BlockPos.MutableBlockPos currentPos, LevelAccessor accessor, int distance) {
-        ArrayList<Integer> distances = new ArrayList<>();
+    public void climbColumn(BlockPos.MutableBlockPos currentPos, LevelAccessor accessor, AtomicInteger score, int distance) {
+        AtomicInteger dist = new AtomicInteger(distance);
 
-        boolean isColumn = false;
+        this.iterateDirection(currentPos, accessor, Direction.UP, state -> {
+            if (dist.get() > MAX_DISTANCE) return false;
 
-        BlockState currentState = accessor.getBlockState(currentPos);
-        while (currentState.getBlock() instanceof AntennaBlock) {
-            if (distance > MAX_DISTANCE) break;
-            if (currentState.getValue(ATTACHED)) {
-                isColumn = true;
-                distances.add(distance);
-                break;
+            Direction.Axis axis = state.getValue(AXIS);
+            if (!axis.isVertical()) {
+                score.addAndGet(2);
+                climbAxis(currentPos, axis, accessor, score, distance);
             }
 
-            Direction.Axis axis = currentState.getValue(AXIS);
+            if (!state.getValue(UP)) {
+                score.addAndGet(2);
+                return false;
+            }
+
+            score.getAndIncrement();
+            dist.getAndIncrement();
+            return true;
+        });
+    }
+    public Pair<Integer, Boolean> crawlColumn(BlockPos.MutableBlockPos currentPos, LevelAccessor accessor, int distance) {
+        ArrayList<Integer> distances = new ArrayList<>();
+
+        AtomicBoolean isColumn = new AtomicBoolean(false);
+        AtomicInteger dist = new AtomicInteger(distance);
+
+        this.iterateDirection(currentPos, accessor, Direction.DOWN, state -> {
+            if (dist.get() > MAX_DISTANCE) return false;
+            if (state.getValue(ATTACHED)) {
+                isColumn.set(true);
+                distances.add(dist.get());
+                return false;
+            }
+
+            Direction.Axis axis = state.getValue(AXIS);
             if (!axis.isVertical()) {
-                int otherDistance = checkAxis(currentPos, axis, accessor, distance);
+                int otherDistance = crawlAxis(currentPos, axis, accessor, dist.get());
                 if (otherDistance != -1) {
                     distances.add(otherDistance);
                 }
             }
 
-            if (!currentState.getValue(DOWN)) break;
+            if (!state.getValue(DOWN)) return false;
 
-            currentPos.move(Direction.DOWN);
+            dist.getAndIncrement();
+
+            return true;
+        });
+
+        if (distances.isEmpty()) return new Pair<>(-1, isColumn.get());
+        return new Pair<>(Collections.min(distances), isColumn.get());
+    }
+
+    public void iterateDirection(BlockPos.MutableBlockPos currentPos, LevelAccessor accessor, Direction direction, Function<BlockState, Boolean> iterator) {
+        BlockState currentState = accessor.getBlockState(currentPos);
+        while (currentState.getBlock() instanceof AntennaBlock) {
+            if (!iterator.apply(currentState)) break;
+
+            currentPos.move(direction);
             currentState = accessor.getBlockState(currentPos);
-
-            distance++;
         }
-
-        if (distances.isEmpty()) return new Pair<>(-1, isColumn);
-        return new Pair<>(Collections.min(distances), isColumn);
     }
 }
