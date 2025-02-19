@@ -2,13 +2,18 @@ package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioCatalysts;
 import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.core.registry.blocks.SocketBlock;
+import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
+import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,6 +52,37 @@ public interface Frequencing {
             return false;
         });
     }
+
+    /**
+     * Get the location of the base of the antenna connected to this core block.
+     * @param location the location of the core block
+     * @return The frequency, or null if it doesn't have one.
+     */
+    default WorldlyPosition getAntennaBase(WorldlyPosition location) {
+        BlockPos coreBlockPos = location.blockPos();
+        for (Direction direction : Direction.values()) {
+            BlockPos offsetPos = coreBlockPos.relative(direction);
+            BlockEntity blockEntity = location.level.getBlockEntity(offsetPos);
+
+            if (blockEntity instanceof SocketBlockEntity socketBlockEntity) {
+                List<Wire> wires = socketBlockEntity.getWires();
+                if (wires.isEmpty()) continue;
+
+                Wire wire = wires.get(0);
+                RadioRouter router = wire.transport(socketBlockEntity.getRouter());
+                BlockPos routerPos = router.location.blockPos();
+
+                BlockState blockState = location.level.getBlockState(routerPos);
+                if (!(blockState.getBlock() instanceof SocketBlock)) continue;
+
+                Direction routerDirection = blockState.getValue(SocketBlock.FACING);
+                return WorldlyPosition.of(routerPos.relative(routerDirection.getOpposite()).above(), router.location.level);
+            }
+        }
+
+        return WorldlyPosition.of(coreBlockPos.above(), location.level);
+    }
+
 
     /**
      * Sets the frequency for an ItemStack.

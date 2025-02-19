@@ -99,6 +99,20 @@ public class Wire extends Entity implements Medium {
     }
 
     /**
+     * Get the router opposite to the one provided.
+     * @param source The originating router
+     */
+    public RadioRouter transport(RadioRouter source) {
+        RadioRouter from = this.getFromRouter();
+        RadioRouter to = this.getToRouter();
+
+        if (source == from) return to;
+        if (source == to) return from;
+
+        return null;
+    }
+
+    /**
      * Relay a {@link RadioSource} along this wire.
      * @param source The {@link RadioSource} to relay
      * @param originSocket The {@link Socket} the source came from
