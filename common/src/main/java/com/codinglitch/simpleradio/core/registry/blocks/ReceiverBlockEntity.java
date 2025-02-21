@@ -92,7 +92,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
         if (!blockEntity.catalyzed) return;
 
-        if (blockEntity.isDirty) {
+        if (blockEntity.isDirty && level.getGameTime() % 200 == 0) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
             level.sendBlockUpdated(pos, blockState, blockState, 2);
 

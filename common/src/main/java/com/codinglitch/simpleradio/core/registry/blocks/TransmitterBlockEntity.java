@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -92,7 +93,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
         if (!blockEntity.catalyzed) return;
 
-        if (blockEntity.isDirty) {
+        if (blockEntity.isDirty && level.getGameTime() % 200 == 0) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
             level.sendBlockUpdated(pos, blockState, blockState, 2);
 
