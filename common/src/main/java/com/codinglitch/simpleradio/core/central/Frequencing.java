@@ -1,9 +1,8 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioCatalysts;
-import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
-import com.codinglitch.simpleradio.core.registry.blocks.SocketBlock;
-import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
+import com.codinglitch.simpleradio.core.registry.blocks.*;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioManager;
@@ -51,6 +50,20 @@ public interface Frequencing {
                 return frequency == null || ((Frequencing) stack.getItem()).getFrequency(stack) == frequency;
             return false;
         });
+    }
+
+    int getAntennaPower(WorldlyPosition corePosition);
+    default int calculateAntennaPower(WorldlyPosition corePosition) {
+        Level level = corePosition.level;
+
+        BlockPos basePosition = this.getAntennaBase(corePosition).blockPos();
+        BlockState state = level.getBlockState(basePosition);
+
+        if (state.getBlock() instanceof AntennaBlock antennaBlock) {
+            return antennaBlock.climbAntenna(basePosition, level);
+        }
+
+        return 0;
     }
 
     /**
