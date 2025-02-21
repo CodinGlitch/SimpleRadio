@@ -49,6 +49,8 @@
   "block.simpleradio.transmitter": "Transmitter",
   "block.simpleradio.socket": "Socket",
 
+  "screen.simpleradio.frequencing.catalyst": "CATALYST",
+
   "screen.simpleradio.radiosmither": "Radiosmithing Station",
   "screen.simpleradio.radiosmither.am": "AM",
   "screen.simpleradio.radiosmither.fm": "FM",
