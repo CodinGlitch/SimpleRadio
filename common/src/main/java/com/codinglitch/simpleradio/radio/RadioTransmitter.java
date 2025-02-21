@@ -17,6 +17,7 @@ import java.util.function.BiPredicate;
 public class RadioTransmitter extends RadioRouter {
     public BiPredicate<RadioSource, RadioRouter> transmitCriteria;
 
+    public int antennaPower = 0;
     public Frequency frequency;
 
     protected RadioTransmitter(Frequency frequency, UUID id) {

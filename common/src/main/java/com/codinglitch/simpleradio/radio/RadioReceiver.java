@@ -21,6 +21,7 @@ import java.util.function.Predicate;
  * <b>Does route further.</b>
  */
 public class RadioReceiver extends RadioRouter {
+    public int antennaPower = 0;
     public Frequency frequency;
 
     protected RadioReceiver(Frequency frequency, UUID id) {

@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -94,8 +95,10 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
         if (blockEntity.isDirty && level.getGameTime() % 200 == 0) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
-            level.sendBlockUpdated(pos, blockState, blockState, 2);
+            RadioRouter router = blockEntity.getRouter();
+            if (router instanceof RadioReceiver receiver) receiver.antennaPower = blockEntity.antennaPower;
 
+            level.sendBlockUpdated(pos, blockState, blockState, 2);
             blockEntity.isDirty = false;
         }
     }

@@ -7,6 +7,8 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -95,8 +97,10 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
         if (blockEntity.isDirty && level.getGameTime() % 200 == 0) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
-            level.sendBlockUpdated(pos, blockState, blockState, 2);
+            RadioRouter router = blockEntity.getRouter();
+            if (router instanceof RadioTransmitter transmitter) transmitter.antennaPower = blockEntity.antennaPower;
 
+            level.sendBlockUpdated(pos, blockState, blockState, 2);
             blockEntity.isDirty = false;
         }
     }
