@@ -25,7 +25,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
     @Override
     public BlockPos getAdaptorLocation() {
-        return getBlockPos().relative(getBlockState().getValue(ReceiverBlock.FACING).getOpposite());
+        return getBlockPos().relative(getBlockState().getValue(TransmitterBlock.FACING).getOpposite());
     }
 
     @Override
@@ -52,13 +52,18 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     @Override
     public void saveTag(CompoundTag tag) {
         super.saveTag(tag);
-    }
 
+        tag.putInt("antennaPower", antennaPower);
+    }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         loadTag(tag);
+
+        if (tag.contains("antennaPower")) {
+            this.antennaPower = tag.getInt("antennaPower");
+        }
     }
 
     @Override

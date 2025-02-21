@@ -26,6 +26,7 @@ import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -245,7 +246,9 @@ public class AntennaBlock extends Block {
 
     public int climbAntenna(BlockPos pos, LevelAccessor accessor) {
         AtomicInteger score = new AtomicInteger();
-        climbColumn(pos.mutable(), accessor, score, 0);
+        List<BlockPos> navigated = new ArrayList<>();
+
+        climbColumn(pos.mutable(), accessor, score, 0, navigated);
 
         return score.get();
     }
@@ -266,12 +269,12 @@ public class AntennaBlock extends Block {
 
     // ---- Crawling/Climbing Methods ---- \\
 
-    public void climbAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, AtomicInteger score, int distance) {
+    public void climbAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, AtomicInteger score, int distance, List<BlockPos> navigated) {
         Direction positiveDirection = Direction.get(Direction.AxisDirection.POSITIVE, axis);
         Direction negativeDirection = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
 
-        climbRow(currentPos.mutable().move(positiveDirection), positiveDirection, accessor, score, distance+1);
-        climbRow(currentPos.mutable().move(negativeDirection), negativeDirection, accessor, score, distance+1);
+        climbRow(currentPos.mutable().move(positiveDirection), positiveDirection, accessor, score, distance+1, navigated);
+        climbRow(currentPos.mutable().move(negativeDirection), negativeDirection, accessor, score, distance+1, navigated);
     }
     public int crawlAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, int distance) {
         Direction positiveDirection = Direction.get(Direction.AxisDirection.POSITIVE, axis);
@@ -286,13 +289,17 @@ public class AntennaBlock extends Block {
         return Math.min(positiveDistance, negativeDistance);
     }
 
-    public void climbRow(BlockPos.MutableBlockPos currentPos, Direction direction, LevelAccessor accessor, AtomicInteger score, int distance) {
+    public void climbRow(BlockPos.MutableBlockPos currentPos, Direction direction, LevelAccessor accessor, AtomicInteger score, int distance, List<BlockPos> navigated) {
         AtomicInteger dist = new AtomicInteger(distance);
 
         this.iterateDirection(currentPos, accessor, direction, state -> {
+            if (navigated.stream().anyMatch(nav -> nav.equals(currentPos))) return false;
             if (dist.get() > MAX_DISTANCE) return false;
+
+            navigated.add(currentPos.immutable());
+
             if (state.getValue(UP)) {
-                climbColumn(currentPos.mutable().move(Direction.UP), accessor,  score, distance+1);
+                climbColumn(currentPos.mutable().move(Direction.UP), accessor,  score, distance+1, navigated);
             }
 
             score.getAndIncrement();
@@ -326,16 +333,19 @@ public class AntennaBlock extends Block {
         return Collections.min(distances);
     }
 
-    public void climbColumn(BlockPos.MutableBlockPos currentPos, LevelAccessor accessor, AtomicInteger score, int distance) {
+    public void climbColumn(BlockPos.MutableBlockPos currentPos, LevelAccessor accessor, AtomicInteger score, int distance, List<BlockPos> navigated) {
         AtomicInteger dist = new AtomicInteger(distance);
 
         this.iterateDirection(currentPos, accessor, Direction.UP, state -> {
+            if (navigated.stream().anyMatch(nav -> nav.equals(currentPos))) return false;
             if (dist.get() > MAX_DISTANCE) return false;
+
+            navigated.add(currentPos.immutable());
 
             Direction.Axis axis = state.getValue(AXIS);
             if (!axis.isVertical()) {
                 score.addAndGet(2);
-                climbAxis(currentPos, axis, accessor, score, distance);
+                climbAxis(currentPos, axis, accessor, score, distance, navigated);
             }
 
             if (!state.getValue(UP)) {
