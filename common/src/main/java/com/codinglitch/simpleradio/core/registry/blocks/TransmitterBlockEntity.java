@@ -18,6 +18,7 @@ import java.util.UUID;
 
 public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Transmitting {
     public boolean isActive = false;
+    public int antennaPower = 0;
 
     public TransmitterBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.TRANSMITTER, pos, state);
@@ -107,5 +108,9 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         }
 
         this.isActive = true;
+    }
+
+    public int getAntennaPower(WorldlyPosition corePosition) {
+        return antennaPower;
     }
 }

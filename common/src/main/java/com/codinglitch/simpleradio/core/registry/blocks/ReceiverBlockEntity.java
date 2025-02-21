@@ -8,7 +8,6 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -16,10 +15,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.UUID;
-
 public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiving {
     public boolean isActive = false;
+    public int antennaPower = 0;
 
     public ReceiverBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.RECEIVER, pos, state);
@@ -79,8 +77,11 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
             blockEntity.activate();
         }
-
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
+
+        if (!blockEntity.catalyzed) return;
+
+        blockEntity.antennaPower = blockEntity.calculateAntennaPower(WorldlyPosition.of(pos.relative(blockState.getValue(ReceiverBlock.FACING).getOpposite()), level));
     }
 
     public void inactivate() {
@@ -109,5 +110,10 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         }
 
         this.isActive = true;
+    }
+
+    @Override
+    public int getAntennaPower(WorldlyPosition corePosition) {
+        return antennaPower;
     }
 }
