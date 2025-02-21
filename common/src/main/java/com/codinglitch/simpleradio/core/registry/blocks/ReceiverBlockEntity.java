@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -17,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiving {
     public boolean isActive = false;
+    public boolean isDirty = true;
     public int antennaPower = 0;
 
     public ReceiverBlockEntity(BlockPos pos, BlockState state) {
@@ -52,6 +52,8 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     @Override
     public void saveTag(CompoundTag tag) {
         super.saveTag(tag);
+
+        tag.putInt("antennaPower", antennaPower);
     }
 
 
@@ -59,6 +61,10 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     public void load(CompoundTag tag) {
         super.load(tag);
         loadTag(tag);
+
+        if (tag.contains("antennaPower")) {
+            this.antennaPower = tag.getInt("antennaPower");
+        }
     }
 
     @Override
@@ -73,6 +79,11 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         super.saveToItem(stack);
     }
 
+    @Override
+    public void markDirty() {
+        this.isDirty = true;
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState blockState, ReceiverBlockEntity blockEntity) {
         if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
             blockEntity.activate();
@@ -81,7 +92,12 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
         if (!blockEntity.catalyzed) return;
 
-        blockEntity.antennaPower = blockEntity.calculateAntennaPower(WorldlyPosition.of(pos.relative(blockState.getValue(ReceiverBlock.FACING).getOpposite()), level));
+        if (blockEntity.isDirty) {
+            blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
+            level.sendBlockUpdated(pos, blockState, blockState, 2);
+
+            blockEntity.isDirty = false;
+        }
     }
 
     public void inactivate() {
@@ -113,7 +129,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     }
 
     @Override
-    public int getAntennaPower(WorldlyPosition corePosition) {
-        return antennaPower;
+    public int getAntennaPower() {
+        return this.antennaPower;
     }
 }

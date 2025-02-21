@@ -14,10 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.UUID;
-
 public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Transmitting {
     public boolean isActive = false;
+    public boolean isDirty = true;
     public int antennaPower = 0;
 
     public TransmitterBlockEntity(BlockPos pos, BlockState state) {
@@ -74,12 +73,26 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         super.saveToItem(stack);
     }
 
+    @Override
+    public void markDirty() {
+        this.isDirty = true;
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState blockState, TransmitterBlockEntity blockEntity) {
         if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
             blockEntity.activate();
         }
 
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
+
+        if (!blockEntity.catalyzed) return;
+
+        if (blockEntity.isDirty) {
+            blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
+            level.sendBlockUpdated(pos, blockState, blockState, 2);
+
+            blockEntity.isDirty = false;
+        }
     }
 
     public void inactivate() {
@@ -110,7 +123,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         this.isActive = true;
     }
 
-    public int getAntennaPower(WorldlyPosition corePosition) {
+    public int getAntennaPower() {
         return antennaPower;
     }
 }

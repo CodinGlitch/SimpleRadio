@@ -18,7 +18,9 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking {
     public boolean isActive = false;
+    public int antennaPower = 0;
     public float time = 0;
+
 
     public int playingTime = 0;
 
@@ -116,5 +118,10 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
         }
 
         this.isActive = true;
+    }
+
+    @Override
+    public int getAntennaPower() {
+        return antennaPower;
     }
 }

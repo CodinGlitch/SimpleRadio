@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.core.central.Frequencing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
@@ -248,6 +250,20 @@ public class AntennaBlock extends Block {
         return score.get();
     }
 
+    public void notifyExtension(BlockPos pos, LevelAccessor accessor) {
+        BlockPos travelledPos = SocketBlock.travelExtension(pos, accessor);
+        if (travelledPos == pos) return;
+
+        for (Direction direction : Direction.Plane.HORIZONTAL) {
+            BlockPos relativePosition = travelledPos.relative(direction);
+            BlockEntity blockEntity = accessor.getBlockEntity(relativePosition);
+
+            if (blockEntity instanceof Frequencing frequencing) {
+                frequencing.markDirty();
+            }
+        }
+    }
+
     // ---- Crawling/Climbing Methods ---- \\
 
     public void climbAxis(BlockPos.MutableBlockPos currentPos, Direction.Axis axis, LevelAccessor accessor, AtomicInteger score, int distance) {
@@ -341,6 +357,8 @@ public class AntennaBlock extends Block {
         this.iterateDirection(currentPos, accessor, Direction.DOWN, state -> {
             if (dist.get() > MAX_DISTANCE) return false;
             if (state.getValue(ATTACHED)) {
+                this.notifyExtension(currentPos.below(), accessor);
+
                 isColumn.set(true);
                 distances.add(dist.get());
                 return false;
