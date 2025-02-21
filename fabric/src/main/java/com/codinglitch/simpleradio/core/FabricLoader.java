@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
@@ -48,6 +49,8 @@ public class FabricLoader {
                 clientbound(ClientboundTransceiverPacket::decode, ClientboundTransceiverPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundWireEffectPacket.ID,
                 clientbound(ClientboundWireEffectPacket::decode, ClientboundWireEffectPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundSpeakSoundPacket.ID,
+                clientbound(ClientboundSpeakSoundPacket::decode, ClientboundSpeakSoundPacket::handle));
     }
 
     public static <P> ServerPlayNetworking.PlayChannelHandler serverbound(Function<FriendlyByteBuf, P> decoder, TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {

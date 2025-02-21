@@ -20,3 +20,12 @@ accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace 
 
 # TextureAtlasSprite constructor
 accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite <init> (Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/texture/SpriteContents;IIII)V
+
+# SoundEngine field
+accessible field net/minecraft/client/sounds/SoundManager soundEngine Lnet/minecraft/client/sounds/SoundEngine;
+
+# SoundBufferLibrary field
+accessible field net/minecraft/client/sounds/SoundEngine soundBuffers Lnet/minecraft/client/sounds/SoundBufferLibrary;
+
+# ChannelAccess field
+accessible field net/minecraft/client/sounds/SoundEngine channelAccess Lnet/minecraft/client/sounds/ChannelAccess;

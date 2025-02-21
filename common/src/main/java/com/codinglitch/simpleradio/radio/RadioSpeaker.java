@@ -4,6 +4,9 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
@@ -118,6 +121,60 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         }
     }
 
+    private static final int FRAME_SIZE = 960;  // Size of each audio frame
+    private static final int OVERLAP = FRAME_SIZE / 2;  // 50% overlap
+    private static final int UPPER_BOUND = FRAME_SIZE - OVERLAP;  // 50% overlap
+
+    private short[] previousOverlap = new short[FRAME_SIZE];  // Stores the overlap from the last frame
+
+    public short[] processFrame(short[] inputFrame, double pitch) {
+        // Resample the frame to change pitch
+        short[] resampledFrame = resample(inputFrame, pitch);
+        short[] outputFrame = new short[inputFrame.length];
+
+        // Apply overlap-add for smooth transition
+        for (int i = 0; i < outputFrame.length; i++) {
+            outputFrame[i] = resampledFrame[i % resampledFrame.length];
+        }
+
+        for (int i = 0; i < OVERLAP; i++) {
+            double factor = (double) i/OVERLAP;
+            outputFrame[i] = (short) ((outputFrame[i] * factor) + (previousOverlap[i] * (1 - factor)));
+        }
+
+        // Store the new overlap
+        for (int i = 0; i < OVERLAP; i++) {
+            previousOverlap[i] = outputFrame[OVERLAP + i];
+        }
+
+        return outputFrame;
+    }
+
+    private short[] resample(short[] data, double pitch) {
+        int newLength = (int) (data.length / pitch);
+        if (newLength == data.length) return data;
+
+        short[] resampledData = new short[newLength];
+
+        // Perform linear interpolation for resampling
+        for (int i = 0; i < newLength; i++) {
+            // Calculate the exact position in the original data
+            double originalIndex = i * pitch;
+
+            // Find the surrounding indices
+            int index1 = (int) Math.floor(originalIndex);
+            int index2 = Math.min(index1 + 1, data.length - 1); // Clamp to avoid out-of-bounds
+
+            // Interpolate between the two points
+            double weight2 = originalIndex - index1; // Fractional part
+            double weight1 = 1.0 - weight2;
+
+            resampledData[i] = (short) ((data[index1] * weight1) + (data[index2] * weight2));
+        }
+
+        return resampledData;
+    }
+
     @Override
     public void accept(RadioSource source) {
         super.accept(source);
@@ -151,11 +208,11 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
             for (ServerPlayer player : level.players()) {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
-                    player.connection.send(new ClientboundSoundPacket(
+                    Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
                             Holder.direct(source.soundEvent),
                             SoundSource.BLOCKS,
-                            position.x, position.y, position.z,
-                            source.volume, source.pitch, level.getLevel().getRandom().nextLong()
+                            (int) position.x, (int) position.y, (int) position.z,
+                            source.volume, source.pitch, this.effect.severity
                     ));
                 }
             }
@@ -172,7 +229,6 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             }
         }
 
-
         // Decoding
         byte[] data = source.data;
 
@@ -182,29 +238,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             return;
         }
         short[] decoded = decoder.decode(data);
-
-        // Calculate the new length of the resampled data
-        int newLength = (int) (decoded.length / source.pitch);
-        short[] resampledData = new short[newLength];
-
-        // Perform linear interpolation for resampling
-        for (int i = 0; i < newLength; i++) {
-            // Calculate the exact position in the original data
-            double originalIndex = i * source.pitch;
-
-            // Find the surrounding indices
-            int index1 = (int) Math.floor(originalIndex);
-            int index2 = Math.min(index1 + 1, decoded.length - 1); // Clamp to avoid out-of-bounds
-
-            // Interpolate between the two points
-            double weight2 = originalIndex - index1; // Fractional part
-            double weight1 = 1.0 - weight2;
-
-            resampledData[i] = (short) ((decoded[index1] * weight1) + (decoded[index2] * weight2));
-        }
-
-        CommonSimpleRadio.info(resampledData);
-        playerPackets.offer(effect.apply(resampledData));
+        playerPackets.offer(effect.apply(decoded));
 
         // Loader-specific compat
         Services.COMPAT.onData(this, source, decoded);

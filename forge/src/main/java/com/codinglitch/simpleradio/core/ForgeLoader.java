@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
@@ -87,6 +88,9 @@ public class ForgeLoader {
                 .consumerMainThread(clientbound(ClientboundTransceiverPacket::handle)).add();
         CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index++).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)
                 .consumerMainThread(clientbound(ClientboundWireEffectPacket::handle)).add();
+
+        CHANNEL.messageBuilder(ClientboundSpeakSoundPacket.class, index++).decoder(ClientboundSpeakSoundPacket::decode).encoder(ClientboundSpeakSoundPacket::encode)
+                .consumerMainThread(clientbound(ClientboundSpeakSoundPacket::handle)).add();
     }
 
     private static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {

@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.VolumeCategory;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
@@ -39,6 +40,8 @@ public class CommonRadioPlugin {
 
     @Nullable
     public static VoicechatServerApi serverApi;
+
+    public static VoicechatApi commonApi;
 
     private ExecutorService executor;
 
@@ -104,8 +107,8 @@ public class CommonRadioPlugin {
             sourceFactor = sourceVelocity.normalize().dot(sourceToObserver);
         }
 
-        return (1000 + observerVelocity.length()*-observerFactor) /
-                (1000 + sourceVelocity.length()*-sourceFactor);
+        return (5 + observerVelocity.length()*-observerFactor) /
+                (5 + sourceVelocity.length()*-sourceFactor);
     }
 
     public String getPluginId() {
