@@ -1,7 +1,5 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioCatalysts;
 import com.codinglitch.simpleradio.core.registry.blocks.*;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
@@ -16,15 +14,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -52,11 +46,28 @@ public interface Frequencing {
         });
     }
 
-    int getAntennaPower(WorldlyPosition corePosition);
-    default int calculateAntennaPower(WorldlyPosition corePosition) {
-        Level level = corePosition.level;
+    /**
+     * Mark this frequencing instance as dirty such that it will recalculate antenna strength at the next possible chance.
+     */
+    default void markDirty() {}
 
-        BlockPos basePosition = this.getAntennaBase(corePosition).blockPos();
+    /**
+     * Get the current cached antenna power.
+     * Only works if the instance has overriden this method.
+     * Use this method instead of {@link Frequencing#calculateAntennaPower(BlockPos, Level)} whenever possible.
+     * @return The antenna power
+     */
+    default int getAntennaPower() { return 0; }
+
+    /**
+     * Calculate the power of the attached antenna (via climbing).
+     * Use sparingly, and use {@link Frequencing#getAntennaPower()} instead whenever possible.
+     * @param corePosition the location of the core block
+     * @param level the Level to check
+     * @return The power of the connected antenna.
+     */
+    default int calculateAntennaPower(BlockPos corePosition, Level level) {
+        BlockPos basePosition = this.getAntennaBase(corePosition, level);
         BlockState state = level.getBlockState(basePosition);
 
         if (state.getBlock() instanceof AntennaBlock antennaBlock) {
@@ -68,32 +79,15 @@ public interface Frequencing {
 
     /**
      * Get the location of the base of the antenna connected to this core block.
-     * @param location the location of the core block
-     * @return The frequency, or null if it doesn't have one.
+     * @param pos the location of the core block
+     * @param level the Level to check
+     * @return The position of the base of the antenna.
      */
-    default WorldlyPosition getAntennaBase(WorldlyPosition location) {
-        BlockPos coreBlockPos = location.blockPos();
-        for (Direction direction : Direction.values()) {
-            BlockPos offsetPos = coreBlockPos.relative(direction);
-            BlockEntity blockEntity = location.level.getBlockEntity(offsetPos);
+    default BlockPos getAntennaBase(BlockPos pos, Level level) {
+        BlockPos travelledPosition = SocketBlock.travelExtension(pos, level);
+        if (travelledPosition != pos) return travelledPosition.above();
 
-            if (blockEntity instanceof SocketBlockEntity socketBlockEntity) {
-                List<Wire> wires = socketBlockEntity.getWires();
-                if (wires.isEmpty()) continue;
-
-                Wire wire = wires.get(0);
-                RadioRouter router = wire.transport(socketBlockEntity.getRouter());
-                BlockPos routerPos = router.location.blockPos();
-
-                BlockState blockState = location.level.getBlockState(routerPos);
-                if (!(blockState.getBlock() instanceof SocketBlock)) continue;
-
-                Direction routerDirection = blockState.getValue(SocketBlock.FACING);
-                return WorldlyPosition.of(routerPos.relative(routerDirection.getOpposite()).above(), router.location.level);
-            }
-        }
-
-        return WorldlyPosition.of(coreBlockPos.above(), location.level);
+        return pos.above();
     }
 
 

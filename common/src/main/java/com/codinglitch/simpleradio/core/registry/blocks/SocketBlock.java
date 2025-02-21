@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.core.central.Routing;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
@@ -11,6 +12,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -24,6 +26,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
 public class SocketBlock extends BaseEntityBlock implements Routing {
@@ -41,6 +44,30 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
     public SocketBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    public static BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
+        for (Direction direction : Direction.values()) {
+            BlockPos offsetPos = pos.relative(direction);
+            BlockEntity blockEntity = level.getBlockEntity(offsetPos);
+
+            if (blockEntity instanceof SocketBlockEntity socketBlockEntity) {
+                List<Wire> wires = socketBlockEntity.getWires();
+                if (wires.isEmpty()) continue;
+
+                Wire wire = wires.get(0);
+                RadioRouter router = wire.transport(socketBlockEntity.getRouter());
+                BlockPos routerPos = router.location.blockPos();
+
+                BlockState blockState = level.getBlockState(routerPos);
+                if (!(blockState.getBlock() instanceof SocketBlock)) continue;
+
+                Direction routerDirection = blockState.getValue(SocketBlock.FACING);
+                return routerPos.relative(routerDirection.getOpposite());
+            }
+        }
+
+        return pos;
     }
 
     @Override
