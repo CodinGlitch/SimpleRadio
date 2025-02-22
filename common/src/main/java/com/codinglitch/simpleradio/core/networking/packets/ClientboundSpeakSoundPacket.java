@@ -21,6 +21,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
-public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource source, int x, int y, int z, float volume, float pitch, float severity) implements Packeter {
+public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource source, int x, int y, int z, float volume, float pitch, float severity, long seed) implements Packeter {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "speak_sound_packet");
     @Override
     public ResourceLocation resource() {
@@ -48,13 +49,14 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
         buffer.writeFloat(this.volume);
         buffer.writeFloat(this.pitch);
         buffer.writeFloat(this.severity);
+        buffer.writeLong(this.seed);
     }
 
     public static ClientboundSpeakSoundPacket decode(FriendlyByteBuf buffer) {
         return new ClientboundSpeakSoundPacket(
                 buffer.readById(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), SoundEvent::readFromNetwork),
                 buffer.readEnum(SoundSource.class), buffer.readInt(), buffer.readInt(), buffer.readInt(),
-                buffer.readFloat(), buffer.readFloat(), buffer.readFloat()
+                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readLong()
         );
     }
 
@@ -69,7 +71,7 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
 
             SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound.value(), packet.source,
                     packet.volume, packet.pitch,
-                    Minecraft.getInstance().player.getRandom(), new BlockPos(packet.x, packet.y, packet.z));
+                    RandomSource.create(packet.seed), new BlockPos(packet.x, packet.y, packet.z));
             instance.resolve(soundManager);
 
             Sound sound = instance.getSound();

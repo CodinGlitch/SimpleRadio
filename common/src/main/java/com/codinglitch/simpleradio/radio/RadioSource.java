@@ -33,6 +33,7 @@ public class RadioSource {
 
     public float pitch = 1;
     public float volume;
+    public long seed;
 
     public Frequency frequencyMedium;
     public Wire wireMedium;

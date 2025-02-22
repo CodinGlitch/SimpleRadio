@@ -405,7 +405,7 @@ public class RadioManager {
 
     // --- Audio Gathering --- \\
 
-    public void onSoundPlayed(Player except, ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, SoundSource source, float volume, float pitch) {
+    public void onSoundPlayed(Player except, ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, SoundSource source, float volume, float pitch, long seed) {
         SoundEvent sound = soundHolder.value();
 
         if (level.isClientSide) return;
@@ -426,6 +426,7 @@ public class RadioManager {
                     (float) (falloff * volume)
             );
             newSource.pitch = pitch;
+            newSource.seed = seed;
 
             listener.onData(newSource);
         }

@@ -212,7 +212,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
                             Holder.direct(source.soundEvent),
                             SoundSource.BLOCKS,
                             (int) position.x, (int) position.y, (int) position.z,
-                            source.volume, source.pitch, this.effect.severity
+                            source.volume, source.pitch, this.effect.severity, source.seed
                     ));
                 }
             }
