@@ -13,7 +13,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -405,7 +404,10 @@ public class RadioManager {
 
     // --- Audio Gathering --- \\
 
-    public void onSoundPlayed(Player except, ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, SoundSource source, float volume, float pitch, long seed) {
+    public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
+        onSoundPlayed(level, location, soundHolder, volume, pitch, 0, seed);
+    }
+    public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
         SoundEvent sound = soundHolder.value();
 
         if (level.isClientSide) return;
@@ -426,6 +428,7 @@ public class RadioManager {
                     (float) (falloff * volume)
             );
             newSource.pitch = pitch;
+            newSource.offset = offset;
             newSource.seed = seed;
 
             listener.onData(newSource);
@@ -458,8 +461,7 @@ public class RadioManager {
             Vector3f senderVelocity = playerVelocities.get(sender.getUUID());
             Vector3f senderPosition = sender.position().toVector3f();
 
-            double dopplerFactor = CommonRadioPlugin.getDoppler(listenerPosition, listener.velocity, senderPosition, senderVelocity);
-            CommonSimpleRadio.info("{} {} {} {}", dopplerFactor, senderVelocity.x, senderVelocity.y, senderVelocity.z);
+            ///double dopplerFactor = CommonRadioPlugin.getDoppler(listenerPosition, listener.velocity, senderPosition, senderVelocity);
 
             RadioSource newSource = new RadioSource(
                     sender.getUUID(),
@@ -467,7 +469,7 @@ public class RadioManager {
                     event.getPacket().getOpusEncodedData(),
                     (float) falloff
             );
-            newSource.pitch = (float) dopplerFactor;
+            newSource.pitch = 1;//(float) dopplerFactor;
 
             listener.onData(newSource);
         }

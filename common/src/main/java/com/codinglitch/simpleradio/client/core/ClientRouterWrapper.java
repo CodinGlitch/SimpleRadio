@@ -1,12 +1,14 @@
 package com.codinglitch.simpleradio.client.core;
 
 import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.sounds.ChannelAccess;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ClientRouterWrapper {
-    public final HashMap<Long, ChannelAccess.ChannelHandle> audioChannels = new HashMap<>();
+    public final HashMap<Long, ChannelHandleWrapper> audioChannels = new HashMap<>();
     public final RadioRouter router;
 
     public ClientRouterWrapper(RadioRouter router) {
@@ -17,15 +19,21 @@ public class ClientRouterWrapper {
         return new ClientRouterWrapper(router);
     }
 
-    public ChannelAccess.ChannelHandle getChannel(long seed) {
+    public ChannelHandleWrapper getChannel(long seed) {
         return audioChannels.get(seed);
     }
 
-    public ChannelAccess.ChannelHandle addChannel(long seed, ChannelAccess.ChannelHandle channelHandle) {
+    public ChannelHandleWrapper addChannel(long seed, ChannelHandleWrapper channelHandle) {
         return audioChannels.put(seed, channelHandle);
     }
 
-    public ChannelAccess.ChannelHandle removeChannel(long seed) {
+    public ChannelHandleWrapper removeChannel(long seed) {
         return audioChannels.remove(seed);
+    }
+
+    public void close() {
+        for (Map.Entry<Long, ChannelHandleWrapper> entry : audioChannels.entrySet()) {
+            entry.getValue().execute(Channel::destroy);
+        }
     }
 }

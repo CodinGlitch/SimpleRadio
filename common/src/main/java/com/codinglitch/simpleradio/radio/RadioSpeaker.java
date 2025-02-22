@@ -210,8 +210,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
                     Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
                             this.getID(), Holder.direct(source.soundEvent),
-                            SoundSource.BLOCKS,
-                            source.volume, source.pitch, this.effect.severity, source.seed
+                            source.volume, source.pitch, this.effect.severity, source.offset, source.seed
                     ));
                 }
             }

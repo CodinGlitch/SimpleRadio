@@ -93,22 +93,32 @@ public class ClientRadioManager {
     public static void registerRouter(RadioRouter router) {
         routers.add(ClientRouterWrapper.of(router));
     }
+    public static void removeRouter(Predicate<ClientRouterWrapper> predicate) {
+        routers.removeIf(wrapper -> {
+            if (predicate.test(wrapper)) {
+                wrapper.close();
+                return true;
+            }
+
+            return false;
+        });
+    }
     public static void removeRouter(RadioRouter router) {
-        routers.removeIf(wrapper -> wrapper.router == router);
+        removeRouter(wrapper -> wrapper.router == router);
     }
     public static void removeRouter(UUID uuid) {
-        routers.removeIf(wrapper -> uuid.equals(wrapper.router.id));
+        removeRouter(wrapper -> uuid.equals(wrapper.router.id));
     }
     public static void removeRouter(Entity owner) {
-        routers.removeIf(wrapper -> owner.equals(wrapper.router.owner));
+        removeRouter(wrapper -> owner.equals(wrapper.router.owner));
     }
     public static void removeRouter(WorldlyPosition location) {
-        routers.removeIf(wrapper -> wrapper.router.location != null && location.equals(wrapper.router.location));
+        removeRouter(wrapper -> wrapper.router.location != null && location.equals(wrapper.router.location));
     }
 
     public static void garbageCollect() {
-        routers.removeIf(wrapper -> !wrapper.router.validate());
-        routers.removeIf(wrapper -> wrapper.router.owner == null && wrapper.router.location == null);
+        removeRouter(wrapper -> !wrapper.router.validate());
+        removeRouter(wrapper -> wrapper.router.owner == null && wrapper.router.location == null);
     }
 
     public static void tick(long gameTime) {

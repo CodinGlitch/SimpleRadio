@@ -33,6 +33,7 @@ public class RadioSource {
 
     public float pitch = 1;
     public float volume;
+    public float offset;
     public long seed;
 
     public Frequency frequencyMedium;
@@ -114,6 +115,9 @@ public class RadioSource {
         copy.soundEvent = this.soundEvent;
 
         copy.volume = this.volume;
+        copy.pitch = this.pitch;
+        copy.offset = this.offset;
+        copy.seed = this.seed;
 
         copy.frequencyMedium = this.frequencyMedium;
         copy.wireMedium = this.wireMedium;

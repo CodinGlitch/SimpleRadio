@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.client.core.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.EffectStream;
 import com.codinglitch.simpleradio.core.central.Packeter;
@@ -10,15 +11,12 @@ import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
-import com.mojang.blaze3d.audio.OggAudioStream;
 import com.mojang.blaze3d.audio.SoundBuffer;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.*;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -28,16 +26,20 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Math;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.EXTOffset;
 
+import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 
-public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, float severity, long seed) implements Packeter {
+public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> sound, float volume, float pitch, float severity, float offset, long seed) implements Packeter {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "speak_sound_packet");
     @Override
     public ResourceLocation resource() {
@@ -49,18 +51,17 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
         buffer.writeId(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), this.sound, (byteBuf, event) -> {
             event.writeToNetwork(byteBuf);
         });
-        buffer.writeEnum(this.source);
         buffer.writeFloat(this.volume);
         buffer.writeFloat(this.pitch);
         buffer.writeFloat(this.severity);
+        buffer.writeFloat(this.offset);
         buffer.writeLong(this.seed);
     }
 
     public static ClientboundSpeakSoundPacket decode(FriendlyByteBuf buffer) {
         return new ClientboundSpeakSoundPacket(
                 buffer.readUUID(), buffer.readById(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), SoundEvent::readFromNetwork),
-                buffer.readEnum(SoundSource.class),
-                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readLong()
+                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readLong()
         );
     }
 
@@ -77,18 +78,31 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
             RadioRouter router = wrapper.router;
             if (router == null) return;
 
-            if (packet.sound.value().getLocation().equals(SoundEvents.EMPTY.getLocation())) {
-                ChannelAccess.ChannelHandle channelHandle = wrapper.getChannel(packet.seed);
-                if (channelHandle != null) {
-                    channelHandle.execute(Channel::stop);
-                }
-
-                return;
-            }
-
             Vec3 position = new Vec3(router.location.position());
 
-            SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound.value(), packet.source,
+            ChannelHandleWrapper existingChannelHandle = wrapper.getChannel(packet.seed);
+            if (existingChannelHandle != null) {
+                if (existingChannelHandle.channelHandle.isStopped()) {
+                    wrapper.removeChannel(packet.seed);
+                } else {
+                    if (packet.sound.value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume == 0) {
+                        existingChannelHandle.execute(Channel::stop);
+                    } else {
+                        if (true) return;
+
+                        existingChannelHandle.effect.severity = packet.severity;
+                        existingChannelHandle.effect.volume = packet.volume;
+
+                        existingChannelHandle.execute(channel -> {
+                            channel.setSelfPosition(position);
+                        });
+                    }
+
+                    return;
+                }
+            }
+
+            SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound.value(), SoundSource.BLOCKS,
                     packet.volume, packet.pitch,
                     RandomSource.create(packet.seed), router.location.blockPos());
             instance.resolve(soundManager);
@@ -130,11 +144,27 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
 
             stream.effect = effect;
 
+            AudioFormat format = stream.getFormat();
             if (sound.shouldStream()) {
-                wrapper.addChannel(packet.seed, channelHandle);
+                ChannelHandleWrapper channelWrapper = ChannelHandleWrapper.of(channelHandle);
+                channelWrapper.effect = effect;
+
+                wrapper.addChannel(packet.seed, channelWrapper);
 
                 channelHandle.execute(channel -> {
+
+                    int sampleOffset = (int)((packet.offset * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());;
+                    CommonSimpleRadio.info(sampleOffset);
+                    try {
+                        stream.push(sampleOffset);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                     channel.attachBufferStream(stream);
+
+                    //AL10.alSourcei(channel.source, EXTOffset.AL_SAMPLE_OFFSET, 160000);
+
                     channel.play();
                 });
             } else {
@@ -145,7 +175,7 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
                     throw new RuntimeException(e);
                 }
 
-                SoundBuffer soundBuffer = new SoundBuffer(byteBuffer, stream.getFormat());
+                SoundBuffer soundBuffer = new SoundBuffer(byteBuffer, format);
                 channelHandle.execute(channel -> {
                     channel.attachStaticBuffer(soundBuffer);
                     channel.play();

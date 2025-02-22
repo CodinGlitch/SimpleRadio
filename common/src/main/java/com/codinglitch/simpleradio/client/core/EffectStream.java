@@ -23,6 +23,10 @@ public class EffectStream extends OggAudioStream {
         buffer.asShortBuffer().put(effect.apply(data));
     }
 
+    public ByteBuffer push(int size) throws IOException {
+        return super.read(size);
+    }
+
     @Override
     public ByteBuffer read(int size) throws IOException {
         ByteBuffer buffer = super.read(size);
