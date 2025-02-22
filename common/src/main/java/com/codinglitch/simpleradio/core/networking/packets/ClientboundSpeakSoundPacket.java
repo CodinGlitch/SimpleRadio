@@ -1,8 +1,10 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.core.EffectStream;
 import com.codinglitch.simpleradio.core.central.Packeter;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import com.mojang.blaze3d.audio.Library;
@@ -27,11 +29,12 @@ import net.minecraft.world.phys.Vec3;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
-public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource source, int x, int y, int z, float volume, float pitch, float severity, long seed) implements Packeter {
+public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, float severity, long seed) implements Packeter {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "speak_sound_packet");
     @Override
     public ResourceLocation resource() {
@@ -39,13 +42,11 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
     }
 
     public void encode(FriendlyByteBuf buffer) {
+        buffer.writeUUID(routerID);
         buffer.writeId(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), this.sound, (byteBuf, event) -> {
             event.writeToNetwork(byteBuf);
         });
         buffer.writeEnum(this.source);
-        buffer.writeInt(this.x);
-        buffer.writeInt(this.y);
-        buffer.writeInt(this.z);
         buffer.writeFloat(this.volume);
         buffer.writeFloat(this.pitch);
         buffer.writeFloat(this.severity);
@@ -54,8 +55,8 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
 
     public static ClientboundSpeakSoundPacket decode(FriendlyByteBuf buffer) {
         return new ClientboundSpeakSoundPacket(
-                buffer.readById(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), SoundEvent::readFromNetwork),
-                buffer.readEnum(SoundSource.class), buffer.readInt(), buffer.readInt(), buffer.readInt(),
+                buffer.readUUID(), buffer.readById(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), SoundEvent::readFromNetwork),
+                buffer.readEnum(SoundSource.class),
                 buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readLong()
         );
     }
@@ -67,11 +68,14 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
             SoundManager soundManager = mc.getSoundManager();
             SoundEngine soundEngine = soundManager.soundEngine;
 
-            Vec3 position = new Vec3(packet.x, packet.y, packet.z);
+            RadioRouter router = ClientRadioManager.getRouter(packet.routerID);
+            if (router == null) return;
+
+            Vec3 position = new Vec3(router.location.position());
 
             SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound.value(), packet.source,
                     packet.volume, packet.pitch,
-                    RandomSource.create(packet.seed), new BlockPos(packet.x, packet.y, packet.z));
+                    RandomSource.create(packet.seed), router.location.blockPos());
             instance.resolve(soundManager);
 
             Sound sound = instance.getSound();
