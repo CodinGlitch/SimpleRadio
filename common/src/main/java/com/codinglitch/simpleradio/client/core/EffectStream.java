@@ -34,7 +34,7 @@ public class EffectStream extends OggAudioStream {
     @Override
     public ByteBuffer readAll() throws IOException {
         ByteBuffer buffer = super.readAll();
-        this.applyEffect(buffer, buffer.capacity());
+        this.applyEffect(buffer, buffer.limit());
 
         return buffer;
     }

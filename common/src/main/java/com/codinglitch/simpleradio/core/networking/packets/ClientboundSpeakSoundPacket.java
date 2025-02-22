@@ -2,11 +2,13 @@ package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.client.core.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.EffectStream;
 import com.codinglitch.simpleradio.core.central.Packeter;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
+import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.OggAudioStream;
 import com.mojang.blaze3d.audio.SoundBuffer;
@@ -22,6 +24,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
@@ -68,8 +71,20 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
             SoundManager soundManager = mc.getSoundManager();
             SoundEngine soundEngine = soundManager.soundEngine;
 
-            RadioRouter router = ClientRadioManager.getRouter(packet.routerID);
+            ClientRouterWrapper wrapper = ClientRadioManager.getWrapper(packet.routerID);
+            if (wrapper == null) return;
+
+            RadioRouter router = wrapper.router;
             if (router == null) return;
+
+            if (packet.sound.value().getLocation().equals(SoundEvents.EMPTY.getLocation())) {
+                ChannelAccess.ChannelHandle channelHandle = wrapper.getChannel(packet.seed);
+                if (channelHandle != null) {
+                    channelHandle.execute(Channel::stop);
+                }
+
+                return;
+            }
 
             Vec3 position = new Vec3(router.location.position());
 
@@ -116,6 +131,8 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
             stream.effect = effect;
 
             if (sound.shouldStream()) {
+                wrapper.addChannel(packet.seed, channelHandle);
+
                 channelHandle.execute(channel -> {
                     channel.attachBufferStream(stream);
                     channel.play();

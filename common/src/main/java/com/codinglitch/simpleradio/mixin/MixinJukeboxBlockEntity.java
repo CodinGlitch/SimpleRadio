@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Clearable;
@@ -37,7 +38,20 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
                     getBlockPos().getCenter(),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
                     SoundSource.RECORDS,
-                    1, 1, RandomSupport.generateUniqueSeed()
+                    1, 1, 12
+            );
+        }
+    }
+
+    @Inject(method = "stopPlaying()V", at = @At(value = "TAIL"))
+    private void simpleradio$stopPlaying_audioGathering(CallbackInfo ci) {
+        if (level instanceof ServerLevel serverLevel) {
+            RadioManager.getInstance().onSoundPlayed(
+                    null, serverLevel,
+                    getBlockPos().getCenter(),
+                    BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY),
+                    SoundSource.RECORDS,
+                    1, 1, 12
             );
         }
     }
