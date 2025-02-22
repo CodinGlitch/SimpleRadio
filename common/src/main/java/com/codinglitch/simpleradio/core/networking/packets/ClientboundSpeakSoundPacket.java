@@ -153,12 +153,13 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
 
                 channelHandle.execute(channel -> {
 
-                    int sampleOffset = (int)((packet.offset * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());;
-                    CommonSimpleRadio.info(sampleOffset);
-                    try {
-                        stream.push(sampleOffset);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    if (packet.offset != 0) {
+                        int sampleOffset = (int)((packet.offset * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());
+                        try {
+                            stream.push(sampleOffset);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
                     channel.attachBufferStream(stream);
