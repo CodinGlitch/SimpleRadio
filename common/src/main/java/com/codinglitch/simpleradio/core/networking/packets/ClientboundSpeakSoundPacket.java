@@ -1,19 +1,19 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.core.EffectStream;
 import com.codinglitch.simpleradio.core.central.Packeter;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.OggAudioStream;
 import com.mojang.blaze3d.audio.SoundBuffer;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.client.sounds.ChannelAccess;
-import net.minecraft.client.sounds.SoundEngine;
-import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.sounds.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,8 +24,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
 public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource source, int x, int y, int z, float volume, float pitch, float severity) implements Packeter {
@@ -73,31 +75,8 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
             Sound sound = instance.getSound();
             ResourceLocation path = sound.getPath();
 
-            OggAudioStream stream;
-            ByteBuffer byteBuffer;
-            try {
-                stream = (OggAudioStream) soundEngine.soundBuffers.getStream(path, false).get();
-                byteBuffer = stream.readAll();
-            } catch (IOException | InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-
-            short[] data = new short[byteBuffer.capacity()/2];
-            byteBuffer.asShortBuffer().get(data);
-
-            if (data.length == 0) return;
-
-            AudioEffect effect = new BaseAudioEffect();
-            effect.volume = 1;
-            effect.severity = packet.severity;
-
-            data = effect.apply(data);
-
-            byteBuffer.asShortBuffer().put(data);
-
-            SoundBuffer soundBuffer = new SoundBuffer(byteBuffer, stream.getFormat());
-
-            CompletableFuture<ChannelAccess.ChannelHandle> completableFuture = soundEngine.channelAccess.createHandle(Library.Pool.STATIC);
+            // --- Playback Setup --- \\
+            CompletableFuture<ChannelAccess.ChannelHandle> completableFuture = soundEngine.channelAccess.createHandle(sound.shouldStream() ? Library.Pool.STREAMING : Library.Pool.STATIC);
             ChannelAccess.ChannelHandle channelHandle = completableFuture.join();
 
             float attenuatedVolume = Math.max(packet.volume, 1.0F) * (float) (sound.getAttenuationDistance());
@@ -115,10 +94,40 @@ public record ClientboundSpeakSoundPacket(Holder<SoundEvent> sound, SoundSource 
                 channel.setRelative(instance.isRelative());
             });
 
-            channelHandle.execute(channel -> {
-                channel.attachStaticBuffer(soundBuffer);
-                channel.play();
-            });
+            // --- Audio Streaming --- \\
+            EffectStream stream;
+            try {
+                InputStream inputStream = soundEngine.soundBuffers.resourceManager.open(path);
+                stream = new EffectStream(inputStream);
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+
+            AudioEffect effect = new BaseAudioEffect();
+            effect.volume = 1;
+            effect.severity = packet.severity;
+
+            stream.effect = effect;
+
+            if (sound.shouldStream()) {
+                channelHandle.execute(channel -> {
+                    channel.attachBufferStream(stream);
+                    channel.play();
+                });
+            } else {
+                ByteBuffer byteBuffer;
+                try {
+                    byteBuffer = stream.readAll();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                SoundBuffer soundBuffer = new SoundBuffer(byteBuffer, stream.getFormat());
+                channelHandle.execute(channel -> {
+                    channel.attachStaticBuffer(soundBuffer);
+                    channel.play();
+                });
+            }
 
             /* failure attempt
             Services.COMPAT.handleSound(data, position, packet.severity);

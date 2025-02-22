@@ -29,3 +29,6 @@ accessible field net/minecraft/client/sounds/SoundEngine soundBuffers Lnet/minec
 
 # ChannelAccess field
 accessible field net/minecraft/client/sounds/SoundEngine channelAccess Lnet/minecraft/client/sounds/ChannelAccess;
+
+# ResourceProvider field
+accessible field net/minecraft/client/sounds/SoundBufferLibrary resourceManager Lnet/minecraft/server/packs/resources/ResourceProvider;

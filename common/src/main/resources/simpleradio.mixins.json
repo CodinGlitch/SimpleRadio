@@ -6,10 +6,11 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinEntity",
+    "MixinJukeboxBlockEntity",
+    "MixinLevel",
     "MixinMinecraftServer",
     "MixinPlayerList",
-    "MixinServerLevel",
-    "MixinLevel"
+    "MixinServerLevel"
   ],
   "client": [
     "MixinClientLevel",
