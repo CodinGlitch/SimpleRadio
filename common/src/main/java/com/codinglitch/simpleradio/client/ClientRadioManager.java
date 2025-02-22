@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.client.core.ClientRouterWrapper;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.*;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -7,28 +8,37 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.debug.DebugRenderer;
+import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 public class ClientRadioManager {
-    private static final List<RadioRouter> routers = new ArrayList<>();
+    private static final List<ClientRouterWrapper> routers = new ArrayList<>();
 
     public static List<RadioRouter> getRouters() {
-        return routers;
+        return routers.stream().map(wrapper -> wrapper.router).toList();
     }
 
     public static RadioRouter getRouter(Predicate<RadioRouter> criteria) {
-        return routers.stream().filter(criteria).findFirst().orElse(null);
+        ClientRouterWrapper routerWrapper = routers.stream().filter(wrapper -> criteria.test(wrapper.router)).findFirst().orElse(null);
+        if (routerWrapper == null) return null;
+
+        return routerWrapper.router;
     }
 
     // im, losing it
+
+    public static ClientRouterWrapper getWrapper(UUID uuid) {
+        return routers.stream().filter(wrapper -> wrapper.router.id.equals(uuid)).findFirst().orElse(null);
+    }
 
     public static RadioRouter getRouter(UUID uuid) {
         return ClientRadioManager.getRouter(router -> uuid.equals(router.id));
@@ -81,24 +91,24 @@ public class ClientRadioManager {
     }
 
     public static void registerRouter(RadioRouter router) {
-        routers.add(router);
+        routers.add(ClientRouterWrapper.of(router));
     }
     public static void removeRouter(RadioRouter router) {
-        routers.removeIf(router::equals);
+        routers.removeIf(wrapper -> wrapper.router == router);
     }
     public static void removeRouter(UUID uuid) {
-        routers.removeIf(router -> uuid.equals(router.id));
+        routers.removeIf(wrapper -> uuid.equals(wrapper.router.id));
     }
     public static void removeRouter(Entity owner) {
-        routers.removeIf(router -> owner.equals(router.owner));
+        routers.removeIf(wrapper -> owner.equals(wrapper.router.owner));
     }
     public static void removeRouter(WorldlyPosition location) {
-        routers.removeIf(router -> router.location != null && location.equals(router.location));
+        routers.removeIf(wrapper -> wrapper.router.location != null && location.equals(wrapper.router.location));
     }
 
     public static void garbageCollect() {
-        routers.removeIf(Predicate.not(RadioRouter::validate));
-        routers.removeIf(router -> router.owner == null && router.location == null);
+        routers.removeIf(wrapper -> !wrapper.router.validate());
+        routers.removeIf(wrapper -> wrapper.router.owner == null && wrapper.router.location == null);
     }
 
     public static void tick(long gameTime) {
@@ -106,7 +116,7 @@ public class ClientRadioManager {
             garbageCollect();
         }
 
-        for (RadioRouter router : routers) {
+        for (RadioRouter router : getRouters()) {
             router.tick(0);
         }
     }
@@ -114,6 +124,8 @@ public class ClientRadioManager {
     public static void close() {
         routers.clear();
     }
+
+
 
     //
 
