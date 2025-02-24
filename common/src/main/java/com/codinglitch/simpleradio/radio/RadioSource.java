@@ -3,10 +3,13 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.FrequencingRegistry;
+import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.Medium;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
@@ -25,7 +28,7 @@ public class RadioSource {
     public UUID owner;
     public UUID originalOwner;
     public WorldlyPosition origin;
-    public Type type;
+    public ResourceLocation frequencingType;
 
     public byte[] data;
 
@@ -72,35 +75,27 @@ public class RadioSource {
         this.transmissionPower += power;
     }
 
-    public LexiconPageData getPage() {
-        String pageName = this.type.toString().toLowerCase();
-        LexiconPageData pageData = SimpleRadioLibrary.SERVER_CONFIG.getPage(pageName);
-        if (pageData == null) {
-            CommonSimpleRadio.warn("Could not find page {}!", pageName);
-            return null;
+    public FrequencingType getFrequencingType() {
+        FrequencingType type = FrequencingRegistry.get(this.frequencingType);
+        if (type == null) {
+            CommonSimpleRadio.error("Missing frequencing type for location {}!", this.frequencingType);
         }
-
-        return pageData;
-    }
-    public Object getConfigFor(Frequency.Modulation modulation, String configName) {
-        LexiconPageData pageData = getPage();
-        if (pageData == null) return 0;
-
-        return pageData.getEntry(configName + modulation.shorthand);
+        return type;
     }
 
     public int getTransmissionPower(Frequency.Modulation modulation) {
-        return (int) getConfigFor(modulation, "transmissionPower");
+        return modulation == Frequency.Modulation.AMPLITUDE ?
+                getFrequencingType().transmissionPowerAM :
+                getFrequencingType().transmissionPowerFM;
     }
-
     public int getDiminishThreshold(Frequency.Modulation modulation) {
-        return (int) getConfigFor(modulation, "transmissionPower");
+        return modulation == Frequency.Modulation.AMPLITUDE ?
+                getFrequencingType().diminishThresholdAM :
+                getFrequencingType().diminishThresholdFM;
     }
 
     public double getTransmissionDiminishment() {
-        LexiconPageData pageData = getPage();
-        if (pageData == null) return 1;
-        return (double) pageData.getEntry("transmissionDiminishment");
+        return getFrequencingType().transmissionDiminishment;
     }
 
     public RadioSource copy() {
@@ -109,7 +104,7 @@ public class RadioSource {
         copy.owner = this.owner;
         copy.originalOwner = this.originalOwner;
         copy.origin = this.origin;
-        copy.type = this.type;
+        copy.frequencingType = this.frequencingType;
 
         copy.data = this.data;
         copy.soundEvent = this.soundEvent;

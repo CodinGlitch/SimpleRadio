@@ -1,7 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -20,7 +22,7 @@ public class RadioTransmitter extends RadioRouter {
     public int antennaPower = 0;
     public Frequency frequency;
 
-    public RadioSource.Type sourceType = RadioSource.Type.TRANSMITTER;
+    public ResourceLocation frequencingType;
 
     protected RadioTransmitter(Frequency frequency, UUID id) {
         super(id);
@@ -59,8 +61,8 @@ public class RadioTransmitter extends RadioRouter {
         return this;
     }
 
-    public RadioTransmitter sourceType(RadioSource.Type type) {
-        this.sourceType = type;
+    public RadioTransmitter frequencingType(FrequencingType type) {
+        this.frequencingType = type.location;
         return this;
     }
 
@@ -88,8 +90,8 @@ public class RadioTransmitter extends RadioRouter {
 
     @Override
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
-        if (source.type == null) {
-            source.type = this.sourceType;
+        if (source.frequencingType == null) {
+            source.frequencingType = this.frequencingType;
             source.addPower(source.getTransmissionPower(frequency.modulation));
         }
         return super.prepareSource(source, destination);

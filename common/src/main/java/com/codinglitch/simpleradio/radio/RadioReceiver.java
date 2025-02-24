@@ -1,7 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +17,8 @@ import java.util.UUID;
 public class RadioReceiver extends RadioRouter {
     public int antennaPower = 0;
     public Frequency frequency;
+
+    public ResourceLocation frequencingType;
 
     protected RadioReceiver(Frequency frequency, UUID id) {
         super(id);
@@ -37,6 +41,11 @@ public class RadioReceiver extends RadioRouter {
     public RadioReceiver(Frequency frequency, WorldlyPosition location, UUID uuid) {
         this(frequency, uuid);
         this.location = location;
+    }
+
+    public RadioReceiver frequencingType(FrequencingType type) {
+        this.frequencingType = type.location;
+        return this;
     }
 
     public double getPower() {

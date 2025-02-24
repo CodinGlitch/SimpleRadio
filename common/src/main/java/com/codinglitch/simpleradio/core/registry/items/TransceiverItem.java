@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
@@ -42,7 +43,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
         speaker.audioChannel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
 
-        transmitter.sourceType(RadioSource.Type.TRANSCEIVER);
+        transmitter.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {

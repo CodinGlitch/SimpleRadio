@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.VibrationParticleOption;
@@ -29,7 +30,7 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
         speaker.audioChannel.setCategory(CommonRadioPlugin.WALKIES_CATEGORY);
 
-        transmitter.sourceType(RadioSource.Type.WALKIE_TALKIE);
+        transmitter.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
     }
 
     @Override
