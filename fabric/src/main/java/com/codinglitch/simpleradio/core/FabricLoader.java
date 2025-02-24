@@ -1,7 +1,8 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.SimpleRadioCatalysts;
+import com.codinglitch.simpleradio.api.CatalystRegistry;
+import com.codinglitch.simpleradio.api.FrequencingRegistry;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
@@ -108,5 +109,6 @@ public class FabricLoader {
         SimpleRadioMenus.load();
 
         SimpleRadioCatalysts.load();
+        SimpleRadioFrequencing.load();
     }
 }

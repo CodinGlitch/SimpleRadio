@@ -9,22 +9,18 @@ import net.minecraft.world.item.Items;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleRadioCatalysts {
+public class CatalystRegistry {
     private static final HashMap<ResourceLocation, Catalyst> CATALYSTS = new HashMap<>();
 
     public static Catalyst GILDED_BLACKSTONE = register(CommonSimpleRadio.id("catalyst/gilded_blackstone"),
             new Catalyst(Items.GILDED_BLACKSTONE)
     );
 
-    public static Catalyst fromLocation(ResourceLocation location) {
-        for (Map.Entry<ResourceLocation, Catalyst> entry : CATALYSTS.entrySet()) {
-            if (entry.getKey().equals(location)) return entry.getValue();
-        }
-
-        return null;
+    public static Catalyst get(ResourceLocation location) {
+        return CATALYSTS.get(location);
     }
 
-    public static Catalyst fromItem(Item item) {
+    public static Catalyst get(Item item) {
         for (Map.Entry<ResourceLocation, Catalyst> entry : CATALYSTS.entrySet()) {
             Catalyst catalyst = entry.getValue();
             if (catalyst.associate == item) return catalyst;

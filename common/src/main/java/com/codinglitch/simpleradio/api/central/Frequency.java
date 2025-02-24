@@ -75,7 +75,7 @@ public class Frequency implements Medium {
     }
 
     static {
-        onLexiconRevision(); // stupid
+        //onLexiconRevision(); // stupid maybe not need?
     }
 
     public static void garbageCollect() {

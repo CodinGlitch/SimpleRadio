@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.api.central.Catalyst;
-import com.codinglitch.simpleradio.api.SimpleRadioCatalysts;
+import com.codinglitch.simpleradio.api.CatalystRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +32,7 @@ public abstract class CatalyzingBlockEntity extends AuditoryBlockEntity {
 
         if (this.catalyst == null) {
             if (!stack.isEmpty()) {
-                Catalyst catalyst = SimpleRadioCatalysts.fromItem(stack.getItem());
+                Catalyst catalyst = CatalystRegistry.get(stack.getItem());
                 if (catalyst != null) {
                     stack.shrink(1);
                     this.catalyst = catalyst;
@@ -78,7 +78,7 @@ public abstract class CatalyzingBlockEntity extends AuditoryBlockEntity {
         super.loadTag(tag);
 
         if (tag.contains("catalyst")) {
-            this.catalyst = SimpleRadioCatalysts.fromLocation(ResourceLocation.tryParse(tag.getString("catalyst")));
+            this.catalyst = CatalystRegistry.get(ResourceLocation.tryParse(tag.getString("catalyst")));
         }
     }
 
