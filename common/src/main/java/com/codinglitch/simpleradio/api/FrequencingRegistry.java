@@ -22,6 +22,9 @@ public class FrequencingRegistry {
         Object receptionPower = page.getEntry("receptionPower");
         newType.receptionPower = (int) (receptionPower != null ? receptionPower : -1);
 
+        Object antennaAptitude = page.getEntry("antennaAptitude");
+        newType.antennaAptitude = (int) (antennaAptitude != null ? antennaAptitude : -1);
+
         Object transmissionPowerFM = page.getEntry("transmissionPowerFM");
         newType.transmissionPowerFM = (int) (transmissionPowerFM != null ? transmissionPowerFM : -1);
         Object diminishThresholdFM = page.getEntry("diminishThresholdFM");
@@ -33,7 +36,7 @@ public class FrequencingRegistry {
         newType.diminishThresholdAM = (int) (diminishThresholdAM != null ? diminishThresholdAM : -1);
 
         Object transmissionDiminishment = page.getEntry("transmissionDiminishment");
-        newType.transmissionDiminishment = (int) (transmissionDiminishment != null ? transmissionDiminishment : -1);
+        newType.transmissionDiminishment = (double) (transmissionDiminishment != null ? transmissionDiminishment : -1d);
 
         return newType;
     }

@@ -89,7 +89,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer diminishThresholdAM = 200;
 
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
-        public Integer transmissionDiminishment = 1;
+        public Double transmissionDiminishment = 1d;
 
         @LexiconEntry(comment = "This is the range for the walkie that it can hear from. Defaults to 4.")
         public Integer listeningRange = 4;
