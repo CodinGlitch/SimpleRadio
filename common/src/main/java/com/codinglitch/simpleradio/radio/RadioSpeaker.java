@@ -36,6 +36,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
     private final Map<UUID, OpusDecoder> decoders;
     private final AudioEffect effect;
 
+    public String category;
     public float range = 8;
 
     protected RadioSpeaker(UUID id) {
@@ -255,7 +256,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
                         CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
                 );
                 locationalChannel.setDistance(range);
-                locationalChannel.setCategory(CommonRadioPlugin.RADIOS_CATEGORY);
+                locationalChannel.setCategory(category);
 
                 this.audioChannel = locationalChannel;
             } else {
@@ -263,7 +264,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
                         this.id,
                         CommonRadioPlugin.serverApi.fromEntity(this.owner)
                 );
-                audioChannel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
+                audioChannel.setCategory(category);
             }
 
             this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this);

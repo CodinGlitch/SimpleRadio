@@ -28,7 +28,7 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
         speaker.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
-        speaker.audioChannel.setCategory(CommonRadioPlugin.WALKIES_CATEGORY);
+        speaker.category = CommonRadioPlugin.WALKIES_CATEGORY;
 
         transmitter.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
     }

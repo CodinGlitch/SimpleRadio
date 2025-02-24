@@ -41,7 +41,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
         speaker.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
-        speaker.audioChannel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
+        speaker.category = CommonRadioPlugin.TRANSCEIVERS_CATEGORY;
 
         transmitter.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
     }
