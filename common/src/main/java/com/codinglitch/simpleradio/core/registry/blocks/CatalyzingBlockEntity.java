@@ -36,6 +36,8 @@ public abstract class CatalyzingBlockEntity extends AuditoryBlockEntity {
                 if (catalyst != null) {
                     stack.shrink(1);
                     this.catalyst = catalyst;
+                    level.sendBlockUpdated(pos, state, state, 2);
+                    this.setChanged();
 
                     if (!level.isClientSide) {
                         level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 1, 1);
@@ -48,6 +50,8 @@ public abstract class CatalyzingBlockEntity extends AuditoryBlockEntity {
             if (stack.isEmpty()) {
                 player.setItemInHand(hand, new ItemStack(this.catalyst.associate));
                 this.catalyst = null;
+                level.sendBlockUpdated(pos, state, state, 2);
+                this.setChanged();
 
                 if (!level.isClientSide) {
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1, 1);

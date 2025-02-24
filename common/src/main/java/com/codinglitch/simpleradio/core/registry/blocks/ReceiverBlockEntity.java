@@ -100,6 +100,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
             if (router instanceof RadioReceiver receiver) receiver.antennaPower = blockEntity.antennaPower;
 
             level.sendBlockUpdated(pos, blockState, blockState, 2);
+            blockEntity.setChanged();
             blockEntity.isDirty = false;
         }
     }
@@ -130,6 +131,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         }
 
         this.isActive = true;
+        markDirty();
     }
 
     @Override

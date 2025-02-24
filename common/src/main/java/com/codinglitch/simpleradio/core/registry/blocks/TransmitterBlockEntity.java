@@ -100,6 +100,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
             if (router instanceof RadioTransmitter transmitter) transmitter.antennaPower = blockEntity.antennaPower;
 
             level.sendBlockUpdated(pos, blockState, blockState, 2);
+            blockEntity.setChanged();
             blockEntity.isDirty = false;
         }
     }
