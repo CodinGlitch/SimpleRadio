@@ -37,7 +37,7 @@ public interface Frequencing {
     }
     static boolean validate(Entity entity, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
         return RadioManager.verifyEntityCollection(entity, stack -> {
-            if (stack.getItem().getClass().isInstance(clazz))
+            if (clazz.isAssignableFrom(stack.getItem().getClass()))
                 return frequency == null || ((Frequencing) stack.getItem()).getFrequency(stack) == frequency;
             return false;
         });

@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -293,8 +294,8 @@ public class RadioManager {
         return clazz.isInstance(block) || clazz.isInstance(block.asItem());
     }
 
-    public static boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria) {
-        CollectionResult result = CompatCore.verifyEntityCollection(entity, inventoryCriteria);
+    public static boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> itemCriteria) {
+        CollectionResult result = CompatCore.verifyEntityCollection(entity, itemCriteria);
         if (result == CollectionResult.IGNORE) {
             return true;
         } else if (result == CollectionResult.COLLECT) {
@@ -302,10 +303,12 @@ public class RadioManager {
         }
 
         if (entity instanceof Player player) {
-            return player.getInventory().hasAnyMatching(inventoryCriteria);
+            return player.getInventory().hasAnyMatching(itemCriteria);
+        } else if (entity instanceof ItemEntity itemEntity) {
+            return itemCriteria.test(itemEntity.getItem());
         } else {
             for (ItemStack stack : entity.getHandSlots()) {
-                if (inventoryCriteria.test(stack)) return true;
+                if (itemCriteria.test(stack)) return true;
             }
             return false;
         }
