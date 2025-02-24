@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MicrophoneItem extends BlockItem implements Listening, Alterable {
+public class MicrophoneItem extends BlockItem implements Alterable {
     public MicrophoneItem(Properties settings) {
         super(SimpleRadioBlocks.MICROPHONE, settings);
     }

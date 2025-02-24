@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
+import com.codinglitch.simpleradio.api.central.Frequencing;
 import com.codinglitch.simpleradio.api.central.Transmitting;
 import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.api.central.Module;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TransmitterItem extends BlockItem implements Transmitting, Alterable {
+public class TransmitterItem extends BlockItem implements Frequencing, Alterable {
     public TransmitterItem(Properties settings) {
         super(SimpleRadioBlocks.TRANSMITTER, settings);
     }
