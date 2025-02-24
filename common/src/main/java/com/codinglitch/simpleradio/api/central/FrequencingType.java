@@ -17,4 +17,11 @@ public class FrequencingType {
     public int diminishThresholdAM;
 
     public double transmissionDiminishment;
+
+    public int getTransmissionPower(Frequency.Modulation modulation) {
+        return modulation == Frequency.Modulation.AMPLITUDE ? transmissionPowerAM : transmissionPowerFM;
+    }
+    public int getDiminishThreshold(Frequency.Modulation modulation) {
+        return modulation == Frequency.Modulation.AMPLITUDE ? diminishThresholdAM : diminishThresholdFM;
+    }
 }

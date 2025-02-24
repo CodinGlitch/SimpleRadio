@@ -22,7 +22,7 @@ public class RadioTransmitter extends RadioRouter {
     public int antennaPower = 0;
     public Frequency frequency;
 
-    public ResourceLocation frequencingType;
+    public FrequencingType frequencingType;
 
     protected RadioTransmitter(Frequency frequency, UUID id) {
         super(id);
@@ -62,12 +62,14 @@ public class RadioTransmitter extends RadioRouter {
     }
 
     public RadioTransmitter frequencingType(FrequencingType type) {
-        this.frequencingType = type.location;
+        this.frequencingType = type;
         return this;
     }
 
-    public double getPower() {
-        return 10d + antennaPower;
+    public double getPower(Frequency.Modulation modulation) {
+        int baseTransmissionPower = frequencingType.getTransmissionPower(modulation);
+
+        return baseTransmissionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
     @Nullable
@@ -91,8 +93,8 @@ public class RadioTransmitter extends RadioRouter {
     @Override
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
         if (source.frequencingType == null) {
-            source.frequencingType = this.frequencingType;
-            source.addPower(source.getTransmissionPower(frequency.modulation));
+            source.frequencingType = this.frequencingType.location;
+            source.addPower(getPower(frequency.modulation));
         }
         return super.prepareSource(source, destination);
     }

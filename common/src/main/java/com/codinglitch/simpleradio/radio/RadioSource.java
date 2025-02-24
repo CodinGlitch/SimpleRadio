@@ -84,14 +84,10 @@ public class RadioSource {
     }
 
     public int getTransmissionPower(Frequency.Modulation modulation) {
-        return modulation == Frequency.Modulation.AMPLITUDE ?
-                getFrequencingType().transmissionPowerAM :
-                getFrequencingType().transmissionPowerFM;
+        return getFrequencingType().getTransmissionPower(modulation);
     }
     public int getDiminishThreshold(Frequency.Modulation modulation) {
-        return modulation == Frequency.Modulation.AMPLITUDE ?
-                getFrequencingType().diminishThresholdAM :
-                getFrequencingType().diminishThresholdFM;
+        return getFrequencingType().getDiminishThreshold(modulation);
     }
 
     public double getTransmissionDiminishment() {
@@ -146,7 +142,12 @@ public class RadioSource {
 
         //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
 
-        this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionDiminishment));
+        // beware.... negative transmission...
+        this.transmissionPower = this.transmissionPower - (distance * transmissionDiminishment);
+    }
+
+    public void compensate(double power) {
+        this.transmissionPower += power; // what the hell do i do about infinite transmission power bruh
     }
 
     public double computeSeverity() {

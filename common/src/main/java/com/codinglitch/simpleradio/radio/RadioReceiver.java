@@ -18,7 +18,7 @@ public class RadioReceiver extends RadioRouter {
     public int antennaPower = 0;
     public Frequency frequency;
 
-    public ResourceLocation frequencingType;
+    public FrequencingType frequencingType;
 
     protected RadioReceiver(Frequency frequency, UUID id) {
         super(id);
@@ -44,12 +44,12 @@ public class RadioReceiver extends RadioRouter {
     }
 
     public RadioReceiver frequencingType(FrequencingType type) {
-        this.frequencingType = type.location;
+        this.frequencingType = type;
         return this;
     }
 
     public double getPower() {
-        return 10d + antennaPower;
+        return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
     @Nullable
@@ -60,9 +60,10 @@ public class RadioReceiver extends RadioRouter {
 
     @Override
     public void accept(RadioSource source) {
-        if (source.transmissionPower <= 0) {
-            return;
-        }
+        // --- Reception power compensation
+        source.compensate(getPower());
+
+        if (source.transmissionPower <= 0) return;
 
         //super.accept(source);
         this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));
