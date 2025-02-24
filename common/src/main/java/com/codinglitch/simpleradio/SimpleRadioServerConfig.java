@@ -17,7 +17,10 @@ public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage(comment = "These are the configurations for the walkie talkie item.")
     public WalkieTalkie walkie_talkie = new WalkieTalkie();
 
-    @LexiconPage(comment = "These are the configurations for the transmitter block. (IN DEVELOPMENT)")
+    @LexiconPage(comment = "These are the configurations for the receiver block.")
+    public Receiver receiver = new Receiver();
+
+    @LexiconPage(comment = "These are the configurations for the transmitter block.")
     public Transmitter transmitter = new Transmitter();
 
     @LexiconPage(comment = "These are the configurations for the radio block.")
@@ -39,6 +42,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     public Compatibilities compatibilities = new Compatibilities();
 
     public static class Transceiver extends LexiconPageData {
+        @LexiconEntry(comment = "This is how effective the transceiver is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 200.")
+        public Integer receptionPower = 200;
+
         @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 1000.")
         public Integer transmissionPowerFM = 1000;
 
@@ -67,6 +73,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class WalkieTalkie extends LexiconPageData {
+        @LexiconEntry(comment = "This is how effective the walkie is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 100.")
+        public Integer receptionPower = 100;
+
         @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 500.")
         public Integer transmissionPowerFM = 500;
 
@@ -100,7 +109,7 @@ public class SimpleRadioServerConfig extends LexiconData {
     public static class Wire extends LexiconPageData {
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.1.")
         public Double transmissionDiminishment = 0.1d;
-        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire takes to relay data. Defaults to 5.")
+        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire takes to relay data. Defaults to 4.")
         public Double transmissionTime = 4d;
 
         @LexiconEntry(comment = "This is the amount of time (in ticks) between each header sent. Defaults to 5.")
@@ -117,6 +126,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class Transmitter extends LexiconPageData {
+        @LexiconEntry(comment = "This is the capability of this item to make use of antennas. Essentially acts as a multiplier for the antenna score. Defaults to 10.")
+        public Integer antennaAptitude = 10;
+
         @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 3000.")
         public Integer transmissionPowerFM = 3300;
 
@@ -132,11 +144,25 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
         public Double transmissionDiminishment = 1d;
 
-        @LexiconEntry(comment = "When false, removes the transmitter (will not disable speaker) recipe. Defaults to true.")
+        @LexiconEntry(comment = "When false, removes the transmitter recipe. Defaults to true.")
+        public Boolean enabled = true;
+    }
+
+    public static class Receiver extends LexiconPageData {
+        @LexiconEntry(comment = "This is the capability of this item to make use of antennas. Essentially acts as a multiplier for the antenna score. Defaults to 10.")
+        public Integer antennaAptitude = 10;
+
+        @LexiconEntry(comment = "This is how effective the receiver is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 300.")
+        public Integer receptionPower = 300;
+
+        @LexiconEntry(comment = "When false, removes the receiver recipe. Defaults to true.")
         public Boolean enabled = true;
     }
 
     public static class Radio extends LexiconPageData {
+        @LexiconEntry(comment = "This is how effective the radio is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 100.")
+        public Integer receptionPower = 100;
+
         @LexiconEntry(comment = "This is the range for the radio in which the audio played from it can be heard. Defaults to 24.")
         public Integer speakingRange = 24;
 
@@ -161,6 +187,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class Antenna extends LexiconPageData {
+        @LexiconEntry(comment = "This is the maximum distance an antenna can travel without support before falling. CAUTION: SETTING THIS TOO HIGH MAY CAUSE LAG WITH LARGE ANTENNAS. Defaults to 8.")
+        public Integer maxDistance = 8;
+
         @LexiconEntry(comment = "When false, removes the antenna recipe. Defaults to true.")
         public Boolean enabled = true;
     }

@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.Frequencing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,7 +48,10 @@ public class AntennaBlock extends Block {
     private static final Direction[] Z_PRIORITY = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
     private static final Direction[] X_PRIORITY = new Direction[]{Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH};
 
-    private static final int MAX_DISTANCE = 8;
+    private static int MAX_DISTANCE = 8;
+    public static void onLexiconRevision() {
+        MAX_DISTANCE = SimpleRadioLibrary.SERVER_CONFIG.antenna.maxDistance;
+    }
 
     public AntennaBlock(Properties properties) {
         super(properties);

@@ -5,6 +5,7 @@ import com.codinglitch.lexiconfig.Library;
 import com.codinglitch.lexiconfig.annotations.LexiconLibrary;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.blocks.AntennaBlock;
 
 @LexiconLibrary
 public class SimpleRadioLibrary extends Library {
@@ -18,6 +19,9 @@ public class SimpleRadioLibrary extends Library {
 
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> Frequency.onLexiconRevision());
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> Frequency.onLexiconRevision());
+
+        LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> AntennaBlock.onLexiconRevision());
+        LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> AntennaBlock.onLexiconRevision());
 
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> CompatCore.reloadCompatibilities());
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> CompatCore.spoutCompatibilities());
