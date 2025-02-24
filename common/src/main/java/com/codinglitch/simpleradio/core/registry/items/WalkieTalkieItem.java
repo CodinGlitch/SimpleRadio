@@ -31,6 +31,7 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
         speaker.category = CommonRadioPlugin.WALKIES_CATEGORY;
 
         transmitter.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
+        receiver.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
     }
 
     @Override

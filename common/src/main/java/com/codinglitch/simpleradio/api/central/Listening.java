@@ -47,9 +47,10 @@ public interface Listening extends Auricular {
     /**
      * Stop listening in the world.
      * @param owner the Entity that will stop listening
+     * @param isClient if to remove in client
      */
-    default void stopListening(Entity owner) {
-        if (owner.level().isClientSide) {
+    default void stopListening(UUID owner, boolean isClient) {
+        if (isClient) {
             ClientRadioManager.removeRouter(owner);
         } else {
             RadioManager.removeListener(owner);

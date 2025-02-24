@@ -13,6 +13,8 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -34,13 +36,16 @@ public abstract class MixinEntity implements CommandSource, Nameable, EntityAcce
     @Inject(method = "baseTick()V", at = @At(value = "TAIL"))
     private void simpleradio$baseTick_itemInWorldTicking(CallbackInfo ci) {
         if ((Entity)(Object)this instanceof ItemEntity item) {
-            SimpleRadioItems.ITEMS.forEach(((location, itemHolder) -> {
-                if (itemHolder.get() instanceof WorldTicking) {
-                    if (item.getItem().getItem() instanceof WorldTicking worldTicking) {
-                        worldTicking.worldTick(item, this.level);
-                    }
+            if (item.getItem().getItem() instanceof WorldTicking worldTicking) {
+                worldTicking.worldTick(item, this.level);
+            }
+        } else if ((Entity)(Object)this instanceof LivingEntity livingEntity) {
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                ItemStack stack = livingEntity.getItemBySlot(slot);
+                if (stack.getItem() instanceof WorldTicking worldTicking) {
+                    stack.getItem().inventoryTick(stack, this.level, livingEntity, slot.getIndex(), false);
                 }
-            }));
+            }
         }
     }
 }

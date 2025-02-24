@@ -216,12 +216,12 @@ public class RadioRouter implements Socket {
 
         for (int i = 0; i < routers.size(); i++) {
             RadioRouter router = routers.get(i);
-            if (!shouldRouteTo(source, router)) continue;
-
-            source = this.prepareSource(source, router);
             if (criteria != null) {
                 if (!criteria.test(router)) continue;
             }
+            if (!shouldRouteTo(source, router)) continue;
+
+            source = this.prepareSource(source, router);
 
             RadioSource oldSource = source;
             if (i < routers.size()-1) source = source.copy();

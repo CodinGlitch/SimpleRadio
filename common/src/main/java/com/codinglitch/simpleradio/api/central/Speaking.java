@@ -38,9 +38,10 @@ public interface Speaking extends Auricular {
     /**
      * Stop speaking in the world.
      * @param owner the Entity that will stop speaking
+     * @param isClient if to remove in client
      */
-    default void stopSpeaking(Entity owner) {
-        if (owner.level().isClientSide) {
+    default void stopSpeaking(UUID owner, boolean isClient) {
+        if (isClient) {
             ClientRadioManager.removeRouter(owner);
         } else {
             RadioManager.removeSpeaker(owner);

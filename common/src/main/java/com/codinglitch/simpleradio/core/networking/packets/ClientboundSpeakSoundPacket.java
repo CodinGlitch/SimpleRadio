@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.central.ClientRouterWrapper;
@@ -75,7 +76,8 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
             RadioRouter router = wrapper.router;
             if (router == null) return;
 
-            Vec3 position = new Vec3(router.location.position());
+            WorldlyPosition location = router.getLocation();
+            Vec3 position = new Vec3(location.position());
 
             ChannelHandleWrapper existingChannelHandle = wrapper.getChannel(packet.seed);
             if (existingChannelHandle != null) {
@@ -101,7 +103,7 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
 
             SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound.value(), SoundSource.BLOCKS,
                     packet.volume, packet.pitch,
-                    RandomSource.create(packet.seed), router.location.blockPos());
+                    RandomSource.create(packet.seed), location.blockPos());
             instance.resolve(soundManager);
 
             Sound sound = instance.getSound();

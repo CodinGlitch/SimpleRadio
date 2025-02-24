@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.*;
+import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class TransceiverItem extends Item implements Listening, Speaking, Receiving, Transmitting {
+public class TransceiverItem extends Item implements Listening, Speaking, Receiving, Transmitting, WorldTicking {
     public TransceiverItem(Properties settings) {
         super(settings);
     }
@@ -44,47 +45,42 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         speaker.category = CommonRadioPlugin.TRANSCEIVERS_CATEGORY;
 
         transmitter.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
+        receiver.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
-        if (!level.isClientSide) {
-            RadioListener listener = startListening(entity, owner);
-            RadioSpeaker speaker = startSpeaking(entity, owner);
-            RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
-            RadioTransmitter transmitter = startTransmitting(entity, frequencyName, Frequency.modulationOf(modulation), owner);
+        RadioListener listener = startListening(entity, owner);
+        RadioSpeaker speaker = startSpeaking(entity, owner);
+        RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
+        RadioTransmitter transmitter = startTransmitting(entity, frequencyName, Frequency.modulationOf(modulation), owner);
 
-            listener.tryAddRouter(transmitter);
-            receiver.tryAddRouter(speaker);
+        listener.tryAddRouter(transmitter);
+        receiver.tryAddRouter(speaker);
 
-            this.setupRouters(listener, speaker, receiver, transmitter);
+        this.setupRouters(listener, speaker, receiver, transmitter);
 
-            transmitter.transmitCriteria((source, router) -> {
-                if (entity instanceof Player player) {
-                    ItemStack using = player.getUseItem();
-                    if (!(using.getItem() instanceof TransceiverItem)) return false;
+        transmitter.transmitCriteria((source, router) -> {
+            if (entity instanceof Player player) {
+                ItemStack using = player.getUseItem();
+                if (!(using.getItem() instanceof TransceiverItem)) return false;
 
-                    CompoundTag usingTag = using.getOrCreateTag();
+                CompoundTag usingTag = using.getOrCreateTag();
 
-                    if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return false;
-                    if (!usingTag.getString("frequency").equals(frequencyName) || !usingTag.getString("modulation").equals(modulation)) return false;
-                }
+                if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return false;
+                if (!usingTag.getString("frequency").equals(frequencyName) || !usingTag.getString("modulation").equals(modulation)) return false;
+            }
 
-                Frequency frequency = getFrequency(stack);
-                if (frequency == null) return false;
+            Frequency frequency = getFrequency(stack);
+            if (frequency == null) return false;
 
-                return true;
-            });
-        }
+            return true;
+        });
     }
     private void inactivate(Level level, String frequencyName, String modulation, UUID owner) {
-        if (!level.isClientSide) {
-            Entity entity = ((ServerLevel) level).getEntity(owner);
-
-            stopListening(entity);
-            stopSpeaking(entity);
-            stopReceiving(frequencyName, Frequency.modulationOf(modulation), owner);
-            stopTransmitting(frequencyName, Frequency.modulationOf(modulation), owner);
-        }
+        stopListening(owner, level.isClientSide);
+        stopSpeaking(owner, level.isClientSide);
+        stopReceiving(frequencyName, Frequency.modulationOf(modulation), owner);
+        stopTransmitting(frequencyName, Frequency.modulationOf(modulation), owner);
     }
 
     public int getCooldown() {
@@ -108,10 +104,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
     }
 
-    @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
-        super.inventoryTick(stack, level, entity, slot, b);
-
+    public void entityTick(ItemStack stack, Entity entity) {
+        Level level = entity.level();
         CompoundTag tag = stack.getOrCreateTag();
 
         String frequency = tag.getString("frequency");
@@ -139,11 +133,20 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         frequency = tag.getString("frequency");
         modulation = tag.getString("modulation");
-        if (!level.isClientSide) {
-            activate(level, stack, frequency, modulation, entity, uuid);
-        }
+        activate(level, stack, frequency, modulation, entity, uuid);
 
         tag.putUUID("user", uuid);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
+        super.inventoryTick(stack, level, entity, slot, b);
+        entityTick(stack, entity);
+    }
+
+    @Override
+    public void worldTick(ItemEntity item, Level level) {
+        entityTick(item.getItem(), item);
     }
 
     @Override
