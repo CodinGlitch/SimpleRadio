@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.core;
+package com.codinglitch.simpleradio.client.central;
 
 import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;

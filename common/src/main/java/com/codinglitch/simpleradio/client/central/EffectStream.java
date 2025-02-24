@@ -1,13 +1,11 @@
-package com.codinglitch.simpleradio.client.core;
+package com.codinglitch.simpleradio.client.central;
 
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.mojang.blaze3d.audio.OggAudioStream;
-import com.mojang.blaze3d.audio.SoundBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 
 public class EffectStream extends OggAudioStream {
     public AudioEffect effect;

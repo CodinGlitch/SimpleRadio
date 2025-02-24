@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.core;
+package com.codinglitch.simpleradio.client.central;
 
 import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;

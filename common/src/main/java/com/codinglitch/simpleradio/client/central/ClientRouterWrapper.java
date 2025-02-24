@@ -1,8 +1,7 @@
-package com.codinglitch.simpleradio.client.core;
+package com.codinglitch.simpleradio.client.central;
 
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.audio.Channel;
-import net.minecraft.client.sounds.ChannelAccess;
 
 import java.util.HashMap;
 import java.util.Map;
