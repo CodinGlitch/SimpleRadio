@@ -94,7 +94,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
         if (!blockEntity.catalyzed) return;
 
-        if (blockEntity.isDirty && level.getGameTime() % 200 == 0) {
+        if (blockEntity.isDirty && level.getGameTime() % 200 == 0 && !level.isClientSide) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
             RadioRouter router = blockEntity.getRouter();
             if (router instanceof RadioReceiver receiver) receiver.antennaPower = blockEntity.antennaPower;

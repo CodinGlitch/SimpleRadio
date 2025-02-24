@@ -157,7 +157,7 @@ public class Wire extends Entity implements Medium {
             }
         }
 
-        source.travel(from.getLocation(), to.getLocation(), this);
+        source.travel(from, to, this);
 
         if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime == -1) {
             destination.accept(source);

@@ -7,6 +7,7 @@ public class FrequencingType {
     public ResourceLocation location;
 
     public int receptionPower;
+    public int receptionFloor;
 
     public int antennaAptitude;
 

@@ -21,6 +21,8 @@ public class FrequencingRegistry {
         // why didnt i make this an optional :(
         Object receptionPower = page.getEntry("receptionPower");
         newType.receptionPower = (int) (receptionPower != null ? receptionPower : -1);
+        Object receptionFloor = page.getEntry("receptionFloor");
+        newType.receptionFloor = (int) (receptionFloor != null ? receptionFloor : -1);
 
         Object antennaAptitude = page.getEntry("antennaAptitude");
         newType.antennaAptitude = (int) (antennaAptitude != null ? antennaAptitude : -1);

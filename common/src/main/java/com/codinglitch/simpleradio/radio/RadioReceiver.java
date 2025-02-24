@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
@@ -60,8 +61,7 @@ public class RadioReceiver extends RadioRouter {
 
     @Override
     public void accept(RadioSource source) {
-        // --- Reception power compensation
-        source.compensate(getPower());
+        CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (source.transmissionPower <= 0) return;
 

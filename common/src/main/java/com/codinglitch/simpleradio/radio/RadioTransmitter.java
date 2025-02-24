@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
@@ -81,10 +82,13 @@ public class RadioTransmitter extends RadioRouter {
     @Override
     public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
         if (destination instanceof RadioReceiver receiver) {
-            double distance = this.getLocation().distance(receiver.getLocation());
-            double cost = distance * source.getTransmissionDiminishment();
+            FrequencingType type = source.frequencingType == null ? this.frequencingType : source.getFrequencingType();
+            double transmissionPower = source.frequencingType == null ? this.getPower(this.frequency.modulation) : source.transmissionPower;
 
-            return (source.transmissionPower + receiver.getPower()) >= cost;
+            double distance = this.getLocation().distance(receiver.getLocation());
+            double cost = distance * type.transmissionDiminishment;
+
+            return (transmissionPower + receiver.getPower()) >= cost;
         }
 
         return super.shouldRouteTo(source, destination);
@@ -95,6 +99,8 @@ public class RadioTransmitter extends RadioRouter {
         if (source.frequencingType == null) {
             source.frequencingType = this.frequencingType.location;
             source.addPower(getPower(frequency.modulation));
+
+            CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
         }
         return super.prepareSource(source, destination);
     }

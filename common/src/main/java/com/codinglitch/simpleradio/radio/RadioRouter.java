@@ -183,11 +183,9 @@ public class RadioRouter implements Socket {
     }
 
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
-        WorldlyPosition from = this.getLocation();
-        WorldlyPosition to = destination.getLocation();
-        if (from.equals(to)) return source;
+        if (this.getLocation().equals(destination.getLocation())) return source;
 
-        source.travel(from, to, getFrequency());
+        source.travel(this, destination, getFrequency());
         return source;
     }
 

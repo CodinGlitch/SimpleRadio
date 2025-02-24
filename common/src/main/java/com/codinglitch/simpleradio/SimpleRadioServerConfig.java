@@ -45,6 +45,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is how effective the transceiver is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 200.")
         public Integer receptionPower = 200;
 
+        @LexiconEntry(comment = "Effectively, this is the *floor* for which reception power can reduce travel distance to. Defaults to 20.")
+        public Integer receptionFloor = 10;
+
         @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 1000.")
         public Integer transmissionPowerFM = 1000;
 
@@ -75,6 +78,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     public static class WalkieTalkie extends LexiconPageData {
         @LexiconEntry(comment = "This is how effective the walkie is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 100.")
         public Integer receptionPower = 100;
+
+        @LexiconEntry(comment = "Effectively, this is the *floor* for which reception power can reduce travel distance to. Defaults to 20.")
+        public Integer receptionFloor = 20;
 
         @LexiconEntry(comment = "This is the transmission power for frequency modulation. Defaults to 500.")
         public Integer transmissionPowerFM = 500;
@@ -155,6 +161,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is how effective the receiver is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 300.")
         public Integer receptionPower = 300;
 
+        @LexiconEntry(comment = "Effectively, this is the *floor* for which reception power can reduce travel distance to. Defaults to 20.")
+        public Integer receptionFloor = 20;
+
         @LexiconEntry(comment = "When false, removes the receiver recipe. Defaults to true.")
         public Boolean enabled = true;
     }
@@ -162,6 +171,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     public static class Radio extends LexiconPageData {
         @LexiconEntry(comment = "This is how effective the radio is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 100.")
         public Integer receptionPower = 100;
+
+        @LexiconEntry(comment = "Effectively, this is the *floor* for which reception power can reduce travel distance to. Defaults to 50.")
+        public Integer receptionFloor = 50;
 
         @LexiconEntry(comment = "This is the range for the radio in which the audio played from it can be heard. Defaults to 24.")
         public Integer speakingRange = 24;

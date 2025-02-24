@@ -31,7 +31,6 @@ public class RadioSource {
     public ResourceLocation frequencingType;
 
     public byte[] data;
-
     public SoundEvent soundEvent;
 
     public float pitch = 1;
@@ -83,17 +82,6 @@ public class RadioSource {
         return type;
     }
 
-    public int getTransmissionPower(Frequency.Modulation modulation) {
-        return getFrequencingType().getTransmissionPower(modulation);
-    }
-    public int getDiminishThreshold(Frequency.Modulation modulation) {
-        return getFrequencingType().getDiminishThreshold(modulation);
-    }
-
-    public double getTransmissionDiminishment() {
-        return getFrequencingType().transmissionDiminishment;
-    }
-
     public RadioSource copy() {
         RadioSource copy = new RadioSource();
 
@@ -112,22 +100,34 @@ public class RadioSource {
 
         copy.frequencyMedium = this.frequencyMedium;
         copy.wireMedium = this.wireMedium;
+
         copy.transmissionPower = this.transmissionPower;
 
         return copy;
     }
 
-    public void travel(WorldlyPosition from, WorldlyPosition to, Medium medium) {
-        double distance = from.distance(to);
+    public void travel(RadioRouter from, RadioRouter to, Medium medium) {
+        WorldlyPosition fromPos = from.getLocation();
+        WorldlyPosition toPos = to.getLocation();
+
+        double distance = fromPos.distance(toPos);
         double transmissionDiminishment = 0;
         if (medium instanceof Wire wire) {
             transmissionDiminishment = SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionDiminishment;
 
             this.wireMedium = wire;
         } else if (medium instanceof Frequency frequency) {
-            transmissionDiminishment = getTransmissionDiminishment();
+            FrequencingType type = this.getFrequencingType();
 
-            if (from.level.dimensionType() != to.level.dimensionType()) {
+            transmissionDiminishment = type.transmissionDiminishment;
+
+            if (to instanceof RadioReceiver receiver) {
+                if (distance > type.receptionFloor) {
+                    distance = Math.max(type.receptionFloor, distance - receiver.getPower());
+                }
+            }
+
+            if (fromPos.level.dimensionType() != toPos.level.dimensionType()) {
                 if (SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional) {
                     double interference = SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalInterference;
                     transmissionDiminishment += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
@@ -146,16 +146,12 @@ public class RadioSource {
         this.transmissionPower = this.transmissionPower - (distance * transmissionDiminishment);
     }
 
-    public void compensate(double power) {
-        this.transmissionPower += power; // what the hell do i do about infinite transmission power bruh
-    }
-
     public double computeSeverity() {
         float base = 0;
 
         double severity = 0;
         if (this.frequencyMedium != null) {
-            double diminishThreshold = this.getDiminishThreshold(frequencyMedium.modulation);
+            double diminishThreshold = this.getFrequencingType().getDiminishThreshold(frequencyMedium.modulation);
 
             base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
             severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
