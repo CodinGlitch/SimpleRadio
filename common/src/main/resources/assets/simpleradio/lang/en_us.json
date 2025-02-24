@@ -60,6 +60,8 @@
   "subtitles.simpleradio.radio_open": "Radio starts broadcasting",
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
 
+  "subtitles.simpleradio.short_circuit": "Wire short-circuits",
+
   "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
   "tooltip.simpleradio.receiver_user": "User: %s"
 }

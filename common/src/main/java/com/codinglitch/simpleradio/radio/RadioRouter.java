@@ -140,6 +140,10 @@ public class RadioRouter implements Socket {
         return null;
     }
 
+    public double distanceTo(RadioRouter other) {
+        return this.getLocation().distance(other.getLocation());
+    }
+
     public WorldlyPosition getLocation() {
         if (this.location != null) {
             return this.location;

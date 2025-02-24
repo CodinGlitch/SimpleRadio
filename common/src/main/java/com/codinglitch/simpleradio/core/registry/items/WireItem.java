@@ -49,11 +49,12 @@ public class WireItem extends Item implements WorldTicking {
                         Wire wire = Wire.connect(interactingSocket, socket, level);
 
                         //connecting.connectTo(centralBlockEntity);
-
                         level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 0.8f);
                     }
 
                     tag.remove("connectTo");
+
+                    return InteractionResult.SUCCESS;
                 }
             } else {
                 tag.putLong("connectTo", blockEntity.getBlockPos().asLong());

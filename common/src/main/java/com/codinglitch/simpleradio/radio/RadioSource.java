@@ -118,12 +118,11 @@ public class RadioSource {
             this.wireMedium = wire;
         } else if (medium instanceof Frequency frequency) {
             FrequencingType type = this.getFrequencingType();
-
             transmissionDiminishment = type.transmissionDiminishment;
 
             if (to instanceof RadioReceiver receiver) {
-                if (distance > type.receptionFloor) {
-                    distance = Math.max(type.receptionFloor, distance - receiver.getPower());
+                if (distance > receiver.frequencingType.receptionFloor) {
+                    distance = Math.max(receiver.frequencingType.receptionFloor, distance - receiver.getPower());
                 }
             }
 
@@ -142,8 +141,8 @@ public class RadioSource {
 
         //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
 
-        // beware.... negative transmission...
-        this.transmissionPower = this.transmissionPower - (distance * transmissionDiminishment);
+        // nevermind... dont beware.... negative transmission...
+        this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionDiminishment));
     }
 
     public double computeSeverity() {

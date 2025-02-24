@@ -1,7 +1,13 @@
 package com.codinglitch.simpleradio.api.central;
 
+import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.*;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -80,8 +86,31 @@ public interface Socket {
     }
 
     default void shortCircuit() {
-        for (Object wire : this.getWires().toArray()) {
-            ((Wire) wire).kill();
+        RadioRouter router = this.getRouter();
+        WorldlyPosition location = router.getLocation();
+
+        Level level = location.level;
+
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(null, location.x, location.y, location.z, SimpleRadioSounds.SHORT_CIRCUIT, SoundSource.BLOCKS, 0.3f, 0.9f + level.random.nextFloat()*0.2f);
+
+            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                    location.x, location.y, location.z, 10,
+                    -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
+            );
+            serverLevel.sendParticles(ParticleTypes.CRIT,
+                    location.x, location.y, location.z, 8,
+                    -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
+            );
+            serverLevel.sendParticles(ParticleTypes.POOF,
+                    location.x, location.y, location.z, 5,
+                    0.2d, 0.2d, 0.2d, 0.1d
+            );
+        }
+
+
+        for (Object wire : router.getWires().toArray()) {
+            ((Wire) wire).shortCircuit();
         }
         this.getWires().clear();
     }

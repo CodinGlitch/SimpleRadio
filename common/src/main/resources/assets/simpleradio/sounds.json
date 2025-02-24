@@ -10,6 +10,13 @@
     "sounds": [
       "simpleradio:radio_close"
     ]
+  },
+  "short_circuit": {
+    "sounds": [
+      "simpleradio:short_circuit/short_circuit1",
+      "simpleradio:short_circuit/short_circuit2"
+    ],
+    "subtitle": "subtitles.simpleradio.short_circuit"
   }
 }
 
