@@ -4,8 +4,8 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.minecraft.core.BlockPos;
@@ -408,11 +408,11 @@ public class RadioManager {
         onSoundPlayed(level, location, soundHolder, volume, pitch, 0, seed);
     }
     public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
-        SoundEvent sound = soundHolder.value();
-
         if (level.isClientSide) return;
         if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.soundListening) return;
         if (!level.isLoaded(BlockPos.containing(location))) return;
+
+        SoundEvent sound = soundHolder.value();
 
         TreeMap<Float, RadioListener> qualified = getListeners(location.toVector3f());
         for (Map.Entry<Float, RadioListener> entry : qualified.entrySet()) {
@@ -458,7 +458,7 @@ public class RadioManager {
             }
             if (listenerPosition == null) continue;
 
-            Vector3f senderVelocity = playerVelocities.get(sender.getUUID());
+            //Vector3f senderVelocity = playerVelocities.get(sender.getUUID());
             Vector3f senderPosition = sender.position().toVector3f();
 
             ///double dopplerFactor = CommonRadioPlugin.getDoppler(listenerPosition, listener.velocity, senderPosition, senderVelocity);
@@ -469,7 +469,7 @@ public class RadioManager {
                     event.getPacket().getOpusEncodedData(),
                     (float) falloff
             );
-            newSource.pitch = 1;//(float) dopplerFactor;
+            //newSource.pitch = (float) dopplerFactor;
 
             listener.onData(newSource);
         }

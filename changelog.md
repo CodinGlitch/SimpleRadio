@@ -1,1 +1,17 @@
-- i forgot to add radiosmither rework to 1.20.1
+- [Feature] **New routers system**
+- [Feature] **New wiring system**
+- [Feature] **Rework of the audio transmission system**
+- [Feature] **Compatibility with Create contraptions**
+- [Feature] **Enhanced compatibility with Valkyrien Skies**
+- [Feature] Antenna building logic
+- [Feature] Antenna strength logic
+- [Added] Transmitter block
+- [Added] Receiver block
+- [Added] Socket block
+- [Added] Copper Wire
+- [Added] New configurations
+- [Change] New Antenna models
+- [Change] New Module textures
+- [Fix] FFAPI recipe incompatibility
+- [Fix] Crash upon holding certain radio items
+- [Experimental] In-world audio listening config

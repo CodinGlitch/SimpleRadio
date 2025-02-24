@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.api.central;
 
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioManager;

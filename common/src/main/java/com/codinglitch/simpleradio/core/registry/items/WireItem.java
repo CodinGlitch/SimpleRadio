@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.Socket;
+import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.core.BlockPos;

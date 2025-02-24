@@ -1,10 +1,7 @@
 package com.codinglitch.simpleradio.compat;
 
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
-import net.minecraft.core.BlockPos;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import org.joml.Vector3f;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class ValkyrienCompat {

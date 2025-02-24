@@ -1,10 +1,11 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Routing;
-import com.codinglitch.simpleradio.core.central.Transmitting;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.Routing;
+import com.codinglitch.simpleradio.api.central.Transmitting;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,7 +46,7 @@ public class TransmitterBlock extends BaseEntityBlock implements Routing, Transm
 
     @Override
     public RadioTransmitter getOrCreateTransmitter(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
-        return startTransmitting(location, frequency, id);
+        return startTransmitting(location, frequency, id).sourceType(RadioSource.Type.TRANSMITTER);
     }
 
     @Override

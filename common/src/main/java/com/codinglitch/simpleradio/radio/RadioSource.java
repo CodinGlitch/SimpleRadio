@@ -3,9 +3,9 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Medium;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.Medium;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
@@ -128,21 +128,21 @@ public class RadioSource {
 
     public void travel(WorldlyPosition from, WorldlyPosition to, Medium medium) {
         double distance = from.distance(to);
-        double transmissionFactor = 0;
+        double transmissionDiminishment = 0;
         if (medium instanceof Wire wire) {
-            transmissionFactor = SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionDiminishment;
+            transmissionDiminishment = SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionDiminishment;
 
             this.wireMedium = wire;
         } else if (medium instanceof Frequency frequency) {
-            transmissionFactor = getTransmissionDiminishment();
+            transmissionDiminishment = getTransmissionDiminishment();
 
             if (from.level.dimensionType() != to.level.dimensionType()) {
                 if (SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional) {
                     double interference = SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalInterference;
-                    transmissionFactor += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
+                    transmissionDiminishment += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
                 } else {
                     this.transmissionPower = 0;
-                    transmissionFactor = 0;
+                    transmissionDiminishment = 0;
                 }
             }
 
@@ -151,7 +151,7 @@ public class RadioSource {
 
         //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
 
-        this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionFactor));
+        this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionDiminishment));
     }
 
     public double computeSeverity() {

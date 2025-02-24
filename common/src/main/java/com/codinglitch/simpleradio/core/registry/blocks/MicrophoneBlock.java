@@ -1,11 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.SimpleRadioServerConfig;
-import com.codinglitch.simpleradio.core.central.Listening;
-import com.codinglitch.simpleradio.core.central.Routing;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Listening;
+import com.codinglitch.simpleradio.api.central.Routing;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;

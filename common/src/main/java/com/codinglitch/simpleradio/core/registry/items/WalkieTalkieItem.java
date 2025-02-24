@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
+import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +22,15 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     }
 
     private Random RANDOM = new Random();
+
+    @Override
+    protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
+        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
+        listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
+        speaker.audioChannel.setCategory(CommonRadioPlugin.WALKIES_CATEGORY);
+
+        transmitter.sourceType(RadioSource.Type.WALKIE_TALKIE);
+    }
 
     @Override
     public String getDefaultFrequency() {

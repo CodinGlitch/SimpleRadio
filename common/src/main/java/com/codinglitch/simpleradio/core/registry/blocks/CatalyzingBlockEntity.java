@@ -1,16 +1,10 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.Catalyst;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Socket;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioCatalysts;
-import com.codinglitch.simpleradio.core.registry.entities.Wire;
-import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.api.central.Catalyst;
+import com.codinglitch.simpleradio.api.SimpleRadioCatalysts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -18,18 +12,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * A block entity containing a catalyst.

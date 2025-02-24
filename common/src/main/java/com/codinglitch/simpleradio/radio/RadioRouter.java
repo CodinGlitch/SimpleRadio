@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.*;
+import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.world.entity.Entity;
@@ -182,13 +182,17 @@ public class RadioRouter implements Socket {
         this.route(source);
     }
 
-    public RadioSource prepareSource(RadioSource source, RadioRouter router) {
+    public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
         WorldlyPosition from = this.getLocation();
-        WorldlyPosition to = router.getLocation();
+        WorldlyPosition to = destination.getLocation();
         if (from.equals(to)) return source;
 
         source.travel(from, to, getFrequency());
         return source;
+    }
+
+    public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
+        return true;
     }
 
     public void route(RadioSource source, Predicate<RadioRouter> criteria) {
@@ -210,6 +214,7 @@ public class RadioRouter implements Socket {
 
         for (int i = 0; i < routers.size(); i++) {
             RadioRouter router = routers.get(i);
+            if (!shouldRouteTo(source, router)) continue;
 
             source = this.prepareSource(source, router);
             if (criteria != null) {

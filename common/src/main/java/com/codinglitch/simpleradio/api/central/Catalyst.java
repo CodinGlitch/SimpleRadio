@@ -1,9 +1,8 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.api.central;
 
 import com.codinglitch.simpleradio.radio.RadioSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 
 public class Catalyst {
     public ResourceLocation location;

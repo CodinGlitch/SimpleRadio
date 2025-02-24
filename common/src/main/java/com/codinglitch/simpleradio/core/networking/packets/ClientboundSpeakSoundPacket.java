@@ -2,9 +2,9 @@ package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.client.core.ChannelHandleWrapper;
-import com.codinglitch.simpleradio.client.core.ClientRouterWrapper;
-import com.codinglitch.simpleradio.client.core.EffectStream;
+import com.codinglitch.simpleradio.client.central.ChannelHandleWrapper;
+import com.codinglitch.simpleradio.client.central.ClientRouterWrapper;
+import com.codinglitch.simpleradio.client.central.EffectStream;
 import com.codinglitch.simpleradio.core.central.Packeter;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
@@ -27,9 +27,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.EXTOffset;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;

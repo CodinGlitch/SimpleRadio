@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
 
 import java.util.*;

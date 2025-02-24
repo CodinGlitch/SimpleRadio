@@ -1,7 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.*;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
@@ -36,6 +37,14 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         Services.NETWORKING.sendToPlayer(player, new ClientboundTransceiverPacket(started, player.getUUID(), this.getClass().getName()));
     }
 
+    protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
+        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
+        listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
+        speaker.audioChannel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
+
+        transmitter.sourceType(RadioSource.Type.TRANSCEIVER);
+    }
+
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
         if (!level.isClientSide) {
             RadioListener listener = startListening(entity, owner);
@@ -46,15 +55,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             listener.tryAddRouter(transmitter);
             receiver.tryAddRouter(speaker);
 
-            /*if (this.getClass() == TransceiverItem.class) {
-                channel.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
-                listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
-                channel.category = CommonRadioPlugin.TRANSCEIVERS_CATEGORY;
-            } else if (this.getClass() == WalkieTalkieItem.class) {
-                channel.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
-                listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
-                channel.category = CommonRadioPlugin.WALKIES_CATEGORY;
-            }*/
+            this.setupRouters(listener, speaker, receiver, transmitter);
 
             transmitter.transmitCriteria((source, router) -> {
                 if (entity instanceof Player player) {
@@ -66,9 +67,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                     if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return false;
                     if (!usingTag.getString("frequency").equals(frequencyName) || !usingTag.getString("modulation").equals(modulation)) return false;
                 }
-
-                //if (this.getClass() == TransceiverItem.class) source.type = RadioSource.Type.TRANSCEIVER;
-                //else if (this.getClass() == WalkieTalkieItem.class) source.type = RadioSource.Type.WALKIE_TALKIE;
 
                 Frequency frequency = getFrequency(stack);
                 if (frequency == null) return false;

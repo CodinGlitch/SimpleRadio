@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;

@@ -1,16 +1,13 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.api.central;
 
 import com.codinglitch.simpleradio.core.registry.blocks.*;
-import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioRouter;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;

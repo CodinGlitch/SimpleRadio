@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.client.models;
 
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.client.core.AnimatableModel;
+import com.codinglitch.simpleradio.client.central.AnimatableModel;
 import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -16,7 +16,6 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector3f;
 
 public class RadioModel extends AnimatableModel {
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(CommonSimpleRadio.id("radiomodel"), "main");

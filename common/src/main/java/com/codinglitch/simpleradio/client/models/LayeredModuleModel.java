@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.models;
 
-import com.codinglitch.simpleradio.core.central.Module;
+import com.codinglitch.simpleradio.api.central.Module;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;

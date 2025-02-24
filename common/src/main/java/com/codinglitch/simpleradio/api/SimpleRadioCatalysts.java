@@ -1,12 +1,10 @@
-package com.codinglitch.simpleradio.core.registry;
+package com.codinglitch.simpleradio.api;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.Catalyst;
+import com.codinglitch.simpleradio.api.central.Catalyst;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
 import java.util.HashMap;
 import java.util.Map;

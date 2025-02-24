@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -19,6 +19,8 @@ public class RadioTransmitter extends RadioRouter {
 
     public int antennaPower = 0;
     public Frequency frequency;
+
+    public RadioSource.Type sourceType = RadioSource.Type.TRANSMITTER;
 
     protected RadioTransmitter(Frequency frequency, UUID id) {
         super(id);
@@ -52,8 +54,18 @@ public class RadioTransmitter extends RadioRouter {
         this.routers = (List<RadioRouter>)(List<?>) this.frequency.receivers;
     }
 
-    public void transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
+    public RadioTransmitter transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
         this.transmitCriteria = criteria;
+        return this;
+    }
+
+    public RadioTransmitter sourceType(RadioSource.Type type) {
+        this.sourceType = type;
+        return this;
+    }
+
+    public double getPower() {
+        return 10d + antennaPower;
     }
 
     @Nullable
@@ -63,12 +75,24 @@ public class RadioTransmitter extends RadioRouter {
     }
 
     @Override
-    public RadioSource prepareSource(RadioSource source, RadioRouter router) {
+    public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
+        if (destination instanceof RadioReceiver receiver) {
+            double distance = this.getLocation().distance(receiver.getLocation());
+            double cost = distance * source.getTransmissionDiminishment();
+
+            return (source.transmissionPower + receiver.getPower()) >= cost;
+        }
+
+        return super.shouldRouteTo(source, destination);
+    }
+
+    @Override
+    public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
         if (source.type == null) {
-            source.type = RadioSource.Type.TRANSMITTER;
+            source.type = this.sourceType;
             source.addPower(source.getTransmissionPower(frequency.modulation));
         }
-        return super.prepareSource(source, router);
+        return super.prepareSource(source, destination);
     }
 
     @Override

@@ -1,19 +1,11 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Receiving;
-import com.codinglitch.simpleradio.core.central.Transmitting;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
-import de.maxhenkel.voicechat.api.VoicechatConnection;
-import net.minecraft.server.level.ServerPlayer;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * A type of {@link RadioRouter} that accepts {@link RadioSource}s from its connected {@link Frequency}.
@@ -45,6 +37,10 @@ public class RadioReceiver extends RadioRouter {
     public RadioReceiver(Frequency frequency, WorldlyPosition location, UUID uuid) {
         this(frequency, uuid);
         this.location = location;
+    }
+
+    public double getPower() {
+        return 10d + antennaPower;
     }
 
     @Nullable

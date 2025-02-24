@@ -1,13 +1,9 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.api.central;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.joml.Math;
 import org.joml.Vector3f;
-import org.lwjgl.system.MathUtil;
-
-import javax.annotation.Nullable;
 
 public class WorldlyPosition extends Vector3f {
     public Level level;

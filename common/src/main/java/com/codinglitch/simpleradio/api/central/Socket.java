@@ -1,9 +1,7 @@
-package com.codinglitch.simpleradio.core.central;
+package com.codinglitch.simpleradio.api.central;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.*;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.UUID;
