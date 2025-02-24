@@ -28,7 +28,7 @@ public class SimpleRadioMenus {
             .title(Component.translatable("item_group." + CommonSimpleRadio.ID))
             .icon(() -> new ItemStack(SimpleRadioItems.TRANSCEIVER))
             .displayItems((params, output) -> {
-                SimpleRadioItems.ITEMS.entrySet().stream().filter(entry -> entry.getValue().tab.equals(RADIO_TAB_LOCATION))
+                SimpleRadioItems.ITEMS.entrySet().stream().filter(entry -> RADIO_TAB_LOCATION.equals(entry.getValue().tab))
                         .forEach(entry -> {if (entry.getValue().enabled) output.accept(entry.getValue().get());});
             })
             .build()
