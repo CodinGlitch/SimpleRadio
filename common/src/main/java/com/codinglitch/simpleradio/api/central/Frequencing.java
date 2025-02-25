@@ -173,7 +173,6 @@ public interface Frequencing {
     }
 
     default void tick(ItemStack stack, Level level) {
-        if (level.isClientSide) return;
         CompoundTag tag = stack.getOrCreateTag();
         if (!tag.contains("frequency") || tag.getString("frequency").isEmpty())
             setFrequency(stack, this.getDefaultFrequency(), this.getDefaultModulation());

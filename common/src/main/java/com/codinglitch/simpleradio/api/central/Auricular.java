@@ -23,6 +23,6 @@ public interface Auricular {
         return validate(player, clazz);
     }
     static boolean validate(Entity entity, Class<? extends Auricular> clazz) {
-        return RadioManager.verifyEntityCollection(entity, stack -> stack.getItem().getClass().isInstance(clazz));
+        return RadioManager.verifyEntityCollection(entity, stack -> clazz.isAssignableFrom(stack.getItem().getClass()));
     }
 }
