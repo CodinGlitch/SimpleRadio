@@ -46,6 +46,11 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         transmitter.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
         receiver.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
+
+        listener.link = this.getClass();
+        speaker.link = this.getClass();
+        receiver.link = this.getClass();
+        transmitter.link = this.getClass();
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
@@ -125,9 +130,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             if (currentUUID.equals(uuid)) {
                 if (validate(frequency, Frequency.modulationOf(modulation), currentUUID)) return;
             } else {
-                if (!level.isClientSide) {
-                    inactivate(level, frequency, modulation, currentUUID);
-                }
+                inactivate(level, frequency, modulation, currentUUID);
             }
         }
 

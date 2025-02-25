@@ -274,7 +274,7 @@ public class RadioRouter implements Socket {
             } else if (this instanceof RadioTransmitter) {
                 flag = Frequencing.validate(owner, Transmitting.class, null);
             } else {
-                flag = this.link != null && RadioManager.verifyEntityCollection(owner, stack -> stack.getItem().getClass().isInstance(this.link));
+                flag = this.link != null && RadioManager.verifyEntityCollection(owner, stack -> this.link.isAssignableFrom(stack.getItem().getClass()));
             }
 
             if (!flag) {
