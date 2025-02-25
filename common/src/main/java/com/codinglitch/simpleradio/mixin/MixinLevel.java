@@ -15,15 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Level.class)
 public class MixinLevel {
-
-    @Shadow @Final public boolean isClientSide;
-
     @Inject(at = @At("TAIL"), method = "close")
     private void simpleradio$close(CallbackInfo info) {
-        if (this.isClientSide) {
-            ClientRadioManager.close();
-        } else {
-            RadioManager.close();
-        }
+        RadioManager.close();
     }
 }
