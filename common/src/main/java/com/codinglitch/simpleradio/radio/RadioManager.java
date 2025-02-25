@@ -302,6 +302,8 @@ public class RadioManager {
             return false;
         }
 
+        if (entity.isRemoved()) return false;
+
         if (entity instanceof Player player) {
             return player.getInventory().hasAnyMatching(itemCriteria);
         } else if (entity instanceof ItemEntity itemEntity) {
