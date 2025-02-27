@@ -61,7 +61,7 @@ public class RadioReceiver extends RadioRouter {
 
     @Override
     public void accept(RadioSource source) {
-        CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
+        //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (source.transmissionPower <= 0) return;
 

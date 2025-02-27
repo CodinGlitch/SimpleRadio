@@ -19,16 +19,10 @@ import java.util.UUID;
  * A source containing the audio data as well as other data collected while travelling.
  */
 public class RadioSource {
-    public enum Type {
-        TRANSCEIVER,
-        WALKIE_TALKIE,
-        TRANSMITTER
-    }
-
     public UUID owner;
     public UUID originalOwner;
     public WorldlyPosition origin;
-    public ResourceLocation frequencingType;
+    public short frequencingType = -1;
 
     public byte[] data;
     public SoundEvent soundEvent;
@@ -41,7 +35,7 @@ public class RadioSource {
     public Frequency frequencyMedium;
     public Wire wireMedium;
 
-    public double transmissionPower = 50;
+    public float transmissionPower = 50;
 
     protected RadioSource() {}
 
@@ -75,9 +69,9 @@ public class RadioSource {
     }
 
     public FrequencingType getFrequencingType() {
-        FrequencingType type = FrequencingRegistry.get(this.frequencingType);
+        FrequencingType type = FrequencingRegistry.getById(this.frequencingType);
         if (type == null) {
-            CommonSimpleRadio.error("Missing frequencing type for location {}!", this.frequencingType);
+            CommonSimpleRadio.error("Missing frequencing type for id {}!", this.frequencingType);
         }
         return type;
     }
@@ -142,7 +136,7 @@ public class RadioSource {
         //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
 
         // nevermind... dont beware.... negative transmission...
-        this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionDiminishment));
+        this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (distance * transmissionDiminishment));
     }
 
     public double computeSeverity() {

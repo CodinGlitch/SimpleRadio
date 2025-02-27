@@ -9,14 +9,19 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.HashMap;
 
 public class FrequencingRegistry {
-    private static final HashMap<ResourceLocation, FrequencingType> FREQUENCING_TYPES = new HashMap<>();
+    private static short id = 0;
+    private static final HashMap<Short, FrequencingType> FREQUENCING_TYPES = new HashMap<>();
 
     public static FrequencingType get(ResourceLocation location) {
+        return FREQUENCING_TYPES.values().stream().filter(type -> type.location.equals(location)).findFirst().orElse(null);
+    }
+
+    public static FrequencingType getById(int location) {
         return FREQUENCING_TYPES.get(location);
     }
 
     public static FrequencingType fromConfig(LexiconPageData page) {
-        FrequencingType newType = new FrequencingType();
+        FrequencingType newType = new FrequencingType(id++);
 
         // why didnt i make this an optional :(
         Object receptionPower = page.getEntry("receptionPower");
@@ -46,7 +51,7 @@ public class FrequencingRegistry {
     public static FrequencingType register(ResourceLocation location, FrequencingType frequencingType) {
         frequencingType.location = location;
 
-        FREQUENCING_TYPES.put(location, frequencingType);
+        FREQUENCING_TYPES.put(frequencingType.id, frequencingType);
         return frequencingType;
     }
 }

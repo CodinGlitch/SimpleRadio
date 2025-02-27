@@ -82,8 +82,8 @@ public class RadioTransmitter extends RadioRouter {
     @Override
     public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
         if (destination instanceof RadioReceiver receiver) {
-            FrequencingType type = source.frequencingType == null ? this.frequencingType : source.getFrequencingType();
-            double transmissionPower = source.frequencingType == null ? this.getPower(this.frequency.modulation) : source.transmissionPower;
+            FrequencingType type = source.frequencingType == -1 ? this.frequencingType : source.getFrequencingType();
+            double transmissionPower = source.frequencingType == -1 ? this.getPower(this.frequency.modulation) : source.transmissionPower;
 
             double distance = this.getLocation().distance(receiver.getLocation());
             double cost = distance * type.transmissionDiminishment;
@@ -96,11 +96,11 @@ public class RadioTransmitter extends RadioRouter {
 
     @Override
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
-        if (source.frequencingType == null) {
-            source.frequencingType = this.frequencingType.location;
+        if (source.frequencingType == -1) {
+            source.frequencingType = this.frequencingType.id;
             source.addPower(getPower(frequency.modulation));
 
-            CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
+            //CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
         }
         return super.prepareSource(source, destination);
     }
