@@ -30,3 +30,9 @@ mandatory=true
 versionRange="[${minecraft_version}-${voicechat_version},)"
 ordering="AFTER"
 side="BOTH"
+[[dependencies.${mod_id}]]
+modId="lexiconfig"
+mandatory=true
+versionRange="[${lexiconfig_version},)"
+ordering="AFTER"
+side="BOTH"
