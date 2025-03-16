@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FrequencingType {
     public ResourceLocation location;
-    public final short id;
+    public short id;
 
     public int receptionPower;
     public int receptionFloor;
@@ -20,8 +20,7 @@ public class FrequencingType {
 
     public double transmissionDiminishment;
 
-    public FrequencingType(short id) {
-        this.id = id;
+    public FrequencingType() {
     }
 
     public int getTransmissionPower(Frequency.Modulation modulation) {

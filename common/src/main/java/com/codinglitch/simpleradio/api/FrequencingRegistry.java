@@ -16,12 +16,12 @@ public class FrequencingRegistry {
         return FREQUENCING_TYPES.values().stream().filter(type -> type.location.equals(location)).findFirst().orElse(null);
     }
 
-    public static FrequencingType getById(int location) {
-        return FREQUENCING_TYPES.get(location);
+    public static FrequencingType getById(short id) {
+        return FREQUENCING_TYPES.get(id);
     }
 
     public static FrequencingType fromConfig(LexiconPageData page) {
-        FrequencingType newType = new FrequencingType(id++);
+        FrequencingType newType = new FrequencingType();
 
         // why didnt i make this an optional :(
         Object receptionPower = page.getEntry("receptionPower");
@@ -50,6 +50,7 @@ public class FrequencingRegistry {
 
     public static FrequencingType register(ResourceLocation location, FrequencingType frequencingType) {
         frequencingType.location = location;
+        frequencingType.id = id++;
 
         FREQUENCING_TYPES.put(frequencingType.id, frequencingType);
         return frequencingType;
