@@ -33,9 +33,9 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer {
         if (this.isUsingItem()) {
             ItemStack stack = player.getItemInHand(player.getUsedItemHand());
             if (stack.getItem().getClass() == TransceiverItem.class) {
-                return SimpleRadioLibrary.SERVER_CONFIG.transceiver.transceiverSlow;
+                return SimpleRadioLibrary.CLIENT_CONFIG.transceiver.transceiverSlow;
             } else if (stack.getItem().getClass() == WalkieTalkieItem.class) {
-                return SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.walkieTalkieSlow;
+                return SimpleRadioLibrary.CLIENT_CONFIG.walkie_talkie.walkieTalkieSlow;
             }
         }
         return original.call(player);

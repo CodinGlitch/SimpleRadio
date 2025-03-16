@@ -68,9 +68,6 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is the range for the transceiver in which the audio played from it can be heard. Defaults to 4.")
         public Integer speakingRange = 4;
 
-        @LexiconEntry(comment = "This is whether or not using the transceiver slows the player. Defaults to true.")
-        public Boolean transceiverSlow = true;
-
         @LexiconEntry(comment = "When false, removes the transceiver recipe. Defaults to true.")
         public Boolean enabled = true;
     }
@@ -101,9 +98,6 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer listeningRange = 4;
         @LexiconEntry(comment = "This is the range for the walkie in which the audio played from it can be heard. Defaults to 4.")
         public Integer speakingRange = 4;
-
-        @LexiconEntry(comment = "This is whether or not using the walkie talkie slows the player. Defaults to true.")
-        public Boolean walkieTalkieSlow = true;
 
         @LexiconEntry(comment = "When true, replaces the walkie talkie with the spuddie talkie. Defaults to true.")
         public Boolean spuddieTalkie = true;
