@@ -144,6 +144,12 @@ public class RadioRouter implements Socket {
         return this.getLocation().distance(other.getLocation());
     }
 
+    public Vec3 getConnectionPosition() {
+        Vector3f translatedOffset = rotation == null ? connectionOffset.toVector3f() : rotation.transform(connectionOffset.toVector3f());
+
+        return new Vec3(getLocation().position()).add(translatedOffset.x, translatedOffset.y, translatedOffset.z);
+    }
+
     public WorldlyPosition getLocation() {
         if (this.location != null) {
             return this.location;
@@ -179,6 +185,8 @@ public class RadioRouter implements Socket {
                 velocity.set(0);
             }
             oldPosition.set(currentPosition);
+        } else if (owner != null) {
+            this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
     }
 

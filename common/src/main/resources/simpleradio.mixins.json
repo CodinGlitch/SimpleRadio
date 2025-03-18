@@ -15,8 +15,8 @@
   "client": [
     "MixinClientLevel",
     "MixinDebugRenderer",
+    "MixinGameRenderer",
     "MixinItemBlockRenderTypes",
-    "MixinItemInHandRenderer",
     "MixinItemRenderer",
     "MixinLocalPlayer",
     "MixinModelManager",

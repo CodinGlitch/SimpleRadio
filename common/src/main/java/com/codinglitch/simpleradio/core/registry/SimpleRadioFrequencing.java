@@ -29,5 +29,10 @@ public class SimpleRadioFrequencing {
             FrequencingRegistry.fromConfig(SimpleRadioLibrary.SERVER_CONFIG.receiver)
     );
 
+    public static FrequencingType RADIO = FrequencingRegistry.register(
+            CommonSimpleRadio.id("radio"),
+            FrequencingRegistry.fromConfig(SimpleRadioLibrary.SERVER_CONFIG.radio)
+    );
+
     public static void load() {}
 }
