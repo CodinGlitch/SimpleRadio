@@ -50,6 +50,8 @@
   "block.simpleradio.socket": "Socket",
 
   "screen.simpleradio.frequencing.catalyst": "CATALYST",
+  "screen.simpleradio.frequencing.efficiency": "EFFICIENCY: %s%%",
+  "screen.simpleradio.frequencing.antenna_strength": "ANTENNA STRENGTH:",
 
   "screen.simpleradio.radiosmither": "Radiosmithing Station",
   "screen.simpleradio.radiosmither.am": "AM",

@@ -14,13 +14,19 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Math;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 
 public class FrequencingRenderer {
+    public static final int FRAME_RATE = 12;
+
     public static void renderCatalyst(CatalyzingBlockEntity blockEntity, BlockState state, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
         Minecraft minecraft = Minecraft.getInstance();
 
@@ -64,7 +70,6 @@ public class FrequencingRenderer {
             float width = (float) (-font.width(text) / 2);
             font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
 
-            //minecraft.getItemRenderer().renderStatic(new ItemStack(Items.GILDED_BLACKSTONE), ItemDisplayContext.GUI, light, overlay, poseStack, bufferSource, blockEntity.getLevel(), 0);
             text = "✖";
             poseStack.scale(4f, 4f, 4f);
             poseStack.translate(0, -9f, 0);
@@ -75,28 +80,49 @@ public class FrequencingRenderer {
             return;
         }
 
+        float time = (level.getGameTime() + Minecraft.getInstance().getFrameTime())/20; // in SECONDS bro
+        time = Math.floor(time*FRAME_RATE)/FRAME_RATE;
+
         //--- Catalyst Display ---\\
         poseStack.pushPose();
         poseStack.translate(24f, -5f, 0f);
         poseStack.scale(10f, 10f, 0.01f);
-
-        float time = level.getGameTime() + Minecraft.getInstance().getFrameTime();
+        poseStack.mulPose(Axis.YP.rotationDegrees(time*60));
 
         minecraft.getItemRenderer().renderStatic(
                 new ItemStack(blockEntity.catalyst.associate), ItemDisplayContext.GUI, light,
-                OverlayTexture.pack((int) Math.floor((Math.sin(time * 0.2f) + 1) * 5), 15), poseStack, bufferSource, blockEntity.getLevel(), 0
+                OverlayTexture.pack((int) Math.floor((Math.sin(time * 5f) + 1) * 5), 15), poseStack, bufferSource, blockEntity.getLevel(), 0
         );
         poseStack.popPose();
 
 
+        poseStack.pushPose();
+        poseStack.translate(-28f, -4f, 0f);
+        poseStack.scale(0.4f, 0.4f, 0.4f);
+
+        String text = Component.translatable(
+                "screen.simpleradio.frequencing.efficiency",
+                100
+        ).getString();
+        font.drawInBatch(text, 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        poseStack.popPose();
+
         //--- Antenna Power Display ---\\
+
         int antennaPower = frequencing.getAntennaPower();
         String antenna = String.valueOf(frequencing.getAntennaPower());
 
         float progress = Mth.clamp(antennaPower / 100f, 0, 1);
 
         poseStack.pushPose();
-        poseStack.translate(-24 + progress*40, 12f, 0f);
+        poseStack.translate(-28f, 8f, 0f);
+        poseStack.scale(0.4f, 0.4f, 0.4f);
+
+        font.drawInBatch(I18n.get("screen.simpleradio.frequencing.antenna_strength"), 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        poseStack.translate(-23 + progress*40, 14f, 0f);
         poseStack.scale(0.5f, 0.5f, 0.5f);
 
         //antenna = String.valueOf((int) (progress * 100));
@@ -106,7 +132,7 @@ public class FrequencingRenderer {
         poseStack.popPose();
 
         poseStack.pushPose();
-        poseStack.translate(-9, 14f, 0f);
+        poseStack.translate(-8, 16f, 0f);
         poseStack.scale(0.5f, 0.5f, 0.5f);
 
         Vector3f one = poseStack.last().pose().transformPosition(new Vector3f(-40, -5, 0));
@@ -130,11 +156,10 @@ public class FrequencingRenderer {
         String frequency = frequencing.getFrequency(blockEntity).toString();
 
         poseStack.pushPose();
-        poseStack.translate(0f, -8f, 0f);
-        poseStack.scale(0.65f, 0.65f, 0.65f);
-        width = (float) -font.width(frequency);
+        poseStack.translate(-28f, -10f, 0f);
+        poseStack.scale(0.5f, 0.5f, 0.5f);
 
-        font.drawInBatch(frequency, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        font.drawInBatch(frequency, 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
         poseStack.popPose();
     }
 }
