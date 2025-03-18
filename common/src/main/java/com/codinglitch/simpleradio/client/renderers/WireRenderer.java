@@ -105,7 +105,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
                 int skyLight = (int) Mth.lerp(progress, (float)fromSkyLight, (float)toSkyLight);
                 int blockLight = (int) Mth.lerp(progress, (float)fromBlockLight, (float)toBlockLight);
 
-                int packedLight = LightTexture.pack(skyLight, blockLight);
+                int packedLight = LightTexture.pack(blockLight, skyLight);
 
                 float newTile = vOffset + ((vOffset*SEGMENTS) * progress);
 
@@ -137,11 +137,8 @@ public class WireRenderer extends EntityRenderer<Wire> {
                 RadioRouter to = ClientRadioManager.getRouter(toUUID);
                 if (to == null) return;
 
-                Vector3f fromOffset = from.rotation == null ? from.connectionOffset.toVector3f() : from.rotation.transform(from.connectionOffset.toVector3f());
-                Vector3f toOffset = to.rotation == null ? to.connectionOffset.toVector3f() : to.rotation.transform(to.connectionOffset.toVector3f());
-
-                Vec3 fromPosition = new Vec3(from.getLocation().position()).add(fromOffset.x, fromOffset.y, fromOffset.z);
-                Vec3 toPosition = new Vec3(to.getLocation().position()).add(toOffset.x, toOffset.y, toOffset.z);
+                Vec3 fromPosition = from.getConnectionPosition();
+                Vec3 toPosition = to.getConnectionPosition();
 
                 Vec3 offset = wire.getPosition(partialTick);
 
@@ -157,27 +154,40 @@ public class WireRenderer extends EntityRenderer<Wire> {
         super.render(wire, f, partialTick, poseStack, source, i);
     }
 
-    public static void renderPlayer(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick) {
+    public static void renderPlayerWorld(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick) {
+        poseStack.pushPose();
+        renderPlayer(player, source, poseStack, partialTick, false);
+        poseStack.popPose();
+    }
+    public static void renderPlayerHeld(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick) {
+        poseStack.pushPose();
+        renderPlayer(player, source, poseStack, partialTick, true);
+        poseStack.popPose();
+    }
+
+    public static void renderPlayer(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick, boolean isHeld) {
         ItemStack wire = RadioManager.isEntityHolding(player, stack -> stack.is(SimpleRadioItems.COPPER_WIRE));
         if (wire != null) {
             CompoundTag tag = wire.getOrCreateTag();
             if (tag.contains("connectTo")) {
-                BlockPos pos = BlockPos.of(tag.getLong("connectTo"));
+                RadioRouter router = ClientRadioManager.getRouter(tag.getUUID("connectTo"));
+                if (router == null) return;
 
                 ClientLevel level = player.clientLevel;
-                BlockEntity blockEntity = level.getBlockEntity(pos);
-                if (blockEntity instanceof AuditoryBlockEntity auditoryBlockEntity) {
-                    Vec3 holdPosition = player.getRopeHoldPosition(partialTick);
-                    Vec3 connectionPosition = auditoryBlockEntity.getConnectionPosition();
 
-                    Vec3 offset = connectionPosition.subtract(player.getPosition(partialTick));
-                    poseStack.pushPose();
+                Vec3 holdPosition = player.getRopeHoldPosition(partialTick);
+                Vec3 connectionPosition = router.getConnectionPosition();
 
+                Vec3 offset = player.getPosition(partialTick);
+
+                if (isHeld) {
+                    poseStack.translate(-offset.x, -offset.y - 1.75, -offset.z);
+
+                    renderWire(level, source, poseStack, holdPosition, connectionPosition, null, partialTick);
+                } else {
                     poseStack.translate(-offset.x, -offset.y, -offset.z);
 
                     renderWire(level, source, poseStack, holdPosition, connectionPosition, null, partialTick);
-
-                    poseStack.popPose();
                 }
             }
         }

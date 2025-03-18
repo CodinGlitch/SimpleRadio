@@ -40,7 +40,7 @@ public class WireItem extends Item implements WorldTicking {
 
             CompoundTag tag = stack.getOrCreateTag();
             if (tag.contains("connectTo")) {
-                BlockPos connectTo = BlockPos.of(tag.getLong("connectTo"));
+                BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
 
                 BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
                 if (connectToBlockEntity instanceof Socket socket) {
@@ -53,11 +53,13 @@ public class WireItem extends Item implements WorldTicking {
                     }
 
                     tag.remove("connectTo");
+                    tag.remove("connectToPos");
 
                     return InteractionResult.SUCCESS;
                 }
             } else {
-                tag.putLong("connectTo", blockEntity.getBlockPos().asLong());
+                tag.putUUID("connectTo", interactingSocket.getID());
+                tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
 
                 level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 1.1f);
             }
