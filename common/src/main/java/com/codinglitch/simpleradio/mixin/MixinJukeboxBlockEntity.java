@@ -40,7 +40,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
                     serverLevel,
                     getBlockPos().getCenter(),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
-                    1, 1, 12
+                    1, 1, this.getBlockPos().asLong()
             );
         }
     }
@@ -52,7 +52,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
                     serverLevel,
                     getBlockPos().getCenter(),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY),
-                    0, 1, 12
+                    0, 1, this.getBlockPos().asLong()
             );
         }
     }
@@ -74,7 +74,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
                     serverLevel,
                     getBlockPos().getCenter(),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
-                    1, 1,  offset, 12
+                    1, 1,  offset, this.getBlockPos().asLong()
             );
         }
     }
