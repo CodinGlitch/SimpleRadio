@@ -10,6 +10,7 @@ import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.LightTexture;
@@ -154,18 +155,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
         super.render(wire, f, partialTick, poseStack, source, i);
     }
 
-    public static void renderPlayerWorld(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick) {
-        poseStack.pushPose();
-        renderPlayer(player, source, poseStack, partialTick, false);
-        poseStack.popPose();
-    }
-    public static void renderPlayerHeld(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick) {
-        poseStack.pushPose();
-        renderPlayer(player, source, poseStack, partialTick, true);
-        poseStack.popPose();
-    }
-
-    public static void renderPlayer(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick, boolean isHeld) {
+    public static void renderPlayer(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick, @Nullable Camera camera) {
         ItemStack wire = RadioManager.isEntityHolding(player, stack -> stack.is(SimpleRadioItems.COPPER_WIRE));
         if (wire != null) {
             CompoundTag tag = wire.getOrCreateTag();
@@ -180,8 +170,10 @@ public class WireRenderer extends EntityRenderer<Wire> {
 
                 Vec3 offset = player.getPosition(partialTick);
 
-                if (isHeld) {
-                    poseStack.translate(-offset.x, -offset.y - 1.75, -offset.z);
+                poseStack.pushPose();
+                if (camera != null) {
+                    Vec3 cameraPos = camera.getPosition();
+                    poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
                     renderWire(level, source, poseStack, holdPosition, connectionPosition, null, partialTick);
                 } else {
@@ -189,6 +181,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
 
                     renderWire(level, source, poseStack, holdPosition, connectionPosition, null, partialTick);
                 }
+                poseStack.popPose();
             }
         }
     }
