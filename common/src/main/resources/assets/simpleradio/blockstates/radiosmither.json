@@ -1,5 +1,19 @@
 {
   "variants": {
-    "": { "model": "simpleradio:block/radiosmither" }
+    "facing=east": {
+      "model": "simpleradio:block/radiosmither",
+      "y": 180
+    },
+    "facing=north": {
+      "model": "simpleradio:block/radiosmither",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "simpleradio:block/radiosmither",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "simpleradio:block/radiosmither"
+    }
   }
 }
