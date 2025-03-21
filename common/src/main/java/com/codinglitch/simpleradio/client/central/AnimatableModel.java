@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client.central;
 
-import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
+import com.codinglitch.simpleradio.client.models.RadioModel;
+import com.codinglitch.simpleradio.core.central.Animatable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.animation.AnimationDefinition;
@@ -11,10 +12,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.AnimationState;
 import org.joml.Vector3f;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 public abstract class AnimatableModel extends Model {
+    protected final Map<Integer, AnimationDefinition> animations = new HashMap<>();
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 
     public AnimatableModel(Function<ResourceLocation, RenderType> function) {
@@ -31,14 +33,27 @@ public abstract class AnimatableModel extends Model {
         });
     }
 
-    protected void animate(AnimationState animationState, AnimationDefinition animationDefinition, float age, float speed) {
-        animationState.updateTime(age, speed);
-        animationState.ifStarted((p_233392_) -> {
-            ModelAnimations.animate(this, animationDefinition, p_233392_.getAccumulatedTime(), 1.0F, ANIMATION_VECTOR_CACHE);
+    protected void animate(AnimationState animationState, AnimationDefinition animationDefinition, float age) {
+        animationState.updateTime(age, 20f);
+        animationState.ifStarted((state) -> {
+            ModelAnimations.animate(this, animationDefinition, state.getAccumulatedTime(), 1.0F, ANIMATION_VECTOR_CACHE);
         });
     }
 
-    public abstract void setupAnim(RadioBlockEntity blockEntity, float ageInTicks);
+    public void setupAnim(Animatable animatable, float ageInTicks) {
+        this.root().getAllParts().forEach(ModelPart::resetPose);
+
+        for (Map.Entry<Integer, AnimationDefinition> entry : animations.entrySet()) {
+            AnimationInstance instance = animatable.getAnim(entry.getKey());
+            AnimationDefinition animation = entry.getValue();
+
+            animate(instance, animation, ageInTicks);
+        }
+    }
+
+    public void allocate(int id, AnimationDefinition definition) {
+        animations.put(id, definition);
+    }
 
     @Override
     public abstract void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, float v, float v1, float v2, float v3);

@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -22,7 +23,7 @@ public class RadioRenderer implements BlockEntityRenderer<RadioBlockEntity> {
 
     @Override
     public void render(RadioBlockEntity blockEntity, float tickDelta, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
-        float time = blockEntity.time + (tickDelta/20f);
+        float time = blockEntity.time + tickDelta/20f;
 
         this.model.setupAnim(blockEntity, time);
 

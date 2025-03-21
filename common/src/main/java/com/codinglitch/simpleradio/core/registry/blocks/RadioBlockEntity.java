@@ -1,8 +1,11 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Receiving;
 import com.codinglitch.simpleradio.api.central.Speaking;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.client.central.AnimationInstance;
+import com.codinglitch.simpleradio.core.central.Animatable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -15,18 +18,34 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking {
+import java.util.HashMap;
+import java.util.Map;
+
+public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking, Animatable {
     public boolean isActive = false;
     public int antennaPower = 0;
+
+    private final Map<Integer, AnimationInstance> animations = new HashMap<>();
     public float time = 0;
-
-
-    public int playingTime = 0;
-
-    public final AnimationState playingAnimationState = new AnimationState();
+    public static final int PLAYING = 0;
 
     public RadioBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.RADIO, pos, state);
+
+        allocate(PLAYING);
+    }
+
+    @Override
+    public Map<Integer, AnimationInstance> getStates() {
+        return animations;
+    }
+    @Override
+    public float getTime() {
+        return time;
+    }
+    @Override
+    public void setTime(float time) {
+        this.time = time;
     }
 
     @Override
@@ -74,17 +93,11 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
         }
 
         if (level.isClientSide) {
-            blockEntity.playingAnimationState.ifStarted(state -> state.start((int) blockEntity.time));
+            //blockEntity.playingAnimationState.ifStarted(state -> state.start((int) blockEntity.time));
 
             blockEntity.time += 0.05f;
         } else {
-            if (blockEntity.playingTime > 0) {
-                blockEntity.playingTime--;
-            } else if (blockEntity.playingTime == 0) {
-                blockEntity.playingTime = -1;
 
-                //TODO: update players of radio state
-            }
         }
     }
 

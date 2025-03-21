@@ -54,6 +54,8 @@ public class RadioModel extends AnimatableModel {
 		super(RenderType::entityCutoutNoCull);
 		this.root = root;
 		this.bone = root.getChild("bone");
+
+		allocate(RadioBlockEntity.PLAYING, RadioModel.RADIO_PLAYING);
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -69,12 +71,6 @@ public class RadioModel extends AnimatableModel {
 		PartDefinition cube_r2 = bone.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 20).addBox(-0.5F, -5.0F, 0.0F, 1.0F, 5.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(1.3997F, -4.005F, 0.0F, 0.0F, 0.3491F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 32, 32);
-	}
-
-	public void setupAnim(RadioBlockEntity blockEntity, float ageInTicks) {
-		this.root().getAllParts().forEach(ModelPart::resetPose);
-
-		this.animate(blockEntity.playingAnimationState, RadioModel.RADIO_PLAYING, ageInTicks, 20F);
 	}
 
 	@Override
