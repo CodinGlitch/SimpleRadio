@@ -32,6 +32,17 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
 
         transmitter.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
         receiver.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
+
+        listener.link = this.getClass();
+        speaker.link = this.getClass();
+        receiver.link = this.getClass();
+        transmitter.link = this.getClass();
+
+        // --- Half-duplex implementation
+
+        receiver.receiveCriteria(((source, radioRouter) -> {
+            return true;
+        }));
     }
 
     @Override
