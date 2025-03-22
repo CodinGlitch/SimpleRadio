@@ -156,6 +156,9 @@ public class RadioManager {
         return listeners.stream().filter(listener -> id.equals(listener.id))
                 .findFirst().orElse(null);
     }
+    public static Optional<RadioListener> tryGetListener(UUID id) {
+        return listeners.stream().filter(listener -> id.equals(listener.id)).findFirst();
+    }
 
     public static RadioListener getOrCreateListener(Entity owner, @Nullable UUID id) {
         boolean isClient = owner.level().isClientSide;

@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.radio.*;
@@ -11,6 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
@@ -40,7 +42,22 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
 
         // --- Half-duplex implementation
 
-        receiver.receiveCriteria(((source, radioRouter) -> {
+        receiver.receiveCriteria(((source) -> {
+            Entity entity = receiver.owner;
+            Frequency frequency = receiver.getFrequency();
+            if (frequency == null) return false;
+
+            if (entity instanceof Player player) {
+                ItemStack using = player.getUseItem();
+
+                CompoundTag usingTag = using.getOrCreateTag();
+                if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return true;
+
+                if (!(using.getItem() instanceof TransceiverItem)) return true;
+                if (!usingTag.getString("frequency").equals(frequency.frequency)) return true;
+                return !usingTag.getString("modulation").equals(frequency.modulation.shorthand);
+            }
+
             return true;
         }));
     }

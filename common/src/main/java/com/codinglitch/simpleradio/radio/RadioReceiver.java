@@ -8,7 +8,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * A type of {@link RadioRouter} that accepts {@link RadioSource}s from its connected {@link Frequency}.
@@ -16,6 +19,8 @@ import java.util.UUID;
  * <b>Does route further.</b>
  */
 public class RadioReceiver extends RadioRouter {
+    public Predicate<RadioSource> receiveCriteria;
+
     public int antennaPower = 0;
     public Frequency frequency;
 
@@ -23,7 +28,7 @@ public class RadioReceiver extends RadioRouter {
 
     protected RadioReceiver(Frequency frequency, UUID id) {
         super(id);
-        this.frequency = frequency;
+        this.setFrequency(frequency);
     }
     protected RadioReceiver(Frequency frequency) {
         this(frequency, UUID.randomUUID());
@@ -42,6 +47,19 @@ public class RadioReceiver extends RadioRouter {
     public RadioReceiver(Frequency frequency, WorldlyPosition location, UUID uuid) {
         this(frequency, uuid);
         this.location = location;
+    }
+
+    public void setFrequency(Frequency frequency) {
+        if (this.frequency != null) {
+            this.frequency.removeReceiver(this);
+        }
+
+        this.frequency = frequency;
+    }
+
+    public RadioReceiver receiveCriteria(Predicate<RadioSource> criteria) {
+        this.receiveCriteria = criteria;
+        return this;
     }
 
     public RadioReceiver frequencingType(FrequencingType type) {
@@ -64,6 +82,7 @@ public class RadioReceiver extends RadioRouter {
         //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (source.transmissionPower <= 0) return;
+        if (receiveCriteria != null && !receiveCriteria.test(source)) return;
 
         //super.accept(source);
         this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));
