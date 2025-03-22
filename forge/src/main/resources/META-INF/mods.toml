@@ -36,3 +36,9 @@ mandatory=true
 versionRange="[${lexiconfig_version},)"
 ordering="AFTER"
 side="BOTH"
+[[dependencies.${mod_id}]]
+modId="create"
+mandatory=true
+versionRange="[${create_version},)"
+ordering="AFTER"
+side="BOTH"

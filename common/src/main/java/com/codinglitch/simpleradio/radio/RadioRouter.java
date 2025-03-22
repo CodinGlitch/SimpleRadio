@@ -170,11 +170,17 @@ public class RadioRouter implements Socket {
         return routers.stream().filter(router -> router.id.equals(id)).findFirst().orElse(null);
     }
 
+    //this method is so dumb bro
     public void updateLocation(WorldlyPosition location) {
+    }
+
+    public void updateRotation(Quaternionf rotation) {
+        this.rotation = rotation;
     }
 
     public void tick(int tickCount) {
         if (location != null) {
+            this.updateRotation(Services.COMPAT.modifyRotation(location, rotation));
             Services.COMPAT.modifyPosition(location);
             this.updateLocation(location);
 

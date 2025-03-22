@@ -10,6 +10,7 @@ import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Quaternionf;
 
 import java.util.function.Predicate;
 
@@ -28,6 +29,17 @@ public class ForgeCompatPlatform implements CompatPlatform {
         }
 
         return position;
+    }
+
+    @Override
+    public Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+
+        // ---- Valkyrien Skies ---- \\
+        if (CompatCore.VALKYRIEN_SKIES) {
+            return ValkyrienCompat.modifyRotation(position, rotation);
+        }
+
+        return rotation;
     }
 
     @Override

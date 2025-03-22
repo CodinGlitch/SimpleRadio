@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.compat;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.core.BlockPos;
 import org.joml.Matrix4dc;
+import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 
@@ -21,6 +22,15 @@ public class CommonValkyrienCompat {
         }
 
         return position;
+    }
+
+    public static Quaternionf modifyRotation(Ship ship, Quaternionf rotation) {
+        if (ship != null) {
+            Matrix4dc shipToWorld = ship.getTransform().getShipToWorld();
+            rotation = new Quaternionf(shipToWorld.getNormalizedRotation(new Quaternionf()));
+        }
+
+        return rotation;
     }
 
     /*public static Vector3f modifyPosition(Ship ship, BlockPos originalBlockPos) {
