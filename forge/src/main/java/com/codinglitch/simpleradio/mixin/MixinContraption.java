@@ -27,19 +27,9 @@ public abstract class MixinContraption {
 
     @Shadow protected Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks;
 
+    // this only runs on the server but it's kinda fine because the routers are re-created in the contraption
     @Inject(method = "addBlock", at = @At("TAIL"), remap = false)
-    private void simpleradio$addBlock(BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
+    private void simpleradio$addBlock(Level level, BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
         CreateCompat.contraptionAddBlock((Contraption) (Object) this, pos, pair.getValue(), pair.getKey());
-    }
-
-    @Inject(method = "addBlocksToWorld", at = @At("TAIL"), remap = false)
-    private void simpleradio$addBlocksToWorld(Level level, StructureTransform transform, CallbackInfo ci) {
-        for (StructureTemplate.StructureBlockInfo blockInfo : this.blocks.values()) {
-            BlockPos pos = transform.apply(blockInfo.pos());
-            BlockState state = transform.apply(blockInfo.state());
-
-            if (blockInfo.nbt() != null)
-                CreateCompat.contraptionRemoveBlock((Contraption) (Object) this, level, pos, state, blockInfo.nbt());
-        }
     }
 }

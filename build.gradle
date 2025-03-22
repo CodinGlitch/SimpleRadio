@@ -6,7 +6,7 @@ plugins {
 subprojects {
     apply plugin: 'java'
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
     java.withJavadocJar()
         
@@ -88,7 +88,7 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = 'UTF-8'
-        it.options.getRelease().set(21)
+        it.options.getRelease().set(17)
     }
 
     processResources {
@@ -117,6 +117,7 @@ subprojects {
                 "night_config_version": night_config_version,
                 "lexiconfig_version": lexiconfig_version,
                 "vibrative_voice_version": vibrative_voice_version,
+                "create_version": create_version,
                 "name_template": name_template,
                 "modrinth_id": modrinth_id,
                 "curseforge_id": curseforge_id,

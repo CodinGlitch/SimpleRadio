@@ -4,13 +4,11 @@ import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.Routing;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.*;
-import com.jozufozu.flywheel.api.MaterialManager;
-import com.jozufozu.flywheel.core.virtual.VirtualRenderWorld;
+import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
-import com.simibubi.create.content.contraptions.behaviour.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
-import com.simibubi.create.content.contraptions.render.ActorInstance;
 import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
+import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -108,17 +106,4 @@ public class CentralMovementBehaviour implements MovementBehaviour {
 
         update(context);
     }
-
-    @Override
-    public boolean renderAsNormalBlockEntity() {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public ActorInstance createInstance(MaterialManager materialManager, VirtualRenderWorld simulationWorld, MovementContext context) {
-        return MovementBehaviour.super.createInstance(materialManager, simulationWorld, context);
-    }
-
-
 }

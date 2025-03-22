@@ -1,12 +1,14 @@
 package com.codinglitch.simpleradio.compat.create;
 
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
 import com.simibubi.create.AllMovementBehaviours;
+import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import net.minecraft.core.BlockPos;
@@ -40,28 +42,40 @@ public class CreateCompat {
     }
 
     public static void contraptionRemoveBlock(Contraption contraption, Level level, BlockPos pos, BlockState state, CompoundTag tag) {
-        if (level.isClientSide) return;
-
         if (tag.contains("uuid")) {
             UUID uuid = tag.getUUID("uuid");
 
-            resetRouter(RadioRouter.getRouterFromReceivers(uuid), pos, level);
-            resetRouter(RadioRouter.getRouterFromTransmitters(uuid), pos, level);
+            if (level.isClientSide) {
+                resetRouter(ClientRadioManager.getReceiver(uuid), pos, level);
+                resetRouter(ClientRadioManager.getTransmitter(uuid), pos, level);
 
-            resetRouter(RadioManager.getListener(uuid), pos, level);
-            resetRouter(RadioManager.getSpeaker(uuid), pos, level);
+                resetRouter(ClientRadioManager.getListener(uuid), pos, level);
+                resetRouter(ClientRadioManager.getSpeaker(uuid), pos, level);
 
-            resetRouter(RadioRouter.getRouterFromUUID(uuid, null), pos, level);
+                // might be problematic
+                resetRouter(ClientRadioManager.getRouter(router -> {
+                    return uuid.equals(router.getID()) && router.getClass() == RadioRouter.class;
+                }), pos, level);
+            } else {
+                resetRouter(RadioRouter.getRouterFromReceivers(uuid), pos, level);
+                resetRouter(RadioRouter.getRouterFromTransmitters(uuid), pos, level);
+
+                resetRouter(RadioManager.getListener(uuid), pos, level);
+                resetRouter(RadioManager.getSpeaker(uuid), pos, level);
+
+                resetRouter(RadioRouter.getRouterFromUUID(uuid, null), pos, level);
+            }
+
         }
     }
 
     public static void registerMovementBehaviours() {
-        AllMovementBehaviours.registerBehaviour(SimpleRadioBlocks.RADIO, new CentralMovementBehaviour());
-        AllMovementBehaviours.registerBehaviour(SimpleRadioBlocks.SPEAKER, new CentralMovementBehaviour());
-        AllMovementBehaviours.registerBehaviour(SimpleRadioBlocks.MICROPHONE, new CentralMovementBehaviour());
-        AllMovementBehaviours.registerBehaviour(SimpleRadioBlocks.RECEIVER, new CentralMovementBehaviour());
-        AllMovementBehaviours.registerBehaviour(SimpleRadioBlocks.TRANSMITTER, new CentralMovementBehaviour());
-        AllMovementBehaviours.registerBehaviour(SimpleRadioBlocks.SOCKET, new CentralMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.RADIO, new CentralMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.SPEAKER, new CentralMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.MICROPHONE, new CentralMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.RECEIVER, new CentralMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.TRANSMITTER, new CentralMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.SOCKET, new CentralMovementBehaviour());
     }
 
     public static RadioManager.CollectionResult verifyContraptionCollection(Entity entity) {
