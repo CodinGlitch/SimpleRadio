@@ -104,16 +104,21 @@ public class WireRenderer extends EntityRenderer<Wire> {
 
             if (lastTopLeft != null) {
                 int skyLight = (int) Mth.lerp(progress, (float)fromSkyLight, (float)toSkyLight);
-                int blockLight = (int) Mth.lerp(progress, (float)fromBlockLight, (float)toBlockLight);
-
-                int packedLight = LightTexture.pack(blockLight, skyLight);
+                int blockLight = (int) Mth.lerp(
+                        Math.clamp(0, 1, effector),
+                        Mth.lerp(progress, (float)fromBlockLight, (float)toBlockLight),
+                        15f
+                );
 
                 float newTile = vOffset + ((vOffset*SEGMENTS) * progress);
 
-                buildQuad(consumer, matrix, effector, packedLight, up.normalize(), vOffset, newTile, lastTopRight, topRight, topLeft, lastTopLeft);
-                buildQuad(consumer, matrix, effector, packedLight, side.normalize(), vOffset, newTile, lastBottomRight, bottomRight, topRight, lastTopRight);
-                buildQuad(consumer, matrix, effector, packedLight, down.normalize(), vOffset, newTile, lastBottomLeft, bottomLeft, bottomRight, lastBottomRight);
-                buildQuad(consumer, matrix, effector, packedLight, otherSide.normalize(), vOffset, newTile, lastTopLeft, topLeft, bottomLeft, lastBottomLeft);
+                int overlay = Math.clamp(0, 10, Math.round(effector*5));
+                int packedLight = LightTexture.pack(blockLight, skyLight);
+
+                buildQuad(consumer, matrix, overlay, packedLight, up.normalize(), vOffset, newTile, lastTopRight, topRight, topLeft, lastTopLeft);
+                buildQuad(consumer, matrix, overlay, packedLight, side.normalize(), vOffset, newTile, lastBottomRight, bottomRight, topRight, lastTopRight);
+                buildQuad(consumer, matrix, overlay, packedLight, down.normalize(), vOffset, newTile, lastBottomLeft, bottomLeft, bottomRight, lastBottomRight);
+                buildQuad(consumer, matrix, overlay, packedLight, otherSide.normalize(), vOffset, newTile, lastTopLeft, topLeft, bottomLeft, lastBottomLeft);
             }
 
             lastTopLeft = topLeft;
@@ -186,9 +191,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
         }
     }
 
-    public static void buildQuad(VertexConsumer consumer, Matrix4f matrix, float effect, int packedLight, Vec3 normal, float offset, float tile, Vec3 one, Vec3 two, Vec3 three, Vec3 four) {
-        int overlay = Math.clamp(0, 15, Math.round(effect*10));
-
+    public static void buildQuad(VertexConsumer consumer, Matrix4f matrix, int overlay, int packedLight, Vec3 normal, float offset, float tile, Vec3 one, Vec3 two, Vec3 three, Vec3 four) {
         consumer.vertex(matrix, (float) one.x, (float) one.y, (float) one.z).color(1f, 1f, 1f, 1f).uv(0.51f, tile)
                 .overlayCoords(OverlayTexture.pack(overlay, 15)).uv2(packedLight).normal((float) normal.x, (float) normal.y, (float) normal.z).endVertex();
         consumer.vertex(matrix, (float) two.x, (float) two.y, (float) two.z).color(1f, 1f, 1f, 1f).uv(0.51f, offset + tile)
