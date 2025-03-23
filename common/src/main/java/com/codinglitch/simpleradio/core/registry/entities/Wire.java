@@ -120,6 +120,8 @@ public class Wire extends Entity implements Medium {
      * @param originSocket The {@link Socket} the source came from
      */
     public void relay(RadioSource source, Socket originSocket) {
+        if (!this.isAlive()) return;
+
         UUID fromID = this.getFrom().orElse(null);
         UUID toID = this.getTo().orElse(null);
 
@@ -154,6 +156,7 @@ public class Wire extends Entity implements Medium {
         if (source instanceof RadioHeader header) {
             if (header.willShort(this)) {
                 originSocket.shortCircuit();
+                return;
             } else {
                 header.visit(this);
             }
@@ -217,6 +220,7 @@ public class Wire extends Entity implements Medium {
     }
 
     public void shortCircuit() {
+        RadioManager.dequeueSource(queuedSource -> queuedSource.source.wireMedium == this);
         this.kill();
     }
 

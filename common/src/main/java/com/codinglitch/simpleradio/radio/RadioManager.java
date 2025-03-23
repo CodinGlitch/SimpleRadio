@@ -32,7 +32,7 @@ public class RadioManager {
     // double queue for the win
     private static final ArrayList<QueuedSource> pendingSources = new ArrayList<>();
     private static final ArrayList<QueuedSource> sourceQueue = new ArrayList<>();
-    private static class QueuedSource {
+    public static class QueuedSource {
 
 
         public RadioSource source;
@@ -248,15 +248,21 @@ public class RadioManager {
         sourceQueue.addAll(pendingSources);
         pendingSources.clear();
 
+        // i must be stupid
+        List<QueuedSource> acceptedSources = new ArrayList<>();
         Iterator<QueuedSource> iterator = sourceQueue.iterator();
         while (iterator.hasNext()) {
             QueuedSource source = iterator.next();
             source.time--;
 
             if (source.time <= 0) {
-                source.router.accept(source.source);
+                acceptedSources.add(source);
                 iterator.remove();
             }
+        }
+
+        for (QueuedSource source : acceptedSources) {
+            source.router.accept(source.source);
         }
     }
 
@@ -270,6 +276,10 @@ public class RadioManager {
 
     public static void queueSource(RadioSource source, RadioRouter destination, int delay) {
         pendingSources.add(new QueuedSource(source, destination, delay));
+    }
+    public static void dequeueSource(Predicate<QueuedSource> criteria) {
+        pendingSources.removeIf(criteria);
+        sourceQueue.removeIf(criteria);
     }
 
     public enum CollectionResult {
