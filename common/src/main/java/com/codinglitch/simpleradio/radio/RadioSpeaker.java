@@ -30,7 +30,8 @@ import java.util.function.Supplier;
  */
 public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
-    public AudioChannel audioChannel;
+    // migrated to locational audio channels only due to alternatives not having range property
+    public LocationalAudioChannel audioChannel;
     public AudioPlayer audioPlayer;
     private final Map<UUID, Map<UUID, Queue<short[]>>> packetBuffer;
     private final Map<UUID, OpusDecoder> decoders;
@@ -112,8 +113,9 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
     @Override
     public void updateLocation(WorldlyPosition location) {
         super.updateLocation(location);
-        if (this.audioChannel instanceof LocationalAudioChannel locationalAudioChannel) {
-            locationalAudioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x, location.y, location.z));
+
+        if (audioChannel != null) {
+            audioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x, location.y, location.z));
         }
     }
 
@@ -250,22 +252,14 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
     private AudioPlayer getAudioPlayer() {
         if (this.audioPlayer == null) {
-            if (this.location != null) {
-                LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.id,
-                        CommonRadioPlugin.serverApi.fromServerLevel(location.level),
-                        CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
-                );
-                locationalChannel.setDistance(range);
-                locationalChannel.setCategory(category);
 
-                this.audioChannel = locationalChannel;
-            } else {
-                this.audioChannel = CommonRadioPlugin.serverApi.createEntityAudioChannel(
-                        this.id,
-                        CommonRadioPlugin.serverApi.fromEntity(this.owner)
-                );
-                audioChannel.setCategory(category);
-            }
+            WorldlyPosition location = this.getLocation();
+            this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.id,
+                    CommonRadioPlugin.serverApi.fromServerLevel(location.level),
+                    CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
+            );
+            audioChannel.setDistance(range);
+            audioChannel.setCategory(category);
 
             this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this);
         }

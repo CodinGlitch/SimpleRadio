@@ -181,8 +181,7 @@ public class RadioRouter implements Socket {
     public void tick(int tickCount) {
         if (location != null) {
             this.updateRotation(Services.COMPAT.modifyRotation(location, rotation));
-            Services.COMPAT.modifyPosition(location);
-            this.updateLocation(location);
+            this.updateLocation(Services.COMPAT.modifyPosition(location));
 
             Vector3f currentPosition = location.position();
             if (currentPosition != oldPosition) {
