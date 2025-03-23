@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -62,6 +63,9 @@ public class ClientRadioManager {
 
     public static ClientRouterWrapper getWrapper(UUID uuid) {
         return routers.stream().filter(wrapper -> wrapper.router.id.equals(uuid)).findFirst().orElse(null);
+    }
+    public static ClientRouterWrapper getWrapper(RadioRouter router) {
+        return routers.stream().filter(wrapper -> wrapper.router.equals(router)).findFirst().orElse(null);
     }
 
     public static RadioRouter getRouter(UUID uuid) {
@@ -150,8 +154,14 @@ public class ClientRadioManager {
             garbageCollect();
         }
 
-        for (RadioRouter router : getRouters()) {
-            router.tick(0);
+        for (ClientRouterWrapper router : routers) {
+            router.router.tick(0);
+
+            for (Map.Entry<Long, ChannelHandleWrapper> entry : router.audioChannels.entrySet()) {
+                entry.getValue().execute(channel -> {
+                    channel.setSelfPosition(new Vec3(router.router.getLocation().position()));
+                });
+            }
         }
     }
 
@@ -182,7 +192,7 @@ public class ClientRadioManager {
                 if (packet.sound().value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume() == 0) {
                     existingChannelHandle.execute(Channel::stop);
                 } else {
-                    if (true) return;
+                    //if (true) return;
 
                     existingChannelHandle.effect.severity = packet.severity();
                     existingChannelHandle.effect.volume = packet.volume();
