@@ -36,7 +36,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void transmit(ServerPlayer player, boolean started) {
-        Services.NETWORKING.sendToPlayer(player, new ClientboundTransceiverPacket(started, player.getUUID(), this.getClass().getName()));
+        //Services.NETWORKING.sendToPlayer(player, new ClientboundTransceiverPacket(started, player.getUUID(), this.getClass().getName()));
     }
 
     protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
@@ -169,7 +169,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         );
         player.startUsingItem(hand);
 
-        // Send started using packet
+        // Send time using packet
         if (!level.isClientSide) {
             transmit((ServerPlayer) player, true);
         }

@@ -4,10 +4,7 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.CatalystRegistry;
 import com.codinglitch.simpleradio.api.FrequencingRegistry;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
+import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,6 +44,8 @@ public class FabricLoader {
     }
 
     public static void loadClientPackets() {
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundReceiverPacket.ID,
+                clientbound(ClientboundReceiverPacket::decode, ClientboundReceiverPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundTransceiverPacket.ID,
                 clientbound(ClientboundTransceiverPacket::decode, ClientboundTransceiverPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundWireEffectPacket.ID,

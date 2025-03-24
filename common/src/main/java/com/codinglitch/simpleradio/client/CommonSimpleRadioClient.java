@@ -6,12 +6,14 @@ import com.codinglitch.simpleradio.client.renderers.*;
 import com.codinglitch.simpleradio.client.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.platform.ClientServices;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -32,15 +34,25 @@ public class CommonSimpleRadioClient {
     public static final Map<UUID, Boolean> isTransmitting = new HashMap<>();
     public static void loadProperties(TriConsumer<Item, ResourceLocation, ClampedItemPropertyFunction> registry) {
         registry.accept(SimpleRadioItems.TRANSCEIVER, new ResourceLocation("using"),
-                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
 
         registry.accept(SimpleRadioItems.TRANSCEIVER, new ResourceLocation("speaking"),
-                (stack, level, entity, i) -> entity != null && isTransmitting.containsValue(true) ? 1.0f : 0.0f);
+            (stack, level, entity, i) -> {
+                CompoundTag tag = stack.getOrCreateTag();
+                if (!tag.contains("user")) return 0;
+
+                UUID uuid = tag.getUUID("user");
+                RadioReceiver receiver = ClientRadioManager.getReceiver(uuid);
+                if (receiver == null) return 0;
+
+                return receiver.receivingTime > 0 ? 1 : 0;
+            }
+        );
 
         registry.accept(SimpleRadioItems.WALKIE_TALKIE, new ResourceLocation("using"),
-                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
         registry.accept(SimpleRadioItems.SPUDDIE_TALKIE, new ResourceLocation("using"),
-                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
     }
 
     // -- Render Types -- \\

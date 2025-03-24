@@ -3,10 +3,7 @@ package com.codinglitch.simpleradio.core;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.CatalystRegistry;
 import com.codinglitch.simpleradio.api.FrequencingRegistry;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
+import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
@@ -86,6 +83,8 @@ public class ForgeLoader {
         CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index++).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
                 .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle)).add();
 
+        CHANNEL.messageBuilder(ClientboundReceiverPacket.class, index++).decoder(ClientboundReceiverPacket::decode).encoder(ClientboundReceiverPacket::encode)
+                .consumerMainThread(clientbound(ClientboundReceiverPacket::handle)).add();
         CHANNEL.messageBuilder(ClientboundTransceiverPacket.class, index++).decoder(ClientboundTransceiverPacket::decode).encoder(ClientboundTransceiverPacket::encode)
                 .consumerMainThread(clientbound(ClientboundTransceiverPacket::handle)).add();
         CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index++).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)

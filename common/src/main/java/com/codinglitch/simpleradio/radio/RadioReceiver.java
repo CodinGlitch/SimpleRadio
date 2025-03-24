@@ -1,16 +1,16 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import net.minecraft.resources.ResourceLocation;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundReceiverPacket;
+import com.codinglitch.simpleradio.platform.Services;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -23,6 +23,8 @@ public class RadioReceiver extends RadioRouter {
 
     public int antennaPower = 0;
     public Frequency frequency;
+
+    public int receivingTime = 0;
 
     public FrequencingType frequencingType;
 
@@ -71,6 +73,13 @@ public class RadioReceiver extends RadioRouter {
         return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
+    @Override
+    public void tick(int tickCount) {
+        super.tick(tickCount);
+
+        if (receivingTime > 0) receivingTime--;
+    }
+
     @Nullable
     @Override
     public Frequency getFrequency() {
@@ -83,6 +92,20 @@ public class RadioReceiver extends RadioRouter {
 
         if (source.transmissionPower <= 0) return;
         if (receiveCriteria != null && !receiveCriteria.test(source)) return;
+
+        if (receivingTime == 0) {
+            this.receivingTime = 20; //TODO: make configurable and maybe just better 💀
+
+            WorldlyPosition location = getLocation();
+            if (!location.isClientSide()) {
+                for (Player player : location.level.players()) {
+                    if (location.distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
+                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundReceiverPacket(20, this.getID()));
+                    }
+                }
+            }
+        }
+
 
         //super.accept(source);
         this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));
