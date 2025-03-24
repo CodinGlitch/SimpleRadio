@@ -102,7 +102,7 @@ public class FrequencingRenderer {
 
         String text = Component.translatable(
                 "screen.simpleradio.frequencing.efficiency",
-                100
+                Math.round(blockEntity.catalyst.efficiency*100)
         ).getString();
         font.drawInBatch(text, 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
         poseStack.popPose();

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class SimpleRadioCatalysts {
     public static Catalyst GILDED_BLACKSTONE = CatalystRegistry.register(CommonSimpleRadio.id("catalyst/gilded_blackstone"),
-            new Catalyst(Items.GILDED_BLACKSTONE)
+            new Catalyst(Items.GILDED_BLACKSTONE).setEfficiency(0.65f)
     );
 
     public static void load() {}
