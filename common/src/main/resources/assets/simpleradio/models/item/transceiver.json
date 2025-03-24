@@ -1,25 +1,32 @@
 {
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "simpleradio:item/transceiver"
-  },
+  "parent": "simpleradio:item/transceiver/transceiver_in_hand",
   "overrides": [
     {
       "predicate": {
         "using": 1
       },
-      "model": "simpleradio:item/using_transceiver"
+      "model": "simpleradio:item/transceiver/using_transceiver_in_hand"
     }, {
       "predicate": {
         "speaking": 1
       },
-      "model": "simpleradio:item/speaking_transceiver"
+      "model": "simpleradio:item/transceiver/glowing_transceiver_in_hand"
     }, {
       "predicate": {
         "using": 1,
         "speaking": 1
       },
-      "model": "simpleradio:item/using_speaking_transceiver"
+      "model": "simpleradio:item/transceiver/using_glowing_transceiver_in_hand"
     }
-  ]
+  ],
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [ 0, -30, 0 ],
+      "translation": [ 5, 1, -4 ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [ 0, -30, 0 ],
+      "translation": [ 5, 1, -4 ]
+    }
+  }
 }
