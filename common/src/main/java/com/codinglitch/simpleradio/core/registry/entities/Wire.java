@@ -245,6 +245,9 @@ public class Wire extends Entity implements Medium {
         this.effectCooldowns.replaceAll((owner, time) -> time - 1);
         this.effectCooldowns.entrySet().removeIf(entry -> entry.getValue() <= 0);
 
+        UUID fromUUID = this.getFrom().orElse(null);
+        UUID toUUID = this.getTo().orElse(null);
+
         if (this.level().isClientSide) {
             int effectDuration = (int) Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
 
@@ -260,11 +263,15 @@ public class Wire extends Entity implements Medium {
 
                 effect.progress += effect.direction;
             }
-        } else {
-            UUID fromUUID = this.getFrom().orElse(null);
-            RadioRouter.Type fromType = this.getFromType();
 
-            UUID toUUID = this.getTo().orElse(null);
+            RadioRouter from = ClientRadioManager.getRouter(fromUUID);
+            RadioRouter to = ClientRadioManager.getRouter(toUUID);
+
+            if (from != null && !from.hasWire(this)) from.connect(this);
+            if (to != null && !to.hasWire(this)) to.connect(this);
+
+        } else {
+            RadioRouter.Type fromType = this.getFromType();
             RadioRouter.Type toType = this.getToType();
 
             if (fromUUID != null && toUUID != null) {
@@ -317,7 +324,18 @@ public class Wire extends Entity implements Medium {
     public void remove(RemovalReason reason) {
         ItemEntity drop = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), new ItemStack(SimpleRadioItems.COPPER_WIRE, 1));
         this.level().addFreshEntity(drop);
+        cleanUp();
 
+        super.remove(reason);
+    }
+
+    @Override
+    public void onClientRemoval() {
+        cleanUp();
+        super.onClientRemoval();
+    }
+
+    public void cleanUp() {
         RadioRouter from = this.getFromRouter();
         if (from != null) {
             from.disconnect(this);
@@ -327,11 +345,7 @@ public class Wire extends Entity implements Medium {
         if (to != null) {
             to.disconnect(this);
         }
-
-        super.remove(reason);
     }
-
-
 
     @Override
     public boolean canBeCollidedWith() {

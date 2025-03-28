@@ -46,7 +46,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
     }
 
     public static void renderWire(Level level, MultiBufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, @Nullable Wire wire, float partialTick) {
-        VertexConsumer consumer = source.getBuffer(RenderType.entitySolid(new ResourceLocation("textures/block/copper_block.png")));
+        VertexConsumer consumer = source.getBuffer(RenderType.entitySolid(CommonSimpleRadio.id("textures/entity/wire.png")));
 
         Matrix4f matrix = poseStack.last().pose();
 
@@ -66,7 +66,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
         int toBlockLight = level.getBrightness(LightLayer.BLOCK, BlockPos.containing(to));
 
         float tile = 0f;//distance*(1f/24f)*CABLE_SIZE;
-        float vOffset = ((distance/CABLE_SIZE)/SEGMENTS) * 0.06f;
+        float vOffset = ((distance/CABLE_SIZE)/SEGMENTS) * 0.065f;
 
         for (int i = 0; i <= SEGMENTS; i++) {
             float progress = i/SEGMENTS;
@@ -115,10 +115,10 @@ public class WireRenderer extends EntityRenderer<Wire> {
                 int overlay = Math.clamp(0, 10, Math.round(effector*5));
                 int packedLight = LightTexture.pack(blockLight, skyLight);
 
-                buildQuad(consumer, matrix, overlay, packedLight, up.normalize(), vOffset, newTile, lastTopRight, topRight, topLeft, lastTopLeft);
-                buildQuad(consumer, matrix, overlay, packedLight, side.normalize(), vOffset, newTile, lastBottomRight, bottomRight, topRight, lastTopRight);
-                buildQuad(consumer, matrix, overlay, packedLight, down.normalize(), vOffset, newTile, lastBottomLeft, bottomLeft, bottomRight, lastBottomRight);
-                buildQuad(consumer, matrix, overlay, packedLight, otherSide.normalize(), vOffset, newTile, lastTopLeft, topLeft, bottomLeft, lastBottomLeft);
+                buildQuad(consumer, matrix, overlay, packedLight, up.normalize(), 0.0625f, vOffset, newTile, lastTopRight, topRight, topLeft, lastTopLeft);
+                buildQuad(consumer, matrix, overlay, packedLight, side.normalize(), 2f, vOffset, newTile, lastBottomRight, bottomRight, topRight, lastTopRight);
+                buildQuad(consumer, matrix, overlay, packedLight, down.normalize(), 1.1875f, vOffset, newTile, lastBottomLeft, bottomLeft, bottomRight, lastBottomRight);
+                buildQuad(consumer, matrix, overlay, packedLight, otherSide.normalize(), 3.25f, vOffset, newTile, lastTopLeft, topLeft, bottomLeft, lastBottomLeft);
             }
 
             lastTopLeft = topLeft;
@@ -191,14 +191,14 @@ public class WireRenderer extends EntityRenderer<Wire> {
         }
     }
 
-    public static void buildQuad(VertexConsumer consumer, Matrix4f matrix, int overlay, int packedLight, Vec3 normal, float offset, float tile, Vec3 one, Vec3 two, Vec3 three, Vec3 four) {
-        consumer.vertex(matrix, (float) one.x, (float) one.y, (float) one.z).color(1f, 1f, 1f, 1f).uv(0.51f, tile)
+    public static void buildQuad(VertexConsumer consumer, Matrix4f matrix, int overlay, int packedLight, Vec3 normal, float index, float offset, float tile, Vec3 one, Vec3 two, Vec3 three, Vec3 four) {
+        consumer.vertex(matrix, (float) one.x, (float) one.y, (float) one.z).color(1f, 1f, 1f, 1f).uv(index, tile)
                 .overlayCoords(OverlayTexture.pack(overlay, 15)).uv2(packedLight).normal((float) normal.x, (float) normal.y, (float) normal.z).endVertex();
-        consumer.vertex(matrix, (float) two.x, (float) two.y, (float) two.z).color(1f, 1f, 1f, 1f).uv(0.51f, offset + tile)
+        consumer.vertex(matrix, (float) two.x, (float) two.y, (float) two.z).color(1f, 1f, 1f, 1f).uv(index, offset + tile)
                 .overlayCoords(OverlayTexture.pack(overlay, 15)).uv2(packedLight).normal((float) normal.x, (float) normal.y, (float) normal.z).endVertex();
-        consumer.vertex(matrix, (float) three.x, (float) three.y, (float) three.z).color(1f, 1f, 1f, 1f).uv(0.51f, offset + tile)
+        consumer.vertex(matrix, (float) three.x, (float) three.y, (float) three.z).color(1f, 1f, 1f, 1f).uv(index, offset + tile)
                 .overlayCoords(OverlayTexture.pack(overlay, 15)).uv2(packedLight).normal((float) normal.x, (float) normal.y, (float) normal.z).endVertex();
-        consumer.vertex(matrix, (float) four.x, (float) four.y, (float) four.z).color(1f, 1f, 1f, 1f).uv(0.51f, tile)
+        consumer.vertex(matrix, (float) four.x, (float) four.y, (float) four.z).color(1f, 1f, 1f, 1f).uv(index, tile)
                 .overlayCoords(OverlayTexture.pack(overlay, 15)).uv2(packedLight).normal((float) normal.x, (float) normal.y, (float) normal.z).endVertex();
     }
 
