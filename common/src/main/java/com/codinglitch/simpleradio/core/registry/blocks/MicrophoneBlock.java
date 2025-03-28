@@ -7,7 +7,11 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -26,9 +30,13 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +62,10 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         RadioListener listener = startListening(location, id);
 
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.microphone.listeningRange;
+
+        float rotation = Math.toRadians(getYRotationDegrees(state) - 90);
+        Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
+        listener.connectionOffset = new Vec3(normal.x*0.1f, -0.2f, normal.z*0.1f);
 
         // Allow distribution through wires
         listener.allowDistribution();
@@ -104,6 +116,22 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
             radioBlockEntity.saveToItem(stack);
 
         return List.of(stack);
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof MicrophoneBlockEntity microphoneBlockEntity) {
+            if (player.isCrouching()) {
+                microphoneBlockEntity.tilt = (microphoneBlockEntity.tilt + 0.1f) % 3;
+                return InteractionResult.SUCCESS;
+            } else {
+                microphoneBlockEntity.setListening(!microphoneBlockEntity.isListening());
+                return InteractionResult.SUCCESS;
+            }
+        }
+
+        return super.use(state, level, pos, player, hand, result);
     }
 
     @Override

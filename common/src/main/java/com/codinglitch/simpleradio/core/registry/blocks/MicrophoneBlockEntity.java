@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Listening;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -8,13 +9,20 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listening {
     public boolean isActive = false;
+    private boolean listening = true;
+    public float tilt = 1.5f;
+    public float currentTilt = tilt - 1.5f;
 
     public MicrophoneBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.MICROPHONE, pos, state);
@@ -58,6 +66,17 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         if (!blockEntity.isActive && blockEntity.id != null) {
             blockEntity.activate();
         }
+
+        if (blockEntity.listener != null) {
+            blockEntity.listener.active = blockEntity.listening;
+        }
+    }
+
+    public boolean isListening() {
+        return listening;
+    }
+    public void setListening(boolean listening) {
+        this.listening = listening;
     }
 
     public void inactivate() {
@@ -87,5 +106,27 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     public void loadTag(CompoundTag tag) {
         inactivate();
         super.loadTag(tag);
+
+        if (tag.contains("tilt")) {
+            this.tilt = tag.getFloat("tilt");
+        }
+
+        if (tag.contains("listening")) {
+            this.setListening(tag.getBoolean("listening"));
+        }
+    }
+
+    @Override
+    public void saveTag(CompoundTag tag) {
+        super.saveTag(tag);
+
+        tag.putFloat("tilt", this.tilt);
+        tag.putBoolean("listening", this.listening);
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 }
