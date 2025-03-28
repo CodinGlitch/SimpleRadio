@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.api.central.Routing;
 import com.codinglitch.simpleradio.api.central.Speaking;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,6 +40,7 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
         RadioSpeaker speaker = startSpeaking(location, id);
         speaker.range = SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange;
+        speaker.category = CommonRadioPlugin.SPEAKERS_CATEGORY;
 
         return speaker;
     }

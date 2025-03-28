@@ -140,7 +140,7 @@ public class CommonRadioPlugin {
                 .setIcon(getIcon("transceiver_icon.png"))
                 .build();
         walkies = serverApi.volumeCategoryBuilder()
-                .setId(TRANSCEIVERS_CATEGORY)
+                .setId(WALKIES_CATEGORY)
                 .setName("Walkie Talkies")
                 .setDescription("The volume of walkie/spuddie talkies")
                 .setIcon(getIcon("transceiver_icon.png"))
@@ -153,6 +153,8 @@ public class CommonRadioPlugin {
                 .build();
 
         serverApi.registerVolumeCategory(radios);
+        serverApi.registerVolumeCategory(speakers);
+        serverApi.registerVolumeCategory(walkies);
         serverApi.registerVolumeCategory(transceivers);
     }
 
