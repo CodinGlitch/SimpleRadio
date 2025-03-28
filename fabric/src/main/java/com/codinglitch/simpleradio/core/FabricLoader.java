@@ -38,6 +38,10 @@ public class FabricLoader {
         SimpleRadioBlocks.BLOCKS.forEach(((location, block) -> Registry.register(BuiltInRegistries.BLOCK, location, block)));
     }
 
+    public static void loadParticles() {
+        SimpleRadioParticles.PARTICLES.forEach(((location, particleType) -> Registry.register(BuiltInRegistries.PARTICLE_TYPE, location, particleType)));
+    }
+
     public static void loadPackets() {
         ServerPlayNetworking.registerGlobalReceiver(ServerboundRadioUpdatePacket.ID,
                 serverbound(ServerboundRadioUpdatePacket::decode, ServerboundRadioUpdatePacket::handle));
@@ -102,6 +106,7 @@ public class FabricLoader {
         loadItems();
         loadBlocks();
         loadPackets();
+        loadParticles();
 
         SimpleRadioEntities.load();
         SimpleRadioBlockEntities.load();

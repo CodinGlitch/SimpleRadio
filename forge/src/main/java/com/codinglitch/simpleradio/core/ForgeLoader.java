@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 public class ForgeLoader {
     private static final String PROTOCOL_VERSION = "0";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(CommonSimpleRadio.ID,"channel"),
+            CommonSimpleRadio.id("channel"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
@@ -68,6 +68,8 @@ public class ForgeLoader {
 
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
         event.register(Registries.CREATIVE_MODE_TAB, helper -> SimpleRadioMenus.CREATIVE_TABS.forEach(helper::register));
+
+        event.register(ForgeRegistries.Keys.PARTICLE_TYPES, helper -> SimpleRadioParticles.PARTICLES.forEach(helper::register));
 
         event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
             CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);

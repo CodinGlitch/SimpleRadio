@@ -33,4 +33,8 @@ accessible field net/minecraft/client/sounds/SoundEngine channelAccess Lnet/mine
 # ResourceProvider field
 accessible field net/minecraft/client/sounds/SoundBufferLibrary resourceManager Lnet/minecraft/server/packs/resources/ResourceProvider;
 
+accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
+
+accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
+
 accessible field com/mojang/blaze3d/audio/Channel source I

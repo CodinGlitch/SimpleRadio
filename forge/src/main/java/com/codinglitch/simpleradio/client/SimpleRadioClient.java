@@ -1,10 +1,12 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.platform.ForgeClientRegistryHelper;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -20,6 +22,11 @@ public class SimpleRadioClient {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         CommonSimpleRadioClient.loadBlockEntityRenderers(event::registerBlockEntityRenderer);
         CommonSimpleRadioClient.loadEntityRenderers(event::registerEntityRenderer);
+    }
+
+    @SubscribeEvent
+    public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+        CommonSimpleRadioClient.loadParticles(event::registerSpriteSet);
     }
 
     @SubscribeEvent

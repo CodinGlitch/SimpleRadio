@@ -1,11 +1,15 @@
 package com.codinglitch.simpleradio.platform;
 
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.platform.services.ClientRegistryHelper;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ForgeClientRegistryHelper implements ClientRegistryHelper {
-    public static final Map<BlockEntityType<? extends BlockEntity>, BlockEntityRendererProvider<BlockEntity>> BLOCK_ENTITY_RENDERERS = new HashMap<>();
-
     @Override
     public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerScreen(MenuType<? extends M> menuType, ScreenConstructor<M, U> screenConstructor) {
         MenuScreens.register(menuType, screenConstructor::create);
