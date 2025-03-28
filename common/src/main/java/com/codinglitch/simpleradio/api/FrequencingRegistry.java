@@ -23,27 +23,18 @@ public class FrequencingRegistry {
     public static FrequencingType fromConfig(LexiconPageData page) {
         FrequencingType newType = new FrequencingType();
 
-        // why didnt i make this an optional :(
-        Object receptionPower = page.getEntry("receptionPower");
-        newType.receptionPower = (int) (receptionPower != null ? receptionPower : -1);
-        Object receptionFloor = page.getEntry("receptionFloor");
-        newType.receptionFloor = (int) (receptionFloor != null ? receptionFloor : -1);
+        newType.receptionPower = (int) page.getEntry("receptionPower").orElse(-1);
+        newType.receptionFloor = (int) page.getEntry("receptionFloor").orElse(-1);
 
-        Object antennaAptitude = page.getEntry("antennaAptitude");
-        newType.antennaAptitude = (int) (antennaAptitude != null ? antennaAptitude : -1);
+        newType.antennaAptitude = (int) page.getEntry("antennaAptitude").orElse(-1);
 
-        Object transmissionPowerFM = page.getEntry("transmissionPowerFM");
-        newType.transmissionPowerFM = (int) (transmissionPowerFM != null ? transmissionPowerFM : -1);
-        Object diminishThresholdFM = page.getEntry("diminishThresholdFM");
-        newType.diminishThresholdFM = (int) (diminishThresholdFM != null ? diminishThresholdFM : -1);
+        newType.transmissionPowerFM = (int) page.getEntry("transmissionPowerFM").orElse(-1);
+        newType.diminishThresholdFM = (int) page.getEntry("diminishThresholdFM").orElse(-1);
 
-        Object transmissionPowerAM = page.getEntry("transmissionPowerAM");
-        newType.transmissionPowerAM = (int) (transmissionPowerAM != null ? transmissionPowerAM : -1);
-        Object diminishThresholdAM = page.getEntry("diminishThresholdAM");
-        newType.diminishThresholdAM = (int) (diminishThresholdAM != null ? diminishThresholdAM : -1);
+        newType.transmissionPowerAM = (int) page.getEntry("transmissionPowerAM").orElse(-1);
+        newType.diminishThresholdAM = (int) page.getEntry("diminishThresholdAM").orElse(-1);
 
-        Object transmissionDiminishment = page.getEntry("transmissionDiminishment");
-        newType.transmissionDiminishment = (double) (transmissionDiminishment != null ? transmissionDiminishment : -1d);
+        newType.transmissionDiminishment = (double) page.getEntry("transmissionDiminishment").orElse(-1d);
 
         return newType;
     }

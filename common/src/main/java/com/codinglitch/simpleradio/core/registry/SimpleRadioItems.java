@@ -48,18 +48,17 @@ public class SimpleRadioItems {
     public static void reload() {
         ITEMS.forEach((location, holder) -> {
             String path = location.getPath();
-            LexiconPageData configData = SimpleRadioLibrary.SERVER_CONFIG.getPage(path);
-            if (configData != null) {
-                Object field = configData.getEntry("enabled");
-                holder.enabled = field == null || (boolean) field;
+            Optional<LexiconPageData> configData = SimpleRadioLibrary.SERVER_CONFIG.getPage(path);
+            if (configData.isPresent()) {
+                holder.enabled = (boolean) configData.get().getEntry("enabled").orElse(false);
             }
 
             if (path.equals("walkie_talkie") || path.equals("spuddie_talkie")) {
-                LexiconPageData spudData = SimpleRadioLibrary.SERVER_CONFIG.getPage("walkie_talkie");
+                LexiconPageData spudData = SimpleRadioLibrary.SERVER_CONFIG.getPage("walkie_talkie").orElse(null);
                 //TODO mak this beter
-                Object enabled = spudData.getEntry("enabled");
-                Object spudder = spudData.getEntry("spuddieTalkie");
-                holder.enabled = (boolean) enabled && (spudder == null || path.equals("spuddie_talkie") == (boolean) spudder);
+                boolean enabled = (boolean) spudData.getEntry("enabled").orElse(false);
+                boolean spudder = (boolean) spudData.getEntry("spuddieTalkie").orElse(false);
+                holder.enabled = enabled && path.equals("spuddie_talkie") == spudder;
             }
         });
     }

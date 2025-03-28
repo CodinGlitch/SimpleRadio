@@ -1,12 +1,13 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.lexiconfig.LexiconfigApi;
 import com.codinglitch.lexiconfig.annotations.Lexicon;
 import com.codinglitch.lexiconfig.annotations.LexiconEntry;
 import com.codinglitch.lexiconfig.annotations.LexiconPage;
 import com.codinglitch.lexiconfig.classes.LexiconData;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
 
-@Lexicon(name = CommonSimpleRadio.ID+"-server")
+@Lexicon(name = CommonSimpleRadio.ID+"-server", location = LexiconfigApi.Location.SERVER)
 public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage(comment = "These are the configurations for the wires.")
     public Wire wire = new Wire();
