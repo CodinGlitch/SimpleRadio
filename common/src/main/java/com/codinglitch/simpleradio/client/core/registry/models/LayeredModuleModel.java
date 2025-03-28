@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.models;
+package com.codinglitch.simpleradio.client.core.registry.models;
 
 import com.codinglitch.simpleradio.api.central.Module;
 import com.google.common.collect.Lists;

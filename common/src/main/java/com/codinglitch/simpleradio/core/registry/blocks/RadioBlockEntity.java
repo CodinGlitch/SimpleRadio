@@ -1,10 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Receiving;
 import com.codinglitch.simpleradio.api.central.Speaking;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.central.AnimationInstance;
+import com.codinglitch.simpleradio.client.core.central.AnimationInstance;
 import com.codinglitch.simpleradio.core.central.Animatable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
@@ -13,7 +12,6 @@ import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;

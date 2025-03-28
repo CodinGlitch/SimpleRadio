@@ -1,13 +1,9 @@
-package com.codinglitch.simpleradio.client.renderers;
+package com.codinglitch.simpleradio.client.core.registry.renderers;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.client.models.MicrophoneModel;
-import com.codinglitch.simpleradio.client.models.RadioModel;
+import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
-import com.codinglitch.simpleradio.core.registry.blocks.RadioBlock;
-import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;

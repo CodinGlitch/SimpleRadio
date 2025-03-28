@@ -1,9 +1,10 @@
 package com.codinglitch.simpleradio.client;
 
-import com.codinglitch.simpleradio.client.models.MicrophoneModel;
-import com.codinglitch.simpleradio.client.models.RadioModel;
+import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
+import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
+import com.codinglitch.simpleradio.client.core.registry.renderers.*;
 import com.codinglitch.simpleradio.client.renderers.*;
-import com.codinglitch.simpleradio.client.screens.RadiosmitherScreen;
+import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.RadioReceiver;

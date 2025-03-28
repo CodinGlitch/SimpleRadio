@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.renderers;
+package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;

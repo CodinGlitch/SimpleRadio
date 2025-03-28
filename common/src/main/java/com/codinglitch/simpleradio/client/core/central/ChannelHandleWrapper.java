@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.central;
+package com.codinglitch.simpleradio.client.core.central;
 
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.mojang.blaze3d.audio.Channel;

@@ -1,9 +1,9 @@
 package com.codinglitch.simpleradio.client;
 
-import com.codinglitch.simpleradio.client.central.ChannelHandleWrapper;
-import com.codinglitch.simpleradio.client.central.ClientRouterWrapper;
+import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
+import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.central.EffectStream;
+import com.codinglitch.simpleradio.client.core.central.EffectStream;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;

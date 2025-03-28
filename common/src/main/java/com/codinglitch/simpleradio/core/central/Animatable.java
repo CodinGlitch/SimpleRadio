@@ -1,9 +1,8 @@
 package com.codinglitch.simpleradio.core.central;
 
-import com.codinglitch.simpleradio.client.central.AnimationInstance;
+import com.codinglitch.simpleradio.client.core.central.AnimationInstance;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public interface Animatable {

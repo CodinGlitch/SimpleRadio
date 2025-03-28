@@ -1,21 +1,13 @@
-package com.codinglitch.simpleradio.client.renderers;
+package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.core.registry.blocks.ReceiverBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.ReceiverBlockEntity;
-import com.codinglitch.simpleradio.core.registry.blocks.TransmitterBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Matrix4f;
 
 public class ReceiverRenderer implements BlockEntityRenderer<ReceiverBlockEntity> {
 

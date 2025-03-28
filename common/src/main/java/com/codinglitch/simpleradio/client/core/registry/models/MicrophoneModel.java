@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.models;// Made with Blockbench 4.10.0
+package com.codinglitch.simpleradio.client.core.registry.models;// Made with Blockbench 4.10.0
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 

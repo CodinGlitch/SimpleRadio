@@ -1,13 +1,11 @@
-package com.codinglitch.simpleradio.client.renderers;
+package com.codinglitch.simpleradio.client.core.registry.renderers;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.client.models.RadioModel;
+import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
 import com.codinglitch.simpleradio.core.registry.blocks.RadioBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.RadioBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

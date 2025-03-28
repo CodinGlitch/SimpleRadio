@@ -1,6 +1,5 @@
-package com.codinglitch.simpleradio.client.central;
+package com.codinglitch.simpleradio.client.core.central;
 
-import com.codinglitch.simpleradio.client.models.RadioModel;
 import com.codinglitch.simpleradio.core.central.Animatable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

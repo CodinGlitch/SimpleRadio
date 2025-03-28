@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.client.renderers;
+package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.core.registry.blocks.FrequencerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
