@@ -15,13 +15,25 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class CreateCompat {
+    public static List<Block> CENTRAL_BLOCKS = List.of(
+        SimpleRadioBlocks.RADIO,
+        SimpleRadioBlocks.SPEAKER,
+        SimpleRadioBlocks.MICROPHONE,
+        SimpleRadioBlocks.RECEIVER,
+        SimpleRadioBlocks.TRANSMITTER,
+        SimpleRadioBlocks.SOCKET
+    );
+
     public static void contraptionAddBlock(Contraption contraption, BlockPos pos, BlockEntity blockEntity, StructureTemplate.StructureBlockInfo info) {
         if (blockEntity instanceof AuditoryBlockEntity centralBlockEntity) {
             centralBlockEntity.receiver = null;
@@ -70,12 +82,10 @@ public class CreateCompat {
     }
 
     public static void registerMovementBehaviours() {
-        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.RADIO, new CentralMovementBehaviour());
-        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.SPEAKER, new CentralMovementBehaviour());
-        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.MICROPHONE, new CentralMovementBehaviour());
-        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.RECEIVER, new CentralMovementBehaviour());
-        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.TRANSMITTER, new CentralMovementBehaviour());
-        MovementBehaviour.REGISTRY.register(SimpleRadioBlocks.SOCKET, new CentralMovementBehaviour());
+        for (Block centralBlock : CENTRAL_BLOCKS) {
+            if (MovementBehaviour.REGISTRY.get(centralBlock) != null) continue;
+            MovementBehaviour.REGISTRY.register(centralBlock, new CentralMovementBehaviour());
+        }
     }
 
     public static RadioManager.CollectionResult verifyContraptionCollection(Entity entity) {
