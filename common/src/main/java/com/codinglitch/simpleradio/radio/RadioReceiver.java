@@ -19,8 +19,6 @@ import java.util.function.Predicate;
  * <b>Does route further.</b>
  */
 public class RadioReceiver extends RadioRouter {
-    public Predicate<RadioSource> receiveCriteria;
-
     public int antennaPower = 0;
     public Frequency frequency;
 
@@ -60,7 +58,7 @@ public class RadioReceiver extends RadioRouter {
     }
 
     public RadioReceiver receiveCriteria(Predicate<RadioSource> criteria) {
-        this.receiveCriteria = criteria;
+        this.acceptCriteria = criteria;
         return this;
     }
 
@@ -90,8 +88,9 @@ public class RadioReceiver extends RadioRouter {
     public void accept(RadioSource source) {
         //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         if (source.transmissionPower <= 0) return;
-        if (receiveCriteria != null && !receiveCriteria.test(source)) return;
 
         if (receivingTime == 0) {
             this.receivingTime = 20; //TODO: make configurable and maybe just better 💀

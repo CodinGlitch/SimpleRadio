@@ -1,10 +1,8 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -18,8 +16,6 @@ import java.util.function.BiPredicate;
  * <b>Does route further.</b>
  */
 public class RadioTransmitter extends RadioRouter {
-    public BiPredicate<RadioSource, RadioRouter> transmitCriteria;
-
     public int antennaPower = 0;
     public Frequency frequency;
 
@@ -58,7 +54,7 @@ public class RadioTransmitter extends RadioRouter {
     }
 
     public RadioTransmitter transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
-        this.transmitCriteria = criteria;
+        this.routeCriteria = criteria;
         return this;
     }
 
@@ -107,11 +103,10 @@ public class RadioTransmitter extends RadioRouter {
 
     @Override
     public void accept(RadioSource source) {
-        this.route(source, router -> {
-            if (transmitCriteria != null && !transmitCriteria.test(source, router)) {
-                return false;
-            }
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
 
+        this.route(source, router -> {
             return source.owner == null || !source.owner.equals(router.id);
         });
     }

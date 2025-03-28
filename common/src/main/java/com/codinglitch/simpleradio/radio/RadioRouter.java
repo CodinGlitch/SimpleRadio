@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -52,8 +53,10 @@ public class RadioRouter implements Socket {
     public ArrayList<Wire> wires = new ArrayList<>();
 
     public List<RadioRouter> routers = new ArrayList<>();
-    public Predicate<RadioRouter> routerCriteria;
     public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
+
+    public BiPredicate<RadioSource, RadioRouter> routeCriteria;
+    public Predicate<RadioSource> acceptCriteria;
 
     public boolean active = true;
     public boolean distributes = false;
@@ -196,6 +199,8 @@ public class RadioRouter implements Socket {
     }
 
     public void accept(RadioSource source) {
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         this.route(source);
     }
 
@@ -210,7 +215,7 @@ public class RadioRouter implements Socket {
         return true;
     }
 
-    public void route(RadioSource source, Predicate<RadioRouter> criteria) {
+    public void route(RadioSource source, @Nullable Predicate<RadioRouter> criteria) {
         if (!this.active) return;
 
         if (!source.isValid()) {
@@ -229,10 +234,13 @@ public class RadioRouter implements Socket {
 
         for (int i = 0; i < routers.size(); i++) {
             RadioRouter router = routers.get(i);
+
             if (criteria != null) {
                 if (!criteria.test(router)) continue;
             }
             if (!shouldRouteTo(source, router)) continue;
+
+            if (routeCriteria != null && !routeCriteria.test(source, router)) continue;
 
             source = this.prepareSource(source, router);
 
@@ -243,7 +251,7 @@ public class RadioRouter implements Socket {
     }
 
     public void route(RadioSource source) {
-        this.route(source, this.routerCriteria);
+        this.route(source, null);
     }
 
     public void invalidate() {
