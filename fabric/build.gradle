@@ -22,7 +22,7 @@ dependencies {
     implementation project(":common")
 
     implementation "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    runtimeOnly "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
+    modRuntimeOnly "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}"
@@ -34,17 +34,17 @@ dependencies {
     // Voice Chat Interaction
     modCompileOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
     modCompileOnly include("eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}")
-    //modRuntimeOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
-    //modRuntimeOnly include("eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}")
+    modRuntimeOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
+    modRuntimeOnly include("eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}")
 
     // Vibrative Voice
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
-    //modCompileOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
-    //modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
+    modCompileOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
+    modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
 
     // Valkyrien Skies
     modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
-    //modRuntimeOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
+    modRuntimeOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
 
     // JEI / REI
     if (recipe_viewer == "jei") {
@@ -55,6 +55,17 @@ dependencies {
         modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
     } else if (recipe_viewer == "rei") {
         // TODO: add rei to devenv
+    }
+
+    // Config mods
+    if (config_mod == "configured") {
+        modRuntimeOnly "com.mrcrayfish:configured-fabric:${configured_version}"
+    } else if (config_mod == "cloth_config") {
+
+    } else if (config_mod == "owo") {
+
+    } else if (config_mod == "config_screens") {
+
     }
 }
 

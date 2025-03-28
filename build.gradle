@@ -47,6 +47,15 @@ subprojects {
             url = 'https://maven.blamejared.com'
         }
 
+        maven {
+            name = "MrCrayfish (GitHub)"
+            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+            credentials {
+                username = "CodinGlitch"
+                password = project.property("github_token")
+            }
+        }
+
         maven { url 'https://maven.maxhenkel.de/repository/public' }
         maven { url 'https://maven.nucleoid.xyz' }
         maven { url 'https://maven.codinglitch.com/repository/releases' }
