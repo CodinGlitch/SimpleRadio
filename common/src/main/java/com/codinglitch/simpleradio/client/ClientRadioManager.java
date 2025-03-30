@@ -1,10 +1,14 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
+import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlock;
+import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlockEntity;
 import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
@@ -12,6 +16,7 @@ import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,11 +28,15 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
@@ -303,6 +312,35 @@ public class ClientRadioManager {
             }*/
     }
 
+    public static void handleSpeakParticle(BlockState state, SpeakerBlockEntity blockEntity) {
+        RadioRouter mainRouter = blockEntity.getRouter();
+        if (mainRouter == null) return;
+
+        Direction direction = state.getValue(SpeakerBlock.FACING);
+
+        Vec3i dir = direction.getNormal();
+        Vector3f transformedDir = new Vector3f(dir.getX(), dir.getY(), dir.getZ());
+
+        WorldlyPosition position = mainRouter.getLocation();
+        Vec3 blockPosition = blockEntity.getBlockPos().getCenter();
+
+        if (mainRouter.rotation != null) {
+            mainRouter.rotation.transform(transformedDir);
+        }
+
+        Entity camera = Minecraft.getInstance().cameraEntity;
+        if (camera == null) return;
+
+        float dot = transformedDir.normalize().dot(camera.position().toVector3f().sub(position).normalize());
+        if (Math.abs(dot) > 0.65f) {
+            Vec3 pos = blockPosition.relative(direction, 0.55d);
+            blockEntity.getLevel().addParticle(SimpleRadioParticles.SPEAK_RING, pos.x, pos.y, pos.z, dir.getX()*0.01f, dir.getY()*0.01f, dir.getZ()*0.01f);
+        } else {
+            Vec3 pos = blockPosition.relative(direction, 0.9d);
+            blockEntity.getLevel().addParticle(SimpleRadioParticles.SPEAK_LINE, pos.x, pos.y, pos.z, dir.getX()*0.01f, dir.getY()*0.01f, dir.getZ()*0.01f);
+        }
+    }
+
     //
 
     public static void renderRouter(RadioRouter router, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
@@ -363,5 +401,9 @@ public class ClientRadioManager {
         LevelRenderer.renderLineBox(poseStack, bufferSource.getBuffer(RenderType.lines()), boundingBox, r, g, b, 0.8f);
 
         poseStack.popPose();
+    }
+
+    public static void onSoundEvent(ClientReceiveSoundEvent receiveSoundEvent) {
+
     }
 }
