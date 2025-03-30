@@ -13,7 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * A source containing the audio data as well as other data collected while travelling.
@@ -31,6 +34,8 @@ public class RadioSource {
     public float volume;
     public float offset;
     public long seed;
+
+    public List<Short> record = new ArrayList<>();
 
     public Frequency frequencyMedium;
     public Wire wireMedium;
@@ -92,12 +97,26 @@ public class RadioSource {
         copy.offset = this.offset;
         copy.seed = this.seed;
 
+        copy.record = new ArrayList<>(this.record);
+
         copy.frequencyMedium = this.frequencyMedium;
         copy.wireMedium = this.wireMedium;
 
         copy.transmissionPower = this.transmissionPower;
 
         return copy;
+    }
+
+    public boolean willShort(RadioRouter router) {
+        short identifier = router.getIdentifier();
+        for (short recordIdentifier : record) {
+            if (identifier == recordIdentifier) return true;
+        }
+        return false;
+    }
+
+    public void visit(RadioRouter router) {
+        record.add(router.getIdentifier());
     }
 
     public void travel(RadioRouter from, RadioRouter to, Medium medium) {
@@ -137,6 +156,8 @@ public class RadioSource {
 
         // nevermind... dont beware.... negative transmission...
         this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (distance * transmissionDiminishment));
+
+        this.visit(to);
     }
 
     public double computeSeverity() {

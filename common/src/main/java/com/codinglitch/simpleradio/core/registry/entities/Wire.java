@@ -153,14 +153,12 @@ public class Wire extends Entity implements Medium {
             this.effectCooldowns.put(source.owner, SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
         }
 
-        if (source instanceof RadioHeader header) {
-            if (header.willShort(this)) {
-                originSocket.shortCircuit();
-                return;
-            } else {
-                header.visit(this);
-            }
+        if (source.willShort(destination)) {
+            destination.shortCircuit();
+            return;
         }
+
+        CommonSimpleRadio.info("Relaying from {} to {}", from.getClass().getSimpleName(), to.getClass().getSimpleName());
 
         source.travel(from, to, this);
 

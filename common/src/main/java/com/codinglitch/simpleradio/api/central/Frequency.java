@@ -40,8 +40,8 @@ public class Frequency implements Medium {
 
     public final Queue<Runnable> pendingModifications = new LinkedList<>();
 
-    public final List<RadioReceiver> receivers;
-    public final List<RadioTransmitter> transmitters;
+    public final RouterContainer<RadioReceiver> receivers;
+    public final RouterContainer<RadioTransmitter> transmitters;
 
     public Frequency(String frequency, Modulation modulation) {
         if (!check(frequency)) {
@@ -51,8 +51,8 @@ public class Frequency implements Medium {
 
         this.frequency = frequency;
         this.modulation = modulation;
-        this.receivers = new ArrayList<>();
-        this.transmitters = new ArrayList<>();
+        this.receivers = new RouterContainer<>();
+        this.transmitters = new RouterContainer<>();
 
         pendingFrequencyModifications.add(() -> frequencies.add(this));
     }
@@ -80,8 +80,8 @@ public class Frequency implements Medium {
 
     public static void garbageCollect() {
         for (Frequency frequency : frequencies) {
-            frequency.receivers.removeIf(Predicate.not(RadioReceiver::validate));
-            frequency.transmitters.removeIf(Predicate.not(RadioTransmitter::validate));
+            RadioManager.validate(frequency.receivers);
+            RadioManager.validate(frequency.transmitters);
         }
 
         frequencies.removeIf(Predicate.not(Frequency::validate));
@@ -134,8 +134,9 @@ public class Frequency implements Medium {
 
     //---- Receivers ----\\
 
-    public RadioReceiver getReceiver(Predicate<RadioReceiver> criteria) {
-        return receivers.stream().filter(criteria).findFirst().orElse(null);
+    public RadioReceiver getReceiver(Predicate<RadioReceiver> filter) {
+        Optional<RadioReceiver> result = receivers.stream().filter(filter).findFirst();
+        return result.orElse(null);
     }
     public RadioReceiver getReceiver(WorldlyPosition location) {
         return getReceiver(receiver -> location.equals(receiver.location));
@@ -147,8 +148,8 @@ public class Frequency implements Medium {
         return getReceiver(receiver -> id.equals(receiver.id));
     }
 
-    public void queueReceiver(RadioReceiver receiver) {
-        pendingModifications.add(() -> receivers.add(receiver));
+    public void registerReceiver(RadioReceiver receiver) {
+        RadioManager.putRouter(receivers, receiver);
     }
 
     public RadioReceiver addReceiver(RadioReceiver receiver) {
@@ -194,14 +195,14 @@ public class Frequency implements Medium {
         return addReceiver(new RadioReceiver(this, entity, id));
     }
 
-    public void removeReceiver(RadioReceiver receiver) {
-        pendingModifications.add(() -> receivers.remove(receiver));
+    public void removeReceiver(Predicate<RadioReceiver> criteria) {
+        receivers.removeIf(criteria);
 
         if (!this.validate())
             pendingFrequencyModifications.add(() -> frequencies.remove(this));
     }
-    public void removeReceiver(Predicate<RadioReceiver> criteria) {
-        receivers.stream().filter(criteria).findFirst().ifPresent(receiver -> this.removeReceiver(receiver));
+    public void removeReceiver(RadioReceiver receiver) {
+        removeReceiver(receiver::equals);
     }
     public void removeReceiver(Entity owner) {
         removeReceiver(receiver -> owner.equals(receiver.owner));
@@ -215,8 +216,9 @@ public class Frequency implements Medium {
 
     //---- Transmitters ----\\
 
-    public RadioTransmitter getTransmitter(Predicate<RadioTransmitter> criteria) {
-        return transmitters.stream().filter(criteria).findFirst().orElse(null);
+    public RadioTransmitter getTransmitter(Predicate<RadioTransmitter> filter) {
+        Optional<RadioTransmitter> result = transmitters.stream().filter(filter).findFirst();
+        return result.orElse(null);
     }
     public RadioTransmitter getTransmitter(WorldlyPosition location) {
         return getTransmitter(transmitter -> location.equals(transmitter.location));
@@ -228,8 +230,8 @@ public class Frequency implements Medium {
         return getTransmitter(transmitter -> id.equals(transmitter.id));
     }
 
-    public void queueTransmitter(RadioTransmitter transmitter) {
-        pendingModifications.add(() -> transmitters.add(transmitter));
+    public void registerTransmitter(RadioTransmitter transmitter) {
+        RadioManager.putRouter(transmitters, transmitter);
     }
 
     public RadioTransmitter addTransmitter(RadioTransmitter transmitter) {
@@ -275,14 +277,14 @@ public class Frequency implements Medium {
         return addTransmitter(new RadioTransmitter(this, entity, id));
     }
 
-    public void removeTransmitter(RadioTransmitter transmitter) {
-        pendingModifications.add(() -> transmitters.remove(transmitter));
+    public void removeTransmitter(Predicate<RadioTransmitter> criteria) {
+        transmitters.removeIf(criteria);
 
         if (!this.validate())
             pendingFrequencyModifications.add(() -> frequencies.remove(this));
     }
-    public void removeTransmitter(Predicate<RadioTransmitter> criteria) {
-        transmitters.stream().filter(criteria).findFirst().ifPresent(this::removeTransmitter);
+    public void removeTransmitter(RadioTransmitter transmitter) {
+        removeTransmitter(transmitter::equals);
     }
     public void removeTransmitter(Entity owner) {
         removeTransmitter(transmitter -> owner.equals(transmitter.owner));

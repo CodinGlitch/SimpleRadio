@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.api.central;
 
 import com.codinglitch.lexiconfig.annotations.LexiconEntry;
+import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import net.minecraft.resources.ResourceLocation;
 
 public class FrequencingType {
@@ -20,7 +21,25 @@ public class FrequencingType {
 
     public double transmissionDiminishment;
 
+    public LexiconPageData page;
+
     public FrequencingType() {
+    }
+
+    public void reload() {
+        if (page == null) return;
+        this.receptionPower = (int) page.getEntry("receptionPower").orElse(-1);
+        this.receptionFloor = (int) page.getEntry("receptionFloor").orElse(-1);
+
+        this.antennaAptitude = (int) page.getEntry("antennaAptitude").orElse(-1);
+
+        this.transmissionPowerFM = (int) page.getEntry("transmissionPowerFM").orElse(-1);
+        this.diminishThresholdFM = (int) page.getEntry("diminishThresholdFM").orElse(-1);
+
+        this.transmissionPowerAM = (int) page.getEntry("transmissionPowerAM").orElse(-1);
+        this.diminishThresholdAM = (int) page.getEntry("diminishThresholdAM").orElse(-1);
+
+        this.transmissionDiminishment = (double) page.getEntry("transmissionDiminishment").orElse(-1d);
     }
 
     public int getTransmissionPower(Frequency.Modulation modulation) {

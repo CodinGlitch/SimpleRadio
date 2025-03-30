@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;
@@ -50,7 +51,7 @@ public class RadioTransmitter extends RadioRouter {
         }
 
         this.frequency = frequency;
-        this.routers = (List<RadioRouter>)(List<?>) this.frequency.receivers;
+        this.routers = (List) this.frequency.receivers;
     }
 
     public RadioTransmitter transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
@@ -78,6 +79,8 @@ public class RadioTransmitter extends RadioRouter {
     @Override
     public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
         if (destination instanceof RadioReceiver receiver) {
+            if (source.willShort(receiver)) return false;
+
             FrequencingType type = source.frequencingType == -1 ? this.frequencingType : source.getFrequencingType();
             double transmissionPower = source.frequencingType == -1 ? this.getPower(this.frequency.modulation) : source.transmissionPower;
 

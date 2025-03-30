@@ -62,8 +62,8 @@ public class RadioListener extends RadioRouter {
         long currentTime = this.location.level.getGameTime();
         if (currentTime - lastHeader < SimpleRadioLibrary.SERVER_CONFIG.wire.headerInterval) return;
 
-        RadioHeader header = new RadioHeader(this.location);
-        this.route(header);
+        //RadioHeader header = new RadioHeader(this.location);
+        //this.route(header);
 
         this.lastHeader = currentTime;
     }

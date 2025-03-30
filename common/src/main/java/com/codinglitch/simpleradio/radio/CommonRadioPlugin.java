@@ -1,9 +1,11 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.VolumeCategory;
+import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent;
@@ -122,6 +124,7 @@ public class CommonRadioPlugin {
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(VoicechatServerStartedEvent.class, this::onServerStarted);
         registration.registerEvent(MicrophonePacketEvent.class, microphonePacketEvent -> executor.submit(() -> RadioManager.getInstance().onMicPacket(microphonePacketEvent)));
+        registration.registerEvent(ClientReceiveSoundEvent.class, ClientRadioManager::onSoundEvent);
     }
 
     public void onServerStarted(VoicechatServerStartedEvent event) {

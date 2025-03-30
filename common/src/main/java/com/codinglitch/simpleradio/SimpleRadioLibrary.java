@@ -3,7 +3,9 @@ package com.codinglitch.simpleradio;
 import com.codinglitch.lexiconfig.LexiconfigApi;
 import com.codinglitch.lexiconfig.Library;
 import com.codinglitch.lexiconfig.annotations.LexiconLibrary;
+import com.codinglitch.simpleradio.api.FrequencingRegistry;
 import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.blocks.AntennaBlock;
 
@@ -28,5 +30,8 @@ public class SimpleRadioLibrary extends Library {
 
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> SimpleRadioItems.reload());
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> SimpleRadioItems.reload());
+
+        LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> FrequencingRegistry.reload());
+        LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> FrequencingRegistry.reload());
     }
 }

@@ -5,14 +5,13 @@ import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
 import com.codinglitch.simpleradio.client.core.registry.renderers.*;
 import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
-import com.codinglitch.simpleradio.core.registry.particles.SpeakParticle;
+import com.codinglitch.simpleradio.core.registry.particles.SpeakLineParticle;
+import com.codinglitch.simpleradio.core.registry.particles.SpeakRingParticle;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -27,16 +26,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.util.BiConsumer;
 import org.apache.logging.log4j.util.TriConsumer;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class CommonSimpleRadioClient {
@@ -109,7 +104,8 @@ public class CommonSimpleRadioClient {
         <O extends ParticleOptions> void register(ParticleType<O> type, ParticleEngine.SpriteParticleRegistration<O> registration);
     }
     public static void loadParticles(ParticleProviderRegistry registry) {
-        registry.register(SimpleRadioParticles.SPEAK, SpeakParticle.Provider::new);
+        registry.register(SimpleRadioParticles.SPEAK_RING, SpeakRingParticle.Provider::new);
+        registry.register(SimpleRadioParticles.SPEAK_LINE, SpeakLineParticle.Provider::new);
     }
 
     // -- Atlases -- \\

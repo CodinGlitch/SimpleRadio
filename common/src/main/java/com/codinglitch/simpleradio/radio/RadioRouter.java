@@ -61,6 +61,8 @@ public class RadioRouter implements Socket {
     public boolean active = true;
     public boolean distributes = false;
     public boolean valid = true;
+
+    public short identifier;
     public UUID id;
     public Entity owner;
     public WorldlyPosition location;
@@ -90,9 +92,8 @@ public class RadioRouter implements Socket {
     @Nullable
     public static RadioReceiver getRouterFromReceivers(UUID uuid) {
         for (Frequency frequency : Frequency.getFrequencies()) {
-            for (RadioReceiver receiver : frequency.receivers) {
-                if (receiver.id.equals(uuid)) return receiver;
-            }
+            RadioReceiver receiver = frequency.getReceiver(uuid);
+            if (receiver != null) return receiver;
         }
         return null;
     }
@@ -100,9 +101,8 @@ public class RadioRouter implements Socket {
     @Nullable
     public static RadioTransmitter getRouterFromTransmitters(UUID uuid) {
         for (Frequency frequency : Frequency.getFrequencies()) {
-            for (RadioTransmitter transmitter : frequency.transmitters) {
-                if (transmitter.id.equals(uuid)) return transmitter;
-            }
+            RadioTransmitter transmitter = frequency.getTransmitter(uuid);
+            if (transmitter != null) return transmitter;
         }
         return null;
     }
@@ -127,6 +127,10 @@ public class RadioRouter implements Socket {
     @Override
     public UUID getID() {
         return this.id;
+    }
+
+    public short getIdentifier() {
+        return this.identifier;
     }
 
     @Override
@@ -242,6 +246,11 @@ public class RadioRouter implements Socket {
 
             if (routeCriteria != null && !routeCriteria.test(source, router)) continue;
 
+            if (source.willShort(router)) {
+                router.shortCircuit();
+                continue;
+            }
+
             source = this.prepareSource(source, router);
 
             RadioSource oldSource = source;
@@ -269,13 +278,13 @@ public class RadioRouter implements Socket {
 
             boolean flag = true;
             if (this instanceof RadioSpeaker) {
-                flag = Auricular.validate(location, Speaking.class);
+                flag = Auricular.validate(location, this.link != null ? this.link : Speaking.class);
             } else if (this instanceof RadioListener) {
-                flag = Auricular.validate(location, Listening.class);
+                flag = Auricular.validate(location, this.link != null ? this.link : Listening.class);
             } else if (this instanceof RadioReceiver) {
-                flag = Frequencing.validate(location, Receiving.class, null);
+                flag = Frequencing.validate(location, this.link != null ? this.link : Receiving.class, null);
             } else if (this instanceof RadioTransmitter) {
-                flag = Frequencing.validate(location, Transmitting.class, null);
+                flag = Frequencing.validate(location, this.link != null ? this.link : Transmitting.class, null);
             } else {
                 flag = this.link != null && RadioManager.verifyLocationCollection(location, this.link);
             }
@@ -287,13 +296,13 @@ public class RadioRouter implements Socket {
         } else {
             boolean flag = true;
             if (this instanceof RadioSpeaker) {
-                flag = Auricular.validate(owner, Speaking.class);
+                flag = Auricular.validate(owner, this.link != null ? this.link : Speaking.class);
             } else if (this instanceof RadioListener) {
-                flag = Auricular.validate(owner, Listening.class);
+                flag = Auricular.validate(owner, this.link != null ? this.link : Listening.class);
             } else if (this instanceof RadioReceiver) {
-                flag = Frequencing.validate(owner, Receiving.class, null);
+                flag = Frequencing.validate(owner, this.link != null ? this.link : Receiving.class, null);
             } else if (this instanceof RadioTransmitter) {
-                flag = Frequencing.validate(owner, Transmitting.class, null);
+                flag = Frequencing.validate(owner, this.link != null ? this.link : Transmitting.class, null);
             } else {
                 flag = this.link != null && RadioManager.verifyEntityCollection(owner, stack -> this.link.isAssignableFrom(stack.getItem().getClass()));
             }

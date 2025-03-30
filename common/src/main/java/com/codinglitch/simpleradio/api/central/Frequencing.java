@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface Frequencing {
-    static boolean validate(WorldlyPosition position, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+    static boolean validate(WorldlyPosition position, Class<?> clazz, @Nullable Frequency frequency) {
         return RadioManager.verifyLocationCollection(position, clazz);
     }
     static boolean validate(UUID uuid, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
@@ -30,12 +30,12 @@ public interface Frequencing {
         if (connection != null) return validate(connection, clazz, frequency);
         return false;
     }
-    static boolean validate(VoicechatConnection connection, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+    static boolean validate(VoicechatConnection connection, Class<?> clazz, @Nullable Frequency frequency) {
         ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
         if (player == null) return false;
         return validate(player, clazz, frequency);
     }
-    static boolean validate(Entity entity, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+    static boolean validate(Entity entity, Class<?> clazz, @Nullable Frequency frequency) {
         return RadioManager.verifyEntityCollection(entity, stack -> {
             if (clazz.isAssignableFrom(stack.getItem().getClass()))
                 return frequency == null || ((Frequencing) stack.getItem()).getFrequency(stack) == frequency;

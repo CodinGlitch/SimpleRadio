@@ -54,6 +54,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
+        CommonSimpleRadio.info("activating client:{}", level.isClientSide);
+
         RadioListener listener = startListening(entity, owner);
         RadioSpeaker speaker = startSpeaking(entity, owner);
         RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
@@ -124,26 +126,29 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             tag.putString("frequency", frequency);
         }
 
+        CommonSimpleRadio.info("{} {}", entity.level().isClientSide, tag);
+
         UUID uuid = entity.getUUID();
         if (tag.contains("user")) {
             UUID currentUUID = tag.getUUID("user");
             if (currentUUID.equals(uuid)) {
-                if (validate(frequency, Frequency.modulationOf(modulation), currentUUID)) return;
+                return;
             } else {
                 inactivate(level, frequency, modulation, currentUUID);
             }
         }
 
+        tag.putUUID("user", uuid);
         frequency = tag.getString("frequency");
         modulation = tag.getString("modulation");
         activate(level, stack, frequency, modulation, entity, uuid);
-
-        tag.putUUID("user", uuid);
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
-        super.inventoryTick(stack, level, entity, slot, b);
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
+        if (selected) return;
+
         entityTick(stack, entity);
     }
 
