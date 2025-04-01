@@ -13,10 +13,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
-public class SpeakLineParticle extends AlignedParticle {
-    SpeakLineParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+public class ListenParticle extends AlignedParticle {
+    ListenParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
-        this.lifetime = 5;
+        this.lifetime = 4;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -28,7 +28,7 @@ public class SpeakLineParticle extends AlignedParticle {
         }
 
         public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            return new SpeakLineParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
+            return new ListenParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
         }
     }
 }

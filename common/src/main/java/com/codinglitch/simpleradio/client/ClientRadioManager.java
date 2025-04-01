@@ -9,6 +9,8 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSound
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
+import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
+import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlockEntity;
 import com.codinglitch.simpleradio.platform.ClientServices;
@@ -39,9 +41,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -342,6 +346,27 @@ public class ClientRadioManager {
                 byte[] encodedData = encoder.encode(frame);
 
             }*/
+    }
+
+    public static void handleListenParticle(BlockState state, MicrophoneBlockEntity blockEntity) {
+        RadioRouter mainRouter = blockEntity.getRouter();
+        if (mainRouter == null) return;
+
+        float rotation = RotationSegment.convertToDegrees(state.getValue(MicrophoneBlock.ROTATION));
+
+        Vector3f direction = new Vector3f(0f, 1f, 0f);
+        direction.rotateX(blockEntity.currentTilt);
+        direction.rotateY(Math.toRadians(-rotation));
+
+        WorldlyPosition position = mainRouter.getLocation();
+
+        if (mainRouter.rotation != null) {
+            mainRouter.rotation.transform(direction);
+        }
+
+        Vector3f pos = position.add(direction.x*0.4f, direction.y*0.4f, direction.z*0.4f, new Vector3f());
+        blockEntity.getLevel().addParticle(SimpleRadioParticles.LISTEN, pos.x, pos.y, pos.z, direction.x*0.01f, direction.y*0.01f, direction.z*0.01f);
+
     }
 
     public static void handleSpeakParticle(BlockState state, SpeakerBlockEntity blockEntity) {

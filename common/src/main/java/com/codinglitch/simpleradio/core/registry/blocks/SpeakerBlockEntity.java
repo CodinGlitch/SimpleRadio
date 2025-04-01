@@ -70,7 +70,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
         if (blockEntity.level == null) return;
         if (blockEntity.level.isClientSide && blockEntity.level.getGameTime() % 10 == 0) {
-            ClientRadioManager.handleSpeakParticle(state, blockEntity);
+            if (blockEntity.speaker != null && blockEntity.speaker.activity > 0) ClientRadioManager.handleSpeakParticle(state, blockEntity);
         }
     }
 

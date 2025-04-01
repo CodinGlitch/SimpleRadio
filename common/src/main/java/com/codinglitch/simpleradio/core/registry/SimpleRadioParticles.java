@@ -13,6 +13,7 @@ public class SimpleRadioParticles {
 
     public static final SimpleParticleType SPEAK_RING = register(CommonSimpleRadio.id("speak_ring"), new SimpleParticleType(true));
     public static final SimpleParticleType SPEAK_LINE = register(CommonSimpleRadio.id("speak_line"), new SimpleParticleType(true));
+    public static final SimpleParticleType LISTEN = register(CommonSimpleRadio.id("listen"), new SimpleParticleType(true));
 
     private static <T extends ParticleType<?>> T register(ResourceLocation location, T type) {
         PARTICLES.put(location, type);

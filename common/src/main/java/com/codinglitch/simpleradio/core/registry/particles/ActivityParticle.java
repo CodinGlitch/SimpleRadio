@@ -9,14 +9,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class SpeakParticle extends TextureSheetParticle {
+public class ActivityParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
     protected float growth = 0;
 
-    SpeakParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    ActivityParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z);
         this.setAlpha(1);
         this.quadSize = 0.4f;
@@ -110,7 +109,7 @@ public class SpeakParticle extends TextureSheetParticle {
         }
 
         public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            return new SpeakParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
+            return new ActivityParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
         }
     }
 }
