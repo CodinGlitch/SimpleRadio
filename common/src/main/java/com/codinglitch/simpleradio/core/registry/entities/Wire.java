@@ -197,7 +197,8 @@ public class Wire extends Entity implements Medium {
 
     @Nullable
     public String getFromType() {
-        return this.getEntityData().get(FROM_TYPE);
+        String type = this.getEntityData().get(FROM_TYPE);
+        return type.isEmpty() ? null : type;
     }
     public void setFrom(RadioRouter from) {
         this.getEntityData().set(FROM, Optional.of(from.getReference()));
@@ -217,7 +218,8 @@ public class Wire extends Entity implements Medium {
     }
     @Nullable
     public String getToType() {
-        return this.getEntityData().get(TO_TYPE);
+        String type = this.getEntityData().get(TO_TYPE);
+        return type.isEmpty() ? null : type;
     }
     public void setTo(RadioRouter to) {
         this.getEntityData().set(TO, Optional.of(to.getReference()));

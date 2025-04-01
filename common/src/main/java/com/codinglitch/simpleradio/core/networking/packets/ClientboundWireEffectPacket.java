@@ -38,7 +38,7 @@ public record ClientboundWireEffectPacket(int id, boolean reversed) implements P
             if (entity instanceof Wire wire) {
                 Wire.Effect effect = new Wire.Effect();
                 if (reversed) {
-                    effect.progress = (int) Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * wire.getLength());
+                    effect.progress = Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * wire.getLength());
                     effect.direction = -1;
                 } else {
                     effect.progress = 0;
