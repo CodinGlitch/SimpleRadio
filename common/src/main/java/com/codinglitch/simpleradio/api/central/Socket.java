@@ -7,6 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -51,17 +52,19 @@ public interface Socket {
     }
 
     default boolean hasWire(Wire wire) {
-        Optional<UUID> from = wire.getFrom();
-        Optional<UUID> to = wire.getTo();
-        if (from.isEmpty() || to.isEmpty()) return false;
+        return this.hasWire(wire.getFrom().orElse(null), wire.getTo().orElse(null));
+    }
+
+    default boolean hasWire(UUID from, UUID to) {
+        if (from == null || to == null) return false;
 
         for (Wire otherWire : this.getWires()) {
             Optional<UUID> otherFrom = otherWire.getFrom();
             Optional<UUID> otherTo = otherWire.getTo();
             if (otherFrom.isEmpty() || otherTo.isEmpty()) continue;
 
-            if (otherFrom.equals(from) && otherTo.equals(to)) return true;
-            if (otherFrom.equals(to) && otherTo.equals(from)) return true;
+            if (otherFrom.get().equals(from) && otherTo.get().equals(to)) return true;
+            if (otherFrom.get().equals(to) && otherTo.get().equals(from)) return true;
         }
 
         return false;
@@ -93,29 +96,29 @@ public interface Socket {
         WorldlyPosition location = router.getLocation();
 
         Level level = location.level;
-
-        if (level instanceof ServerLevel serverLevel) {
-            serverLevel.playSound(null, location.x, location.y, location.z, SimpleRadioSounds.SHORT_CIRCUIT, SoundSource.BLOCKS, 0.3f, 0.9f + level.random.nextFloat()*0.2f);
-
-            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                    location.x, location.y, location.z, 10,
-                    -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
-            );
-            serverLevel.sendParticles(ParticleTypes.CRIT,
-                    location.x, location.y, location.z, 8,
-                    -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
-            );
-            serverLevel.sendParticles(ParticleTypes.POOF,
-                    location.x, location.y, location.z, 5,
-                    0.2d, 0.2d, 0.2d, 0.1d
-            );
-        }
-
+        if (level instanceof ServerLevel serverLevel) shortAt(serverLevel, location);
 
         for (Object wire : router.getWires().toArray()) {
-            ((Wire) wire).shortCircuit();
+            ((Wire) wire).burnOut();
         }
         this.getWires().clear();
+    }
+
+    static void shortAt(ServerLevel level, Vector3f location) {
+        level.playSound(null, location.x, location.y, location.z, SimpleRadioSounds.SHORT_CIRCUIT, SoundSource.BLOCKS, 0.3f, 0.9f + level.random.nextFloat()*0.2f);
+
+        level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                location.x, location.y, location.z, 10,
+                -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
+        );
+        level.sendParticles(ParticleTypes.CRIT,
+                location.x, location.y, location.z, 8,
+                -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
+        );
+        level.sendParticles(ParticleTypes.POOF,
+                location.x, location.y, location.z, 5,
+                0.2d, 0.2d, 0.2d, 0.1d
+        );
     }
 
     /**

@@ -9,11 +9,9 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffect
 import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioHeader;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioSource;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -30,8 +28,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
+import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Wire extends Entity implements Medium {
     private static final EntityDataAccessor<Optional<UUID>> FROM = SynchedEntityData.defineId(Wire.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -41,6 +42,9 @@ public class Wire extends Entity implements Medium {
     private static final EntityDataAccessor<String> TO_TYPE = SynchedEntityData.defineId(Wire.class, EntityDataSerializers.STRING);
 
     private int killTime = -1;
+
+    private int deathRowTime = -1;
+    private float deathRowPosition = -1;
 
 
     private HashMap<UUID, Integer> effectCooldowns = new HashMap<>();
@@ -77,20 +81,16 @@ public class Wire extends Entity implements Medium {
         RadioRouter toRouter = to.getRouter();
         if (toRouter == null) return null;
 
+        UUID fromRef = fromRouter.getReference();
+        UUID toRef = toRouter.getReference();
+
+        if (from.hasWire(fromRef, toRef)) return null;
+        if (to.hasWire(fromRef, toRef)) return null;
+
         Wire wire = new Wire(level);
         wire.moveTo(new Vec3(fromRouter.location));
         wire.setFrom(fromRouter);
         wire.setTo(toRouter);
-
-        if (from.hasWire(wire)) {
-            wire.kill();
-            return null;
-        }
-
-        if (to.hasWire(wire)) {
-            wire.kill();
-            return null;
-        }
 
         level.addFreshEntity(wire);
 
@@ -141,7 +141,37 @@ public class Wire extends Entity implements Medium {
 
         Level level = this.level();
         boolean isReversed = originSocket.getReference().equals(toRef);
+        RadioRouter origin = isReversed ? to : from;
         RadioRouter destination = isReversed ? from : to;
+
+        // Short circuit a socket if we have visited it previously
+        if (source.willShort(destination)) {
+            destination.shortCircuit();
+            return;
+        }
+
+        // Short circuit a wire if two sources are colliding on it
+        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime != -1) {
+            AtomicInteger timeUntilDemise = new AtomicInteger();
+            AtomicReference<Float> placeOfDemise = new AtomicReference<>((float) 0);
+            if (RadioManager.readQueue(queued -> {
+                if (queued.source.wireMedium.equals(this) && queued.router.equals(origin)) {
+                    int maxProgress = Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength());
+                    float progress = (float) queued.time / maxProgress;
+
+                    timeUntilDemise.set((int) Math.ceil((float)queued.time / 2f));
+                    if (isReversed) {
+                        placeOfDemise.set(1 - progress);
+                    } else {
+                        placeOfDemise.set(progress);
+                    }
+                    return true;
+                }
+                return false;
+            })) {
+                this.queueDemise(timeUntilDemise.get(), placeOfDemise.get());
+            }
+        }
 
         if (!level.isClientSide() && !effectCooldowns.containsKey(source.owner) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
             for (Player player : level.players()) {
@@ -153,24 +183,14 @@ public class Wire extends Entity implements Medium {
             this.effectCooldowns.put(source.owner, SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
         }
 
-        if (source.willShort(destination)) {
-            destination.shortCircuit();
-            return;
-        }
-
-        if (isReversed) {
-            CommonSimpleRadio.info("Relaying from {} to {}", to, from);
-        } else {
-            CommonSimpleRadio.info("Relaying from {} to {}", from, to);
-        }
-
+        //CommonSimpleRadio.info("Relaying from {} to {}", origin, destination);
 
         source.travel(from, to, this);
 
         if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime == -1) {
             destination.accept(source);
         } else {
-            RadioManager.queueSource(source, destination, (int) Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));
+            RadioManager.queueSource(source, destination, Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));
         }
     }
 
@@ -181,7 +201,7 @@ public class Wire extends Entity implements Medium {
         RadioRouter to = this.getToRouter();
         if (to == null) return 0;
 
-        return from.getLocation().distance(to.getLocation());
+        return from.getLocation().position().distance(to.getLocation().position());
     }
 
     @Nullable
@@ -227,9 +247,22 @@ public class Wire extends Entity implements Medium {
             this.getEntityData().set(TO_TYPE, to.getClass().getSimpleName());
     }
 
-    public void shortCircuit() {
+    public void burnOut() {
         RadioManager.dequeueSource(queuedSource -> queuedSource.source.wireMedium == this);
         this.kill();
+    }
+
+    public void shortCircuit(Vector3f at) {
+        if (level() instanceof ServerLevel level) Socket.shortAt(level, at);
+        this.burnOut();
+    }
+    public void shortCircuit() {
+        this.shortCircuit(this.position().toVector3f());
+    }
+
+    public void queueDemise(int time, float position) {
+        this.deathRowTime = time;
+        this.deathRowPosition = position;
     }
 
     private void tickDeath() {
@@ -257,7 +290,7 @@ public class Wire extends Entity implements Medium {
         UUID toRef = this.getTo().orElse(null);
 
         if (this.level().isClientSide) {
-            int effectDuration = (int) Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
+            int effectDuration = Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
 
             Iterator<Effect> iterator = this.effectList.iterator();
             while (iterator.hasNext()) {
@@ -303,9 +336,18 @@ public class Wire extends Entity implements Medium {
                     return;
                 }
 
-                if (from.location.position().distance(to.location.position()) > SimpleRadioLibrary.SERVER_CONFIG.wire.range) {
+                if (from.getLocation().position().distance(to.getLocation().position()) > SimpleRadioLibrary.SERVER_CONFIG.wire.range) {
                     this.tickDeath();
                     return;
+                }
+
+                if (deathRowTime != -1) {
+                    if (deathRowTime-- == 0) {
+                        Vector3f position = from.getLocation().position().lerp(to.getLocation().position(), deathRowPosition);
+
+                        this.shortCircuit(position);
+                        return;
+                    }
                 }
 
                 //from.tryAddRouter(to);
