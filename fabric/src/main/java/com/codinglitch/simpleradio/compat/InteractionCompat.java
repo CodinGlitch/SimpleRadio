@@ -32,7 +32,7 @@ public class InteractionCompat {
 
             WorldlyPosition location = channel.location;
             location.level.getServer().execute(() -> {
-                if (setCooldown(channel.id, location.level)) {
+                if (setCooldown(channel.reference, location.level)) {
                     BlockState state = location.level.getBlockState(location.blockPos());
 
                     location.level.gameEvent(VoicechatInteraction.VOICE_GAME_EVENT, location.blockPos(), GameEvent.Context.of(state));

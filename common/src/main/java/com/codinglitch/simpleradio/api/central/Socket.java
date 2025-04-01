@@ -5,11 +5,11 @@ import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -51,14 +51,14 @@ public interface Socket {
     }
 
     default boolean hasWire(Wire wire) {
-        UUID from = wire.getFrom().orElse(null);
-        UUID to = wire.getTo().orElse(null);
-        if (from == null || to == null) return false;
+        Optional<UUID> from = wire.getFrom();
+        Optional<UUID> to = wire.getTo();
+        if (from.isEmpty() || to.isEmpty()) return false;
 
         for (Wire otherWire : this.getWires()) {
-            UUID otherFrom = otherWire.getFrom().orElse(null);
-            UUID otherTo = otherWire.getTo().orElse(null);
-            if (otherFrom == null || otherTo == null) continue;
+            Optional<UUID> otherFrom = otherWire.getFrom();
+            Optional<UUID> otherTo = otherWire.getTo();
+            if (otherFrom.isEmpty() || otherTo.isEmpty()) continue;
 
             if (otherFrom.equals(from) && otherTo.equals(to)) return true;
             if (otherFrom.equals(to) && otherTo.equals(from)) return true;
@@ -77,8 +77,11 @@ public interface Socket {
         this.getWires().removeIf(otherWire -> otherWire.getUUID().equals(wire));
     }
 
-    default UUID getID() {
-        return this.getRouter().getID();
+    default UUID getReference() {
+        return this.getRouter().getReference();
+    }
+    default short getIdentifier() {
+        return this.getRouter().getIdentifier();
     }
 
     default ArrayList<Wire> getWires() {

@@ -33,6 +33,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 public class WireRenderer extends EntityRenderer<Wire> {
@@ -72,7 +73,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
             float progress = i/SEGMENTS;
 
             float effector = 0;
-            if (wire != null) {
+            if (wire != null && SimpleRadioLibrary.CLIENT_CONFIG.wire.effect) {
                 double effectDuration = distance * SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime;
                 for (Wire.Effect effect : wire.effectList) {
                     float effectProgress = (float) ((effect.progress + (effect.direction * partialTick)) / effectDuration);
@@ -130,17 +131,17 @@ public class WireRenderer extends EntityRenderer<Wire> {
 
     @Override
     public void render(Wire wire, float f, float partialTick, PoseStack poseStack, MultiBufferSource source, int i) {
-        UUID fromUUID = wire.getFrom().orElse(null);
-        UUID toUUID = wire.getTo().orElse(null);
+        Optional<UUID> fromRef = wire.getFrom();
+        Optional<UUID> toRef = wire.getTo();
 
-        if (fromUUID != null) {
-            RadioRouter from = ClientRadioManager.getRouter(fromUUID);
+        if (fromRef.isPresent()) {
+            RadioRouter from = ClientRadioManager.getRouter(fromRef.get());
             if (from == null) return;
 
             //wire.setPos(new Vec3(from.getLocation().position()));
 
-            if (toUUID != null) {
-                RadioRouter to = ClientRadioManager.getRouter(toUUID);
+            if (toRef.isPresent()) {
+                RadioRouter to = ClientRadioManager.getRouter(toRef.get());
                 if (to == null) return;
 
                 Vec3 fromPosition = from.getConnectionPosition();

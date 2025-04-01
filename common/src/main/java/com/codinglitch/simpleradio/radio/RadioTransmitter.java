@@ -6,7 +6,6 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;
@@ -64,7 +63,7 @@ public class RadioTransmitter extends RadioRouter {
         return this;
     }
 
-    public double getPower(Frequency.Modulation modulation) {
+    public float getPower(Frequency.Modulation modulation) {
         int baseTransmissionPower = frequencingType.getTransmissionPower(modulation);
 
         return baseTransmissionPower + (antennaPower * frequencingType.antennaAptitude);
@@ -96,8 +95,11 @@ public class RadioTransmitter extends RadioRouter {
     @Override
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
         if (source.frequencingType == -1) {
+            float transmissionPower = getPower(frequency.modulation);
+
             source.frequencingType = this.frequencingType.id;
-            source.addPower(getPower(frequency.modulation));
+            source.addPower(transmissionPower);
+            source.transmissionCap = transmissionPower;
 
             //CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
         }
@@ -110,7 +112,7 @@ public class RadioTransmitter extends RadioRouter {
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
 
         this.route(source, router -> {
-            return source.owner == null || !source.owner.equals(router.id);
+            return source.owner == null || !source.owner.equals(router.reference);
         });
     }
 }

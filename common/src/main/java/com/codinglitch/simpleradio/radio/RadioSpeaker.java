@@ -7,7 +7,6 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSound
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -29,7 +28,6 @@ import java.util.function.Supplier;
  * <b>Does not route further.</b>
  */
 public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
-
     // migrated to locational audio channels only due to alternatives not having range property
     public LocationalAudioChannel audioChannel;
     public AudioPlayer audioPlayer;
@@ -39,6 +37,8 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
     public String category;
     public float range = 8;
+
+    public int speakingTime = 0;
 
     protected RadioSpeaker(UUID id) {
         super(id);
@@ -119,58 +119,11 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         }
     }
 
-    private static final int FRAME_SIZE = 960;  // Size of each audio frame
-    private static final int OVERLAP = FRAME_SIZE / 2;  // 50% overlap
-    private static final int UPPER_BOUND = FRAME_SIZE - OVERLAP;  // 50% overlap
+    @Override
+    public void tick(int tickCount) {
+        super.tick(tickCount);
 
-    private short[] previousOverlap = new short[FRAME_SIZE];  // Stores the overlap from the last frame
-
-    public short[] processFrame(short[] inputFrame, double pitch) {
-        // Resample the frame to change pitch
-        short[] resampledFrame = resample(inputFrame, pitch);
-        short[] outputFrame = new short[inputFrame.length];
-
-        // Apply overlap-add for smooth transition
-        for (int i = 0; i < outputFrame.length; i++) {
-            outputFrame[i] = resampledFrame[i % resampledFrame.length];
-        }
-
-        for (int i = 0; i < OVERLAP; i++) {
-            double factor = (double) i/OVERLAP;
-            outputFrame[i] = (short) ((outputFrame[i] * factor) + (previousOverlap[i] * (1 - factor)));
-        }
-
-        // Store the new overlap
-        for (int i = 0; i < OVERLAP; i++) {
-            previousOverlap[i] = outputFrame[OVERLAP + i];
-        }
-
-        return outputFrame;
-    }
-
-    private short[] resample(short[] data, double pitch) {
-        int newLength = (int) (data.length / pitch);
-        if (newLength == data.length) return data;
-
-        short[] resampledData = new short[newLength];
-
-        // Perform linear interpolation for resampling
-        for (int i = 0; i < newLength; i++) {
-            // Calculate the exact position in the original data
-            double originalIndex = i * pitch;
-
-            // Find the surrounding indices
-            int index1 = (int) Math.floor(originalIndex);
-            int index2 = Math.min(index1 + 1, data.length - 1); // Clamp to avoid out-of-bounds
-
-            // Interpolate between the two points
-            double weight2 = originalIndex - index1; // Fractional part
-            double weight1 = 1.0 - weight2;
-
-            resampledData[i] = (short) ((data[index1] * weight1) + (data[index2] * weight2));
-        }
-
-        return resampledData;
+        if (speakingTime > 0) speakingTime--;
     }
 
     @Override
@@ -209,7 +162,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             for (ServerPlayer player : level.players()) {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
                     Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
-                            this.getID(), Holder.direct(source.soundEvent),
+                            this.getReference(), Holder.direct(source.soundEvent),
                             source.volume, source.pitch, this.effect.severity, source.offset, source.seed
                     ));
                 }
@@ -256,7 +209,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         if (this.audioPlayer == null) {
 
             WorldlyPosition location = this.getLocation();
-            this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.id,
+            this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.reference,
                     CommonRadioPlugin.serverApi.fromServerLevel(location.level),
                     CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
             );

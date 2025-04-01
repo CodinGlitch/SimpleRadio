@@ -145,7 +145,7 @@ public class Frequency implements Medium {
         return getReceiver(receiver -> owner.equals(receiver.owner));
     }
     public RadioReceiver getReceiver(UUID id) {
-        return getReceiver(receiver -> id.equals(receiver.id));
+        return getReceiver(receiver -> id.equals(receiver.reference));
     }
 
     public void registerReceiver(RadioReceiver receiver) {
@@ -159,7 +159,7 @@ public class Frequency implements Medium {
 
         RadioManager.registerRouterSided(receiver, isClient, this);
 
-        CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.id, this.frequency);
+        CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.reference, this.frequency);
         return receiver;
     }
 
@@ -211,7 +211,7 @@ public class Frequency implements Medium {
         removeReceiver(receiver -> location.equals(receiver.location));
     }
     public void removeReceiver(UUID id) {
-        removeReceiver(receiver -> id.equals(receiver.id));
+        removeReceiver(receiver -> id.equals(receiver.reference));
     }
 
     //---- Transmitters ----\\
@@ -227,7 +227,7 @@ public class Frequency implements Medium {
         return getTransmitter(transmitter -> owner.equals(transmitter.owner));
     }
     public RadioTransmitter getTransmitter(UUID id) {
-        return getTransmitter(transmitter -> id.equals(transmitter.id));
+        return getTransmitter(transmitter -> id.equals(transmitter.reference));
     }
 
     public void registerTransmitter(RadioTransmitter transmitter) {
@@ -241,7 +241,7 @@ public class Frequency implements Medium {
 
         RadioManager.registerRouterSided(transmitter, isClient, this);
 
-        CommonSimpleRadio.debug("Added transmitter {} to frequency {}", transmitter.id, this.frequency);
+        CommonSimpleRadio.debug("Added transmitter {} to frequency {}", transmitter.reference, this.frequency);
         return transmitter;
     }
 
@@ -293,7 +293,7 @@ public class Frequency implements Medium {
         removeTransmitter(transmitter -> location.equals(transmitter.location));
     }
     public void removeTransmitter(UUID id) {
-        removeTransmitter(transmitter -> id.equals(transmitter.id));
+        removeTransmitter(transmitter -> id.equals(transmitter.reference));
     }
 
     public void serverTick(int tickCount) {

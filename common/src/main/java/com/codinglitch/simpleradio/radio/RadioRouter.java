@@ -2,18 +2,18 @@ package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.*;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -22,33 +22,7 @@ import java.util.function.Predicate;
  * Routes RadioSources to other routers.
  */
 public class RadioRouter implements Socket {
-    public enum Type { //TODO: turn this into a registry of sorts
-        LISTENER(RadioListener.class),
-        SPEAKER(RadioSpeaker.class),
-        TRANSMITTER(RadioTransmitter.class),
-        RECEIVER(RadioReceiver.class);
-
-        final Class<? extends RadioRouter> matchingClass;
-
-        Type(Class<? extends RadioRouter> matchingClass) {
-            this.matchingClass = matchingClass;
-        }
-
-        public static Type byName(String name) {
-            return Arrays.stream(Type.values())
-                    .filter(value -> value.name().equalsIgnoreCase(name))
-                    .findFirst().orElse(null);
-        }
-
-        public static Type byClass(Class<?> clazz) {
-            return Arrays.stream(Type.values())
-                    .filter(value -> value.matchingClass.equals(clazz))
-                    .findFirst().orElse(null);
-        }
-        public static <T extends RadioRouter> Type byInstance(T instance) {
-            return byClass(instance.getClass());
-        }
-    }
+    public static final Map<String, Function<UUID, RadioRouter>> typeLookup = new HashMap<>();
 
     public ArrayList<Wire> wires = new ArrayList<>();
 
@@ -63,19 +37,21 @@ public class RadioRouter implements Socket {
     public boolean valid = true;
 
     public short identifier;
-    public UUID id;
+    public UUID reference;
     public Entity owner;
     public WorldlyPosition location;
     public Vector3f oldPosition = new Vector3f();
     public Vector3f velocity = new Vector3f();
+
+    public short activity = 0;
 
     public Class<?> link;
 
     public Quaternionf rotation = null;
     public Vec3 connectionOffset = Vec3.ZERO; // A given offset for the rendering of wires connected to it. Relative to rotation if given.
 
-    public RadioRouter(UUID id) {
-        this.id = id;
+    public RadioRouter(UUID reference) {
+        this.reference = reference;
     }
     public RadioRouter() {
         this(UUID.randomUUID());
@@ -84,39 +60,27 @@ public class RadioRouter implements Socket {
     public RadioRouter(WorldlyPosition location) {
         this(location, UUID.randomUUID());
     }
-    public RadioRouter(WorldlyPosition location, UUID uuid) {
-        this(uuid);
+    public RadioRouter(WorldlyPosition location, UUID reference) {
+        this(reference);
         this.location = location;
     }
 
     @Nullable
-    public static RadioReceiver getRouterFromReceivers(UUID uuid) {
+    public static RadioReceiver getRouterFromReceivers(UUID reference) {
         for (Frequency frequency : Frequency.getFrequencies()) {
-            RadioReceiver receiver = frequency.getReceiver(uuid);
+            RadioReceiver receiver = frequency.getReceiver(reference);
             if (receiver != null) return receiver;
         }
         return null;
     }
 
     @Nullable
-    public static RadioTransmitter getRouterFromTransmitters(UUID uuid) {
+    public static RadioTransmitter getRouterFromTransmitters(UUID reference) {
         for (Frequency frequency : Frequency.getFrequencies()) {
-            RadioTransmitter transmitter = frequency.getTransmitter(uuid);
+            RadioTransmitter transmitter = frequency.getTransmitter(reference);
             if (transmitter != null) return transmitter;
         }
         return null;
-    }
-
-    @Nullable
-    public static RadioRouter getRouterFromUUID(UUID uuid, @Nullable Type type) {
-        if (type == null) return RadioManager.getRouter(uuid);
-
-        return switch (type) {
-            case SPEAKER -> RadioManager.getSpeaker(uuid);
-            case LISTENER -> RadioManager.getListener(uuid);
-            case TRANSMITTER -> getRouterFromTransmitters(uuid);
-            case RECEIVER -> getRouterFromReceivers(uuid);
-        };
     }
 
     @Override
@@ -125,8 +89,8 @@ public class RadioRouter implements Socket {
     }
 
     @Override
-    public UUID getID() {
-        return this.id;
+    public UUID getReference() {
+        return this.reference;
     }
 
     public short getIdentifier() {
@@ -167,14 +131,14 @@ public class RadioRouter implements Socket {
     }
 
     public RadioRouter tryAddRouter(RadioRouter router) {
-        RadioRouter existingRouter = getRouter(router.id);
+        RadioRouter existingRouter = getRouter(router.reference);
         if (existingRouter != null) return existingRouter;
 
         routers.add(router);
         return router;
     }
     public RadioRouter getRouter(UUID id) {
-        return routers.stream().filter(router -> router.id.equals(id)).findFirst().orElse(null);
+        return routers.stream().filter(router -> router.reference.equals(id)).findFirst().orElse(null);
     }
 
     //this method is so dumb bro
@@ -263,6 +227,21 @@ public class RadioRouter implements Socket {
         this.route(source, null);
     }
 
+    public void trySendActivity() {
+        if (activity == 0) {
+            this.activity = 20; //TODO: make configurable and maybe just better 💀
+
+            WorldlyPosition location = getLocation();
+            if (!location.isClientSide()) {
+                for (Player player : location.level.players()) {
+                    if (location.distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
+                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(20, this.getReference()));
+                    }
+                }
+            }
+        }
+    }
+
     public void invalidate() {
         this.valid = false;
     }
@@ -313,5 +292,10 @@ public class RadioRouter implements Socket {
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "[" + this.getIdentifier() + "]" + this.getLocation().toString();
     }
 }

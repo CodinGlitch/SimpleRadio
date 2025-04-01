@@ -1,8 +1,6 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.CatalystRegistry;
-import com.codinglitch.simpleradio.api.FrequencingRegistry;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
@@ -45,11 +43,15 @@ public class FabricLoader {
     public static void loadPackets() {
         ServerPlayNetworking.registerGlobalReceiver(ServerboundRadioUpdatePacket.ID,
                 serverbound(ServerboundRadioUpdatePacket::decode, ServerboundRadioUpdatePacket::handle));
+        ServerPlayNetworking.registerGlobalReceiver(ServerboundRequestRouterPacket.ID,
+                serverbound(ServerboundRequestRouterPacket::decode, ServerboundRequestRouterPacket::handle));
     }
 
     public static void loadClientPackets() {
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundReceiverPacket.ID,
-                clientbound(ClientboundReceiverPacket::decode, ClientboundReceiverPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundRegisterRouterPacket.ID,
+                clientbound(ClientboundRegisterRouterPacket::decode, ClientboundRegisterRouterPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundActivityPacket.ID,
+                clientbound(ClientboundActivityPacket::decode, ClientboundActivityPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundTransceiverPacket.ID,
                 clientbound(ClientboundTransceiverPacket::decode, ClientboundTransceiverPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundWireEffectPacket.ID,
@@ -59,7 +61,7 @@ public class FabricLoader {
     }
 
     public static <P> ServerPlayNetworking.PlayChannelHandler serverbound(Function<FriendlyByteBuf, P> decoder, TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (server, player, _handler, buf, _responseSender) -> consumer.accept(decoder.apply(buf), server, player);
+        return (server, player, handler, buf, response) -> consumer.accept(decoder.apply(buf), server, player);
     }
     public static <P> ClientPlayNetworking.PlayChannelHandler clientbound(Function<FriendlyByteBuf, P> decoder, Consumer<P> consumer) {
         return (client, listener, buffer, sender) -> consumer.accept(decoder.apply(buffer));

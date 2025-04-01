@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundReceiverPacket;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -99,7 +99,7 @@ public class RadioReceiver extends RadioRouter {
             if (!location.isClientSide()) {
                 for (Player player : location.level.players()) {
                     if (location.distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
-                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundReceiverPacket(20, this.getID()));
+                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(20, this.getReference()));
                     }
                 }
             }

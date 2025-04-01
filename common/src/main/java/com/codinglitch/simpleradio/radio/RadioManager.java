@@ -3,9 +3,12 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.SimpleRadioApi;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundRegisterRouterPacket;
+import com.codinglitch.simpleradio.platform.Services;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.minecraft.core.BlockPos;
@@ -26,7 +29,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class RadioManager {
+public class RadioManager implements SimpleRadioApi {
     private static RadioManager INSTANCE;
 
     // double queue for the win
@@ -53,6 +56,7 @@ public class RadioManager {
     private static final RouterContainer<RadioSpeaker> speakers = new RouterContainer<>();
     private static final RouterContainer<RadioListener> listeners = new RouterContainer<>();
     static final Map<Short, RadioRouter> routers = new HashMap<>();
+
     public static RadioManager getInstance() {
         if (INSTANCE == null) INSTANCE = new RadioManager();
         return INSTANCE;
@@ -67,14 +71,21 @@ public class RadioManager {
             pushRouter(router);
         }
     }
-    public static void pushRouter(RadioRouter router) {
-        for (short id = Short.MIN_VALUE; id < Short.MAX_VALUE; id++) {
-            if (RadioManager.routers.containsKey(id)) continue;
 
-            router.identifier = id;
-            RadioManager.routers.put(id, router);
-            break;
+    public static short pushRouter(RadioRouter router) {
+        return pushRouter(routers, router);
+    }
+    public static short pushRouter(Map<Short, RadioRouter> map, RadioRouter router) {
+        for (short identifier = Short.MIN_VALUE; identifier < Short.MAX_VALUE; identifier++) {
+            if (map.containsKey(identifier)) continue;
+
+            router.identifier = identifier;
+            map.put(identifier, router);
+
+            return identifier;
         }
+
+        return Short.MAX_VALUE;
     }
 
     // ---- Speakers ---- \\
@@ -100,7 +111,7 @@ public class RadioManager {
         removeSpeaker(speaker -> location.equals(speaker.location));
     }
     public static void removeSpeaker(UUID id) {
-        removeSpeaker(speaker -> id.equals(speaker.id));
+        removeSpeaker(speaker -> id.equals(speaker.reference));
     }
 
     public static RadioSpeaker getSpeaker(Entity owner) {
@@ -110,7 +121,7 @@ public class RadioManager {
         return getSpeaker(speaker -> location.equals(speaker.location));
     }
     public static RadioSpeaker getSpeaker(UUID id) {
-        return getSpeaker(speaker -> id.equals(speaker.id));
+        return getSpeaker(speaker -> id.equals(speaker.reference));
     }
     public static RadioSpeaker getSpeaker(Predicate<RadioSpeaker> filter) {
         Optional<RadioSpeaker> result = speakers.stream().filter(filter).findFirst();
@@ -145,7 +156,7 @@ public class RadioManager {
             }
         }
 
-        pendingModifications.add(() -> putRouter(speakers, speaker));
+        putRouter(speakers, speaker);
         return speaker;
     }
 
@@ -172,7 +183,7 @@ public class RadioManager {
         removeListener(listener -> location.equals(listener.location));
     }
     public static void removeListener(UUID id) {
-        removeListener(listener -> id.equals(listener.id));
+        removeListener(listener -> id.equals(listener.reference));
     }
 
     public static RadioListener getListener(Entity owner) {
@@ -182,7 +193,7 @@ public class RadioManager {
         return getListener(listener -> location.equals(listener.location));
     }
     public static RadioListener getListener(UUID id) {
-        return getListener(listener -> id.equals(listener.id));
+        return getListener(listener -> id.equals(listener.reference));
     }
     public static RadioListener getListener(Predicate<RadioListener> filter) {
         Optional<RadioListener> result = listeners.stream().filter(filter).findFirst();
@@ -216,7 +227,7 @@ public class RadioManager {
             }
         }
 
-        pendingModifications.add(() -> putRouter(listeners, listener));
+        putRouter(listeners, listener);
         return listener;
     }
 
@@ -401,7 +412,7 @@ public class RadioManager {
     }
 
     public static void removeRouter(UUID uuid) {
-        removeRouter(router -> router.id.equals(uuid));
+        removeRouter(router -> router.reference.equals(uuid));
     }
     public static void removeRouter(Entity owner) {
         removeRouter(router -> router.owner == owner);
@@ -410,13 +421,26 @@ public class RadioManager {
         removeRouter(router -> router.location != null && router.location.equals(location));
     }
 
+    public static short getIdentifier(Predicate<RadioRouter> filter) {
+        Optional<Map.Entry<Short, RadioRouter>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
+        return result.map(Map.Entry::getKey).orElse(Short.MAX_VALUE);
+    }
+
     public static RadioRouter getRouter(Predicate<RadioRouter> filter) {
         Optional<Map.Entry<Short, RadioRouter>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getValue).orElse(null);
     }
+    public static RadioRouter getRouter(short identifier) {
+        return routers.get(identifier);
+    }
 
-    public static RadioRouter getRouter(UUID uuid) {
-        return getRouter(router -> router.id.equals(uuid));
+    public static RadioRouter getRouter(UUID reference, @Nullable String type) {
+        return getRouter(router ->
+                router.reference.equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
+        );
+    }
+    public static RadioRouter getRouter(UUID reference) {
+        return getRouter(router -> router.reference.equals(reference));
     }
     public static RadioRouter getRouter(Entity owner) {
         return getRouter(router -> owner.equals(router.owner));
@@ -429,11 +453,14 @@ public class RadioManager {
         putRouter(null, router);
     }
 
-    public static RadioRouter getRouterSided(UUID uuid, boolean isClient) {
-        return isClient ? ClientRadioManager.getRouter(uuid) : RadioManager.getRouter(uuid);
+    public static RadioRouter getRouterSided(UUID reference, boolean isClient) {
+        return isClient ? ClientRadioManager.getRouter(reference) : RadioManager.getRouter(reference);
+    }
+    public static RadioRouter getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
+        return isClient ? ClientRadioManager.getRouter(reference, type) : RadioManager.getRouter(reference, type);
     }
     public static void registerRouterSided(RadioRouter router, boolean isClient, @Nullable Frequency frequency) {
-        CommonSimpleRadio.debug("Adding {} of UID {}", router.getClass().getSimpleName(), router.id);
+        CommonSimpleRadio.debug("Adding {} of reference {}", router.getClass().getSimpleName(), router.reference);
         if (isClient) {
             ClientRadioManager.registerRouter(router);
         } else {
@@ -485,7 +512,7 @@ public class RadioManager {
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
 
             RadioSource newSource = new RadioSource(
-                    listener.id,
+                    listener.reference,
                     WorldlyPosition.of(location.toVector3f(), level),
                     sound,
                     (float) (falloff * volume)

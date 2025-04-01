@@ -3,7 +3,11 @@ package com.codinglitch.simpleradio.api.central;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.joml.Math;
+import org.joml.Options;
 import org.joml.Vector3f;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class WorldlyPosition extends Vector3f {
     public Level level;
@@ -65,5 +69,10 @@ public class WorldlyPosition extends Vector3f {
 
     public boolean isClientSide() {
         return this.level.isClientSide;
+    }
+
+    @Override
+    public String toString() {
+        return toString(NumberFormat.getNumberInstance(Locale.ENGLISH));
     }
 }

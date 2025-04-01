@@ -34,7 +34,7 @@ public class WireItem extends Item implements WorldTicking {
 
         BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof Socket interactingSocket) {
-            CommonSimpleRadio.info(interactingSocket.getID());
+            CommonSimpleRadio.info(interactingSocket.getReference());
 
             if (!interactingSocket.canConnect()) return super.useOn(context);
 
@@ -58,7 +58,7 @@ public class WireItem extends Item implements WorldTicking {
                     return InteractionResult.SUCCESS;
                 }
             } else {
-                tag.putUUID("connectTo", interactingSocket.getID());
+                tag.putUUID("connectTo", interactingSocket.getReference());
                 tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
 
                 level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 1.1f);

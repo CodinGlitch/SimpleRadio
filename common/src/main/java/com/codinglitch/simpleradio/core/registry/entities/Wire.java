@@ -79,8 +79,8 @@ public class Wire extends Entity implements Medium {
 
         Wire wire = new Wire(level);
         wire.moveTo(new Vec3(fromRouter.location));
-        wire.setFrom(from.getID(), RadioRouter.Type.byInstance(fromRouter));
-        wire.setTo(to.getID(), RadioRouter.Type.byInstance(toRouter));
+        wire.setFrom(fromRouter);
+        wire.setTo(toRouter);
 
         if (from.hasWire(wire)) {
             wire.kill();
@@ -122,25 +122,25 @@ public class Wire extends Entity implements Medium {
     public void relay(RadioSource source, Socket originSocket) {
         if (!this.isAlive()) return;
 
-        UUID fromID = this.getFrom().orElse(null);
-        UUID toID = this.getTo().orElse(null);
+        UUID fromRef = this.getFrom().orElse(null);
+        UUID toRef = this.getTo().orElse(null);
 
-        RadioRouter.Type fromType = this.getFromType();
-        RadioRouter.Type toType = this.getToType();
-        if (fromID == null || toID == null) {
+        String fromType = this.getFromType();
+        String toType = this.getToType();
+        if (fromRef == null || toRef == null) {
             CommonSimpleRadio.warn("Relaying cancelled; invalid wire [{}] to relay across.", this.getUUID());
             return;
         }
 
-        RadioRouter from = RadioRouter.getRouterFromUUID(fromID, fromType);
-        RadioRouter to = RadioRouter.getRouterFromUUID(toID, toType);
+        RadioRouter from = RadioManager.getRouter(fromRef, fromType);
+        RadioRouter to = RadioManager.getRouter(toRef, toType);
         if (from == null || to == null) {
             CommonSimpleRadio.warn("Relaying cancelled; either end was unable to be found.");
             return;
         }
 
         Level level = this.level();
-        boolean isReversed = originSocket.getID().equals(toID);
+        boolean isReversed = originSocket.getReference().equals(toRef);
         RadioRouter destination = isReversed ? from : to;
 
         if (!level.isClientSide() && !effectCooldowns.containsKey(source.owner) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
@@ -158,7 +158,12 @@ public class Wire extends Entity implements Medium {
             return;
         }
 
-        CommonSimpleRadio.info("Relaying from {} to {}", from.getClass().getSimpleName(), to.getClass().getSimpleName());
+        if (isReversed) {
+            CommonSimpleRadio.info("Relaying from {} to {}", to, from);
+        } else {
+            CommonSimpleRadio.info("Relaying from {} to {}", from, to);
+        }
+
 
         source.travel(from, to, this);
 
@@ -176,45 +181,48 @@ public class Wire extends Entity implements Medium {
         RadioRouter to = this.getToRouter();
         if (to == null) return 0;
 
-        return from.location.distance(to.location);
+        return from.getLocation().distance(to.getLocation());
     }
 
     @Nullable
     public RadioRouter getFromRouter() {
-        UUID fromID = this.getFrom().orElse(null);
-        if (fromID == null) return null;
+        UUID reference = this.getFrom().orElse(null);
+        if (reference == null) return null;
 
-        return this.level().isClientSide ? ClientRadioManager.getRouter(fromID) : RadioRouter.getRouterFromUUID(fromID, this.getFromType());
+        return RadioManager.getRouterSided(reference, this.getFromType(), this.level().isClientSide);
     }
     public Optional<UUID> getFrom() {
         return this.getEntityData().get(FROM);
     }
-    public RadioRouter.Type getFromType() {
-        return RadioRouter.Type.byName(this.getEntityData().get(FROM_TYPE));
+
+    @Nullable
+    public String getFromType() {
+        return this.getEntityData().get(FROM_TYPE);
     }
-    public void setFrom(UUID to, RadioRouter.Type type) {
-        this.getEntityData().set(FROM, Optional.of(to));
-        if (type != null)
-            this.getEntityData().set(FROM_TYPE, type.name());
+    public void setFrom(RadioRouter from) {
+        this.getEntityData().set(FROM, Optional.of(from.getReference()));
+        if (from.getClass() != RadioRouter.class)
+            this.getEntityData().set(FROM_TYPE, from.getClass().getSimpleName());
     }
 
     @Nullable
     public RadioRouter getToRouter() {
-        UUID toID = this.getTo().orElse(null);
-        if (toID == null) return null;
+        UUID reference = this.getTo().orElse(null);
+        if (reference == null) return null;
 
-        return this.level().isClientSide ? ClientRadioManager.getRouter(toID) : RadioRouter.getRouterFromUUID(toID, this.getToType());
+        return RadioManager.getRouterSided(reference, this.getToType(), this.level().isClientSide);
     }
     public Optional<UUID> getTo() {
         return this.getEntityData().get(TO);
     }
-    public RadioRouter.Type getToType() {
-        return RadioRouter.Type.byName(this.getEntityData().get(TO_TYPE));
+    @Nullable
+    public String getToType() {
+        return this.getEntityData().get(TO_TYPE);
     }
-    public void setTo(UUID to, RadioRouter.Type type) {
-        this.getEntityData().set(TO, Optional.of(to));
-        if (type != null)
-            this.getEntityData().set(TO_TYPE, type.name());
+    public void setTo(RadioRouter to) {
+        this.getEntityData().set(TO, Optional.of(to.getReference()));
+        if (to.getClass() != RadioRouter.class)
+            this.getEntityData().set(TO_TYPE, to.getClass().getSimpleName());
     }
 
     public void shortCircuit() {
@@ -243,8 +251,8 @@ public class Wire extends Entity implements Medium {
         this.effectCooldowns.replaceAll((owner, time) -> time - 1);
         this.effectCooldowns.entrySet().removeIf(entry -> entry.getValue() <= 0);
 
-        UUID fromUUID = this.getFrom().orElse(null);
-        UUID toUUID = this.getTo().orElse(null);
+        UUID fromRef = this.getFrom().orElse(null);
+        UUID toRef = this.getTo().orElse(null);
 
         if (this.level().isClientSide) {
             int effectDuration = (int) Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
@@ -262,24 +270,24 @@ public class Wire extends Entity implements Medium {
                 effect.progress += effect.direction;
             }
 
-            RadioRouter from = ClientRadioManager.getRouter(fromUUID);
-            RadioRouter to = ClientRadioManager.getRouter(toUUID);
+            RadioRouter from = ClientRadioManager.getRouter(fromRef);
+            RadioRouter to = ClientRadioManager.getRouter(toRef);
 
             if (from != null && !from.hasWire(this)) from.connect(this);
             if (to != null && !to.hasWire(this)) to.connect(this);
 
         } else {
-            RadioRouter.Type fromType = this.getFromType();
-            RadioRouter.Type toType = this.getToType();
+            String fromType = this.getFromType();
+            String toType = this.getToType();
 
-            if (fromUUID != null && toUUID != null) {
-                if (fromUUID == toUUID) {
+            if (fromRef != null && toRef != null) {
+                if (fromRef == toRef) {
                     this.kill();
                     return;
                 }
 
-                RadioRouter from = RadioRouter.getRouterFromUUID(fromUUID, fromType);
-                RadioRouter to = RadioRouter.getRouterFromUUID(toUUID, toType);
+                RadioRouter from = RadioManager.getRouter(fromRef, fromType);
+                RadioRouter to = RadioManager.getRouter(toRef, toType);
 
                 if (from == null) {
                     if (to != null) this.moveTo(new Vec3(to.getLocation().position()));

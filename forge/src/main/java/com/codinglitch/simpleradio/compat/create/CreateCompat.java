@@ -7,7 +7,6 @@ import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
-import com.simibubi.create.AllMovementBehaviours;
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,9 +63,7 @@ public class CreateCompat {
                 resetRouter(ClientRadioManager.getSpeaker(uuid), pos, level);
 
                 // might be problematic
-                resetRouter(ClientRadioManager.getRouter(router -> {
-                    return uuid.equals(router.getID()) && router.getClass() == RadioRouter.class;
-                }), pos, level);
+                resetRouter(ClientRadioManager.getRouter(uuid, null), pos, level);
             } else {
                 resetRouter(RadioRouter.getRouterFromReceivers(uuid), pos, level);
                 resetRouter(RadioRouter.getRouterFromTransmitters(uuid), pos, level);
@@ -75,7 +71,7 @@ public class CreateCompat {
                 resetRouter(RadioManager.getListener(uuid), pos, level);
                 resetRouter(RadioManager.getSpeaker(uuid), pos, level);
 
-                resetRouter(RadioRouter.getRouterFromUUID(uuid, null), pos, level);
+                resetRouter(RadioManager.getRouter(uuid, null), pos, level);
             }
 
         }
