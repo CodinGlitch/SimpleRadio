@@ -61,6 +61,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is the threshold of transmission power in amplitude modulation at which it begins to have an auditory effect. Defaults to 300.")
         public Integer diminishThresholdAM = 300;
 
+        @LexiconEntry(comment = "This is the method of diminishment to use. ADDITIVE subtracts a flat amount, while MULTIPLICATIVE subtracts a percentage from the initial transmission power. Defaults to ADDITIVE.")
+        public String diminishmentMethod = "ADDITIVE";
+
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
         public Double transmissionDiminishment = 1d;
 
@@ -92,6 +95,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is the threshold of transmission power in amplitude modulation at which it begins to have an auditory effect. Defaults to 200.")
         public Integer diminishThresholdAM = 200;
 
+        @LexiconEntry(comment = "This is the method of diminishment to use. ADDITIVE subtracts a flat amount, while MULTIPLICATIVE subtracts a percentage from the initial transmission power. Defaults to ADDITIVE.")
+        public String diminishmentMethod = "ADDITIVE";
+
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
         public Double transmissionDiminishment = 1d;
 
@@ -108,10 +114,12 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class Wire extends LexiconPageData {
-        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.1.")
-        public Double transmissionDiminishment = 0.1d;
+        @LexiconEntry(comment = "This is the method of diminishment to use. ADDITIVE subtracts a flat amount, while MULTIPLICATIVE subtracts a percentage from the initial transmission power. Defaults to ADDITIVE.")
+        public String diminishmentMethod = "MULTIPLICATIVE";
+        @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.01.")
+        public Double transmissionDiminishment = 0.01d;
         @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire takes to relay data. Defaults to 4.")
-        public Double transmissionTime = 4d;
+        public Integer transmissionTime = 4;
 
         @LexiconEntry(comment = "This is the amount of time (in ticks) between each header sent. Defaults to 5.")
         public Integer headerInterval = 5;
@@ -141,6 +149,9 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "This is the threshold of transmission power in amplitude modulation at which it begins to have an auditory effect. Defaults to 500.")
         public Integer diminishThresholdAM = 500;
+
+        @LexiconEntry(comment = "This is the method of diminishment to use. ADDITIVE subtracts a flat amount, while MULTIPLICATIVE subtracts a percentage from the initial transmission power. Defaults to ADDITIVE.")
+        public String diminishmentMethod = "ADDITIVE";
 
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
         public Double transmissionDiminishment = 1d;

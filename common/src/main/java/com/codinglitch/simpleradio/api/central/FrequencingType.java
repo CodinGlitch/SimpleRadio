@@ -2,9 +2,19 @@ package com.codinglitch.simpleradio.api.central;
 
 import com.codinglitch.lexiconfig.annotations.LexiconEntry;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
+import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.UUID;
+import java.util.function.Function;
+
 public class FrequencingType {
+    public enum DiminishmentMethod {
+        ADDITIVE,
+        MULTIPLICATIVE
+    }
+
     public ResourceLocation location;
     public short id;
 
@@ -19,12 +29,12 @@ public class FrequencingType {
     public int transmissionPowerAM;
     public int diminishThresholdAM;
 
+    public DiminishmentMethod diminishmentMethod;
     public double transmissionDiminishment;
 
     public LexiconPageData page;
 
-    public FrequencingType() {
-    }
+    public FrequencingType() {}
 
     public void reload() {
         if (page == null) return;
@@ -39,6 +49,7 @@ public class FrequencingType {
         this.transmissionPowerAM = (int) page.getEntry("transmissionPowerAM").orElse(-1);
         this.diminishThresholdAM = (int) page.getEntry("diminishThresholdAM").orElse(-1);
 
+        this.diminishmentMethod = DiminishmentMethod.valueOf((String) page.getEntry("diminishmentMethod").orElse("ADDITIVE"));
         this.transmissionDiminishment = (double) page.getEntry("transmissionDiminishment").orElse(-1d);
     }
 

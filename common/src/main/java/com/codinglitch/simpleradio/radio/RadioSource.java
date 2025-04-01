@@ -8,6 +8,7 @@ import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.Medium;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -40,6 +41,7 @@ public class RadioSource {
     public Frequency frequencyMedium;
     public Wire wireMedium;
 
+    public float transmissionCap = 50;
     public float transmissionPower = 50;
 
     protected RadioSource() {}
@@ -69,8 +71,8 @@ public class RadioSource {
         this.owner = owner;
     }
 
-    public void addPower(double power) {
-        this.transmissionPower += power;
+    public void addPower(float power) {
+        this.transmissionPower = Math.min(this.transmissionPower + power, this.transmissionCap);
     }
 
     public FrequencingType getFrequencingType() {
@@ -125,13 +127,17 @@ public class RadioSource {
 
         double distance = fromPos.distance(toPos);
         double transmissionDiminishment = 0;
+        FrequencingType.DiminishmentMethod diminishmentMethod = FrequencingType.DiminishmentMethod.ADDITIVE;
+
         if (medium instanceof Wire wire) {
-            transmissionDiminishment = SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionDiminishment;
+            transmissionDiminishment = SimpleRadioFrequencing.WIRE.transmissionDiminishment;
+            diminishmentMethod = SimpleRadioFrequencing.WIRE.diminishmentMethod;
 
             this.wireMedium = wire;
         } else if (medium instanceof Frequency frequency) {
             FrequencingType type = this.getFrequencingType();
             transmissionDiminishment = type.transmissionDiminishment;
+            diminishmentMethod = type.diminishmentMethod;
 
             if (to instanceof RadioReceiver receiver) {
                 if (distance > receiver.frequencingType.receptionFloor) {
@@ -152,10 +158,11 @@ public class RadioSource {
             this.frequencyMedium = frequency;
         }
 
-        //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
-
         // nevermind... dont beware.... negative transmission...
-        this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (distance * transmissionDiminishment));
+        switch (diminishmentMethod) {
+            case ADDITIVE -> this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (distance * transmissionDiminishment));
+            case MULTIPLICATIVE -> this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (this.transmissionCap * transmissionDiminishment));
+        }
 
         this.visit(to);
     }

@@ -6,6 +6,8 @@ import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.SimpleRadioServerConfig;
 import com.codinglitch.simpleradio.api.FrequencingRegistry;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
+import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -32,6 +34,11 @@ public class SimpleRadioFrequencing {
     public static FrequencingType RADIO = FrequencingRegistry.register(
             CommonSimpleRadio.id("radio"),
             FrequencingRegistry.fromConfig(SimpleRadioLibrary.SERVER_CONFIG.radio)
+    );
+
+    public static FrequencingType WIRE = FrequencingRegistry.register(
+            CommonSimpleRadio.id("wire"),
+            FrequencingRegistry.fromConfig(SimpleRadioLibrary.SERVER_CONFIG.wire)
     );
 
     public static void load() {}
