@@ -164,6 +164,8 @@ public class RadioRouter implements Socket {
         } else if (owner != null) {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
+
+        if (this.activity > 0) this.activity--;
     }
 
     public void accept(RadioSource source) {
@@ -234,8 +236,8 @@ public class RadioRouter implements Socket {
             WorldlyPosition location = getLocation();
             if (!location.isClientSide()) {
                 for (Player player : location.level.players()) {
-                    if (location.distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
-                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(20, this.getReference()));
+                    if (location.position().distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
+                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(activity, this.getIdentifier()));
                     }
                 }
             }

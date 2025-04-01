@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
 import com.codinglitch.simpleradio.client.core.registry.renderers.*;
 import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.core.registry.particles.ListenParticle;
 import com.codinglitch.simpleradio.core.registry.particles.SpeakLineParticle;
 import com.codinglitch.simpleradio.core.registry.particles.SpeakRingParticle;
 import com.codinglitch.simpleradio.platform.ClientServices;
@@ -50,7 +51,7 @@ public class CommonSimpleRadioClient {
                 RadioReceiver receiver = ClientRadioManager.getReceiver(uuid);
                 if (receiver == null) return 0;
 
-                return receiver.receivingTime > 0 ? 1 : 0;
+                return receiver.activity > 0 ? 1 : 0;
             }
         );
 
@@ -106,6 +107,7 @@ public class CommonSimpleRadioClient {
     public static void loadParticles(ParticleProviderRegistry registry) {
         registry.register(SimpleRadioParticles.SPEAK_RING, SpeakRingParticle.Provider::new);
         registry.register(SimpleRadioParticles.SPEAK_LINE, SpeakLineParticle.Provider::new);
+        registry.register(SimpleRadioParticles.LISTEN, ListenParticle.Provider::new);
     }
 
     // -- Atlases -- \\

@@ -137,6 +137,8 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
     public void speak(RadioSource source) {
         if (source instanceof RadioHeader) return;
 
+        this.trySendActivity();
+
         // Severity calculation
         ServerLevel level = null;
         Vector3f position = null;

@@ -34,8 +34,6 @@ public class RadioManager implements SimpleRadioApi {
     private static final ArrayList<QueuedSource> pendingSources = new ArrayList<>();
     private static final ArrayList<QueuedSource> sourceQueue = new ArrayList<>();
     public static class QueuedSource {
-
-
         public RadioSource source;
 
         public RadioRouter router;

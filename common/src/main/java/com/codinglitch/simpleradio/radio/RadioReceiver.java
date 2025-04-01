@@ -22,8 +22,6 @@ public class RadioReceiver extends RadioRouter {
     public int antennaPower = 0;
     public Frequency frequency;
 
-    public int receivingTime = 0;
-
     public FrequencingType frequencingType;
 
     protected RadioReceiver(Frequency frequency, UUID id) {
@@ -74,8 +72,6 @@ public class RadioReceiver extends RadioRouter {
     @Override
     public void tick(int tickCount) {
         super.tick(tickCount);
-
-        if (receivingTime > 0) receivingTime--;
     }
 
     @Nullable
@@ -92,19 +88,7 @@ public class RadioReceiver extends RadioRouter {
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         if (source.transmissionPower <= 0) return;
 
-        if (receivingTime == 0) {
-            this.receivingTime = 20; //TODO: make configurable and maybe just better 💀
-
-            WorldlyPosition location = getLocation();
-            if (!location.isClientSide()) {
-                for (Player player : location.level.players()) {
-                    if (location.distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
-                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(20, this.getReference()));
-                    }
-                }
-            }
-        }
-
+        this.trySendActivity();
 
         //super.accept(source);
         this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));

@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Listening;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -62,13 +63,18 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         super.saveToItem(stack);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState blockState, MicrophoneBlockEntity blockEntity) {
+    public static void tick(Level level, BlockPos pos, BlockState state, MicrophoneBlockEntity blockEntity) {
         if (!blockEntity.isActive && blockEntity.id != null) {
             blockEntity.activate();
         }
 
         if (blockEntity.listener != null) {
             blockEntity.listener.active = blockEntity.listening;
+
+            if (blockEntity.level == null) return;
+            if (blockEntity.level.isClientSide && blockEntity.level.getGameTime() % 8 == 0) {
+                if (blockEntity.listener.activity > 0) ClientRadioManager.handleListenParticle(state, blockEntity);
+            }
         }
     }
 

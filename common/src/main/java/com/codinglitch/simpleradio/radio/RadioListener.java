@@ -77,6 +77,8 @@ public class RadioListener extends RadioRouter {
             source = dataTransformer.apply(source);
         }
 
+        this.trySendActivity();
+
         source.delegate(this.reference);
 
         this.tryRouteHeader();
