@@ -21,8 +21,8 @@ public class SimpleRadioClientConfig extends LexiconData {
     public static class Wire extends LexiconPageData {
         @LexiconEntry(comment = "This determines whether or not wire effects will be processed. Defaults to true.")
         public Boolean effect = true;
-        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire effect lasts. Best if matching 'transmissionTime'. Defaults to 5.")
-        public Double effectTime = 4d;
+        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire effect lasts. Best if matching 'transmissionTime'. Defaults to 4.")
+        public Integer effectTime = 4;
     }
 
     public static class Transceiver extends LexiconPageData {
