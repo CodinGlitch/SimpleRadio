@@ -63,12 +63,14 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.level.getGameTime() % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
-            if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
-        }
-        if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
-            if (blockEntity.level.isClientSide && blockEntity.level.getGameTime() % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
-                if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) ClientRadioManager.handleSpeakParticle(state, blockEntity);
+        if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) {
+            if (blockEntity.speaker.activityTime % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
+                level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
+            }
+            if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
+                if (blockEntity.level.isClientSide && blockEntity.speaker.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
+                    ClientRadioManager.handleSpeakParticle(state, blockEntity);
+                }
             }
         }
     }
