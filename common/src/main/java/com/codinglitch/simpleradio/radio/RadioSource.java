@@ -170,13 +170,14 @@ public class RadioSource {
     }
 
     public double computeSeverity() {
-        float base = 0;
-
+        double base = 0;
         double severity = 0;
         if (this.frequencyMedium != null) {
             double diminishThreshold = this.getFrequencingType().getDiminishThreshold(frequencyMedium.modulation);
 
-            base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
+            base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ?
+                    SimpleRadioLibrary.SERVER_CONFIG.frequency.baseFMInterference :
+                    SimpleRadioLibrary.SERVER_CONFIG.frequency.baseAMInterference;
             severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
         }
 

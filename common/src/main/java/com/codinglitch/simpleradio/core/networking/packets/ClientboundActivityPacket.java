@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.central.Packeter;
 import com.codinglitch.simpleradio.radio.RadioRouter;
@@ -21,7 +22,7 @@ public record ClientboundActivityPacket(float activity, short identifier) implem
     }
 
     public static ClientboundActivityPacket decode(FriendlyByteBuf buffer) {
-        return new ClientboundActivityPacket(buffer.readShort(), buffer.readShort());
+        return new ClientboundActivityPacket(buffer.readFloat(), buffer.readShort());
     }
 
     public static void handle(ClientboundActivityPacket packet) {
@@ -33,7 +34,7 @@ public record ClientboundActivityPacket(float activity, short identifier) implem
             if (router == null) return;
 
             router.activity = activity;
-            router.activityTime = 20;
+            router.activityTime = SimpleRadioLibrary.SERVER_CONFIG.router.activityTime;
         });
     }
 }

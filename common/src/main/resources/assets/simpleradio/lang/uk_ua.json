@@ -1,0 +1,69 @@
+{
+  "item_group.simpleradio": "Simple Radio",
+
+  "item.simpleradio.transmitting_module": "Модуль Передачі",
+  "item.simpleradio.receiving_module": "Модуль Прийому",
+  "item.simpleradio.speaker_module": "Модуль Динаміка",
+  "item.simpleradio.listener_module": "Модуль Слухача",
+
+  "item.simpleradio.iron_module": "Залізний Модуль %1$s",
+  "item.simpleradio.gold_module": "Золотий Модуль %1$s",
+  "item.simpleradio.diamond_module": "Діамантовий Модуль %1$s",
+  "item.simpleradio.netherite_module": "Незеритовий Модуль %1$s",
+
+  "module.simpleradio.empty": "Порожній",
+
+  "module.simpleradio.clarity": "Чіткість",
+  "module.simpleradio.clarity.effects": "Забезпечує чіткіший звук",
+
+  "module.simpleradio.range": "Дальність",
+  "module.simpleradio.range.transmitting.effects": "Збільшує дальність",
+  "module.simpleradio.range.receiving.effects": "Збільшує дальність",
+
+  "module.simpleradio.latch": "Фіксація",
+  "module.simpleradio.latch.effects": "Дозволяє перемикати стан слухання",
+
+  "module.simpleradio.battery": "Батарея",
+  "module.simpleradio.battery.effects": "Зберігає більше енергії в батареї",
+
+  "module.simpleradio.solar": "Сонячний модуль",
+  "module.simpleradio.solar.effects": "Заряджає батарею на сонці",
+
+  "item.modifiers.transmitting": "Коли використовується у передаючому предметі:",
+  "item.modifiers.receiving": "Коли використовується у приймаючому предметі:",
+  "item.modifiers.emitting": "Коли використовується у випромінюючому предметі:",
+  "item.modifiers.listening": "Коли використовується у слухаючому предметі:",
+  "item.modifiers.powering": "Коли використовується у живлячому предметі:",
+
+  "item.simpleradio.transceiver": "Рація",
+  "item.simpleradio.walkie_talkie": "Мідна Рація",
+  "item.simpleradio.spuddie_talkie": "Картопляна Рація",
+  "item.simpleradio.copper_wire": "Мідний Провід",
+  "block.simpleradio.radio": "Радіо",
+  "block.simpleradio.antenna": "Антена",
+  "block.simpleradio.speaker": "Динамік",
+  "block.simpleradio.microphone": "Мікрофон",
+  "block.simpleradio.radiosmither": "Радіомайстерня",
+  "block.simpleradio.frequencer": "Частотомір",
+  "block.simpleradio.receiver": "Приймач",
+  "block.simpleradio.transmitter": "Передавач",
+  "block.simpleradio.socket": "Гніздо",
+
+  "screen.simpleradio.frequencing.catalyst": "КАТАЛІЗАТОР",
+  "screen.simpleradio.frequencing.efficiency": "ЕФЕКТИВНІСТЬ: %s%%",
+  "screen.simpleradio.frequencing.antenna_strength": "СИЛА АНТЕНИ:",
+
+  "screen.simpleradio.radiosmither": "Радіомайстерня",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "Більший радіус, гірша якість звуку",
+  "screen.simpleradio.radiosmither.fm_description": "Краща якість звуку, менший радіус",
+
+  "subtitles.simpleradio.radio_open": "Радіо починає трансляцію",
+  "subtitles.simpleradio.radio_close": "Радіо зупиняє трансляцію",
+
+  "subtitles.simpleradio.short_circuit": "Коротке замикання дроту",
+
+  "tooltip.simpleradio.transceiver_frequency": "Частота: %s",
+  "tooltip.simpleradio.receiver_user": "Користувач: %s"
+}

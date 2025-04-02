@@ -39,6 +39,9 @@ public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage(comment = "These are the general configurations for frequencies.")
     public Frequency frequency = new Frequency();
 
+    @LexiconPage(comment = "These are the configurations for ALL types of routers (such as Receivers, Transmitters, Listeners, and Speakers).")
+    public Router router = new Router();
+
     @LexiconPage(comment = "These are the general configurations for compatibilities.")
     public Compatibilities compatibilities = new Compatibilities();
 
@@ -222,17 +225,29 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is the default frequency to be provided to frequency-holding items. When set to auto-generate, will generate a pattern of zeros equal to the wholePlaces and decimalPlaces configurations, i.e. '000.00' by default. Defaults to auto-generate.")
         public String defaultFrequency = "auto-generate";
 
+        @LexiconEntry(comment = "The base amount of interference to give to all AM radio transmissions. Defaults to 15.")
+        public Double baseAMInterference = 15d;
+        @LexiconEntry(comment = "The base amount of interference to give to all FM radio transmissions. Defaults to 2.")
+        public Double baseFMInterference = 2d;
+
         @LexiconEntry(comment = "Whether or not the radios work across dimensions. Defaults to false.")
         public Boolean crossDimensional = false;
-
         @LexiconEntry(comment = "The base amount of interference to give to radio transmission per block across dimensions. Defaults to 4.")
         public Double dimensionalInterference = 4d;
 
         @LexiconEntry(comment = "The packet buffer for packet transmission. You likely won't need to worry about this. Defaults to 2.")
         public Integer packetBuffer = 2;
+    }
 
-        @LexiconEntry(comment = "How many listeners should be able to receive a single players audio? Defaults to 2.")
-        public Integer listenerBuffer = 20;
+    public static class Router extends LexiconPageData {
+
+        @LexiconEntry(comment = "How many sources should be compiled for reading audio levels? Affects the rate of updates for activity levels. Changing this value greatly may cause unexpected results. Defaults to 10.")
+        public Integer compileAmount = 10;
+
+        @LexiconEntry(comment = "The factor of audio signal energy for converting to redstone signals. Higher values will cause lower redstone signals, and vice versa. Defaults to 20.")
+        public Float activityRedstoneFactor = 1500f;
+        @LexiconEntry(comment = "How long (in ticks) should a router stay active after receiving audio data? Affects the rate of updates for activity checks. Defaults to 20.")
+        public Integer activityTime = 20;
 
         @LexiconEntry(comment = "[EXPERIMENTAL] Pick up audio from the world, not just players. Defaults to false.")
         public Boolean soundListening = false;

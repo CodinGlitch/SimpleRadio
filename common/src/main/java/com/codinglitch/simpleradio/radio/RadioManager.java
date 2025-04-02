@@ -509,7 +509,7 @@ public class RadioManager implements SimpleRadioApi {
     }
     public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
         if (level.isClientSide) return;
-        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.soundListening) return;
+        if (!SimpleRadioLibrary.SERVER_CONFIG.router.soundListening) return;
         if (!level.isLoaded(BlockPos.containing(location))) return;
 
         SoundEvent sound = soundHolder.value();

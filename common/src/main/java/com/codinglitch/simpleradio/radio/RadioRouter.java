@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
@@ -52,7 +53,7 @@ public class RadioRouter implements Socket {
     public Vector3f velocity = new Vector3f();
 
     public float activity = 0;
-    public short activityTime = 0;
+    public int activityTime = 0;
 
     public float compiledActivity = 0;
     public int compiledSamples = 0;
@@ -242,23 +243,21 @@ public class RadioRouter implements Socket {
     }
 
     public int getRedstoneMappedActivity() {
-        return Math.clamp(0, 15, Math.round(this.activity / 1500f));
+        return Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
     }
 
     public void compileActivity(RadioSource source) {
         if (source.data == null) return;
 
         compiledActivity += source.activity;
-        if (compiledSamples++ >= 10) {
+        if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
             this.activity = Math.sqrt(compiledActivity);
             compiledActivity = 0;
             compiledSamples = 0;
-
-            CommonSimpleRadio.info(this.activity);
         }
 
         if (activityTime == 0) {
-            this.activityTime = 20; //TODO: make configurable and maybe just better 💀
+            this.activityTime = SimpleRadioLibrary.SERVER_CONFIG.router.activityTime;
 
             WorldlyPosition location = getLocation();
             if (!location.isClientSide()) {
