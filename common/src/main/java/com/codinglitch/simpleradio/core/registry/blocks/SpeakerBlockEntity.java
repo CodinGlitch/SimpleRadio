@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.Speaking;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -62,11 +63,13 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.level.getGameTime() % 1 == 0) {
+        if (blockEntity.level.getGameTime() % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
             if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
         }
-        if (blockEntity.level.isClientSide && blockEntity.level.getGameTime() % 10 == 0) {
-            if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) ClientRadioManager.handleSpeakParticle(state, blockEntity);
+        if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
+            if (blockEntity.level.isClientSide && blockEntity.level.getGameTime() % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
+                if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) ClientRadioManager.handleSpeakParticle(state, blockEntity);
+            }
         }
     }
 

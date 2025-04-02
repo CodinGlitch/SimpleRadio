@@ -203,6 +203,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is the range for the radio in which the audio transmitted from it can be heard. Defaults to 32.")
         public Integer speakingRange = 32;
 
+        @LexiconEntry(comment = "This is how often (in ticks) the speaker will update its redstone signal according to its activity. Defaults to 5.")
+        public Integer redstonePolling = 5;
+
         @LexiconEntry(comment = "When false, removes the speaker recipe. Defaults to true.")
         public Boolean enabled = true;
     }
