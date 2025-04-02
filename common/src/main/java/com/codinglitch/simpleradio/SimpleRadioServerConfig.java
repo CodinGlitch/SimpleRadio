@@ -195,6 +195,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is the range for the microphone that it can hear from. Defaults to 8.")
         public Integer listeningRange = 8;
 
+        @LexiconEntry(comment = "This is how often (in ticks) the microphone will update its redstone signal according to its activity. Defaults to 5.")
+        public Integer redstonePolling = 5;
+
         @LexiconEntry(comment = "When false, removes the microphone recipe. Defaults to true.")
         public Boolean enabled = true;
     }
@@ -248,7 +251,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer compileAmount = 10;
 
         @LexiconEntry(comment = "The factor of audio signal energy for converting to redstone signals. Higher values will cause lower redstone signals, and vice versa. Defaults to 20.")
-        public Float activityRedstoneFactor = 1500f;
+        public Double activityRedstoneFactor = 1500d;
         @LexiconEntry(comment = "How long (in ticks) should a router stay active after receiving audio data? Affects the rate of updates for activity checks. Defaults to 20.")
         public Integer activityTime = 20;
 

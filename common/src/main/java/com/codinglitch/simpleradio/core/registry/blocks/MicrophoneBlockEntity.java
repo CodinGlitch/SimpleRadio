@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.Listening;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -67,12 +68,15 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
             blockEntity.activate();
         }
 
-        if (blockEntity.listener != null) {
-            blockEntity.listener.active = blockEntity.listening;
-
-            if (blockEntity.level == null) return;
-            if (blockEntity.level.isClientSide && blockEntity.level.getGameTime() % 8 == 0) {
-                if (blockEntity.listener.activityTime > 0) ClientRadioManager.handleListenParticle(state, blockEntity);
+        if (blockEntity.level == null) return;
+        if (blockEntity.listener != null && blockEntity.listener.activityTime > 0) {
+            if (blockEntity.listener.activityTime % SimpleRadioLibrary.SERVER_CONFIG.microphone.redstonePolling == 0) {
+                level.updateNeighborsAt(pos, SimpleRadioBlocks.MICROPHONE);
+            }
+            if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
+                if (blockEntity.level.isClientSide && blockEntity.listener.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.microphone.particleInterval == 0) {
+                    ClientRadioManager.handleListenParticle(state, blockEntity);
+                }
             }
         }
     }

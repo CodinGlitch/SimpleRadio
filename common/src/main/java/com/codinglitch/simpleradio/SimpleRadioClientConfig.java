@@ -18,6 +18,9 @@ public class SimpleRadioClientConfig extends LexiconData {
     @LexiconPage(comment = "These are the configurations for the speaker block.")
     public Speaker speaker = new Speaker();
 
+    @LexiconPage(comment = "These are the configurations for the microphone block.")
+    public Microphone microphone = new Microphone();
+
     @LexiconPage(comment = "These are the configurations for the walkie talkie item.")
     public WalkieTalkie walkie_talkie = new WalkieTalkie();
 
@@ -35,6 +38,11 @@ public class SimpleRadioClientConfig extends LexiconData {
 
     public static class Speaker extends LexiconPageData {
         @LexiconEntry(comment = "This is how often (in ticks) the speaker will emit a particle when active. Set to -1 to disable. Defaults to 10.")
+        public Integer particleInterval = 10;
+    }
+
+    public static class Microphone extends LexiconPageData {
+        @LexiconEntry(comment = "This is how often (in ticks) the microphone will emit a particle when active. Set to -1 to disable. Defaults to 10.")
         public Integer particleInterval = 10;
     }
 
