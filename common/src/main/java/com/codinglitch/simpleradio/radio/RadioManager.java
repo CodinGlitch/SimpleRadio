@@ -530,6 +530,7 @@ public class RadioManager implements SimpleRadioApi {
             newSource.pitch = pitch;
             newSource.offset = offset;
             newSource.seed = seed;
+            newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.range))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
 
             listener.onSource(newSource);
         }

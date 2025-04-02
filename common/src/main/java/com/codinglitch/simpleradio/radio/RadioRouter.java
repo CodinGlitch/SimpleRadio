@@ -243,17 +243,21 @@ public class RadioRouter implements Socket {
     }
 
     public int getRedstoneMappedActivity() {
-        return Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
+        return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
     }
 
     public void compileActivity(RadioSource source) {
-        if (source.data == null) return;
-
-        compiledActivity += source.activity;
-        if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
-            this.activity = Math.sqrt(compiledActivity);
+        if (source.data == null) {
+            this.activity = source.activity;
             compiledActivity = 0;
             compiledSamples = 0;
+        } else {
+            compiledActivity += source.activity;
+            if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
+                this.activity = Math.sqrt(compiledActivity);
+                compiledActivity = 0;
+                compiledSamples = 0;
+            }
         }
 
         if (activityTime == 0) {
