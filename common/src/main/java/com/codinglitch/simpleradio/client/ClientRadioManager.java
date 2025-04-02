@@ -151,6 +151,8 @@ public class ClientRadioManager {
     }
 
     public static void finalizeRouter(short mapping, short identifier) {
+        CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
+
         RadioRouter router = pendingRouters.remove(mapping);
         if (router == null) {
             CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
@@ -164,6 +166,7 @@ public class ClientRadioManager {
     public static void registerRouter(RadioRouter router) {
         short mapping = RadioManager.pushRouter(pendingRouters, router);
         ClientServices.NETWORKING.sendToServer(new ServerboundRequestRouterPacket(router.getReference(), router.getClass().getSimpleName(), mapping));
+        CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
     public static void removeRouter(Predicate<ClientRouterWrapper> predicate) {
         routers.entrySet().removeIf(entry -> {
@@ -211,6 +214,7 @@ public class ClientRadioManager {
     }
 
     public static void close() {
+        pendingRouters.clear();
         routers.clear();
     }
 

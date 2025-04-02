@@ -40,6 +40,7 @@ public record ServerboundRequestRouterPacket(UUID reference, String type, short 
         server.execute(() -> {
             short identifier = RadioManager.getIdentifier(r -> reference.equals(r.reference) && r.getClass().getSimpleName().equals(type));
             if (identifier == Short.MAX_VALUE) {
+                CommonSimpleRadio.warn("We could not find the {} with reference {} for mapping {}!", type, reference, mapping);
                 return;
             }
 
