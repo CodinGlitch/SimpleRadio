@@ -445,13 +445,14 @@ public class RadioManager implements SimpleRadioApi {
             return false;
         }
 
-        if (!position.level.isLoaded(pos)) return false;
+        //TODO: this is causing issue in server, make sure reloading in chunks the routers get reregistered
+        //if (!position.level.isLoaded(pos)) return false;
 
         BlockState state = position.level.getBlockState(pos);
         if (state.isAir()) return false;
 
         Block block = state.getBlock();
-        return clazz.isInstance(block) || clazz.isInstance(block.asItem());
+        return clazz.isAssignableFrom(block.getClass()) || clazz.isAssignableFrom(block.asItem().getClass());
     }
 
     public static boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> itemCriteria) {
