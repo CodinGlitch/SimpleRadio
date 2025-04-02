@@ -106,6 +106,13 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof MicrophoneBlockEntity microphone) {
+            if (microphone.listener != null) {
+                return microphone.listener.getRedstoneMappedActivity();
+            }
+        }
+
         return 0;
     }
 
