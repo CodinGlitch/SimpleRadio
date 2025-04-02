@@ -67,14 +67,23 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState $$0) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof SpeakerBlockEntity speaker) {
+            if (speaker.speaker != null) {
+                return speaker.speaker.getRedstoneMappedActivity();
+            }
+        }
+
         return 0;
     }
+
+
 
     @Override
     public RenderShape getRenderShape(BlockState state) {

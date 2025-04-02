@@ -9,6 +9,7 @@ import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
+import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Math;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -529,7 +531,7 @@ public class RadioManager implements SimpleRadioApi {
             newSource.offset = offset;
             newSource.seed = seed;
 
-            listener.onData(newSource);
+            listener.onSource(newSource);
         }
     }
 
@@ -556,20 +558,25 @@ public class RadioManager implements SimpleRadioApi {
             }
             if (listenerPosition == null) continue;
 
-            //Vector3f senderVelocity = playerVelocities.get(sender.getUUID());
+            byte[] data = event.getPacket().getOpusEncodedData();
             Vector3f senderPosition = sender.position().toVector3f();
-
-            ///double dopplerFactor = CommonRadioPlugin.getDoppler(listenerPosition, listener.velocity, senderPosition, senderVelocity);
-
             RadioSource newSource = new RadioSource(
                     sender.getUUID(),
                     WorldlyPosition.of(senderPosition, level),
-                    event.getPacket().getOpusEncodedData(),
+                    data,
                     (float) falloff
             );
-            //newSource.pitch = (float) dopplerFactor;
 
-            listener.onData(newSource);
+            // Decoding for initial reading
+            OpusDecoder decoder = listener.getDecoder(sender.getUUID());
+            if (data == null || data.length == 0) {
+                decoder.resetState();
+            } else {
+                short[] decoded = decoder.decode(data);
+                newSource.activity = CommonRadioPlugin.analyzeActivity(decoded);
+            }
+
+            listener.onSource(newSource);
         }
     }
 }

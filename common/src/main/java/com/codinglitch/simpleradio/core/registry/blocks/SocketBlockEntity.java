@@ -40,7 +40,7 @@ public class SocketBlockEntity extends BlockEntity implements Socket {
 
     @Override
     public void setRemoved() {
-        RadioManager.removeRouterSided(router, this.level.isClientSide);
+        if (router != null) RadioManager.removeRouterSided(router, this.level.isClientSide);
 
         super.setRemoved();
     }

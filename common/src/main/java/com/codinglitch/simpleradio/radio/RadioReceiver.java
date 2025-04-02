@@ -3,11 +3,7 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.simpleradio.api.central.FrequencingType;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
-import com.codinglitch.simpleradio.platform.Services;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -88,7 +84,7 @@ public class RadioReceiver extends RadioRouter {
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         if (source.transmissionPower <= 0) return;
 
-        this.trySendActivity();
+        this.compileActivity(source);
 
         //super.accept(source);
         this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));

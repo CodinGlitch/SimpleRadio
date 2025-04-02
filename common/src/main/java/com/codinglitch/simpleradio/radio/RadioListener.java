@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.world.entity.Entity;
 
 import java.util.*;
@@ -17,14 +18,17 @@ import java.util.function.UnaryOperator;
 public class RadioListener extends RadioRouter {
 
     private UnaryOperator<RadioSource> dataTransformer;
-    private static final Queue<RadioSource> pendingSources = new LinkedList<>();
+    private final Map<UUID, OpusDecoder> decoders;
 
     public float range = 8;
     public long lastHeader = 0;
 
-    protected RadioListener(UUID id) {
-        super(id);
+    public byte[] compiledData = new byte[] {};
 
+    protected RadioListener(UUID reference) {
+        super(reference);
+
+        decoders = new HashMap<>();
     }
     protected RadioListener() {
         this(UUID.randomUUID());
@@ -72,12 +76,20 @@ public class RadioListener extends RadioRouter {
         this.dataTransformer = transformer;
     }
 
-    public void onData(RadioSource source) {
+    public OpusDecoder getDecoder(UUID sender) {
+        return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
+    }
+
+    public void onData(byte[] data) {
+        //TODO: compile like RadioSources into a larger sample
+    }
+
+    public void onSource(RadioSource source) {
         if (dataTransformer != null) {
             source = dataTransformer.apply(source);
         }
 
-        this.trySendActivity();
+        this.compileActivity(source);
 
         source.delegate(this.reference);
 

@@ -51,7 +51,7 @@ public class CommonSimpleRadioClient {
                 RadioReceiver receiver = ClientRadioManager.getReceiver(uuid);
                 if (receiver == null) return 0;
 
-                return receiver.activity > 0 ? 1 : 0;
+                return receiver.activityTime > 0 ? 1 : 0;
             }
         );
 

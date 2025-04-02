@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -22,7 +23,14 @@ import java.util.function.Predicate;
  * Routes RadioSources to other routers.
  */
 public class RadioRouter implements Socket {
-    public static final Map<String, Function<UUID, RadioRouter>> typeLookup = new HashMap<>();
+    public static class Compiled<E> extends LinkedList<E> {
+        @Override
+        public boolean add(E value) {
+            super.add(value);
+            while (size() > 20) super.remove();
+            return true;
+        }
+    }
 
     public ArrayList<Wire> wires = new ArrayList<>();
 
@@ -43,7 +51,11 @@ public class RadioRouter implements Socket {
     public Vector3f oldPosition = new Vector3f();
     public Vector3f velocity = new Vector3f();
 
-    public short activity = 0;
+    public float activity = 0;
+    public short activityTime = 0;
+
+    public float compiledActivity = 0;
+    public int compiledSamples = 0;
 
     public Class<?> link;
 
@@ -165,7 +177,7 @@ public class RadioRouter implements Socket {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
 
-        if (this.activity > 0) this.activity--;
+        if (this.activityTime > 0) this.activityTime--;
     }
 
     public void accept(RadioSource source) {
@@ -229,9 +241,24 @@ public class RadioRouter implements Socket {
         this.route(source, null);
     }
 
-    public void trySendActivity() {
-        if (activity == 0) {
-            this.activity = 20; //TODO: make configurable and maybe just better 💀
+    public int getRedstoneMappedActivity() {
+        return Math.clamp(0, 15, Math.round(this.activity / 1500f));
+    }
+
+    public void compileActivity(RadioSource source) {
+        if (source.data == null) return;
+
+        compiledActivity += source.activity;
+        if (compiledSamples++ >= 10) {
+            this.activity = Math.sqrt(compiledActivity);
+            compiledActivity = 0;
+            compiledSamples = 0;
+
+            CommonSimpleRadio.info(this.activity);
+        }
+
+        if (activityTime == 0) {
+            this.activityTime = 20; //TODO: make configurable and maybe just better 💀
 
             WorldlyPosition location = getLocation();
             if (!location.isClientSide()) {

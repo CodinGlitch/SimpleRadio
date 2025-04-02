@@ -36,6 +36,8 @@ public class RadioSource {
     public float offset;
     public long seed;
 
+    public float activity;
+
     public List<Short> record = new ArrayList<>();
 
     public Frequency frequencyMedium;
