@@ -29,6 +29,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +39,10 @@ import java.util.UUID;
 public class TransmitterBlock extends BaseEntityBlock implements Routing, Transmitting {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    private static final VoxelShape SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 7.0, 14.0);
+    private static final VoxelShape SHAPE_NORTH = Shapes.or(Block.box(2.0, 0.0, 4.0, 14.0, 9.0, 16.0), Block.box(1.0, 9.0, 3.0, 15.0, 12.0, 16.0));
+    private static final VoxelShape SHAPE_EAST = Shapes.or(Block.box(0.0, 0.0, 2.0, 12.0, 9.0, 14.0), Block.box(0.0, 9.0, 1.0, 13.0, 12.0, 15.0));
+    private static final VoxelShape SHAPE_SOUTH = Shapes.or(Block.box(2.0, 0.0, 0.0, 14.0, 9.0, 12.0), Block.box(1.0, 9.0, 0.0, 15.0, 12.0, 13.0));
+    private static final VoxelShape SHAPE_WEST = Shapes.or(Block.box(4.0, 0.0, 2.0, 16.0, 9.0, 14.0), Block.box(3.0, 9.0, 1.0, 16.0, 12.0, 15.0));
 
     public TransmitterBlock(Properties properties) {
         super(properties);
@@ -70,7 +74,12 @@ public class TransmitterBlock extends BaseEntityBlock implements Routing, Transm
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        return switch (state.getValue(FACING)) {
+            case NORTH -> SHAPE_NORTH;
+            case EAST -> SHAPE_EAST;
+            case SOUTH -> SHAPE_SOUTH;
+            default -> SHAPE_WEST;
+        };
     }
 
     @Override
