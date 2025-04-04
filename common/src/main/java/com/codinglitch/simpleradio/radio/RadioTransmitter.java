@@ -98,8 +98,8 @@ public class RadioTransmitter extends RadioRouter {
             float transmissionPower = getPower(frequency.modulation);
 
             source.frequencingType = this.frequencingType.id;
-            source.addPower(transmissionPower);
             source.transmissionCap = transmissionPower;
+            source.addPower(transmissionPower);
 
             //CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
         }

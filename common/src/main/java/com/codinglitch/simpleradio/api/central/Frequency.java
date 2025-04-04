@@ -54,7 +54,7 @@ public class Frequency implements Medium {
         this.receivers = new RouterContainer<>();
         this.transmitters = new RouterContainer<>();
 
-        pendingFrequencyModifications.add(() -> frequencies.add(this));
+        frequencies.add(this);
     }
 
     public static Frequency tryParse(String string) {
@@ -123,8 +123,7 @@ public class Frequency implements Medium {
     }
 
     public static Frequency getFrequency(String string, Modulation modulation) {
-        for (int i = 0; i < frequencies.size(); i++) {
-            Frequency frequency = frequencies.get(i);
+        for (Frequency frequency : frequencies) {
             if (frequency.frequency.equals(string) && frequency.modulation.equals(modulation))
                 return frequency;
         }
@@ -342,8 +341,8 @@ public class Frequency implements Medium {
         if (frequency.isEmpty()) frequency = DEFAULT_FREQUENCY;
         if (modulation == null) modulation = DEFAULT_MODULATION;
 
-        int index = getFrequencyIndex(frequency, modulation);
-        if (index != -1) return frequencies.get(index);
+        Frequency found = getFrequency(frequency, modulation);
+        if (found != null) return found;
 
         return new Frequency(frequency, modulation);
     }

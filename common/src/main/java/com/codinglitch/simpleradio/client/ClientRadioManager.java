@@ -255,6 +255,8 @@ public class ClientRadioManager {
             }
         }
 
+        if (packet.sound().value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume() == 0) return;
+
         SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound().value(), SoundSource.BLOCKS,
                 packet.volume(), packet.pitch(),
                 RandomSource.create(packet.seed()), location.blockPos());
@@ -290,6 +292,7 @@ public class ClientRadioManager {
         } catch (IOException e) {
             throw new CompletionException(e);
         }
+        AudioFormat format = stream.getFormat();
 
         AudioEffect effect = new BaseAudioEffect();
         effect.volume = 1;
@@ -297,7 +300,7 @@ public class ClientRadioManager {
 
         stream.effect = effect;
 
-        AudioFormat format = stream.getFormat();
+
         if (sound.shouldStream()) {
             ChannelHandleWrapper channelWrapper = ChannelHandleWrapper.of(channelHandle);
             channelWrapper.effect = effect;
@@ -465,6 +468,6 @@ public class ClientRadioManager {
     }
 
     public static void onSoundEvent(ClientReceiveSoundEvent receiveSoundEvent) {
-
+        CommonSimpleRadio.info(receiveSoundEvent.getId());
     }
 }

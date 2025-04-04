@@ -107,6 +107,7 @@ public class RadioSource {
         copy.wireMedium = this.wireMedium;
 
         copy.transmissionPower = this.transmissionPower;
+        copy.transmissionCap = this.transmissionCap;
 
         return copy;
     }
