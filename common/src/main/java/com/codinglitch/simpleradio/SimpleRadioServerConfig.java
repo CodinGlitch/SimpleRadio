@@ -252,6 +252,8 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "The factor of audio signal energy for converting to redstone signals. Higher values will cause lower redstone signals, and vice versa. Defaults to 20.")
         public Double activityRedstoneFactor = 1500d;
+        @LexiconEntry(comment = "How long (in ticks) before activity expiry can we resend an update? Defaults to 2.")
+        public Integer activityForgiveness = 2;
         @LexiconEntry(comment = "How long (in ticks) should a router stay active after receiving audio data? Affects the rate of updates for activity checks. Defaults to 20.")
         public Integer activityTime = 20;
 

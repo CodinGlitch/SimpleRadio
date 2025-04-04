@@ -260,7 +260,7 @@ public class RadioRouter implements Socket {
             }
         }
 
-        if (activityTime == 0) {
+        if (activityTime < SimpleRadioLibrary.SERVER_CONFIG.router.activityForgiveness) {
             this.activityTime = SimpleRadioLibrary.SERVER_CONFIG.router.activityTime;
 
             WorldlyPosition location = getLocation();
