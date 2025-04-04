@@ -14,16 +14,14 @@ public class BaseAudioEffect extends AudioEffect {
     @Override
     public short[] apply(short[] data) {
         for (int i = 0; i < data.length; i++) {
-            if (RANDOM.nextFloat(100) < severity) data[i] *= 0;
+            if (RANDOM.nextFloat(100) < severity) {
+                data[i] *= 0;
+            }
         }
 
+        bitCrush(data, 12 - Math.round(severity / 15));
+        downsample(data, 5 + Math.round(severity / 15));
         lowPass(data);
-
-        // Bit crush with a depth of 14 to 8
-        bitCrush(data, 14 - Math.round(severity / 15));
-
-        // Downsample from a factor of 3 to 11
-        downsample(data, 3 + Math.round(severity / 12));
 
         return super.apply(data);
     }
@@ -32,7 +30,7 @@ public class BaseAudioEffect extends AudioEffect {
      * Simple single-pole IIR low-pass filter
      */
     public void lowPass(short[] data) {
-        float alpha = 0.03f;
+        float alpha = 0.1f;
 
         for (int i = 0; i < data.length; i++) {
             float filtered = alpha * (float)data[i] + (1.0f - alpha) * lastSample;
