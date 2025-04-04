@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -40,7 +41,9 @@ public class SocketBlockEntity extends BlockEntity implements Socket {
 
     @Override
     public void setRemoved() {
-        if (router != null) RadioManager.removeRouterSided(router, this.level.isClientSide);
+        if (router != null) {
+            RadioManager.removeRouterSided(router, this.level.isClientSide);
+        }
 
         super.setRemoved();
     }

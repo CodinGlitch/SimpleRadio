@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
@@ -107,7 +108,8 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
     public void inactivate() {
         if (this.frequency != null) {
-            stopReceiving(frequency.frequency, frequency.modulation, this.id);
+            RadioManager.removeRouterSided(this.id, this.getLevel().isClientSide);
+            if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
         }
 
         this.isActive = false;

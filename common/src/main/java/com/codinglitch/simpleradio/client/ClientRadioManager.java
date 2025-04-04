@@ -199,6 +199,15 @@ public class ClientRadioManager {
     public static void tick(long gameTime) {
         if (gameTime % 20 == 0) {
             garbageCollect();
+
+            // After garbage collection, we shall also re-request still missing routers
+            for (Map.Entry<Short, RadioRouter> entry : pendingRouters.entrySet()) {
+                short mapping = entry.getKey();
+                RadioRouter router = entry.getValue();
+
+                ClientServices.NETWORKING.sendToServer(new ServerboundRequestRouterPacket(router.getReference(), router.getClass().getSimpleName(), mapping));
+                CommonSimpleRadio.debug("We missed a router, so re-requesting identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
+            }
         }
 
         for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : routers.entrySet()) {

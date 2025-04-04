@@ -14,6 +14,8 @@ public class RouterContainer<R extends RadioRouter> extends ArrayList<R> {
     @Override
     public boolean removeIf(Predicate<? super R> filter) {
         return super.removeIf(router -> {
+            if (router == null) return true;
+
             if (filter.test(router)) {
                 RadioManager.removeRouter(router.getIdentifier());
                 return true;

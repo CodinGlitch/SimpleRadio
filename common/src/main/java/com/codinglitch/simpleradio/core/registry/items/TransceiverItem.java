@@ -54,8 +54,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
-        CommonSimpleRadio.info("activating client:{}", level.isClientSide);
-
         RadioListener listener = startListening(entity, owner);
         RadioSpeaker speaker = startSpeaking(entity, owner);
         RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
@@ -125,8 +123,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             frequency = this.getDefaultFrequency();
             tag.putString("frequency", frequency);
         }
-
-        CommonSimpleRadio.info("{} {}", entity.level().isClientSide, tag);
 
         UUID uuid = entity.getUUID();
         if (tag.contains("user")) {

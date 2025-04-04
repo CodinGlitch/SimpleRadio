@@ -24,7 +24,6 @@ public class Frequency implements Medium {
         }
     }
 
-    private static final Queue<Runnable> pendingFrequencyModifications = new LinkedList<>();
     private static final List<Frequency> frequencies = new ArrayList<>();
 
     public static String DEFAULT_FREQUENCY;
@@ -37,8 +36,6 @@ public class Frequency implements Medium {
 
     public final Modulation modulation;
     public final String frequency;
-
-    public final Queue<Runnable> pendingModifications = new LinkedList<>();
 
     public final RouterContainer<RadioReceiver> receivers;
     public final RouterContainer<RadioTransmitter> transmitters;
@@ -197,8 +194,7 @@ public class Frequency implements Medium {
     public void removeReceiver(Predicate<RadioReceiver> criteria) {
         receivers.removeIf(criteria);
 
-        if (!this.validate())
-            pendingFrequencyModifications.add(() -> frequencies.remove(this));
+        if (!this.validate()) frequencies.remove(this);
     }
     public void removeReceiver(RadioReceiver receiver) {
         removeReceiver(receiver::equals);
@@ -279,8 +275,7 @@ public class Frequency implements Medium {
     public void removeTransmitter(Predicate<RadioTransmitter> criteria) {
         transmitters.removeIf(criteria);
 
-        if (!this.validate())
-            pendingFrequencyModifications.add(() -> frequencies.remove(this));
+        if (!this.validate()) frequencies.remove(this);
     }
     public void removeTransmitter(RadioTransmitter transmitter) {
         removeTransmitter(transmitter::equals);
@@ -303,21 +298,7 @@ public class Frequency implements Medium {
             receiver.tick(tickCount);
         }
 
-        // now that its done iterating the transmitters and receivers we can apply the modifications without any problems 😊
-
-        for (int i = 0; i < pendingModifications.size(); i++) {
-            Runnable modification = pendingModifications.poll(); // i sure hope this is safe!!!
-            if (modification == null) break;
-            modification.run();
-        }
-    }
-
-    public static void applyModifications() {
-        for (int i = 0; i < pendingFrequencyModifications.size(); i++) {
-            Runnable modification = pendingFrequencyModifications.poll();
-            if (modification == null) break;
-            modification.run();
-        }
+        // retired the 'pending' thing it was pretty stupid in hindsight
     }
 
     public boolean validate() {

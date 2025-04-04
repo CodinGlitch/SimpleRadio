@@ -370,7 +370,6 @@ public class RadioManager implements SimpleRadioApi {
         for (Frequency frequency : frequencies) {
             frequency.serverTick(tickCount);
         }
-        Frequency.applyModifications();
 
         for (RadioListener listener : listeners) {
             listener.tick(tickCount);
@@ -449,7 +448,10 @@ public class RadioManager implements SimpleRadioApi {
         //if (!position.level.isLoaded(pos)) return false;
 
         BlockState state = position.level.getBlockState(pos);
-        if (state.isAir()) return false;
+        if (state.isAir()) {
+            // Void air is used in place of unloaded chunks, so if this chunk is unloaded we will wait until it is loaded before checking the block itself
+            return !position.level.isLoaded(pos);
+        }
 
         Block block = state.getBlock();
         return clazz.isAssignableFrom(block.getClass()) || clazz.isAssignableFrom(block.asItem().getClass());

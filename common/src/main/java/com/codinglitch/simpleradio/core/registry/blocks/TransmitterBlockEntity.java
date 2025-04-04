@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Transmitting;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -7,6 +8,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
@@ -107,7 +109,8 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
     public void inactivate() {
         if (this.frequency != null) {
-            stopTransmitting(frequency.frequency, frequency.modulation, this.id);
+            RadioManager.removeRouterSided(this.id, this.level.isClientSide);
+            if (!this.level.isClientSide) stopTransmitting(frequency.frequency, frequency.modulation, this.id);
         }
 
         this.isActive = false;

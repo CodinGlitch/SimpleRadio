@@ -25,7 +25,7 @@ public interface Frequencing {
     static boolean validate(WorldlyPosition position, Class<?> clazz, @Nullable Frequency frequency) {
         return RadioManager.verifyLocationCollection(position, clazz);
     }
-    static boolean validate(UUID uuid, Class<? extends Frequencing> clazz, @Nullable Frequency frequency) {
+    static boolean validate(UUID uuid, Class<?> clazz, @Nullable Frequency frequency) {
         VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(uuid);
         if (connection != null) return validate(connection, clazz, frequency);
         return false;

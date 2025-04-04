@@ -90,6 +90,12 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     }
 
     @Override
+    protected void saveAdditional(CompoundTag tag) {
+        saveTag(tag);
+        super.saveAdditional(tag);
+    }
+
+    @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         this.saveAdditional(tag);
