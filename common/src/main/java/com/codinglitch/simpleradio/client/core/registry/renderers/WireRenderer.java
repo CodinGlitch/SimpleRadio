@@ -53,7 +53,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
 
         float distance = (float) (to.subtract(from)).length();
 
-        Vec3 middle = from.lerp(to, 0.5).subtract(0, 0.75f + (distance*0.075f), 0);
+        Vec3 middle = from.lerp(to, 0.5).subtract(0, SimpleRadioLibrary.CLIENT_CONFIG.wire.baseSag + (distance*SimpleRadioLibrary.CLIENT_CONFIG.wire.distanceSag), 0);
 
         Vec3 lastTopLeft = null;
         Vec3 lastBottomLeft = null;
