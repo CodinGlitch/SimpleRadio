@@ -178,7 +178,15 @@ public class RadioRouter implements Socket {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
 
-        if (this.activityTime > 0) this.activityTime--;
+        if (!this.active) {
+            this.activity = 0;
+            this.activityTime = 0;
+
+            this.compiledSamples = 0;
+            this.compiledActivity = 0;
+        } else {
+            if (this.activityTime > 0) this.activityTime--;
+        }
     }
 
     public void accept(RadioSource source) {
@@ -247,6 +255,8 @@ public class RadioRouter implements Socket {
     }
 
     public void compileActivity(RadioSource source) {
+        if (!this.active) return;
+
         if (source.data == null) {
             this.activity = source.activity;
             compiledActivity = 0;
