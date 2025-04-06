@@ -18,7 +18,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class SocketBlockEntity extends BlockEntity implements Socket {
 
@@ -50,7 +52,7 @@ public class SocketBlockEntity extends BlockEntity implements Socket {
 
     @Override
     public RadioRouter getRouter() {
-        return router;
+        return router != null ? router : (this.hasLevel() ? RadioManager.getRouterSided(this.id, this.level.isClientSide) : null);
     }
 
     @Override

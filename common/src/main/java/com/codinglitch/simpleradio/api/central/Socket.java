@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -33,7 +34,7 @@ public interface Socket {
     default boolean distribute(RadioSource source) {
         boolean result = false;
 
-        ArrayList<Wire> wires = this.getWires();
+        List<Wire> wires = this.getWires();
         wires.removeIf(Predicate.not(Wire::isAlive));
 
         for (int i = 0; i < wires.size(); i++) {
@@ -87,8 +88,10 @@ public interface Socket {
         return this.getRouter().getIdentifier();
     }
 
-    default ArrayList<Wire> getWires() {
-        return this.getRouter().getWires();
+    default List<Wire> getWires() {
+        RadioRouter router = this.getRouter();
+        if (router == null) return List.of();
+        return router.getWires();
     }
 
     default void shortCircuit() {

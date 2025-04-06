@@ -1,9 +1,11 @@
 package com.codinglitch.simpleradio.client.core.registry.renderers;
 
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -29,7 +31,7 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
         BlockState state = blockEntity.getBlockState();
         Block block = state.getBlock();
 
-        if (block instanceof MicrophoneBlock microphoneBlock && blockEntity.isActive) {
+        if (block instanceof MicrophoneBlock microphoneBlock && blockEntity.id != null) {
             poseStack.pushPose();
             poseStack.translate(0.5f, 1.5f, 0.5f);
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
@@ -41,12 +43,14 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
             model.plug.visible = !blockEntity.getWires().isEmpty();
 
             model.body.xRot = blockEntity.currentTilt;
-            if (blockEntity.listener != null) {
+
+            RadioRouter router = ClientRadioManager.getRouter(blockEntity.id); // workaround for create
+            if (router != null) {
                 float rotation = Math.toRadians(SimpleRadioBlocks.MICROPHONE.getYRotationDegrees(state) - 90);
                 float tilt = blockEntity.currentTilt - 0.5f;
                 Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
 
-                blockEntity.listener.connectionOffset = new Vec3(
+                router.connectionOffset = new Vec3(
                         normal.x * Math.cos(tilt)*0.25f,
                         Math.sin(tilt)*0.25f,
                         normal.z * Math.cos(tilt)*0.25f

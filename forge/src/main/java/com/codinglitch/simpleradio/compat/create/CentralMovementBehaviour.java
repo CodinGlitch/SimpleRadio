@@ -9,9 +9,11 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
 import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
 import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
+import net.createmod.catnip.animation.AnimationTickHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -52,12 +54,10 @@ public class CentralMovementBehaviour implements MovementBehaviour {
 
             WorldlyPosition newLocation;
             if (context.world.isClientSide) {
-                double partialTick = Minecraft.getInstance().getPartialTick();
+                double partialTick = AnimationTickHolder.getPartialTicks();
+                Vec3 pos = context.position.add(context.motion.scale(partialTick));
 
-                Vec3 position = context.position;
-                position = position.add(context.motion.scale(partialTick));
-
-                newLocation  = WorldlyPosition.of(position.toVector3f(), context.world);
+                newLocation = WorldlyPosition.of(pos.toVector3f(), context.world);
             } else {
                 newLocation = WorldlyPosition.of(context.position.toVector3f(), context.world);
             }
@@ -106,4 +106,5 @@ public class CentralMovementBehaviour implements MovementBehaviour {
 
         update(context);
     }
+
 }
