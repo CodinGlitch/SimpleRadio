@@ -5,9 +5,11 @@ import com.codinglitch.simpleradio.api.central.Listening;
 import com.codinglitch.simpleradio.api.central.Routing;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -128,12 +130,23 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof MicrophoneBlockEntity microphoneBlockEntity) {
+        if (blockEntity instanceof MicrophoneBlockEntity mic) {
             if (player.isCrouching()) {
-                microphoneBlockEntity.tilt = (microphoneBlockEntity.tilt + 0.1f) % 3;
+                mic.tilt = (mic.tilt + 0.1f) % 3;
+
+                if (!level.isClientSide)
+                 level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.TILT_MICROPHONE, SoundSource.BLOCKS, 0.1f, 0.9f + level.random.nextFloat()*0.2f);
+
+
                 return InteractionResult.SUCCESS;
             } else {
-                microphoneBlockEntity.setListening(!microphoneBlockEntity.isListening());
+                mic.setListening(!mic.isListening());
+
+                if (!level.isClientSide) {
+                    float pitch = mic.isListening() ? 1.1f : 0.9f;
+                    level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.PRESS_MICROPHONE, SoundSource.BLOCKS, 0.4f, pitch + level.random.nextFloat()*0.1f);
+                }
+
                 return InteractionResult.SUCCESS;
             }
         }

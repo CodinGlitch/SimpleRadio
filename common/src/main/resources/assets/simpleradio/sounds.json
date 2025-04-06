@@ -17,6 +17,20 @@
       "simpleradio:short_circuit/short_circuit2"
     ],
     "subtitle": "subtitles.simpleradio.short_circuit"
+  },
+  "press_microphone": {
+    "subtitle": "subtitles.simpleradio.press_microphone",
+    "sounds": [
+      "simpleradio:press_microphone"
+    ]
+  },
+  "tilt_microphone": {
+    "sounds": [
+      "simpleradio:tilt_microphone/tilt_microphone1",
+      "simpleradio:tilt_microphone/tilt_microphone2",
+      "simpleradio:tilt_microphone/tilt_microphone3"
+    ],
+    "subtitle": "subtitles.simpleradio.tilt_microphone"
   }
 }
 
