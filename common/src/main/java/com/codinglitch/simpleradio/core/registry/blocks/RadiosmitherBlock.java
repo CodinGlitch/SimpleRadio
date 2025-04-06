@@ -36,16 +36,16 @@ public class RadiosmitherBlock extends BaseEntityBlock {
     );
 
     private static final VoxelShape NORTH_SIDE_SHAPE = Shapes.or(TOP_SHAPE,
-            Block.box(1, 0, 1, 4, 14, 4), Block.box(14, 0, 0, 16, 14, 2)
+            Block.box(1, 0, 1, 3, 14, 3), Block.box(1, 0, 13, 3, 14, 15)
     );
     private static final VoxelShape SOUTH_SIDE_SHAPE = Shapes.or(TOP_SHAPE,
-            Block.box(13, 0, 13, 15, 14, 15), Block.box(13, 0, 1, 16, 15, 4)
+            Block.box(13, 0, 13, 15, 14, 15), Block.box(13, 0, 1, 15, 14, 3)
     );
     private static final VoxelShape EAST_SIDE_SHAPE = Shapes.or(TOP_SHAPE,
-            Block.box(14, 0, 14, 16, 14, 16), Block.box(14, 0, 0, 16, 14, 2)
+            Block.box(1, 0, 1, 3, 14, 3), Block.box(13, 0, 1, 15, 14, 3)
     );
     private static final VoxelShape WEST_SIDE_SHAPE = Shapes.or(TOP_SHAPE,
-            Block.box(14, 0, 14, 16, 14, 16), Block.box(14, 0, 0, 16, 14, 2)
+            Block.box(1, 0, 13, 3, 14, 15), Block.box(13, 0, 13, 15, 14, 15)
     );
 
     public RadiosmitherBlock(Properties properties) {
@@ -76,19 +76,25 @@ public class RadiosmitherBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState state1, boolean b) {
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity != null) {
-            Containers.dropContents(level, pos, (Container)blockEntity);
-        }
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean b) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof Container container) {
+                Containers.dropContents(level, pos, container);
+                level.updateNeighbourForOutputSignal(pos, this);
+            }
 
-        super.onRemove(state, level, pos, state1, b);
+            super.onRemove(state, level, pos, newState, b);
+        }
     }
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         if (!level.isClientSide) {
-            MenuProvider provider = state.getMenuProvider(level, pos);
+            RadiosmitherPart part = state.getValue(RADIOSMITHER_PART);
+            BlockPos mainPos = part == RadiosmitherPart.MAIN ? pos : pos.relative(state.getValue(FACING).getClockWise());
+
+            MenuProvider provider = state.getMenuProvider(level, mainPos);
 
             if (provider != null) {
                 player.openMenu(provider);
@@ -104,18 +110,10 @@ public class RadiosmitherBlock extends BaseEntityBlock {
             return MAIN_SHAPE;
         } else {
             return switch (state.getValue(FACING)) {
-                case SOUTH -> Shapes.or(TOP_SHAPE,
-                        Block.box(13, 0, 13, 15, 14, 15), Block.box(13, 0, 1, 15, 14, 3)
-                );
-                case WEST -> Shapes.or(TOP_SHAPE,
-                        Block.box(1, 0, 13, 3, 14, 15), Block.box(13, 0, 13, 15, 14, 15)
-                );
-                case EAST -> Shapes.or(TOP_SHAPE,
-                        Block.box(1, 0, 1, 3, 14, 3), Block.box(13, 0, 1, 15, 14, 3)
-                );
-                default -> Shapes.or(TOP_SHAPE,
-                        Block.box(1, 0, 1, 3, 14, 3), Block.box(1, 0, 13, 3, 14, 15)
-                );
+                case SOUTH -> SOUTH_SIDE_SHAPE;
+                case WEST -> WEST_SIDE_SHAPE;
+                case EAST -> EAST_SIDE_SHAPE;
+                default -> NORTH_SIDE_SHAPE;
             };
         }
     }
@@ -123,7 +121,7 @@ public class RadiosmitherBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new RadiosmitherBlockEntity(pos, state);
+        return state.getValue(RADIOSMITHER_PART) == RadiosmitherPart.MAIN ? new RadiosmitherBlockEntity(pos, state) : null;
     }
 
     @Nullable
