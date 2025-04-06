@@ -8,6 +8,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -86,6 +87,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     }
     public void setListening(boolean listening) {
         this.listening = listening;
+        if (this.listener != null) this.listener.active = this.listening;
     }
 
     public void inactivate() {
