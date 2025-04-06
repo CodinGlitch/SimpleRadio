@@ -21,12 +21,12 @@ public class SimpleRadioItems {
     public static WalkieTalkieItem WALKIE_TALKIE = register(id("walkie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
     public static WalkieTalkieItem SPUDDIE_TALKIE = register(id("spuddie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
     public static Item RADIOSMITHER = register(id("radiosmither"), new BlockItem(SimpleRadioBlocks.RADIOSMITHER, new Item.Properties()));
-    public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(1)));
-    public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(1)));
-    public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(1)));
+    public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(16)));
+    public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(16)));
+    public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(16)));
 
-    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(1)));
-    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(1)));
+    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(16)));
+    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(16)));
 
     public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)), null);
 
