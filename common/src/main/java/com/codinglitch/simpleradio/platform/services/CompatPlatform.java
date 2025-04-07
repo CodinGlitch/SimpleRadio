@@ -11,12 +11,13 @@ import org.joml.Quaternionf;
 import java.util.function.Predicate;
 
 public interface CompatPlatform {
+    void postInitialize();
+    void postCompatibilityLoad();
+
     void onData(RadioSpeaker channel, RadioSource source, short[] decoded);
 
     WorldlyPosition modifyPosition(WorldlyPosition position);
     Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation);
-
-    void postCompatibilityLoad();
 
     RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
 

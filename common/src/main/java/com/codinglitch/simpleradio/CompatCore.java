@@ -12,12 +12,24 @@ import net.minecraft.world.item.ItemStack;
 import java.util.function.Predicate;
 
 public class CompatCore {
+    public static boolean initialized = false;
+
     public static boolean VC_INTERACTION = false;
     public static boolean VIBRATIVE_VOICE = false;
     public static boolean VALKYRIEN_SKIES = false;
     public static boolean CREATE = false;
 
+    public static void postInitialize() {
+        Services.COMPAT.postInitialize();
+    }
+
     public static void spoutCompatibilities() {
+        if (!initialized) {
+            initialized = true;
+
+            CompatCore.postInitialize();
+        }
+
         //---- Voice Chat Interaction ----\\
         if (Services.PLATFORM.isModLoaded("vcinteraction")) {
             CommonSimpleRadio.info("Voice Chat Interaction is present!");

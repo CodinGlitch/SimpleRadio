@@ -47,6 +47,11 @@ public class FabricCompatPlatform implements CompatPlatform {
     }
 
     @Override
+    public void postInitialize() {
+
+    }
+
+    @Override
     public void postCompatibilityLoad() {
 
     }

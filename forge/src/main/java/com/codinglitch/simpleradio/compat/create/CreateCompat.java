@@ -4,13 +4,16 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
+import com.simibubi.create.api.contraption.BlockMovementChecks;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -23,14 +26,31 @@ import java.util.List;
 import java.util.UUID;
 
 public class CreateCompat {
-    public static List<Block> CENTRAL_BLOCKS = List.of(
-        SimpleRadioBlocks.RADIO,
-        SimpleRadioBlocks.SPEAKER,
-        SimpleRadioBlocks.MICROPHONE,
-        SimpleRadioBlocks.RECEIVER,
-        SimpleRadioBlocks.TRANSMITTER,
-        SimpleRadioBlocks.SOCKET
-    );
+    public static List<Block> CENTRAL_BLOCKS;
+
+    public static void postInitialize() {
+        BlockMovementChecks.registerAttachedCheck((state, level, pos, direction) -> {
+            if (state.is(SimpleRadioBlocks.RADIOSMITHER)) {
+                Direction facing = state.getValue(RadiosmitherBlock.FACING);
+                facing = state.getValue(RadiosmitherBlock.RADIOSMITHER_PART) == RadiosmitherBlock.RadiosmitherPart.MAIN ?
+                        facing.getCounterClockWise() :
+                        facing.getClockWise();
+
+                return BlockMovementChecks.CheckResult.of(direction == facing);
+            }
+
+            return BlockMovementChecks.CheckResult.PASS;
+        });
+
+        CENTRAL_BLOCKS = List.of(
+                SimpleRadioBlocks.RADIO,
+                SimpleRadioBlocks.SPEAKER,
+                SimpleRadioBlocks.MICROPHONE,
+                SimpleRadioBlocks.RECEIVER,
+                SimpleRadioBlocks.TRANSMITTER,
+                SimpleRadioBlocks.SOCKET
+        );
+    }
 
     public static void contraptionAddBlock(Contraption contraption, BlockPos pos, BlockEntity blockEntity, StructureTemplate.StructureBlockInfo info) {
         if (blockEntity instanceof AuditoryBlockEntity centralBlockEntity) {

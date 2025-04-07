@@ -43,13 +43,6 @@ public class ForgeCompatPlatform implements CompatPlatform {
     }
 
     @Override
-    public void postCompatibilityLoad() {
-        if (CompatCore.CREATE) {
-            CreateCompat.registerMovementBehaviours();
-        }
-    }
-
-    @Override
     public RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz) {
         return RadioManager.CollectionResult.PASS;
     }
@@ -64,5 +57,17 @@ public class ForgeCompatPlatform implements CompatPlatform {
         }
 
         return RadioManager.CollectionResult.PASS;
+    }
+
+    @Override
+    public void postCompatibilityLoad() {
+        if (CompatCore.CREATE) {
+            CreateCompat.registerMovementBehaviours();
+        }
+    }
+
+    @Override
+    public void postInitialize() {
+        CreateCompat.postInitialize();
     }
 }
