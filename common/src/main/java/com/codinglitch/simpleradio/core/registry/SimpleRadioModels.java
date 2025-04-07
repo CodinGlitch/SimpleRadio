@@ -38,13 +38,6 @@ public class SimpleRadioModels {
 
     // ----
 
-    private static final ModelOverride TRANSCEIVER_OVERRIDE = register(new ModelOverride(
-            List.of(ItemDisplayContext.NONE),
-            TRANSCEIVER, SimpleRadioItems.TRANSCEIVER
-    ));
-
-    // ----
-
     public static ModelOverride register(ModelOverride override) {
         OVERRIDES.add(override);
         return override;
@@ -105,6 +98,19 @@ public class SimpleRadioModels {
         }
 
         return null;
+    }
+
+    public static void register() {
+
+    }
+
+    public static void load() {
+        // ---- Overrides ---- \\
+
+        register(new ModelOverride(
+                List.of(ItemDisplayContext.NONE),
+                TRANSCEIVER, SimpleRadioItems.TRANSCEIVER
+        ));
     }
 
     public static class LocationHolder {

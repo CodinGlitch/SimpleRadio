@@ -74,8 +74,7 @@ public class ForgeLoader {
             CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
         });
 
-        SimpleRadioCatalysts.load();
-        SimpleRadioFrequencing.load();
+        CommonSimpleRadio.load();
     }
 
     public static void loadPackets() {

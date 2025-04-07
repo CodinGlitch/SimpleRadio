@@ -110,11 +110,6 @@ public class FabricLoader {
         loadPackets();
         loadParticles();
 
-        SimpleRadioEntities.load();
-        SimpleRadioBlockEntities.load();
-        SimpleRadioMenus.load();
-
-        SimpleRadioCatalysts.load();
-        SimpleRadioFrequencing.load();
+        CommonSimpleRadio.load();
     }
 }

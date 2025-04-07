@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Level;
@@ -42,5 +43,15 @@ public class CommonSimpleRadio {
     }
 
     public static void initialize() {
+    }
+
+    public static void load() {
+        SimpleRadioEntities.load();
+        SimpleRadioBlockEntities.load();
+        SimpleRadioMenus.load();
+
+        SimpleRadioCatalysts.load();
+        SimpleRadioFrequencing.load();
+        SimpleRadioModels.load();
     }
 }
