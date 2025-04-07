@@ -59,7 +59,7 @@ public class CreateCompat {
             centralBlockEntity.speaker = null;
             centralBlockEntity.listener = null;
 
-            centralBlockEntity.frequency = null;
+            //centralBlockEntity.frequency = null;
         } else if (blockEntity instanceof SocketBlockEntity socketBlockEntity) {
             socketBlockEntity.router = null;
         }
