@@ -1,13 +1,7 @@
 package com.codinglitch.simpleradio.api.central;
 
-import com.codinglitch.lexiconfig.annotations.LexiconEntry;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.UUID;
-import java.util.function.Function;
 
 public class FrequencingType {
     public enum DiminishmentMethod {

@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.FrequencingRegistry;
@@ -10,14 +9,12 @@ import com.codinglitch.simpleradio.api.central.Medium;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * A source containing the audio data as well as other data collected while travelling.
