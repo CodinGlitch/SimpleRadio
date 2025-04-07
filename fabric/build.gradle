@@ -21,8 +21,7 @@ dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
 
-    implementation "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    modRuntimeOnly "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
+    modImplementation "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}"
@@ -39,8 +38,8 @@ dependencies {
 
     // Vibrative Voice
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
-    modCompileOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
-    modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
+    //modCompileOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
+    //modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
 
     // Valkyrien Skies
     modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
@@ -115,6 +114,8 @@ processResources {
     from project(":common").sourceSets.main.resources
     from project(":fabric").sourceSets.main.resources
 }
+
+
 
 sourceSets.main.resources.srcDir 'src/main/generated'
 
