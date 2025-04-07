@@ -9,8 +9,6 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
 public class AlignedParticle extends ActivityParticle {
@@ -58,7 +56,6 @@ public class AlignedParticle extends ActivityParticle {
         renderQuad(consumer, vectors, partial);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprite;
 
