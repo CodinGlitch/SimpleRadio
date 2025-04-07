@@ -23,13 +23,26 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
+
+    private static final Map<Direction, Vec3> CONNECTION_OFFSETS = Map.of(
+        Direction.UP, new Vec3(0, -0.5, -0.3),
+        Direction.DOWN, new Vec3(0, 0.5, 0.3),
+
+        Direction.NORTH, new Vec3(0, -0.3, 0.5),
+        Direction.EAST, new Vec3(-0.5, -0.3, 0),
+        Direction.SOUTH, new Vec3(0, -0.3, -0.5),
+        Direction.WEST, new Vec3(0.5, -0.3, 0)
+    );
 
     public SpeakerBlock(Properties properties) {
         super(properties);
@@ -41,6 +54,8 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         RadioSpeaker speaker = startSpeaking(location, id);
         speaker.range = SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange;
         speaker.category = CommonRadioPlugin.SPEAKERS_CATEGORY;
+
+        speaker.connectionOffset = CONNECTION_OFFSETS.get(state.getValue(FACING));
 
         return speaker;
     }
