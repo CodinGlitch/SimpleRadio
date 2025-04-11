@@ -6,6 +6,7 @@ import com.codinglitch.lexiconfig.annotations.LexiconEntry;
 import com.codinglitch.lexiconfig.annotations.LexiconPage;
 import com.codinglitch.lexiconfig.classes.LexiconData;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
+import com.codinglitch.simpleradio.api.compat.CompatibilityInstance;
 
 @Lexicon(name = CommonSimpleRadio.ID+"-server", location = LexiconfigApi.Location.SERVER)
 public class SimpleRadioServerConfig extends LexiconData {
@@ -265,9 +266,12 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Voice Chat Interaction.")
         public VoiceChatInteraction voice_chat_interaction = new VoiceChatInteraction();
 
-        public static class VoiceChatInteraction extends LexiconPageData {
+        public static class VoiceChatInteraction extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
             @LexiconEntry(comment = "When false, removes compatibility for Voice Chat Interaction. Defaults to false. (NON-FUNCTIONAL)")
             public Boolean enabled = false;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
         }
 
         //----
@@ -275,9 +279,12 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Vibrative Voice.")
         public VibrativeVoice vibrative_voice = new VibrativeVoice();
 
-        public static class VibrativeVoice extends LexiconPageData {
+        public static class VibrativeVoice extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
             @LexiconEntry(comment = "When false, removes compatibility for Vibrative Voice. Defaults to true.")
             public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
         }
 
         //----
@@ -285,9 +292,12 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Valkyrien Skies.")
         public ValkyrienSkies valkyrien_skies = new ValkyrienSkies();
 
-        public static class ValkyrienSkies extends LexiconPageData {
+        public static class ValkyrienSkies extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
             @LexiconEntry(comment = "When false, removes compatibility for Valkyrien Skies. Defaults to true.")
             public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
         }
 
         //----
@@ -295,9 +305,12 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Create.")
         public Create create = new Create();
 
-        public static class Create extends LexiconPageData {
+        public static class Create extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
             @LexiconEntry(comment = "When false, removes compatibility for Create. Defaults to true.")
             public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
         }
     }
 }

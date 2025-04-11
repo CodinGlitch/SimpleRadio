@@ -19,7 +19,7 @@ public class FabricCompatPlatform implements CompatPlatform {
     public void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
 
         // ---- Voice Chat Interaction ---- \\
-        if (CompatCore.VC_INTERACTION) {
+        if (CompatCore.VC_INTERACTION.enabled) {
             InteractionCompat.onData(channel, source, decoded);
         }
     }
@@ -28,7 +28,7 @@ public class FabricCompatPlatform implements CompatPlatform {
     public WorldlyPosition modifyPosition(WorldlyPosition position) {
 
         // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES) {
+        if (CompatCore.VALKYRIEN_SKIES.enabled) {
             return ValkyrienCompat.modifyPosition(position);
         }
 
@@ -39,7 +39,7 @@ public class FabricCompatPlatform implements CompatPlatform {
     public Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
 
         // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES) {
+        if (CompatCore.VALKYRIEN_SKIES.enabled) {
             return ValkyrienCompat.modifyRotation(position, rotation);
         }
 

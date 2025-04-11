@@ -24,7 +24,7 @@ public class ForgeCompatPlatform implements CompatPlatform {
     public WorldlyPosition modifyPosition(WorldlyPosition position) {
 
         // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES) {
+        if (CompatCore.VALKYRIEN_SKIES.enabled) {
             return ValkyrienCompat.modifyPosition(position);
         }
 
@@ -35,7 +35,7 @@ public class ForgeCompatPlatform implements CompatPlatform {
     public Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
 
         // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES) {
+        if (CompatCore.VALKYRIEN_SKIES.enabled) {
             return ValkyrienCompat.modifyRotation(position, rotation);
         }
 
@@ -49,7 +49,7 @@ public class ForgeCompatPlatform implements CompatPlatform {
 
     @Override
     public RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria) {
-        if (CompatCore.CREATE) {
+        if (CompatCore.CREATE.enabled) {
             RadioManager.CollectionResult result = CreateCompat.verifyContraptionCollection(entity);
             if (result == RadioManager.CollectionResult.IGNORE || result == RadioManager.CollectionResult.COLLECT) {
                 return result;
@@ -61,13 +61,15 @@ public class ForgeCompatPlatform implements CompatPlatform {
 
     @Override
     public void postCompatibilityLoad() {
-        if (CompatCore.CREATE) {
+        if (CompatCore.CREATE.enabled) {
             CreateCompat.registerMovementBehaviours();
         }
     }
 
     @Override
     public void postInitialize() {
-        CreateCompat.postInitialize();
+        if (CompatCore.CREATE.isLoaded && CompatCore.CREATE.fitsVersion) {
+            CreateCompat.postInitialize();
+        }
     }
 }

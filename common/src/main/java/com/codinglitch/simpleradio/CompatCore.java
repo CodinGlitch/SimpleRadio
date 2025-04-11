@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.api.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.Services;
@@ -9,15 +10,25 @@ import com.codinglitch.simpleradio.radio.RadioSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public class CompatCore {
     public static boolean initialized = false;
 
-    public static boolean VC_INTERACTION = false;
-    public static boolean VIBRATIVE_VOICE = false;
-    public static boolean VALKYRIEN_SKIES = false;
-    public static boolean CREATE = false;
+    public static CompatibilityInstance VC_INTERACTION = new CompatibilityInstance(
+            "Voice Chat Interaction", "vcinteraction", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.voice_chat_interaction
+    );
+    public static CompatibilityInstance VIBRATIVE_VOICE = new CompatibilityInstance(
+            "Vibrative Voice", "vibrativevoice", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.vibrative_voice,
+            List.of(VC_INTERACTION)
+    );
+    public static CompatibilityInstance VALKYRIEN_SKIES = new CompatibilityInstance(
+            "Valkyrien Skies", "valkyrienskies", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.valkyrien_skies
+    );
+    public static CompatibilityInstance CREATE = new CompatibilityInstance(
+            "Create", "create", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create, "[6.0,)"
+    );
 
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
@@ -30,53 +41,11 @@ public class CompatCore {
             CompatCore.postInitialize();
         }
 
-        //---- Voice Chat Interaction ----\\
-        if (Services.PLATFORM.isModLoaded("vcinteraction")) {
-            CommonSimpleRadio.info("Voice Chat Interaction is present!");
-            if (SimpleRadioLibrary.SERVER_CONFIG.compatibilities.voice_chat_interaction.enabled) {
-                VC_INTERACTION = true;
-                CommonSimpleRadio.info("..and compat is enabled!");
-            } else {
-                CommonSimpleRadio.info("..but compat is disabled");
-            }
-        }
+        VC_INTERACTION.spout();
+        VIBRATIVE_VOICE.spout();
 
-        //---- Vibrative Voice ----\\
-        if (Services.PLATFORM.isModLoaded("vibrativevoice")) {
-            CommonSimpleRadio.info("Vibrative Voice is present!");
-            if (Services.PLATFORM.isModLoaded("vcinteraction")) {
-                CommonSimpleRadio.info("..but so is Voice Chat Interaction?!");
-            } else {
-                if (SimpleRadioLibrary.SERVER_CONFIG.compatibilities.vibrative_voice.enabled) {
-                    VIBRATIVE_VOICE = true;
-                    CommonSimpleRadio.info("..and compat is enabled!");
-                } else {
-                    CommonSimpleRadio.info("..but compat is disabled");
-                }
-            }
-        }
-
-        //---- Valkyrien Skies ----\\
-        if (Services.PLATFORM.isModLoaded("valkyrienskies")) {
-            CommonSimpleRadio.info("Valkyrien Skies is present!");
-            if (SimpleRadioLibrary.SERVER_CONFIG.compatibilities.valkyrien_skies.enabled) {
-                VALKYRIEN_SKIES = true;
-                CommonSimpleRadio.info("..and compat is enabled!");
-            } else {
-                CommonSimpleRadio.info("..but compat is disabled");
-            }
-        }
-
-        //---- Create ----\\
-        if (Services.PLATFORM.isModLoaded("create")) {
-            CommonSimpleRadio.info("Create is present!");
-            if (SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create.enabled) {
-                CREATE = true;
-                CommonSimpleRadio.info("..and compat is enabled!");
-            } else {
-                CommonSimpleRadio.info("..but compat is disabled");
-            }
-        }
+        VALKYRIEN_SKIES.spout();
+        CREATE.spout();
 
         Services.COMPAT.postCompatibilityLoad();
     }
@@ -88,7 +57,7 @@ public class CompatCore {
 
     public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
         // ---- Vibrative Voice ---- \\
-        if (CompatCore.VIBRATIVE_VOICE) {
+        if (CompatCore.VIBRATIVE_VOICE.enabled) {
             VibrativeCompat.onData(channel, source, decoded);
         }
     }
