@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
@@ -32,8 +33,9 @@ public abstract class MixinAbstractContraptionEntity extends Entity implements I
         super(type, level);
     }
 
-    @Inject(method = "moveCollidedEntitiesOnDisassembly", at = @At("TAIL"), remap = false)
+    @Inject(method = "Lcom/simibubi/create/content/contraptions/AbstractContraptionEntity;moveCollidedEntitiesOnDisassembly(Lcom/simibubi/create/content/contraptions/StructureTransform;)V", at = @At("TAIL"), remap = false, require = 0)
     private void simpleradio$moveCollidedEntitiesOnDisassembly_resetRouters(StructureTransform transform, CallbackInfo ci) {
+        if (!CompatCore.CREATE.enabled) return;
         if (this.contraption == null) return;
         for (StructureTemplate.StructureBlockInfo blockInfo : this.contraption.getBlocks().values()) {
             BlockPos pos = transform.apply(blockInfo.pos());
