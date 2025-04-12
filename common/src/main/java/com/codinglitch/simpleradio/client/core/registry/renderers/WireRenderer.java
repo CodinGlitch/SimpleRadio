@@ -38,6 +38,7 @@ import java.util.UUID;
 
 public class WireRenderer extends EntityRenderer<Wire> {
     private static final Vec3 UP = new Vec3(0, 1, 0);
+    private static final Vec3 RIGHT = new Vec3(1, 0, 0);
 
     private static final float CABLE_SIZE = 0.05f;
     private static final float SEGMENTS = 24;
@@ -92,7 +93,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
 
             Vec3 direction = fromMiddle.lerp(middleTo, progress + 0.05f).subtract(segmentPosition).normalize();
 
-            Vec3 side = direction.cross(UP).normalize().scale(CABLE_SIZE/2);
+            Vec3 side = direction.cross((direction.y == -1 || direction.y == 1) ? RIGHT : UP).normalize().scale(CABLE_SIZE/2);
             Vec3 up = side.cross(direction).normalize().scale(CABLE_SIZE/2);
 
             Vec3 otherSide = side.reverse();
