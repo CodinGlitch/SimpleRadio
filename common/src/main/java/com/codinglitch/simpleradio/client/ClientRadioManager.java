@@ -6,7 +6,6 @@ import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
@@ -45,7 +44,6 @@ import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -65,7 +63,7 @@ public class ClientRadioManager {
     // it will then assign the given identifier before registering it
     // but what about identical reference?
     // i dont know bruh
-    private static final Map<Short, RadioRouter> pendingRouters = new HashMap<>();
+    private static final Map<Short, PendingRouter<?>> pendingRouters = new HashMap<>();
     private static final Map<Short, ClientRouterWrapper> routers = new HashMap<>();
 
     public static List<RadioRouter> getRouters() {
@@ -153,19 +151,29 @@ public class ClientRadioManager {
     public static void finalizeRouter(short mapping, short identifier) {
         CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
 
-        RadioRouter router = pendingRouters.remove(mapping);
-        if (router == null) {
+        PendingRouter<?> pending = pendingRouters.remove(mapping);
+        if (pending == null) {
             CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
             return;
         }
 
-        router.identifier = identifier;
-        routers.put(identifier, ClientRouterWrapper.of(router));
+        pending.router.identifier = identifier;
+        routers.put(identifier, ClientRouterWrapper.of(pending.router));
     }
 
-    public static void registerRouter(RadioRouter router) {
-        short mapping = RadioManager.pushRouter(pendingRouters, router);
-        ClientServices.NETWORKING.sendToServer(new ServerboundRequestRouterPacket(router.getReference(), router.getClass().getSimpleName(), mapping));
+    public static <R extends RadioRouter> void registerRouter(R router) {
+        PendingRouter<R> pendingRouter = PendingRouter.of(router);
+
+        short mapping = Short.MAX_VALUE;
+        for (short index = Short.MIN_VALUE; index < Short.MAX_VALUE; index++) {
+            if (pendingRouters.containsKey(index)) continue;
+            pendingRouters.put(index, pendingRouter);
+            mapping = index;
+            break;
+        }
+
+        pendingRouter.request(mapping);
+
         CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
     public static void removeRouter(Predicate<ClientRouterWrapper> predicate) {
@@ -201,12 +209,12 @@ public class ClientRadioManager {
             garbageCollect();
 
             // After garbage collection, we shall also re-request still missing routers
-            for (Map.Entry<Short, RadioRouter> entry : pendingRouters.entrySet()) {
+            for (Map.Entry<Short, PendingRouter<?>> entry : pendingRouters.entrySet()) {
                 short mapping = entry.getKey();
-                RadioRouter router = entry.getValue();
+                PendingRouter<?> pending = entry.getValue();
 
-                ClientServices.NETWORKING.sendToServer(new ServerboundRequestRouterPacket(router.getReference(), router.getClass().getSimpleName(), mapping));
-                CommonSimpleRadio.debug("We missed a router, so re-requesting identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
+                pending.request(mapping);
+                CommonSimpleRadio.debug("We missed a router, so re-requesting identifier for {} with mapping {} and reference {}", pending.getClass().getSimpleName(), mapping, pending.router.getReference());
             }
         }
 
@@ -478,5 +486,27 @@ public class ClientRadioManager {
 
     public static void onSoundEvent(ClientReceiveSoundEvent receiveSoundEvent) {
         CommonSimpleRadio.info(receiveSoundEvent.getId());
+    }
+
+    public static class PendingRouter<R extends RadioRouter> {
+        public final R router;
+        public int attempts = 0;
+
+        public PendingRouter(R router) {
+            this.router = router;
+        }
+
+        public void request(short mapping) {
+            if (attempts > 5) {
+                pendingRouters.remove(mapping);
+                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.location);
+                return;
+            }
+            ClientServices.NETWORKING.sendToServer(new ServerboundRequestRouterPacket(router.getReference(), router.getClass().getSimpleName(), mapping));
+        }
+
+        public static <R extends RadioRouter> PendingRouter<R> of(R router) {
+            return new PendingRouter<>(router);
+        }
     }
 }
