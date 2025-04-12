@@ -63,6 +63,7 @@ public class CompatibilityInstance {
                 this.fitsVersion = false;
                 return;
             }
+            this.fitsVersion = true;
 
             if (this.config.isEnabled()) {
                 this.enabled = true;

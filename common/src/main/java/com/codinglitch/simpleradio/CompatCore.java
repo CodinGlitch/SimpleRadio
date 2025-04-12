@@ -35,18 +35,17 @@ public class CompatCore {
     }
 
     public static void spoutCompatibilities() {
-        if (!initialized) {
-            initialized = true;
-
-            CompatCore.postInitialize();
-        }
-
         VC_INTERACTION.spout();
         VIBRATIVE_VOICE.spout();
 
         VALKYRIEN_SKIES.spout();
         CREATE.spout();
 
+        if (!initialized) {
+            initialized = true;
+
+            CompatCore.postInitialize();
+        }
         Services.COMPAT.postCompatibilityLoad();
     }
 
