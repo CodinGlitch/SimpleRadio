@@ -15,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiving {
@@ -93,6 +94,8 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
 
+        if (blockEntity.receiver != null) blockEntity.receiver.active = blockEntity.catalyzed;
+
         if (!blockEntity.catalyzed) return;
 
         if (blockEntity.isDirty && level.getGameTime() % 200 == 0 && !level.isClientSide) {
@@ -100,7 +103,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
             RadioRouter router = blockEntity.getRouter();
             if (router instanceof RadioReceiver receiver) receiver.antennaPower = blockEntity.antennaPower;
 
-            level.sendBlockUpdated(pos, blockState, blockState, 2);
+            level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS);
             blockEntity.setChanged();
             blockEntity.isDirty = false;
         }

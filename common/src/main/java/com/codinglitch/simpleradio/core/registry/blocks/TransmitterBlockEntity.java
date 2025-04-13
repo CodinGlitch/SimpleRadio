@@ -16,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Transmitting {
@@ -91,8 +92,9 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
             blockEntity.activate();
         }
-
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
+
+        if (blockEntity.transmitter != null) blockEntity.transmitter.active = blockEntity.catalyzed;
 
         if (!blockEntity.catalyzed) return;
 
@@ -101,7 +103,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
             RadioRouter router = blockEntity.getRouter();
             if (router instanceof RadioTransmitter transmitter) transmitter.antennaPower = blockEntity.antennaPower;
 
-            level.sendBlockUpdated(pos, blockState, blockState, 2);
+            level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS);
             blockEntity.setChanged();
             blockEntity.isDirty = false;
         }
