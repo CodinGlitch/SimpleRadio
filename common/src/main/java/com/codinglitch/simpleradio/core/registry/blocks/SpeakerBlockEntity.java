@@ -63,7 +63,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.speaker != null && blockEntity.speaker.activityTime > 0) {
+        if (blockEntity.speaker != null && blockEntity.speaker.activityTime >= 0) {
             if (blockEntity.speaker.activityTime % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
                 level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
             }

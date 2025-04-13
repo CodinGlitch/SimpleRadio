@@ -70,7 +70,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.listener != null && blockEntity.listener.activityTime > 0) {
+        if (blockEntity.listener != null && blockEntity.listener.activityTime >= 0) {
             if (blockEntity.listener.activityTime % SimpleRadioLibrary.SERVER_CONFIG.microphone.redstonePolling == 0) {
                 level.updateNeighborsAt(pos, SimpleRadioBlocks.MICROPHONE);
             }

@@ -180,12 +180,19 @@ public class RadioRouter implements Socket {
 
         if (!this.active) {
             this.activity = 0;
-            this.activityTime = 0;
+            this.activityTime = -1;
 
             this.compiledSamples = 0;
             this.compiledActivity = 0;
         } else {
-            if (this.activityTime > 0) this.activityTime--;
+            if (this.activityTime > 0) {
+                if (--this.activityTime == 0) {
+                    this.activity = 0;
+                    //informActivity();
+                }
+            } else if (this.activityTime == 0) {
+                this.activityTime = -1;
+            }
         }
     }
 
@@ -272,13 +279,16 @@ public class RadioRouter implements Socket {
 
         if (activityTime < SimpleRadioLibrary.SERVER_CONFIG.router.activityForgiveness) {
             this.activityTime = SimpleRadioLibrary.SERVER_CONFIG.router.activityTime;
+            informActivity();
+        }
+    }
 
-            WorldlyPosition location = getLocation();
-            if (!location.isClientSide()) {
-                for (Player player : location.level.players()) {
-                    if (location.position().distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
-                        Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(activity, this.getIdentifier()));
-                    }
+    public void informActivity() {
+        WorldlyPosition location = getLocation();
+        if (!location.isClientSide()) {
+            for (Player player : location.level.players()) {
+                if (location.position().distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
+                    Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(activity, this.getIdentifier()));
                 }
             }
         }
