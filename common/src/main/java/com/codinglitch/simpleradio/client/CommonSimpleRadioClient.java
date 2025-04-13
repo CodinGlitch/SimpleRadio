@@ -116,6 +116,6 @@ public class CommonSimpleRadioClient {
     }
 
     public static void initialize() {
-
+        SimpleRadioModels.load();
     }
 }

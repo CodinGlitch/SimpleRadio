@@ -52,6 +52,5 @@ public class CommonSimpleRadio {
 
         SimpleRadioCatalysts.load();
         SimpleRadioFrequencing.load();
-        SimpleRadioModels.load();
     }
 }
