@@ -1,15 +1,19 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.SimpleRadioServerConfig;
-import com.codinglitch.simpleradio.core.central.Listening;
-import com.codinglitch.simpleradio.core.central.Routing;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Listening;
+import com.codinglitch.simpleradio.api.central.Routing;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.RadioListener;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -28,9 +32,13 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +64,10 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         RadioListener listener = startListening(location, id);
 
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.microphone.listeningRange;
+
+        float rotation = Math.toRadians(getYRotationDegrees(state) - 90);
+        Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
+        listener.connectionOffset = new Vec3(normal.x*0.1f, -0.2f, normal.z*0.1f);
 
         // Allow distribution through wires
         listener.allowDistribution();
@@ -96,6 +108,13 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof MicrophoneBlockEntity microphone) {
+            if (microphone.listener != null) {
+                return microphone.listener.getRedstoneMappedActivity();
+            }
+        }
+
         return 0;
     }
 
@@ -106,6 +125,33 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
             radioBlockEntity.saveToItem(stack);
 
         return List.of(stack);
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof MicrophoneBlockEntity mic) {
+            if (player.isCrouching()) {
+                mic.tilt = (mic.tilt + 0.1f) % 3;
+
+                if (!level.isClientSide)
+                 level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.TILT_MICROPHONE, SoundSource.BLOCKS, 0.1f, 0.9f + level.random.nextFloat()*0.2f);
+
+
+                return InteractionResult.SUCCESS;
+            } else {
+                mic.setListening(!mic.isListening());
+
+                if (!level.isClientSide) {
+                    float pitch = mic.isListening() ? 1.1f : 0.9f;
+                    level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.PRESS_MICROPHONE, SoundSource.BLOCKS, 0.4f, pitch + level.random.nextFloat()*0.1f);
+                }
+
+                return InteractionResult.SUCCESS;
+            }
+        }
+
+        return super.use(state, level, pos, player, hand, result);
     }
 
     @Override

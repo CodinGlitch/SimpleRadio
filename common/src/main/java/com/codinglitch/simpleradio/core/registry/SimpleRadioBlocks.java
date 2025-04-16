@@ -1,10 +1,15 @@
 package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.core.registry.blocks.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.PushReaction;
 
 import java.util.HashMap;
 
@@ -14,7 +19,7 @@ public class SimpleRadioBlocks {
     public static final HashMap<ResourceLocation, Block> BLOCKS = new HashMap<>();
 
     public static RadiosmitherBlock RADIOSMITHER = (RadiosmitherBlock) register(id("radiosmither"), new RadiosmitherBlock(
-            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.DEEPSLATE)
+            Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.DEEPSLATE).pushReaction(PushReaction.IGNORE)
     ));
     public static RadioBlock RADIO = (RadioBlock) register(id("radio"), new RadioBlock(
             Block.Properties.of().strength(3.0F, 6.0F).sound(SoundType.METAL)

@@ -21,14 +21,14 @@ public class SimpleRadioItems {
     public static WalkieTalkieItem WALKIE_TALKIE = register(id("walkie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
     public static WalkieTalkieItem SPUDDIE_TALKIE = register(id("spuddie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
     public static Item RADIOSMITHER = register(id("radiosmither"), new BlockItem(SimpleRadioBlocks.RADIOSMITHER, new Item.Properties()));
-    public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(1)));
-    public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(1)));
-    public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(1)));
+    public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(16)));
+    public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(16)));
+    public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(16)));
 
-    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(1)));
-    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(1)));
+    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(16)));
+    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(16)));
 
-    public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)));
+    public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)), null);
 
     public static Item ANTENNA = register(id("antenna"), new BlockItem(SimpleRadioBlocks.ANTENNA, new Item.Properties().stacksTo(16)));
     public static Item SOCKET = register(id("socket"), new BlockItem(SimpleRadioBlocks.SOCKET, new Item.Properties().stacksTo(16)));
@@ -39,27 +39,26 @@ public class SimpleRadioItems {
     public static Item SPEAKER_MODULE = register(id("speaker_module"), new Item(new Item.Properties()));
     public static Item LISTENER_MODULE = register(id("listener_module"), new Item(new Item.Properties()));
 
-    // -- Upgrades -- \\
-    public static ModuleItem IRON_MODULE = register(id("iron_module"), new ModuleItem(Tiers.IRON, new Item.Properties()));
-    public static ModuleItem GOLD_MODULE = register(id("gold_module"), new ModuleItem(Tiers.GOLD, new Item.Properties()));
-    public static ModuleItem DIAMOND_MODULE = register(id("diamond_module"), new ModuleItem(Tiers.DIAMOND, new Item.Properties()));
-    public static ModuleItem NETHERITE_MODULE = register(id("netherite_module"), new ModuleItem(Tiers.NETHERITE, new Item.Properties()));
+    // --- Upgrades --- \\
+    public static ModuleItem IRON_MODULE = register(id("iron_module"), new ModuleItem(Tiers.IRON, new Item.Properties()), null);
+    public static ModuleItem GOLD_MODULE = register(id("gold_module"), new ModuleItem(Tiers.GOLD, new Item.Properties()), null);
+    public static ModuleItem DIAMOND_MODULE = register(id("diamond_module"), new ModuleItem(Tiers.DIAMOND, new Item.Properties()), null);
+    public static ModuleItem NETHERITE_MODULE = register(id("netherite_module"), new ModuleItem(Tiers.NETHERITE, new Item.Properties()), null);
 
     public static void reload() {
         ITEMS.forEach((location, holder) -> {
             String path = location.getPath();
-            LexiconPageData configData = SimpleRadioLibrary.SERVER_CONFIG.getPage(path);
-            if (configData != null) {
-                Object field = configData.getEntry("enabled");
-                holder.enabled = field == null || (boolean) field;
+            Optional<LexiconPageData> configData = SimpleRadioLibrary.SERVER_CONFIG.getPage(path);
+            if (configData.isPresent()) {
+                holder.enabled = (boolean) configData.get().getEntry("enabled").orElse(false);
             }
 
             if (path.equals("walkie_talkie") || path.equals("spuddie_talkie")) {
-                LexiconPageData spudData = SimpleRadioLibrary.SERVER_CONFIG.getPage("walkie_talkie");
+                LexiconPageData spudData = SimpleRadioLibrary.SERVER_CONFIG.getPage("walkie_talkie").orElse(null);
                 //TODO mak this beter
-                Object enabled = spudData.getEntry("enabled");
-                Object spudder = spudData.getEntry("spuddieTalkie");
-                holder.enabled = (boolean) enabled && (spudder == null || path.equals("spuddie_talkie") == (boolean) spudder);
+                boolean enabled = (boolean) spudData.getEntry("enabled").orElse(false);
+                boolean spudder = (boolean) spudData.getEntry("spuddieTalkie").orElse(false);
+                holder.enabled = enabled && path.equals("spuddie_talkie") == spudder;
             }
         });
     }

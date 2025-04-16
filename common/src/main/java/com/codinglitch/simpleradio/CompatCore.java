@@ -1,66 +1,81 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.api.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import org.joml.Vector3f;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 
-import static com.codinglitch.simpleradio.platform.Services.COMPAT;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class CompatCore {
-    public static boolean VC_INTERACTION = false;
-    public static boolean VIBRATIVE_VOICE = false;
-    public static boolean VALKYRIEN_SKIES = false;
+    public static boolean initialized = false;
+
+    public static CompatibilityInstance VC_INTERACTION = new CompatibilityInstance(
+            "Voice Chat Interaction", "vcinteraction", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.voice_chat_interaction
+    );
+    public static CompatibilityInstance VIBRATIVE_VOICE = new CompatibilityInstance(
+            "Vibrative Voice", "vibrativevoice", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.vibrative_voice,
+            List.of(VC_INTERACTION)
+    );
+    public static CompatibilityInstance VALKYRIEN_SKIES = new CompatibilityInstance(
+            "Valkyrien Skies", "valkyrienskies", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.valkyrien_skies
+    );
+    public static CompatibilityInstance CREATE = new CompatibilityInstance(
+            "Create", "create", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create, "[6.0,)"
+    );
+
+    public static void postInitialize() {
+        Services.COMPAT.postInitialize();
+    }
 
     public static void spoutCompatibilities() {
-        //TODO: add a reload method from lexiconfig so we can actually use the fields above
+        VC_INTERACTION.spout();
+        VIBRATIVE_VOICE.spout();
 
-        //---- Voice Chat Interaction ----\\
-        if (Services.PLATFORM.isModLoaded("vcinteraction")) {
-            CommonSimpleRadio.info("Voice Chat Interaction is present!");
-            if (CommonSimpleRadio.SERVER_CONFIG.compatibilities.voice_chat_interaction.enabled) {
-                VC_INTERACTION = true;
-                CommonSimpleRadio.info("..and compat is enabled!");
-            } else {
-                CommonSimpleRadio.info("..but compat is disabled");
-            }
+        VALKYRIEN_SKIES.spout();
+        CREATE.spout();
+
+        if (!initialized) {
+            initialized = true;
+
+            CompatCore.postInitialize();
         }
+        Services.COMPAT.postCompatibilityLoad();
+    }
 
-        //---- Vibrative Voice ----\\
-        if (Services.PLATFORM.isModLoaded("vibrativevoice")) {
-            CommonSimpleRadio.info("Vibrative Voice is present!");
-            if (Services.PLATFORM.isModLoaded("vcinteraction")) {
-                CommonSimpleRadio.info("..but so is Voice Chat Interaction?!");
-            } else {
-                if (CommonSimpleRadio.SERVER_CONFIG.compatibilities.vibrative_voice.enabled) {
-                    VIBRATIVE_VOICE = true;
-                    CommonSimpleRadio.info("..and compat is enabled!");
-                } else {
-                    CommonSimpleRadio.info("..but compat is disabled");
-                }
-            }
-        }
+    public static void reloadCompatibilities() {
+        CommonSimpleRadio.info("Reloading compatibilities!");
+        spoutCompatibilities();
+    }
 
-        //---- Valkyrien Skies ----\\
-        if (Services.PLATFORM.isModLoaded("valkyrienskies")) {
-            CommonSimpleRadio.info("Valkyrien Skies is present!");
-            if (CommonSimpleRadio.SERVER_CONFIG.compatibilities.valkyrien_skies.enabled) {
-                VALKYRIEN_SKIES = true;
-                CommonSimpleRadio.info("..and compat is enabled!");
-            } else {
-                CommonSimpleRadio.info("..but compat is disabled");
-            }
+    public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
+        // ---- Vibrative Voice ---- \\
+        if (CompatCore.VIBRATIVE_VOICE.enabled) {
+            VibrativeCompat.onData(channel, source, decoded);
         }
     }
 
-    public static void onData(RadioChannel channel, RadioSource source, short[] decoded) {
-        // ---- Vibrative Voice ---- \\
-        if (Services.PLATFORM.isModLoaded("vibrativevoice") && CommonSimpleRadio.SERVER_CONFIG.compatibilities.voice_chat_interaction.enabled) {
-            VibrativeCompat.onData(channel, source, decoded);
+    public static RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {
+        RadioManager.CollectionResult result = Services.COMPAT.verifyLocationCollection(position, clazz);
+        if (result == RadioManager.CollectionResult.IGNORE || result == RadioManager.CollectionResult.COLLECT) {
+            return result;
         }
+
+        return RadioManager.CollectionResult.PASS;
+    }
+
+    public static RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria) {
+        RadioManager.CollectionResult result = Services.COMPAT.verifyEntityCollection(entity, inventoryCriteria);
+        if (result == RadioManager.CollectionResult.IGNORE || result == RadioManager.CollectionResult.COLLECT) {
+            return result;
+        }
+
+        return RadioManager.CollectionResult.PASS;
     }
 }

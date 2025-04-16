@@ -1,50 +1,48 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.core.central.*;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.central.Listening;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioListener;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
-
-public class MicrophoneBlockEntity extends FrequencyBlockEntity implements Transmitting {
-    public boolean isListening = false;
-    public UUID listenerID;
-
-    private RadioListener listener;
+public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listening {
+    public boolean isActive = false;
+    private boolean listening = true;
+    public float tilt = 1.5f;
+    public float currentTilt = tilt - 1.5f;
 
     public MicrophoneBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.MICROPHONE, pos, state);
-
-        this.listenerID = UUID.randomUUID();
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !level.isClientSide) {
-            Vector3f locationVec = Services.COMPAT.modifyPosition(level, this.worldPosition);
+        if (level != null && !level.isClientSide && this.listener != null) {
             level.playSound(
-                    null, locationVec.x, locationVec.y, locationVec.z,
+                    null, listener.location.x, listener.location.y, listener.location.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
             );
         }
 
+        inactivate();
 
-        if (this.frequency != null)
-            stopListening(WorldlyPosition.of(getBlockPos(), level));
         super.setRemoved();
     }
 
@@ -66,59 +64,80 @@ public class MicrophoneBlockEntity extends FrequencyBlockEntity implements Trans
         super.saveToItem(stack);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState blockState, MicrophoneBlockEntity blockEntity) {
-        if (!level.isClientSide) {
-            if (blockEntity.listener != null) { blockEntity.listener.location = Services.COMPAT.modifyPosition(pos, level); }
-            if (blockEntity.frequency != null && !blockEntity.isListening) {
-                blockEntity.listen();
+    public static void tick(Level level, BlockPos pos, BlockState state, MicrophoneBlockEntity blockEntity) {
+        if (!blockEntity.isActive && blockEntity.id != null) {
+            blockEntity.activate();
+        }
+
+        if (blockEntity.level == null) return;
+        if (blockEntity.listener != null && blockEntity.listener.activityTime >= 0) {
+            if (blockEntity.listener.activityTime % SimpleRadioLibrary.SERVER_CONFIG.microphone.redstonePolling == 0) {
+                level.updateNeighborsAt(pos, SimpleRadioBlocks.MICROPHONE);
+            }
+            if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
+                if (blockEntity.level.isClientSide && blockEntity.listener.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.microphone.particleInterval == 0) {
+                    ClientRadioManager.handleListenParticle(state, blockEntity);
+                }
             }
         }
     }
 
-    public void listen() {
-        listener = startListening(Services.COMPAT.modifyPosition(getBlockPos(), level));
-
-        listener.range = 12;
-        listener.acceptor(source -> {
-            source.type = RadioSource.Type.TRANSMITTER;
-            source.delegate(listenerID);
-
-            Frequency frequency = getFrequency(this);
-            if (frequency != null) RadioManager.transmit(source, frequency);
-        });
-
-        this.frequency.tryAddTransmitter(listener);
-
-        Vector3f locationVec = Services.COMPAT.modifyPosition(level, this.worldPosition);
-        level.playSound(
-                null, locationVec.x, locationVec.y, locationVec.z,
-                SimpleRadioSounds.RADIO_OPEN,
-                SoundSource.PLAYERS,
-                1f, 1f
-        );
-
-        this.isListening = true;
+    public boolean isListening() {
+        return listening;
+    }
+    public void setListening(boolean listening) {
+        this.listening = listening;
+        if (this.listener != null) this.listener.active = this.listening;
     }
 
-    public void loadFromItem(ItemStack stack) {
-        loadTag(stack.getOrCreateTag());
-    }
-
-    public void loadTag(CompoundTag tag) {
-        if (this.frequency != null) {
-            stopListening(WorldlyPosition.of(getBlockPos(), level));
-            this.isListening = false;
+    public void inactivate() {
+        if (this.isActive) {
+            stopListening();
         }
 
-        String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-        this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
+        this.isActive = false;
+    }
+    public void activate() {
+        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+
+        this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
+        if (!level.isClientSide) {
+            level.playSound(
+                    null, location.x, location.y, location.z,
+                    SimpleRadioSounds.RADIO_OPEN,
+                    SoundSource.PLAYERS,
+                    1f, 1f
+            );
+        }
+
+        this.isActive = true;
     }
 
-    public void saveTag(CompoundTag tag) {
-        if (this.frequency == null) return;
+    @Override
+    public void loadTag(CompoundTag tag) {
+        inactivate();
+        super.loadTag(tag);
 
-        tag.putString("frequency", this.frequency.frequency);
-        tag.putString("modulation", this.frequency.modulation.shorthand);
+        if (tag.contains("tilt")) {
+            this.tilt = tag.getFloat("tilt");
+        }
+
+        if (tag.contains("listening")) {
+            this.setListening(tag.getBoolean("listening"));
+        }
+    }
+
+    @Override
+    public void saveTag(CompoundTag tag) {
+        super.saveTag(tag);
+
+        tag.putFloat("tilt", this.tilt);
+        tag.putBoolean("listening", this.listening);
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 }

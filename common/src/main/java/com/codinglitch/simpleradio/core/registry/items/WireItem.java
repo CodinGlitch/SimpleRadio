@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.Socket;
+import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.core.BlockPos;
@@ -34,13 +34,13 @@ public class WireItem extends Item implements WorldTicking {
 
         BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof Socket interactingSocket) {
-            CommonSimpleRadio.info(interactingSocket.getID());
+            CommonSimpleRadio.info(interactingSocket.getReference());
 
             if (!interactingSocket.canConnect()) return super.useOn(context);
 
             CompoundTag tag = stack.getOrCreateTag();
             if (tag.contains("connectTo")) {
-                BlockPos connectTo = BlockPos.of(tag.getLong("connectTo"));
+                BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
 
                 BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
                 if (connectToBlockEntity instanceof Socket socket) {
@@ -49,14 +49,17 @@ public class WireItem extends Item implements WorldTicking {
                         Wire wire = Wire.connect(interactingSocket, socket, level);
 
                         //connecting.connectTo(centralBlockEntity);
-
                         level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 0.8f);
                     }
 
                     tag.remove("connectTo");
+                    tag.remove("connectToPos");
+
+                    return InteractionResult.SUCCESS;
                 }
             } else {
-                tag.putLong("connectTo", blockEntity.getBlockPos().asLong());
+                tag.putUUID("connectTo", interactingSocket.getReference());
+                tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
 
                 level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 1.1f);
             }

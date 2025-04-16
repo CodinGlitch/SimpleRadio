@@ -1,92 +1,75 @@
 package com.codinglitch.simpleradio.radio.effects;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+
 import java.util.Random;
 
 public class BaseAudioEffect extends AudioEffect {
     public static Random RANDOM = new Random();
 
-    private static final double SAMPLE_RATE = 48000D;
-    private static final double MAX_SHORT = Short.MAX_VALUE;
+    private float lastSample = 0;
 
-    private final double normalizedCenterFrequency;
-    private final double normalizedBandwidth;
-
-    // State variables for the filter
-    private double lastInputSample1;
-    private double lastInputSample2;
-    private double lastOutputSample1;
-    private double lastOutputSample2;
-
-    /**
-     * @param centerFrequency center frequency in Hz
-     * @param bandwidth       bandwidth in Hz
-     */
-    public BaseAudioEffect(double centerFrequency, double bandwidth) {
-        this.normalizedCenterFrequency = 2D * centerFrequency / SAMPLE_RATE;
-        this.normalizedBandwidth = 2D * bandwidth / SAMPLE_RATE;
-    }
-
-    public BaseAudioEffect() {
-        this(750, 4000);
-    }
+    public BaseAudioEffect() {}
 
     @Override
     public short[] apply(short[] data) {
         for (int i = 0; i < data.length; i++) {
-            if (RANDOM.nextFloat(100) < severity) data[i] *= 0;
-        }
-
-        double[] doubleSamples = new double[data.length];
-        for (int i = 0; i < data.length; i++) {
-            doubleSamples[i] = data[i] / MAX_SHORT;
-        }
-
-        // Apply the bandpass filter
-        double maxValue = MAX_SHORT;
-        for (int i = 0; i < doubleSamples.length; i++) {
-            doubleSamples[i] = bandpassFilter(doubleSamples[i]) * MAX_SHORT;
-            if (Math.abs(doubleSamples[i]) > maxValue) {
-                maxValue = Math.abs(doubleSamples[i]);
+            if (RANDOM.nextFloat(100) < severity) {
+                data[i] *= 0;
             }
         }
 
-        short[] output = new short[data.length];
-        double factor = MAX_SHORT / maxValue;
-        for (int i = 0; i < doubleSamples.length; i++) {
-            output[i] = (short) (Math.floor(doubleSamples[i] * factor));
-        }
+        bitCrush(data, 12 - Math.round(severity / 15));
+        downsample(data, 5 + Math.round(severity / 15));
+        lowPass(data);
 
-        return super.apply(output);
+        return super.apply(data);
     }
 
     /**
-     * Bandpass filter implementation (basic second-order IIR filter)
-     *
-     * @param inputSample input sample
-     * @return filtered sample
+     * Simple single-pole IIR low-pass filter
      */
-    private double bandpassFilter(double inputSample) {
-        double bandwidth = normalizedBandwidth * (1 - severity * 0.001);
+    public void lowPass(short[] data) {
+        float alpha = 0.1f;
 
-        double w0 = 2D * Math.PI * normalizedCenterFrequency;
-        double alpha = Math.sin(w0) * Math.sinh(Math.log(2D) / 2D * bandwidth * w0 / Math.sin(w0));
-        double a0 = 1D + alpha;
+        for (int i = 0; i < data.length; i++) {
+            float filtered = alpha * (float)data[i] + (1.0f - alpha) * lastSample;
 
-        double b0 = (1D - Math.cos(w0)) / 2D;
-        double b1 = 1D - Math.cos(w0);
-        double b2 = b0;
-        double a1 = -2D * Math.cos(w0);
-        double a2 = 1D - alpha;
+            data[i] = (short) filtered;
 
-        // Apply the bandpass filter
-        double filteredSample = (b0 * inputSample + b1 * lastInputSample1 + b2 * lastInputSample2 - a1 * lastOutputSample1 - a2 * lastOutputSample2) / a0;
+            lastSample = filtered;
+        }
+    }
 
-        // Update the state variables for the next iteration
-        lastInputSample2 = lastInputSample1;
-        lastInputSample1 = inputSample;
-        lastOutputSample2 = lastOutputSample1;
-        lastOutputSample1 = filteredSample;
+    public void bitCrush(short[] data, int targetDepth) {
+        int factor = 1 << (16 - targetDepth);
 
-        return filteredSample;
+        // Process each sample in the array
+        for (int i = 0; i < data.length; i++) {
+            // Get the current sample
+            int sample = data[i];
+
+            // Quantize the sample by rounding to the nearest multiple of factor
+            // This reduces the resolution by effectively zeroing out the lower bits
+            int quantized = ((sample + (factor / 2)) / factor) * factor;
+
+            // Store the quantized value back in the array
+            data[i] = (short)quantized;
+        }
+    }
+
+    public void downsample(short[] data, int factor) {
+        if (factor < 1) return;
+
+        // Process the samples in blocks of 'factor'
+        for (int i = 0; i < data.length; i += factor) {
+            // Pick the sample from the beginning of the block.
+            short sample = data[i];
+
+            // Replicate that sample over the block (without exceeding numSamples)
+            for (int j = i; j < i + factor && j < data.length; j++) {
+                data[j] = sample;
+            }
+        }
     }
 }

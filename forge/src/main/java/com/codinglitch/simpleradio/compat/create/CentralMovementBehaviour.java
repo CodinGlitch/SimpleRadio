@@ -1,29 +1,24 @@
 package com.codinglitch.simpleradio.compat.create;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Routing;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.Routing;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.*;
-import com.jozufozu.flywheel.api.MaterialManager;
-import com.jozufozu.flywheel.core.virtual.VirtualRenderWorld;
-import com.mojang.math.Axis;
+import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
-import com.simibubi.create.content.contraptions.behaviour.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
-import com.simibubi.create.content.contraptions.render.ActorInstance;
 import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
+import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
+import net.createmod.catnip.animation.AnimationTickHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import javax.swing.text.html.CSS;
 import java.util.UUID;
 
 public class CentralMovementBehaviour implements MovementBehaviour {
@@ -59,12 +54,10 @@ public class CentralMovementBehaviour implements MovementBehaviour {
 
             WorldlyPosition newLocation;
             if (context.world.isClientSide) {
-                double partialTick = Minecraft.getInstance().getPartialTick();
+                double partialTick = AnimationTickHolder.getPartialTicks();
+                Vec3 pos = context.position.add(context.motion.scale(partialTick));
 
-                Vec3 position = context.position;
-                position = position.add(context.motion.scale(partialTick));
-
-                newLocation  = WorldlyPosition.of(position.toVector3f(), context.world);
+                newLocation = WorldlyPosition.of(pos.toVector3f(), context.world);
             } else {
                 newLocation = WorldlyPosition.of(context.position.toVector3f(), context.world);
             }
@@ -113,17 +106,5 @@ public class CentralMovementBehaviour implements MovementBehaviour {
 
         update(context);
     }
-
-    @Override
-    public boolean renderAsNormalBlockEntity() {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public ActorInstance createInstance(MaterialManager materialManager, VirtualRenderWorld simulationWorld, MovementContext context) {
-        return MovementBehaviour.super.createInstance(materialManager, simulationWorld, context);
-    }
-
 
 }

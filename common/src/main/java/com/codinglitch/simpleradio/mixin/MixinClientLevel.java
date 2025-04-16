@@ -22,5 +22,8 @@ public abstract class MixinClientLevel {
         ClientRadioManager.tick(this.getLevelData().getGameTime());
     }
 
-
+    @Inject(at = @At("TAIL"), method = "disconnect")
+    private void simpleradio$disconnect(CallbackInfo info) {
+        ClientRadioManager.close();
+    }
 }

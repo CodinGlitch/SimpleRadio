@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.compat;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
@@ -32,7 +32,7 @@ public class InteractionCompat {
 
             WorldlyPosition location = channel.location;
             location.level.getServer().execute(() -> {
-                if (setCooldown(channel.id, location.level)) {
+                if (setCooldown(channel.reference, location.level)) {
                     BlockState state = location.level.getBlockState(location.blockPos());
 
                     location.level.gameEvent(VoicechatInteraction.VOICE_GAME_EVENT, location.blockPos(), GameEvent.Context.of(state));

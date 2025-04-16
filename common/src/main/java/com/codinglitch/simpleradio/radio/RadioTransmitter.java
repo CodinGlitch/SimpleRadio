@@ -1,7 +1,8 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.FrequencingType;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
@@ -15,9 +16,10 @@ import java.util.function.BiPredicate;
  * <b>Does route further.</b>
  */
 public class RadioTransmitter extends RadioRouter {
-    public BiPredicate<RadioSource, RadioRouter> transmitCriteria;
-
+    public int antennaPower = 0;
     public Frequency frequency;
+
+    public FrequencingType frequencingType;
 
     protected RadioTransmitter(Frequency frequency, UUID id) {
         super(id);
@@ -48,11 +50,23 @@ public class RadioTransmitter extends RadioRouter {
         }
 
         this.frequency = frequency;
-        this.routers = (List<RadioRouter>)(List<?>) this.frequency.receivers;
+        this.routers = (List) this.frequency.receivers;
     }
 
-    public void transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
-        this.transmitCriteria = criteria;
+    public RadioTransmitter transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
+        this.routeCriteria = criteria;
+        return this;
+    }
+
+    public RadioTransmitter frequencingType(FrequencingType type) {
+        this.frequencingType = type;
+        return this;
+    }
+
+    public float getPower(Frequency.Modulation modulation) {
+        int baseTransmissionPower = frequencingType.getTransmissionPower(modulation);
+
+        return baseTransmissionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
     @Nullable
@@ -62,22 +76,43 @@ public class RadioTransmitter extends RadioRouter {
     }
 
     @Override
-    public RadioSource prepareSource(RadioSource source, RadioRouter router) {
-        if (source.type == null) {
-            source.type = RadioSource.Type.TRANSMITTER;
-            source.addPower(source.getTransmissionPower(frequency.modulation));
+    public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
+        if (destination instanceof RadioReceiver receiver) {
+            if (source.willShort(receiver)) return false;
+
+            FrequencingType type = source.frequencingType == -1 ? this.frequencingType : source.getFrequencingType();
+            double transmissionPower = source.frequencingType == -1 ? this.getPower(this.frequency.modulation) : source.transmissionPower;
+
+            double distance = this.getLocation().distance(receiver.getLocation());
+            double cost = distance * type.transmissionDiminishment;
+
+            return (transmissionPower + receiver.getPower()) >= cost;
         }
-        return super.prepareSource(source, router);
+
+        return super.shouldRouteTo(source, destination);
+    }
+
+    @Override
+    public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
+        if (source.frequencingType == -1) {
+            float transmissionPower = getPower(frequency.modulation);
+
+            source.frequencingType = this.frequencingType.id;
+            source.transmissionCap = transmissionPower;
+            source.addPower(transmissionPower);
+
+            //CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
+        }
+        return super.prepareSource(source, destination);
     }
 
     @Override
     public void accept(RadioSource source) {
-        this.route(source, router -> {
-            if (transmitCriteria != null && !transmitCriteria.test(source, router)) {
-                return false;
-            }
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
 
-            return source.owner == null || !source.owner.equals(router.id);
+        this.route(source, router -> {
+            return source.owner == null || !source.owner.equals(router.reference);
         });
     }
 }

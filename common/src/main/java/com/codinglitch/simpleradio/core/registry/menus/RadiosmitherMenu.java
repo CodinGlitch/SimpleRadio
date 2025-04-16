@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.menus;
 
-import com.codinglitch.simpleradio.core.central.Frequencing;
-import com.codinglitch.simpleradio.core.central.Frequency;
+import com.codinglitch.simpleradio.api.central.Frequencing;
+import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlockEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -10,8 +10,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ItemCombinerMenu;
-import net.minecraft.world.inventory.LecternMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 

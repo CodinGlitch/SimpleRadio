@@ -1,21 +1,18 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -31,14 +28,17 @@ import java.util.function.Supplier;
  * <b>Does not route further.</b>
  */
 public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
-
-    public AudioChannel audioChannel;
+    // migrated to locational audio channels only due to alternatives not having range property
+    public LocationalAudioChannel audioChannel;
     public AudioPlayer audioPlayer;
     private final Map<UUID, Map<UUID, Queue<short[]>>> packetBuffer;
     private final Map<UUID, OpusDecoder> decoders;
     private final AudioEffect effect;
 
+    public String category;
     public float range = 8;
+
+    public int speakingTime = 0;
 
     protected RadioSpeaker(UUID id) {
         super(id);
@@ -113,19 +113,29 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
     @Override
     public void updateLocation(WorldlyPosition location) {
         super.updateLocation(location);
-        if (this.audioChannel instanceof LocationalAudioChannel locationalAudioChannel) {
-            locationalAudioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x, location.y, location.z));
+
+        if (audioChannel != null) {
+            audioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x, location.y, location.z));
         }
     }
 
     @Override
+    public void tick(int tickCount) {
+        super.tick(tickCount);
+
+        if (speakingTime > 0) speakingTime--;
+    }
+
+    @Override
     public void accept(RadioSource source) {
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         super.accept(source);
         speak(source);
     }
 
     public void speak(RadioSource source) {
-        if (source instanceof RadioHeader) return;
+        this.compileActivity(source);
 
         // Severity calculation
         ServerLevel level = null;
@@ -151,11 +161,9 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
             for (ServerPlayer player : level.players()) {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
-                    player.connection.send(new ClientboundSoundPacket(
-                            Holder.direct(source.soundEvent),
-                            SoundSource.BLOCKS,
-                            position.x, position.y, position.z,
-                            source.volume, source.pitch, level.getLevel().getRandom().nextLong()
+                    Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
+                            this.getReference(), Holder.direct(source.soundEvent),
+                            source.volume, source.pitch, this.effect.severity, source.offset, source.seed
                     ));
                 }
             }
@@ -172,7 +180,6 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             }
         }
 
-
         // Decoding
         byte[] data = source.data;
 
@@ -182,29 +189,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             return;
         }
         short[] decoded = decoder.decode(data);
-
-        // Calculate the new length of the resampled data
-        int newLength = (int) (decoded.length / source.pitch);
-        short[] resampledData = new short[newLength];
-
-        // Perform linear interpolation for resampling
-        for (int i = 0; i < newLength; i++) {
-            // Calculate the exact position in the original data
-            double originalIndex = i * source.pitch;
-
-            // Find the surrounding indices
-            int index1 = (int) Math.floor(originalIndex);
-            int index2 = Math.min(index1 + 1, decoded.length - 1); // Clamp to avoid out-of-bounds
-
-            // Interpolate between the two points
-            double weight2 = originalIndex - index1; // Fractional part
-            double weight1 = 1.0 - weight2;
-
-            resampledData[i] = (short) ((decoded[index1] * weight1) + (decoded[index2] * weight2));
-        }
-
-        CommonSimpleRadio.info(resampledData);
-        playerPackets.offer(effect.apply(resampledData));
+        playerPackets.offer(effect.apply(decoded));
 
         // Loader-specific compat
         Services.COMPAT.onData(this, source, decoded);
@@ -222,22 +207,14 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
 
     private AudioPlayer getAudioPlayer() {
         if (this.audioPlayer == null) {
-            if (this.location != null) {
-                LocationalAudioChannel locationalChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.id,
-                        CommonRadioPlugin.serverApi.fromServerLevel(location.level),
-                        CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
-                );
-                locationalChannel.setDistance(range);
-                locationalChannel.setCategory(CommonRadioPlugin.RADIOS_CATEGORY);
 
-                this.audioChannel = locationalChannel;
-            } else {
-                this.audioChannel = CommonRadioPlugin.serverApi.createEntityAudioChannel(
-                        this.id,
-                        CommonRadioPlugin.serverApi.fromEntity(this.owner)
-                );
-                audioChannel.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
-            }
+            WorldlyPosition location = this.getLocation();
+            this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.reference,
+                    CommonRadioPlugin.serverApi.fromServerLevel(location.level),
+                    CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
+            );
+            audioChannel.setDistance(range);
+            audioChannel.setCategory(category);
 
             this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this);
         }

@@ -1,17 +1,14 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
+import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
+import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -28,6 +25,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -36,7 +34,7 @@ import java.util.function.Supplier;
 public class ForgeLoader {
     private static final String PROTOCOL_VERSION = "0";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(CommonSimpleRadio.ID,"channel"),
+            CommonSimpleRadio.id("channel"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
@@ -70,23 +68,34 @@ public class ForgeLoader {
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
         event.register(Registries.CREATIVE_MODE_TAB, helper -> SimpleRadioMenus.CREATIVE_TABS.forEach(helper::register));
 
+        event.register(ForgeRegistries.Keys.PARTICLE_TYPES, helper -> SimpleRadioParticles.PARTICLES.forEach(helper::register));
+
         event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
             CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
         });
 
-        SimpleRadioCatalysts.load();
+        CommonSimpleRadio.load();
     }
 
     public static void loadPackets() {
-        int index = 0;
+        AtomicInteger index = new AtomicInteger();
 
-        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index++).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
+        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index.getAndIncrement()).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
                 .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle)).add();
+        CHANNEL.messageBuilder(ServerboundRequestRouterPacket.class, index.getAndIncrement()).decoder(ServerboundRequestRouterPacket::decode).encoder(ServerboundRequestRouterPacket::encode)
+                .consumerMainThread(serverbound(ServerboundRequestRouterPacket::handle)).add();
 
-        CHANNEL.messageBuilder(ClientboundTransceiverPacket.class, index++).decoder(ClientboundTransceiverPacket::decode).encoder(ClientboundTransceiverPacket::encode)
+        CHANNEL.messageBuilder(ClientboundRegisterRouterPacket.class, index.getAndIncrement()).decoder(ClientboundRegisterRouterPacket::decode).encoder(ClientboundRegisterRouterPacket::encode)
+                .consumerMainThread(clientbound(ClientboundRegisterRouterPacket::handle)).add();
+        CHANNEL.messageBuilder(ClientboundActivityPacket.class, index.getAndIncrement()).decoder(ClientboundActivityPacket::decode).encoder(ClientboundActivityPacket::encode)
+                .consumerMainThread(clientbound(ClientboundActivityPacket::handle)).add();
+        CHANNEL.messageBuilder(ClientboundTransceiverPacket.class, index.getAndIncrement()).decoder(ClientboundTransceiverPacket::decode).encoder(ClientboundTransceiverPacket::encode)
                 .consumerMainThread(clientbound(ClientboundTransceiverPacket::handle)).add();
-        CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index++).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)
+        CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index.getAndIncrement()).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)
                 .consumerMainThread(clientbound(ClientboundWireEffectPacket::handle)).add();
+
+        CHANNEL.messageBuilder(ClientboundSpeakSoundPacket.class, index.getAndIncrement()).decoder(ClientboundSpeakSoundPacket::decode).encoder(ClientboundSpeakSoundPacket::encode)
+                .consumerMainThread(clientbound(ClientboundSpeakSoundPacket::handle)).add();
     }
 
     private static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {

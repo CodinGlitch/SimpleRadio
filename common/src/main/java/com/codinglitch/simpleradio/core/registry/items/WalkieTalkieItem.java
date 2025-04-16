@@ -1,7 +1,10 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
+import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
@@ -21,6 +25,42 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     }
 
     private Random RANDOM = new Random();
+
+    @Override
+    protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
+        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
+        listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
+        speaker.category = CommonRadioPlugin.WALKIES_CATEGORY;
+
+        transmitter.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
+        receiver.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
+
+        listener.link = this.getClass();
+        speaker.link = this.getClass();
+        receiver.link = this.getClass();
+        transmitter.link = this.getClass();
+
+        // --- Half-duplex implementation
+
+        receiver.receiveCriteria(((source) -> {
+            Entity entity = receiver.owner;
+            Frequency frequency = receiver.getFrequency();
+            if (frequency == null) return false;
+
+            if (entity instanceof Player player) {
+                ItemStack using = player.getUseItem();
+
+                CompoundTag usingTag = using.getOrCreateTag();
+                if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return true;
+
+                if (!(using.getItem() instanceof TransceiverItem)) return true;
+                if (!usingTag.getString("frequency").equals(frequency.frequency)) return true;
+                return !usingTag.getString("modulation").equals(frequency.modulation.shorthand);
+            }
+
+            return true;
+        }));
+    }
 
     @Override
     public String getDefaultFrequency() {

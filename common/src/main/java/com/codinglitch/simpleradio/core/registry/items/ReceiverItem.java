@@ -1,9 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
+import com.codinglitch.simpleradio.api.central.Frequencing;
 import com.codinglitch.simpleradio.core.central.Alterable;
-import com.codinglitch.simpleradio.core.central.Module;
-import com.codinglitch.simpleradio.core.central.Receiving;
-import com.codinglitch.simpleradio.core.central.Transmitting;
+import com.codinglitch.simpleradio.api.central.Module;
+import com.codinglitch.simpleradio.api.central.Receiving;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioModules;
 import net.minecraft.network.chat.Component;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ReceiverItem extends BlockItem implements Receiving, Alterable {
+public class ReceiverItem extends BlockItem implements Frequencing, Alterable {
     public ReceiverItem(Properties settings) {
         super(SimpleRadioBlocks.RECEIVER, settings);
     }

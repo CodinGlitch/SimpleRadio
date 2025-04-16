@@ -3,13 +3,14 @@ package com.codinglitch.simpleradio.platform;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.compat.InteractionCompat;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Quaternionf;
 
 import java.util.function.Predicate;
 
@@ -18,7 +19,7 @@ public class FabricCompatPlatform implements CompatPlatform {
     public void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
 
         // ---- Voice Chat Interaction ---- \\
-        if (CompatCore.VC_INTERACTION) {
+        if (CompatCore.VC_INTERACTION.enabled) {
             InteractionCompat.onData(channel, source, decoded);
         }
     }
@@ -27,11 +28,27 @@ public class FabricCompatPlatform implements CompatPlatform {
     public WorldlyPosition modifyPosition(WorldlyPosition position) {
 
         // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES) {
+        if (CompatCore.VALKYRIEN_SKIES.enabled) {
             return ValkyrienCompat.modifyPosition(position);
         }
 
         return position;
+    }
+
+    @Override
+    public Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+
+        // ---- Valkyrien Skies ---- \\
+        if (CompatCore.VALKYRIEN_SKIES.enabled) {
+            return ValkyrienCompat.modifyRotation(position, rotation);
+        }
+
+        return rotation;
+    }
+
+    @Override
+    public void postInitialize() {
+
     }
 
     @Override

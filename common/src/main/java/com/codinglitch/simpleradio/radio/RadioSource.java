@@ -1,43 +1,47 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Medium;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.FrequencingRegistry;
+import com.codinglitch.simpleradio.api.central.FrequencingType;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.Medium;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * A source containing the audio data as well as other data collected while travelling.
  */
 public class RadioSource {
-    public enum Type {
-        TRANSCEIVER,
-        WALKIE_TALKIE,
-        TRANSMITTER
-    }
-
     public UUID owner;
     public UUID originalOwner;
     public WorldlyPosition origin;
-    public Type type;
+    public short frequencingType = -1;
 
     public byte[] data;
-
     public SoundEvent soundEvent;
 
     public float pitch = 1;
     public float volume;
+    public float offset;
+    public long seed;
+
+    public float activity;
+
+    public List<Short> record = new ArrayList<>();
 
     public Frequency frequencyMedium;
     public Wire wireMedium;
 
-    public double transmissionPower = 50;
+    public float transmissionCap = 50;
+    public float transmissionPower = 50;
 
     protected RadioSource() {}
 
@@ -66,39 +70,16 @@ public class RadioSource {
         this.owner = owner;
     }
 
-    public void addPower(double power) {
-        this.transmissionPower += power;
+    public void addPower(float power) {
+        this.transmissionPower = Math.min(this.transmissionPower + power, this.transmissionCap);
     }
 
-    public LexiconPageData getPage() {
-        String pageName = this.type.toString().toLowerCase();
-        LexiconPageData pageData = SimpleRadioLibrary.SERVER_CONFIG.getPage(pageName);
-        if (pageData == null) {
-            CommonSimpleRadio.warn("Could not find page {}!", pageName);
-            return null;
+    public FrequencingType getFrequencingType() {
+        FrequencingType type = FrequencingRegistry.getById(this.frequencingType);
+        if (type == null) {
+            CommonSimpleRadio.error("Missing frequencing type for id {}!", this.frequencingType);
         }
-
-        return pageData;
-    }
-    public Object getConfigFor(Frequency.Modulation modulation, String configName) {
-        LexiconPageData pageData = getPage();
-        if (pageData == null) return 0;
-
-        return pageData.getEntry(configName + modulation.shorthand);
-    }
-
-    public int getTransmissionPower(Frequency.Modulation modulation) {
-        return (int) getConfigFor(modulation, "transmissionPower");
-    }
-
-    public int getDiminishThreshold(Frequency.Modulation modulation) {
-        return (int) getConfigFor(modulation, "transmissionPower");
-    }
-
-    public double getTransmissionDiminishment() {
-        LexiconPageData pageData = getPage();
-        if (pageData == null) return 1;
-        return (double) pageData.getEntry("transmissionDiminishment");
+        return type;
     }
 
     public RadioSource copy() {
@@ -107,56 +88,94 @@ public class RadioSource {
         copy.owner = this.owner;
         copy.originalOwner = this.originalOwner;
         copy.origin = this.origin;
-        copy.type = this.type;
+        copy.frequencingType = this.frequencingType;
 
         copy.data = this.data;
         copy.soundEvent = this.soundEvent;
 
         copy.volume = this.volume;
+        copy.pitch = this.pitch;
+        copy.offset = this.offset;
+        copy.seed = this.seed;
+
+        copy.record = new ArrayList<>(this.record);
 
         copy.frequencyMedium = this.frequencyMedium;
         copy.wireMedium = this.wireMedium;
+
         copy.transmissionPower = this.transmissionPower;
+        copy.transmissionCap = this.transmissionCap;
 
         return copy;
     }
 
-    public void travel(WorldlyPosition from, WorldlyPosition to, Medium medium) {
-        double distance = from.distance(to);
-        double transmissionFactor = 0;
+    public boolean willShort(RadioRouter router) {
+        short identifier = router.getIdentifier();
+        for (short recordIdentifier : record) {
+            if (identifier == recordIdentifier) return true;
+        }
+        return false;
+    }
+
+    public void visit(RadioRouter router) {
+        record.add(router.getIdentifier());
+    }
+
+    public void travel(RadioRouter from, RadioRouter to, Medium medium) {
+        WorldlyPosition fromPos = from.getLocation();
+        WorldlyPosition toPos = to.getLocation();
+
+        double distance = fromPos.distance(toPos);
+        double transmissionDiminishment = 0;
+        FrequencingType.DiminishmentMethod diminishmentMethod = FrequencingType.DiminishmentMethod.ADDITIVE;
+
         if (medium instanceof Wire wire) {
-            transmissionFactor = SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionDiminishment;
+            transmissionDiminishment = SimpleRadioFrequencing.WIRE.transmissionDiminishment;
+            diminishmentMethod = SimpleRadioFrequencing.WIRE.diminishmentMethod;
 
             this.wireMedium = wire;
         } else if (medium instanceof Frequency frequency) {
-            transmissionFactor = getTransmissionDiminishment();
+            FrequencingType type = this.getFrequencingType();
+            transmissionDiminishment = type.transmissionDiminishment;
+            diminishmentMethod = type.diminishmentMethod;
 
-            if (from.level.dimensionType() != to.level.dimensionType()) {
+            if (to instanceof RadioReceiver receiver) {
+                if (distance > receiver.frequencingType.receptionFloor) {
+                    distance = Math.max(receiver.frequencingType.receptionFloor, distance - receiver.getPower());
+                }
+            }
+
+            if (fromPos.level.dimensionType() != toPos.level.dimensionType()) {
                 if (SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional) {
                     double interference = SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalInterference;
-                    transmissionFactor += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
+                    transmissionDiminishment += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
                 } else {
                     this.transmissionPower = 0;
-                    transmissionFactor = 0;
+                    transmissionDiminishment = 0;
                 }
             }
 
             this.frequencyMedium = frequency;
         }
 
-        //TODO: fix this; currently you can just use transmitter over a short distance, which sets the transmission power and then travelling tens of thousands of blocks over wire
+        // nevermind... dont beware.... negative transmission...
+        switch (diminishmentMethod) {
+            case ADDITIVE -> this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (distance * transmissionDiminishment));
+            case MULTIPLICATIVE -> this.transmissionPower = (float) Math.max(0f, this.transmissionPower - (this.transmissionCap * transmissionDiminishment));
+        }
 
-        this.transmissionPower = Math.max(0, this.transmissionPower - (distance * transmissionFactor));
+        this.visit(to);
     }
 
     public double computeSeverity() {
-        float base = 0;
-
+        double base = 0;
         double severity = 0;
         if (this.frequencyMedium != null) {
-            double diminishThreshold = this.getDiminishThreshold(frequencyMedium.modulation);
+            double diminishThreshold = this.getFrequencingType().getDiminishThreshold(frequencyMedium.modulation);
 
-            base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ? 2 : 15;
+            base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ?
+                    SimpleRadioLibrary.SERVER_CONFIG.frequency.baseFMInterference :
+                    SimpleRadioLibrary.SERVER_CONFIG.frequency.baseAMInterference;
             severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
         }
 

@@ -47,6 +47,15 @@ subprojects {
             url = 'https://maven.blamejared.com'
         }
 
+        maven {
+            name = "MrCrayfish (GitHub)"
+            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+            credentials {
+                username = "CodinGlitch"
+                password = project.property("github_token")
+            }
+        }
+
         maven { url 'https://maven.maxhenkel.de/repository/public' }
         maven { url 'https://maven.nucleoid.xyz' }
         maven { url 'https://maven.codinglitch.com/repository/releases' }
@@ -70,10 +79,9 @@ subprojects {
             url = 'https://maven.valkyrienskies.org'
         }
 
-        maven {
-            name = 'tterrag maven'
-            url = 'https://maven.tterrag.com/'
-        }
+        maven { url = "https://maven.createmod.net" }
+        maven { url = "https://maven.tterrag.com" }
+        maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
 
         exclusiveContent {
             forRepository {
@@ -88,13 +96,12 @@ subprojects {
     }
 
     tasks.withType(JavaCompile).configureEach {
-    
         it.options.encoding = 'UTF-8'
         it.options.getRelease().set(17)
     }
 
     processResources {
-        def expandProps = [
+        var expandProps = [
                 "version": version,
                 "group": project.group, //Else we target the task's group.
                 "minecraft_version": minecraft_version,
@@ -119,6 +126,7 @@ subprojects {
                 "night_config_version": night_config_version,
                 "lexiconfig_version": lexiconfig_version,
                 "vibrative_voice_version": vibrative_voice_version,
+                "create_version": create_version,
                 "name_template": name_template,
                 "modrinth_id": modrinth_id,
                 "curseforge_id": curseforge_id,
@@ -145,11 +153,11 @@ subprojects {
 }
 
 tasks.register('publishModrinth') {
-    dependsOn("fabric:modrinth", "forge:modrinth", "neoforge:modrinth")
+    dependsOn("fabric:modrinth", "forge:modrinth")
 }
 
 tasks.register('publishCurseForge') {
-    dependsOn("fabric:curseforge", "forge:curseforge", "neoforge:curseforge")
+    dependsOn("fabric:curseforge", "forge:curseforge")
 }
 
 tasks.register('publishSites') {

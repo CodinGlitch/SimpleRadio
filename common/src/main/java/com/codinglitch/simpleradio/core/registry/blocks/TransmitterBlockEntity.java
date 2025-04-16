@@ -1,23 +1,28 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.api.central.Transmitting;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.UUID;
 
 public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Transmitting {
     public boolean isActive = false;
+    public boolean isDirty = true;
+    public int antennaPower = 0;
 
     public TransmitterBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.TRANSMITTER, pos, state);
@@ -25,7 +30,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
     @Override
     public BlockPos getAdaptorLocation() {
-        return getBlockPos().relative(getBlockState().getValue(ReceiverBlock.FACING).getOpposite());
+        return getBlockPos().relative(getBlockState().getValue(TransmitterBlock.FACING).getOpposite());
     }
 
     @Override
@@ -52,13 +57,18 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     @Override
     public void saveTag(CompoundTag tag) {
         super.saveTag(tag);
-    }
 
+        tag.putInt("antennaPower", antennaPower);
+    }
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         loadTag(tag);
+
+        if (tag.contains("antennaPower")) {
+            this.antennaPower = tag.getInt("antennaPower");
+        }
     }
 
     @Override
@@ -73,17 +83,36 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         super.saveToItem(stack);
     }
 
+    @Override
+    public void markDirty() {
+        this.isDirty = true;
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState blockState, TransmitterBlockEntity blockEntity) {
         if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
             blockEntity.activate();
         }
-
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
+
+        if (blockEntity.transmitter != null) blockEntity.transmitter.active = blockEntity.catalyzed;
+
+        if (!blockEntity.catalyzed) return;
+
+        if (blockEntity.isDirty && level.getGameTime() % 200 == 0 && !level.isClientSide) {
+            blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
+            RadioRouter router = blockEntity.getRouter();
+            if (router instanceof RadioTransmitter transmitter) transmitter.antennaPower = blockEntity.antennaPower;
+
+            level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS);
+            blockEntity.setChanged();
+            blockEntity.isDirty = false;
+        }
     }
 
     public void inactivate() {
         if (this.frequency != null) {
-            stopTransmitting(frequency.frequency, frequency.modulation, this.id);
+            RadioManager.removeRouterSided(this.id, this.level.isClientSide);
+            if (!this.level.isClientSide) stopTransmitting(frequency.frequency, frequency.modulation, this.id);
         }
 
         this.isActive = false;
@@ -107,5 +136,9 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         }
 
         this.isActive = true;
+    }
+
+    public int getAntennaPower() {
+        return antennaPower;
     }
 }

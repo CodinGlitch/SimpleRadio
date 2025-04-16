@@ -2,9 +2,7 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
+import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -38,20 +36,32 @@ public class FabricLoader {
         SimpleRadioBlocks.BLOCKS.forEach(((location, block) -> Registry.register(BuiltInRegistries.BLOCK, location, block)));
     }
 
+    public static void loadParticles() {
+        SimpleRadioParticles.PARTICLES.forEach(((location, particleType) -> Registry.register(BuiltInRegistries.PARTICLE_TYPE, location, particleType)));
+    }
+
     public static void loadPackets() {
         ServerPlayNetworking.registerGlobalReceiver(ServerboundRadioUpdatePacket.ID,
                 serverbound(ServerboundRadioUpdatePacket::decode, ServerboundRadioUpdatePacket::handle));
+        ServerPlayNetworking.registerGlobalReceiver(ServerboundRequestRouterPacket.ID,
+                serverbound(ServerboundRequestRouterPacket::decode, ServerboundRequestRouterPacket::handle));
     }
 
     public static void loadClientPackets() {
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundRegisterRouterPacket.ID,
+                clientbound(ClientboundRegisterRouterPacket::decode, ClientboundRegisterRouterPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundActivityPacket.ID,
+                clientbound(ClientboundActivityPacket::decode, ClientboundActivityPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundTransceiverPacket.ID,
                 clientbound(ClientboundTransceiverPacket::decode, ClientboundTransceiverPacket::handle));
         ClientPlayNetworking.registerGlobalReceiver(ClientboundWireEffectPacket.ID,
                 clientbound(ClientboundWireEffectPacket::decode, ClientboundWireEffectPacket::handle));
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundSpeakSoundPacket.ID,
+                clientbound(ClientboundSpeakSoundPacket::decode, ClientboundSpeakSoundPacket::handle));
     }
 
     public static <P> ServerPlayNetworking.PlayChannelHandler serverbound(Function<FriendlyByteBuf, P> decoder, TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (server, player, _handler, buf, _responseSender) -> consumer.accept(decoder.apply(buf), server, player);
+        return (server, player, handler, buf, response) -> consumer.accept(decoder.apply(buf), server, player);
     }
     public static <P> ClientPlayNetworking.PlayChannelHandler clientbound(Function<FriendlyByteBuf, P> decoder, Consumer<P> consumer) {
         return (client, listener, buffer, sender) -> consumer.accept(decoder.apply(buffer));
@@ -98,11 +108,8 @@ public class FabricLoader {
         loadItems();
         loadBlocks();
         loadPackets();
+        loadParticles();
 
-        SimpleRadioEntities.load();
-        SimpleRadioBlockEntities.load();
-        SimpleRadioMenus.load();
-
-        SimpleRadioCatalysts.load();
+        CommonSimpleRadio.load();
     }
 }

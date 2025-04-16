@@ -49,16 +49,20 @@
   "block.simpleradio.transmitter": "Transmitter",
   "block.simpleradio.socket": "Socket",
 
+  "screen.simpleradio.frequencing.catalyst": "CATALYST",
+  "screen.simpleradio.frequencing.efficiency": "EFFICIENCY: %s%%",
+  "screen.simpleradio.frequencing.antenna_strength": "ANTENNA STRENGTH:",
+
   "screen.simpleradio.radiosmither": "Radiosmithing Station",
   "screen.simpleradio.radiosmither.am": "AM",
   "screen.simpleradio.radiosmither.fm": "FM",
   "screen.simpleradio.radiosmither.am_description": "More range, worse sound quality",
   "screen.simpleradio.radiosmither.fm_description": "Better sound quality, less range",
 
-  "screen.simpleradio.radiosmither.frequency": "Set Frequency",
-
   "subtitles.simpleradio.radio_open": "Radio starts broadcasting",
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
+
+  "subtitles.simpleradio.short_circuit": "Wire short-circuits",
 
   "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
   "tooltip.simpleradio.receiver_user": "User: %s"

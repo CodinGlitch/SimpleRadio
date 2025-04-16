@@ -6,18 +6,21 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinEntity",
+    "MixinExplosion",
+    "MixinJukeboxBlockEntity",
+    "MixinLevel",
     "MixinMinecraftServer",
     "MixinPlayerList",
-    "MixinServerLevel",
-    "MixinLevel"
+    "MixinServerLevel"
   ],
   "client": [
     "MixinClientLevel",
     "MixinDebugRenderer",
     "MixinItemBlockRenderTypes",
-    "MixinItemInHandRenderer",
     "MixinItemRenderer",
+    "MixinLevelRenderer",
     "MixinLocalPlayer",
+    "MixinModelBakery",
     "MixinModelManager",
     "MixinPlayerRenderer"
   ],

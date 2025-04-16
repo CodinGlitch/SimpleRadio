@@ -8,7 +8,6 @@ public class SimpleRadio {
     
     public SimpleRadio() {
         CommonSimpleRadio.initialize();
-
         ForgeLoader.load();
     }
 }

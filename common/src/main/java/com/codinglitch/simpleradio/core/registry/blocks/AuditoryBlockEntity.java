@@ -1,9 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Socket;
-import com.codinglitch.simpleradio.core.registry.entities.Wire;
+import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -18,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -58,7 +56,10 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
 
     @Override
     public RadioRouter getRouter() {
-        return Stream.of(listener, speaker, transmitter, receiver).filter(Objects::nonNull).findFirst().orElse(null);
+        return Stream.of(listener, speaker, transmitter, receiver).filter(Objects::nonNull).findFirst().orElseGet(() -> {
+            if (this.id != null && this.hasLevel()) return RadioManager.getRouterSided(this.id, this.level.isClientSide);
+            return null;
+        });
     }
 
     public Vec3 getConnectionPosition() {
@@ -90,6 +91,12 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
         if (this.id != null) {
             tag.putUUID("uuid", this.id);
         }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag) {
+        saveTag(tag);
+        super.saveAdditional(tag);
     }
 
     @Override

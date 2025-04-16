@@ -8,6 +8,6 @@ import net.minecraftforge.network.PacketDistributor;
 public class ForgeClientNetworkingHelper implements ClientNetworkingHelper {
     @Override
     public void sendToServer(Packeter packet) {
-        ForgeLoader.CHANNEL.send(packet, PacketDistributor.SERVER.noArg());
+        ForgeLoader.CHANNEL.send(PacketDistributor.SERVER.noArg(), packet);
     }
 }

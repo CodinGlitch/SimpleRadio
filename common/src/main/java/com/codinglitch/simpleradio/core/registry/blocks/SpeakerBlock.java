@@ -1,18 +1,17 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.core.central.Routing;
-import com.codinglitch.simpleradio.core.central.Speaking;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Routing;
+import com.codinglitch.simpleradio.api.central.Speaking;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,19 +21,28 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
+
+    private static final Map<Direction, Vec3> CONNECTION_OFFSETS = Map.of(
+        Direction.UP, new Vec3(0, -0.5, -0.3),
+        Direction.DOWN, new Vec3(0, 0.5, 0.3),
+
+        Direction.NORTH, new Vec3(0, -0.3, 0.5),
+        Direction.EAST, new Vec3(-0.5, -0.3, 0),
+        Direction.SOUTH, new Vec3(0, -0.3, -0.5),
+        Direction.WEST, new Vec3(0.5, -0.3, 0)
+    );
 
     public SpeakerBlock(Properties properties) {
         super(properties);
@@ -45,6 +53,9 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
         RadioSpeaker speaker = startSpeaking(location, id);
         speaker.range = SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange;
+        speaker.category = CommonRadioPlugin.SPEAKERS_CATEGORY;
+
+        speaker.connectionOffset = CONNECTION_OFFSETS.get(state.getValue(FACING));
 
         return speaker;
     }
@@ -71,14 +82,23 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState $$0) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof SpeakerBlockEntity speaker) {
+            if (speaker.speaker != null) {
+                return speaker.speaker.getRedstoneMappedActivity();
+            }
+        }
+
         return 0;
     }
+
+
 
     @Override
     public RenderShape getRenderShape(BlockState state) {

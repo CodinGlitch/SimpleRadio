@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.StructureTransform;
@@ -27,19 +28,10 @@ public abstract class MixinContraption {
 
     @Shadow protected Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks;
 
-    @Inject(method = "addBlock", at = @At("TAIL"), remap = false)
-    private void simpleradio$addBlock(BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
+    // this only runs on the server but it's kinda fine because the routers are re-created in the contraption
+    @Inject(method = "Lcom/simibubi/create/content/contraptions/Contraption;addBlock(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lorg/apache/commons/lang3/tuple/Pair;)V", at = @At("TAIL"), remap = false, require = 0)
+    private void simpleradio$addBlock(Level level, BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
+        if (!CompatCore.CREATE.enabled) return;
         CreateCompat.contraptionAddBlock((Contraption) (Object) this, pos, pair.getValue(), pair.getKey());
-    }
-
-    @Inject(method = "addBlocksToWorld", at = @At("TAIL"), remap = false)
-    private void simpleradio$addBlocksToWorld(Level level, StructureTransform transform, CallbackInfo ci) {
-        for (StructureTemplate.StructureBlockInfo blockInfo : this.blocks.values()) {
-            BlockPos pos = transform.apply(blockInfo.pos());
-            BlockState state = transform.apply(blockInfo.state());
-
-            if (blockInfo.nbt() != null)
-                CreateCompat.contraptionRemoveBlock((Contraption) (Object) this, level, pos, state, blockInfo.nbt());
-        }
     }
 }

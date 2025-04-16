@@ -1,53 +1,74 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.FrequencyBlockEntity;
-import com.codinglitch.simpleradio.core.central.Receiving;
-import com.codinglitch.simpleradio.core.central.WorldlyPosition;
+import com.codinglitch.simpleradio.api.central.Receiving;
+import com.codinglitch.simpleradio.api.central.Speaking;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.client.core.central.AnimationInstance;
+import com.codinglitch.simpleradio.core.central.Animatable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioChannel;
+import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
 
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
-public class RadioBlockEntity extends FrequencyBlockEntity implements Receiving {
-    public boolean isListening = false;
-    public UUID listenerID;
+public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking, Animatable {
+    public boolean isActive = false;
+    public int antennaPower = 0;
 
-    private RadioChannel channel;
+    private final Map<Integer, AnimationInstance> animations = new HashMap<>();
+    public float time = 0;
+    public static final int PLAYING = 0;
 
     public RadioBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.RADIO, pos, state);
 
-        this.listenerID = UUID.randomUUID();
+        allocate(PLAYING);
+    }
+
+    @Override
+    public Map<Integer, AnimationInstance> getStates() {
+        return animations;
+    }
+    @Override
+    public float getTime() {
+        return time;
+    }
+    @Override
+    public void setTime(float time) {
+        this.time = time;
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !level.isClientSide) {
-            Vector3f locationVec = Services.COMPAT.modifyPosition(level, this.worldPosition);
+        if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, locationVec.x, locationVec.y, locationVec.z,
+                    null, speaker.location.x, speaker.location.y, speaker.location.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
             );
         }
 
-        if (this.frequency != null)
-            stopReceiving(frequency.frequency, frequency.modulation, listenerID);
+        inactivate();
+
         super.setRemoved();
+    }
+
+    @Override
+    public void loadTag(CompoundTag tag) {
+        super.loadTag(tag);
     }
 
     @Override
@@ -69,48 +90,58 @@ public class RadioBlockEntity extends FrequencyBlockEntity implements Receiving 
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, RadioBlockEntity blockEntity) {
-        if (!level.isClientSide) {
-            if (blockEntity.channel != null) { blockEntity.channel.location = Services.COMPAT.modifyPosition(pos, level); }
-            if (blockEntity.frequency != null && !blockEntity.isListening) {
-                blockEntity.listen();
-            }
+        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
+            blockEntity.activate();
+        }
+
+        if (level.isClientSide) {
+            //blockEntity.playingAnimationState.ifStarted(state -> state.start((int) blockEntity.time));
+
+            blockEntity.time += 0.05f;
+        } else {
+
         }
     }
 
-    public void listen() {
-        channel = startReceiving(frequency.frequency, frequency.modulation, listenerID);
-        channel.location = Services.COMPAT.modifyPosition(this.worldPosition, this.level);
-
-        Vector3f locationVec = Services.COMPAT.modifyPosition(level, this.worldPosition);
-        level.playSound(
-                null, locationVec.x, locationVec.y, locationVec.z,
-                SimpleRadioSounds.RADIO_OPEN,
-                SoundSource.PLAYERS,
-                1f, 1f
-        );
-
-        this.isListening = true;
-    }
-
-    public void loadFromItem(ItemStack stack) {
-        loadTag(stack.getOrCreateTag());
-    }
-
-    public void loadTag(CompoundTag tag) {
+    public void inactivate() {
         if (this.frequency != null) {
-            stopReceiving(frequency.frequency, frequency.modulation, listenerID);
-            this.isListening = false;
+            RadioManager.removeRouterSided(this.id, this.level.isClientSide);
+            if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
+            if (!this.level.isClientSide) stopSpeaking();
         }
 
-        String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-        this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
+        this.isActive = false;
     }
 
-    public void saveTag(CompoundTag tag) {
-        if (this.frequency == null) return;
+    public void activate() {
+        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
-        tag.putString("frequency", this.frequency.frequency);
-        tag.putString("modulation", this.frequency.modulation.shorthand);
+        if (!level.isClientSide) {
+            //TODO: update players of radio state
+            this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
+            this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());
+
+            level.playSound(
+                    null, location.x, location.y, location.z,
+                    SimpleRadioSounds.RADIO_OPEN,
+                    SoundSource.PLAYERS,
+                    1f, 1f
+            );
+        } else {
+            this.receiver = new RadioReceiver(frequency, location, id);
+            this.speaker = new RadioSpeaker(location, id);
+
+            ClientRadioManager.registerRouter(receiver);
+            ClientRadioManager.registerRouter(speaker);
+        }
+
+        receiver.routers.add(speaker);
+
+        this.isActive = true;
+    }
+
+    @Override
+    public int getAntennaPower() {
+        return antennaPower;
     }
 }

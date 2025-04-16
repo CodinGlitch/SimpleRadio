@@ -1,17 +1,25 @@
 package com.codinglitch.simpleradio.client;
 
-import com.codinglitch.simpleradio.client.models.MicrophoneModel;
-import com.codinglitch.simpleradio.client.models.RadioModel;
-import com.codinglitch.simpleradio.client.renderers.*;
-import com.codinglitch.simpleradio.client.screens.RadiosmitherScreen;
+import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
+import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
+import com.codinglitch.simpleradio.client.core.registry.renderers.*;
+import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.core.registry.particles.ListenParticle;
+import com.codinglitch.simpleradio.core.registry.particles.SpeakLineParticle;
+import com.codinglitch.simpleradio.core.registry.particles.SpeakRingParticle;
 import com.codinglitch.simpleradio.platform.ClientServices;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -32,15 +40,25 @@ public class CommonSimpleRadioClient {
     public static final Map<UUID, Boolean> isTransmitting = new HashMap<>();
     public static void loadProperties(TriConsumer<Item, ResourceLocation, ClampedItemPropertyFunction> registry) {
         registry.accept(SimpleRadioItems.TRANSCEIVER, new ResourceLocation("using"),
-                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
 
         registry.accept(SimpleRadioItems.TRANSCEIVER, new ResourceLocation("speaking"),
-                (stack, level, entity, i) -> entity != null && isTransmitting.containsValue(true) ? 1.0f : 0.0f);
+            (stack, level, entity, i) -> {
+                CompoundTag tag = stack.getOrCreateTag();
+                if (!tag.contains("user")) return 0;
+
+                UUID uuid = tag.getUUID("user");
+                RadioReceiver receiver = ClientRadioManager.getReceiver(uuid);
+                if (receiver == null) return 0;
+
+                return receiver.activityTime > 0 ? 1 : 0;
+            }
+        );
 
         registry.accept(SimpleRadioItems.WALKIE_TALKIE, new ResourceLocation("using"),
-                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
         registry.accept(SimpleRadioItems.SPUDDIE_TALKIE, new ResourceLocation("using"),
-                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0f : 0.0f);
+                (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
     }
 
     // -- Render Types -- \\
@@ -81,12 +99,23 @@ public class CommonSimpleRadioClient {
         ClientServices.REGISTRY.registerScreen(SimpleRadioMenus.RADIOSMITHER_MENU, RadiosmitherScreen::new);
     }
 
+    // -- Particles -- \\
+    @FunctionalInterface
+    public interface ParticleProviderRegistry {
+        <O extends ParticleOptions> void register(ParticleType<O> type, ParticleEngine.SpriteParticleRegistration<O> registration);
+    }
+    public static void loadParticles(ParticleProviderRegistry registry) {
+        registry.register(SimpleRadioParticles.SPEAK_RING, SpeakRingParticle.Provider::new);
+        registry.register(SimpleRadioParticles.SPEAK_LINE, SpeakLineParticle.Provider::new);
+        registry.register(SimpleRadioParticles.LISTEN, ListenParticle.Provider::new);
+    }
+
     // -- Atlases -- \\
     public static void loadAtlases(BiConsumer<ResourceLocation, Supplier<LayerDefinition>> registry) {
 
     }
 
     public static void initialize() {
-
+        SimpleRadioModels.load();
     }
 }

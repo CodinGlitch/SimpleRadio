@@ -1,15 +1,16 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
+import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.VolumeCategory;
+import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
 import org.joml.Vector3f;
 
 import javax.imageio.ImageIO;
@@ -19,8 +20,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
 
 public class CommonRadioPlugin {
     public static String RADIOS_CATEGORY = "radios";
@@ -39,6 +38,7 @@ public class CommonRadioPlugin {
 
     @Nullable
     public static VoicechatServerApi serverApi;
+    public static VoicechatApi commonApi;
 
     private ExecutorService executor;
 
@@ -50,6 +50,15 @@ public class CommonRadioPlugin {
             thread.setDaemon(true);
             return thread;
         });
+    }
+
+    public static float analyzeActivity(short[] data) {
+        float activity = 0;
+        for (short datum : data) {
+            activity += datum*datum;
+        }
+
+        return activity / data.length; // equivalent as the sample size of the array seems to always be 960
     }
 
     public static short[] combineAudio(List<short[]> audioParts) {
@@ -84,7 +93,7 @@ public class CommonRadioPlugin {
     }
 
     public static double getFalloff(float distance, float range) {
-        return Math.max(0, 1 - (Math.log(1 + distance) / Math.log(1 + range)));
+        return Math.max(0, 1 - (java.lang.Math.log(1 + distance) / java.lang.Math.log(1 + range)));
     }
 
     public static double getDoppler(Vector3f sourcePosition, Vector3f sourceVelocity, Vector3f observerPosition, Vector3f observerVelocity) {
@@ -104,8 +113,8 @@ public class CommonRadioPlugin {
             sourceFactor = sourceVelocity.normalize().dot(sourceToObserver);
         }
 
-        return (1000 + observerVelocity.length()*-observerFactor) /
-                (1000 + sourceVelocity.length()*-sourceFactor);
+        return (5 + observerVelocity.length()*-observerFactor) /
+                (5 + sourceVelocity.length()*-sourceFactor);
     }
 
     public String getPluginId() {
@@ -119,6 +128,7 @@ public class CommonRadioPlugin {
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(VoicechatServerStartedEvent.class, this::onServerStarted);
         registration.registerEvent(MicrophonePacketEvent.class, microphonePacketEvent -> executor.submit(() -> RadioManager.getInstance().onMicPacket(microphonePacketEvent)));
+        registration.registerEvent(ClientReceiveSoundEvent.class, ClientRadioManager::onSoundEvent);
     }
 
     public void onServerStarted(VoicechatServerStartedEvent event) {
@@ -137,7 +147,7 @@ public class CommonRadioPlugin {
                 .setIcon(getIcon("transceiver_icon.png"))
                 .build();
         walkies = serverApi.volumeCategoryBuilder()
-                .setId(TRANSCEIVERS_CATEGORY)
+                .setId(WALKIES_CATEGORY)
                 .setName("Walkie Talkies")
                 .setDescription("The volume of walkie/spuddie talkies")
                 .setIcon(getIcon("transceiver_icon.png"))
@@ -150,6 +160,8 @@ public class CommonRadioPlugin {
                 .build();
 
         serverApi.registerVolumeCategory(radios);
+        serverApi.registerVolumeCategory(speakers);
+        serverApi.registerVolumeCategory(walkies);
         serverApi.registerVolumeCategory(transceivers);
     }
 

@@ -1,49 +1,41 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.core.central.Frequency;
-import com.codinglitch.simpleradio.core.central.FrequencyBlockEntity;
-import com.codinglitch.simpleradio.core.central.Receiving;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.api.central.Speaking;
+import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
 
-import java.util.UUID;
-
-public class SpeakerBlockEntity extends FrequencyBlockEntity implements Receiving {
-    public boolean isListening = false;
-    public UUID listenerID;
-
-    private RadioChannel channel;
+public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking {
+    public boolean isActive = false;
 
     public SpeakerBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.SPEAKER, pos, state);
-
-        this.listenerID = UUID.randomUUID();
     }
 
     @Override
     public void setRemoved() {
-        if (level != null && !level.isClientSide) {
-            Vector3f locationVec = Services.COMPAT.modifyPosition(level, this.worldPosition);
+        if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, locationVec.x, locationVec.y, locationVec.z,
+                    null, speaker.location.x, speaker.location.y, speaker.location.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
             );
         }
 
-        if (this.frequency != null)
-            stopReceiving(frequency.frequency, frequency.modulation, listenerID);
+        inactivate();
+
         super.setRemoved();
     }
 
@@ -65,49 +57,52 @@ public class SpeakerBlockEntity extends FrequencyBlockEntity implements Receivin
         super.saveToItem(stack);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState blockState, SpeakerBlockEntity blockEntity) {
-        if (!level.isClientSide) {
-            if (blockEntity.channel != null) { blockEntity.channel.location = Services.COMPAT.modifyPosition(pos, level); }
-            if (blockEntity.frequency != null && !blockEntity.isListening) {
-                blockEntity.listen();
+    public static void tick(Level level, BlockPos pos, BlockState state, SpeakerBlockEntity blockEntity) {
+        if (!blockEntity.isActive && blockEntity.id != null) {
+            blockEntity.activate();
+        }
+
+        if (blockEntity.level == null) return;
+        if (blockEntity.speaker != null && blockEntity.speaker.activityTime >= 0) {
+            if (blockEntity.speaker.activityTime % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
+                level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
+            }
+            if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
+                if (blockEntity.level.isClientSide && blockEntity.speaker.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
+                    ClientRadioManager.handleSpeakParticle(state, blockEntity);
+                }
             }
         }
     }
 
-    public void listen() {
-        channel = startReceiving(frequency.frequency, frequency.modulation, listenerID);
-        channel.location = Services.COMPAT.modifyPosition(this.worldPosition, this.level);
-
-        Vector3f locationVec = Services.COMPAT.modifyPosition(level, this.worldPosition);
-        level.playSound(
-                null, locationVec.x, locationVec.y, locationVec.z,
-                SimpleRadioSounds.RADIO_OPEN,
-                SoundSource.PLAYERS,
-                1f, 1f
-        );
-
-        this.isListening = true;
-    }
-
-    public void loadFromItem(ItemStack stack) {
-        loadTag(stack.getOrCreateTag());
-    }
-
-    public void loadTag(CompoundTag tag) {
-        if (this.frequency != null) {
-            stopReceiving(frequency.frequency, frequency.modulation, listenerID);
-            this.isListening = false;
+    public void inactivate() {
+        if (this.isActive) {
+            stopSpeaking();
+            //stopReceiving(frequency.frequency, frequency.modulation, id);
         }
 
-        String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-        this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
+        this.isActive = false;
     }
 
-    public void saveTag(CompoundTag tag) {
-        if (this.frequency == null) return;
+    public void activate() {
+        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
-        tag.putString("frequency", this.frequency.frequency);
-        tag.putString("modulation", this.frequency.modulation.shorthand);
+        this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
+        if (!level.isClientSide) {
+            level.playSound(
+                    null, location.x, location.y, location.z,
+                    SimpleRadioSounds.RADIO_OPEN,
+                    SoundSource.PLAYERS,
+                    1f, 1f
+            );
+        }
+
+        this.isActive = true;
+    }
+
+    @Override
+    public void loadTag(CompoundTag tag) {
+        inactivate();
+        super.loadTag(tag);
     }
 }
