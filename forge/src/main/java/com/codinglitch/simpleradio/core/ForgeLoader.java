@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
@@ -12,13 +11,12 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -28,17 +26,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
-    private static final String PROTOCOL_VERSION = "0";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            CommonSimpleRadio.id("channel"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
+    public static final SimpleChannel CHANNEL = ChannelBuilder.named(CommonSimpleRadio.id("channel"))
+            .optional()
+            .networkProtocolVersion(0)
+            .simpleChannel();
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
@@ -70,8 +64,8 @@ public class ForgeLoader {
 
         event.register(ForgeRegistries.Keys.PARTICLE_TYPES, helper -> SimpleRadioParticles.PARTICLES.forEach(helper::register));
 
-        event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
-            CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
+        event.register(ForgeRegistries.Keys.CONDITION_SERIALIZERS, helper -> {
+            helper.register(CommonSimpleRadio.id("items_enabled"), ItemsEnabledCondition.CODEC);
         });
 
         CommonSimpleRadio.load();
@@ -98,16 +92,14 @@ public class ForgeLoader {
                 .consumerMainThread(clientbound(ClientboundSpeakSoundPacket::handle)).add();
     }
 
-    private static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (packet, supplier) -> {
-            NetworkEvent.Context context = supplier.get();
+    private static <P> BiConsumer<P, CustomPayloadEvent.Context> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
+        return (packet, context) -> {
             consumer.accept(packet, context.getSender().getServer(), context.getSender());
             context.setPacketHandled(true);
         };
     }
-    public static <P> BiConsumer<P, Supplier<NetworkEvent.Context>> clientbound(Consumer<P> consumer) {
-        return (packet, supplier) -> {
-            NetworkEvent.Context context = supplier.get();
+    public static <P> BiConsumer<P, CustomPayloadEvent.Context> clientbound(Consumer<P> consumer) {
+        return (packet, context) -> {
             consumer.accept(packet);
             context.setPacketHandled(true);
         };

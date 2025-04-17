@@ -59,9 +59,10 @@ dependencies {
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
 
     // Valkyrien Skies
-    compileOnly "org.valkyrienskies:valkyrienskies-1201-forge:${valkyrien_skies_version}"
-    //runtimeOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}"
-    compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}") // forge wont inherit the api from common for some reason
+    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
+        compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-neoforge:${valkyrien_skies_version}"
+        compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}") // forge wont inherit the api from common for some reason
+    }
 
     if (recipe_viewer == "jei") {
         // compile against the JEI API but do not include it at runtime
