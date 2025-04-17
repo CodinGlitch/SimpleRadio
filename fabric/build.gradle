@@ -42,8 +42,10 @@ dependencies {
     //modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
 
     // Valkyrien Skies
-    modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
-    modRuntimeOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
+    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
+        modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
+        modRuntimeOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
+    }
 
     // JEI / REI
     if (recipe_viewer == "jei") {
