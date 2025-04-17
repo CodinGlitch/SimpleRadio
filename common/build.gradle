@@ -41,7 +41,8 @@ dependencies {
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
 
     // Valkyrien Skies
-    compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}")
+    if (valkyrien_skies_env_versions.contains(minecraft_version))
+        compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}")
 }
 
 publishing {
