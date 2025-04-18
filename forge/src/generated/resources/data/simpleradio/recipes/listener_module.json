@@ -1,0 +1,37 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "microphone"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "misc",
+        "key": {
+          "C": {
+            "item": "minecraft:copper_ingot"
+          },
+          "R": {
+            "item": "minecraft:redstone"
+          },
+          "W": {
+            "tag": "minecraft:wool"
+          }
+        },
+        "pattern": [
+          "R",
+          "C",
+          "W"
+        ],
+        "result": {
+          "item": "simpleradio:listener_module"
+        },
+        "show_notification": true
+      }
+    }
+  ]
+}
