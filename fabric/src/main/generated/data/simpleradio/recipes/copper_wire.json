@@ -1,0 +1,27 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "copper_wire"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "pattern": [
+    " C ",
+    "C C",
+    " C "
+  ],
+  "result": {
+    "count": 2,
+    "item": "simpleradio:copper_wire"
+  },
+  "show_notification": true
+}

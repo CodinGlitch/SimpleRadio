@@ -1,0 +1,41 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "transceiver"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "simpleradio:antenna"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "X": {
+      "item": "simpleradio:transmitting_module"
+    },
+    "Y": {
+      "item": "simpleradio:speaker_module"
+    },
+    "Z": {
+      "item": "simpleradio:receiving_module"
+    }
+  },
+  "pattern": [
+    "AII",
+    "XRZ",
+    "IYI"
+  ],
+  "result": {
+    "item": "simpleradio:transceiver"
+  },
+  "show_notification": true
+}
