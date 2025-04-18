@@ -1,4 +1,5 @@
-<div align="center" style="text-align:center;"><img src="https://github.com/CodinGlitch/SimpleRadio/assets/22829873/30156ede-b1dd-4842-9b26-0f0dfadf9360"></div>
+<div align="center" style="text-align:center;"><img style="width:50%;" src="https://github.com/user-attachments/assets/9784ef54-4970-413d-988a-b13598d74928"></div>
+<br>
 
 <div align="center" style="text-align:center;">
 <a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://img.shields.io/badge/CodinGlitch-red?style=flat-square&logo=patreon"></a>
