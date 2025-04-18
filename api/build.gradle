@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'maven-publish'
+}
+
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
+
+base {
+    archivesName = "${mod_name}-api"
+}
+minecraft {
+    version(minecraft_version)
+}
+
+dependencies {
+
+}
+
+configurations {
+    apiJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    apiJava sourceSets.main.java.sourceDirectories.singleFile
+}
