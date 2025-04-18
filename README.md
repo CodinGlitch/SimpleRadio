@@ -1,4 +1,4 @@
-<div align="center" style="text-align:center;"><img style="width:50%;" src="https://github.com/user-attachments/assets/074c208f-b8d8-472a-97d7-bf026d5638f9"></div>
+<div align="center" style="text-align:center;"><img style="width:50%;" src="https://github.com/user-attachments/assets/9784ef54-4970-413d-988a-b13598d74928"></div>
 <br>
 
 <div align="center" style="text-align:center;">
@@ -9,13 +9,13 @@
 
 <div align="center" style="text-align:center;">
 <a href="https://github.com/CodinGlitch/SimpleRadio"><img alt="Github Badge" src="https://img.shields.io/badge/SimpleRadio-222222?style=flat-square&logo=github"></a>
-<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Game Versions" src="https://img.shields.io/modrinth/game-versions/simple-radio?style=flat-square&label=Available%20for&labelColor=222222&color=white"></a>
+<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Game Versions" src="https://img.shields.io/modrinth/game-versions/simple-voice-radio?style=flat-square&label=Available%20for&labelColor=222222&color=white"></a>
 <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="Static Badge" src="https://img.shields.io/badge/License-GPLv3-darkred?style=flat-square&labelColor=222222"></a>
 </div>
 
 <div align="center" style="text-align:center;">
 <a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Downloads" src="https://img.shields.io/curseforge/dt/820070?style=flat-square&logo=curseforge&label=CurseForge&labelColor=222222&color=red"></a>
-<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/simple-radio?style=flat-square&logo=modrinth&label=Modrinth&labelColor=222222&color=1bd96a"></a>
+<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/simple-voice-radio?style=flat-square&logo=modrinth&label=Modrinth&labelColor=222222&color=1bd96a"></a>
 </div>
 
 ---
@@ -51,7 +51,6 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 | ❌      | Altitude influences interference amount                                                                |
 | ❌      | Relay towers                                                                                           |
 | ❌      | Transmission mapping                                                                                   |
-| ❌      | VR compatibility                                                                                   |
 
 <br>
 
