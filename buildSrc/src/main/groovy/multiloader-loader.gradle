@@ -1,0 +1,69 @@
+plugins {
+    id 'multiloader-common'
+}
+
+configurations {
+    commonJava {
+        canBeResolved = true
+    }
+    commonResources {
+        canBeResolved = true
+    }
+
+    apiJava {
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    compileOnly(project(':common'))
+    commonJava project(path: ':common', configuration: 'commonJava')
+    commonResources project(path: ':common', configuration: 'commonResources')
+
+    // --- Common --- \\
+
+    implementation(project(':api'))
+    apiJava project(path: ':api', configuration: 'apiJava')
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+
+    dependsOn(configurations.apiJava)
+    source(configurations.apiJava)
+}
+
+processResources {
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+tasks.named('javadoc', Javadoc).configure {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+
+    dependsOn(configurations.apiJava)
+    source(configurations.apiJava)
+}
+
+tasks.named("sourcesJar", Jar) {
+    dependsOn(configurations.commonJava)
+    from(configurations.commonJava)
+    dependsOn(configurations.apiJava)
+    from(configurations.apiJava)
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+}
+
+tasks.register('publishModrinth') {
+    dependsOn("fabric:modrinth", "forge:modrinth", "neoforge:modrinth")
+}
+
+tasks.register('publishCurseForge') {
+    dependsOn("fabric:curseforge", "forge:curseforge", "neoforge:curseforge")
+}
+
+tasks.register('publishSites') {
+    dependsOn publishModrinth, publishCurseForge
+}
