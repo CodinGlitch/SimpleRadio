@@ -14,17 +14,9 @@ pluginManagement {
                 includeGroup("fabric-loom")
             }
         }
-        exclusiveContent {
-            forRepository {
-                maven {
-                    name = 'NeoForge'
-                    url = uri("https://maven.neoforged.net/releases")
-                }
-            }
-            filter {
-                includeGroupAndSubgroups("net.neoforged")
-                includeGroup("codechicken")
-            }
+        maven {
+            name = 'NeoForge'
+            url = 'https://maven.neoforged.net/releases/'
         }
         exclusiveContent {
             forRepository {
