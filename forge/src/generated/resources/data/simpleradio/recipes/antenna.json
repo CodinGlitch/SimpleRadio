@@ -1,28 +1,33 @@
 {
   "type": "forge:conditional",
-  "forge:condition": {
-    "type": "simpleradio:items_enabled",
-    "item": "antenna"
-  },
   "recipes": [
     {
-      "type": "minecraft:crafting_shaped",
-      "category": "building",
-      "key": {
-        "B": {
-          "item": "minecraft:iron_bars"
-        },
-        "I": {
-          "item": "minecraft:iron_ingot"
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "microphone"
         }
-      },
-      "pattern": [
-        " B ",
-        " B ",
-        " I "
       ],
-      "result": {
-        "item": "simpleradio:antenna"
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "building",
+        "key": {
+          "B": {
+            "item": "minecraft:iron_bars"
+          },
+          "I": {
+            "item": "minecraft:iron_ingot"
+          }
+        },
+        "pattern": [
+          " B ",
+          " I ",
+          " B "
+        ],
+        "result": {
+          "item": "simpleradio:antenna"
+        },
+        "show_notification": true
       }
     }
   ]
