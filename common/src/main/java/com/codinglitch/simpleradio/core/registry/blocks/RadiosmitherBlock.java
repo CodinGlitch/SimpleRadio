@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -26,7 +27,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class RadiosmitherBlock extends BaseEntityBlock {
-
+    public static final MapCodec<RadiosmitherBlock> CODEC = simpleCodec(RadiosmitherBlock::new);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<RadiosmitherPart> RADIOSMITHER_PART = EnumProperty.create("part", RadiosmitherPart.class);
 
@@ -53,6 +54,11 @@ public class RadiosmitherBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(RADIOSMITHER_PART, RadiosmitherPart.MAIN));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -131,10 +137,10 @@ public class RadiosmitherBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (level.isClientSide) {
             super.playerWillDestroy(level, pos, state, player);
-            return;
+            return state;
         }
 
         RadiosmitherPart part = state.getValue(RADIOSMITHER_PART);
@@ -144,6 +150,7 @@ public class RadiosmitherBlock extends BaseEntityBlock {
             level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             level.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, otherPos, Block.getId(otherState));
         }
+        return state;
     }
 
     @Override

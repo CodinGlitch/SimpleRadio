@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.core.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioChannel;

@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,13 +28,15 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
 
     @Shadow private long tickCount;
 
+    @Shadow public abstract ItemStack getTheItem();
+
     public MixinJukeboxBlockEntity(BlockEntityType<?> $$0, BlockPos $$1, BlockState $$2) {
         super($$0, $$1, $$2);
     }
 
     @Inject(method = "startPlaying()V", at = @At(value = "TAIL"))
     private void simpleradio$startPlaying_audioGathering(CallbackInfo ci) {
-        Item item = this.getFirstItem().getItem();
+        Item item = this.getTheItem().getItem();
 
         if (item instanceof RecordItem recordItem && level instanceof ServerLevel serverLevel) {
             RadioManager.getInstance().onSoundPlayed(
@@ -65,7 +68,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
             ), method = "tick"
     )
     private void simpleradio$tick_audioGathering(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
-        Item item = this.getFirstItem().getItem();
+        Item item = this.getTheItem().getItem();
 
         if (item instanceof RecordItem recordItem && level instanceof ServerLevel serverLevel) {
             float offset = (tickCount - recordStartedTick) / 20f;

@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class FrequencerBlock extends BaseEntityBlock {
+    public static final MapCodec<FrequencerBlock> CODEC = simpleCodec(FrequencerBlock::new);
     public static final VoxelShape SHAPE = Shapes.or(
             Block.box(4, 0, 4, 12, 1, 12),
             Block.box(3, 1, 3, 13, 4, 13),
@@ -35,6 +37,11 @@ public class FrequencerBlock extends BaseEntityBlock {
 
     public FrequencerBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override

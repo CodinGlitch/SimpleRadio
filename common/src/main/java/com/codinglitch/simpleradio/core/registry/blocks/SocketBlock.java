@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class SocketBlock extends BaseEntityBlock implements Routing {
+    public static final MapCodec<SocketBlock> CODEC = simpleCodec(SocketBlock::new);
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     private static final VoxelShape TOP_SHAPE = Block.box(6.0, 0.0, 6.0, 10.0, 5.0, 10.0);
@@ -46,6 +48,11 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
     public SocketBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     public static BlockPos travelExtension(BlockPos pos, LevelAccessor level) {

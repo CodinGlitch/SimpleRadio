@@ -2,31 +2,31 @@ package com.codinglitch.simpleradio.datagen;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class CommonRecipeProvider extends RecipeProvider {
 
-    public static final HashMap<FinishedRecipe, ResourceLocation> MAP = new HashMap<>();
+    public static final HashMap<Recipe<?>, ResourceLocation> MAP = new HashMap<>();
 
     public CommonRecipeProvider(PackOutput output) {
         super(output);
     }
 
     @Override
-    public void buildRecipes(Consumer<FinishedRecipe> consumer) {}
+    public void buildRecipes(RecipeOutput consumer) {}
 
-    public static void defineRecipes(Function<Item, Consumer<FinishedRecipe>> conditionBuilder) {
+    public static void defineRecipes(Function<Item, RecipeOutput> conditionBuilder) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, SimpleRadioItems.TRANSCEIVER)
                 .define('I', Items.IRON_INGOT)
                 .define('R', Items.REDSTONE)
