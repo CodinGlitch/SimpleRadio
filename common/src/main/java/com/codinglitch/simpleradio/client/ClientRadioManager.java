@@ -46,7 +46,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.io.InputStream;
