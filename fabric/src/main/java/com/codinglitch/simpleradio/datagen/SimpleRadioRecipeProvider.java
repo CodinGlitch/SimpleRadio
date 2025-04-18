@@ -31,21 +31,7 @@ public class SimpleRadioRecipeProvider extends FabricRecipeProvider {
             return exporter;
 
         ResourceLocation location = optional.get().getKey();
-        RecipeOutput output = withConditions(exporter, FabricLoader.itemsEnabled(location.getPath()));
-
-        return new RecipeOutput() {
-
-            @Override
-            public void accept(ResourceLocation resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
-                MAP.put(recipe, location);
-                output.accept(resourceLocation, recipe, advancementHolder);
-            }
-
-            @Override
-            public Advancement.Builder advancement() {
-                return null;
-            }
-        };
+        return withConditions(exporter, FabricLoader.itemsEnabled(location.getPath()));
     }
 
     @Override
