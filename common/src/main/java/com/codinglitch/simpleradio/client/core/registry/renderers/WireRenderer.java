@@ -32,7 +32,7 @@ import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 

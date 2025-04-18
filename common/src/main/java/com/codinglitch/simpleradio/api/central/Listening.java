@@ -6,7 +6,7 @@ import com.codinglitch.simpleradio.radio.RadioListener;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.world.entity.Entity;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public interface Listening extends Auricular {
