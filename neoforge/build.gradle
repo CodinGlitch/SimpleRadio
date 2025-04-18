@@ -44,10 +44,10 @@ dependencies {
 
     // --- Dependencies --- \\
 
-    implementation "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
+    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
     runtimeOnly "com.codinglitch.lexiconfig:lexiconfig-neoforge:${lexiconfig_version}"
 
-    implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     runtimeOnly "maven.modrinth:simple-voice-chat:neoforge-${minecraft_version}-${voicechat_version}"
 
     // --- Compatibilities --- \\
