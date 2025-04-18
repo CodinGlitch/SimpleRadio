@@ -17,9 +17,10 @@ dependencies {
 
     // --- Dependencies --- \\
 
-    modImplementation "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
+    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
+    modRuntimeOnly "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
 
-    implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}"
 
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
