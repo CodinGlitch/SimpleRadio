@@ -11,21 +11,22 @@
   "category": "misc",
   "key": {
     "C": {
-      "item": "simpleradio:copper_wire"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:copper_ingot"
     },
     "N": {
       "item": "minecraft:note_block"
+    },
+    "R": {
+      "item": "minecraft:redstone"
     }
   },
   "pattern": [
-    " N ",
-    " I ",
-    " C "
+    "R",
+    "C",
+    "N"
   ],
   "result": {
     "item": "simpleradio:speaker_module"
-  }
+  },
+  "show_notification": true
 }

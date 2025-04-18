@@ -14,21 +14,19 @@
       "item": "simpleradio:antenna"
     },
     "C": {
-      "item": "simpleradio:copper_wire"
+      "item": "minecraft:copper_ingot"
     },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "P": {
-      "item": "minecraft:ender_pearl"
+    "L": {
+      "item": "minecraft:lapis_lazuli"
     }
   },
   "pattern": [
-    " A ",
-    "CIC",
-    " P "
+    "A",
+    "C",
+    "L"
   ],
   "result": {
     "item": "simpleradio:transmitting_module"
-  }
+  },
+  "show_notification": true
 }

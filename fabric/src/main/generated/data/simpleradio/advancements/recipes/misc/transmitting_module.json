@@ -9,24 +9,24 @@
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_wire": {
+    "has_copper_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "simpleradio:copper_wire"
+              "minecraft:copper_ingot"
             ]
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_ender_pearl": {
+    "has_lapis_lazuli": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:ender_pearl"
+              "minecraft:lapis_lazuli"
             ]
           }
         ]
@@ -42,14 +42,15 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_copper_wire",
-      "has_ender_pearl"
+      "has_copper_ingot",
+      "has_lapis_lazuli",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:transmitting_module"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

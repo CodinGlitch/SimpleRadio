@@ -54,15 +54,16 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_transmitting_module",
       "has_speaker_module",
-      "has_receiving_module"
+      "has_receiving_module",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:transceiver"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

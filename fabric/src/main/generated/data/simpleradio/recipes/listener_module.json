@@ -11,21 +11,22 @@
   "category": "misc",
   "key": {
     "C": {
-      "item": "simpleradio:copper_wire"
+      "item": "minecraft:copper_ingot"
     },
-    "I": {
-      "item": "minecraft:iron_ingot"
+    "R": {
+      "item": "minecraft:redstone"
     },
     "W": {
       "tag": "minecraft:wool"
     }
   },
   "pattern": [
-    "W",
-    "I",
-    "C"
+    "R",
+    "C",
+    "W"
   ],
   "result": {
     "item": "simpleradio:listener_module"
-  }
+  },
+  "show_notification": true
 }

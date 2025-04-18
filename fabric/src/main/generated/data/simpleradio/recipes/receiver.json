@@ -16,22 +16,23 @@
     "B": {
       "item": "minecraft:iron_block"
     },
-    "C": {
-      "item": "simpleradio:copper_wire"
-    },
-    "Q": {
-      "item": "minecraft:quartz"
+    "G": {
+      "item": "minecraft:gold_ingot"
     },
     "R": {
       "item": "simpleradio:receiving_module"
+    },
+    "W": {
+      "item": "simpleradio:copper_wire"
     }
   },
   "pattern": [
     " A ",
-    "QBR",
-    " C "
+    "GBW",
+    " R "
   ],
   "result": {
     "item": "simpleradio:receiver"
-  }
+  },
+  "show_notification": true
 }

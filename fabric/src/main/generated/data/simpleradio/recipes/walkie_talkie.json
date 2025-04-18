@@ -14,7 +14,7 @@
       "item": "minecraft:copper_block"
     },
     "C": {
-      "item": "simpleradio:copper_wire"
+      "item": "minecraft:copper_ingot"
     },
     "I": {
       "item": "minecraft:iron_ingot"
@@ -27,5 +27,6 @@
   ],
   "result": {
     "item": "simpleradio:walkie_talkie"
-  }
+  },
+  "show_notification": true
 }

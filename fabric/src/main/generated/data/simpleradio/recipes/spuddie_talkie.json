@@ -11,7 +11,7 @@
   "category": "equipment",
   "key": {
     "C": {
-      "item": "simpleradio:copper_wire"
+      "item": "minecraft:copper_ingot"
     },
     "I": {
       "item": "minecraft:iron_ingot"
@@ -27,5 +27,6 @@
   ],
   "result": {
     "item": "simpleradio:spuddie_talkie"
-  }
+  },
+  "show_notification": true
 }

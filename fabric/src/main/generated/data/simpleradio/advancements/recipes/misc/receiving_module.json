@@ -9,12 +9,12 @@
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_wire": {
+    "has_copper_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "simpleradio:copper_wire"
+              "minecraft:copper_ingot"
             ]
           }
         ]
@@ -42,14 +42,15 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_copper_wire",
-      "has_redstone"
+      "has_copper_ingot",
+      "has_redstone",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:receiving_module"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

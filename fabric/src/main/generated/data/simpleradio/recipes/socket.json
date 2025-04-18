@@ -3,30 +3,29 @@
     {
       "condition": "simpleradio:items_enabled",
       "values": [
-        "speaker"
+        "socket"
       ]
     }
   ],
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
     "I": {
       "item": "minecraft:iron_ingot"
     },
-    "R": {
-      "item": "minecraft:redstone"
-    },
-    "Y": {
-      "item": "simpleradio:speaker_module"
+    "N": {
+      "item": "minecraft:iron_nugget"
     }
   },
   "pattern": [
-    "III",
-    "IRY",
-    "III"
+    "NCN",
+    " I "
   ],
   "result": {
-    "item": "simpleradio:speaker"
+    "item": "simpleradio:socket"
   },
   "show_notification": true
 }

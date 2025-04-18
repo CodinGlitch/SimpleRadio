@@ -9,12 +9,12 @@
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_wire": {
+    "has_copper_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "simpleradio:copper_wire"
+              "minecraft:copper_ingot"
             ]
           }
         ]
@@ -54,15 +54,16 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_iron_ingot",
       "has_potato",
-      "has_copper_wire"
+      "has_copper_ingot",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:spuddie_talkie"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

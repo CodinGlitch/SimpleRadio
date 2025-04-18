@@ -19,10 +19,11 @@
   },
   "pattern": [
     " B ",
-    " B ",
-    " I "
+    " I ",
+    " B "
   ],
   "result": {
     "item": "simpleradio:antenna"
-  }
+  },
+  "show_notification": true
 }
