@@ -1,30 +1,5 @@
 {
-	"variants": {
-		"facing=down": {
-			"model": "simpleradio:block/socket",
-			"x": 180
-		},
-		"facing=east": {
-			"model": "simpleradio:block/socket",
-			"x": 90,
-			"y": 90
-		},
-		"facing=north": {
-			"model": "simpleradio:block/socket",
-			"x": 90
-		},
-		"facing=south": {
-			"model": "simpleradio:block/socket",
-			"x": 90,
-			"y": 180
-		},
-		"facing=up": {
-			"model": "simpleradio:block/socket"
-		},
-		"facing=west": {
-			"model": "simpleradio:block/socket",
-			"x": 90,
-			"y": 270
-		}
-	}
+  "variants": {
+    "": { "model": "simpleradio:block/socket" }
+  }
 }
