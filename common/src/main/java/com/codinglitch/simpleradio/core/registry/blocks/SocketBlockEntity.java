@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public class SocketBlockEntity extends BlockEntity implements Socket {
 
-    UUID id;
+    public UUID id;
 
     public RadioRouter router;
 
