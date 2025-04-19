@@ -115,12 +115,24 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
                 .setValue(FACING, context.getClickedFace());
 
         if (state.canSurvive(context.getLevel(), context.getClickedPos())) {
-            Direction.Axis axis = context.getNearestLookingDirection().getAxis();
-            CommonSimpleRadio.info(axis.test(Direction.WEST));
+            Direction[] directions = context.getNearestLookingDirections();
 
-            state = switch (context.getClickedFace()) {
-                case NORTH, EAST, SOUTH, WEST -> state.setValue(ROTATED, axis.isHorizontal());
-                case UP, DOWN -> state.setValue(ROTATED, axis.test(Direction.WEST));
+            Direction face = context.getClickedFace();
+            state = switch (face) {
+                case NORTH, EAST, SOUTH, WEST -> {
+                    for (Direction direction : directions) {
+                        if (direction.getAxis().test(face)) continue;
+                        yield state.setValue(ROTATED, direction.getAxis().isHorizontal());
+                    }
+                    yield state;
+                }
+                case UP, DOWN -> {
+                    for (Direction direction : directions) {
+                        if (direction.getAxis().isVertical()) continue;
+                        yield state.setValue(ROTATED, direction == Direction.WEST || direction == Direction.EAST);
+                    }
+                    yield state;
+                }
             };
             return state;
         }
