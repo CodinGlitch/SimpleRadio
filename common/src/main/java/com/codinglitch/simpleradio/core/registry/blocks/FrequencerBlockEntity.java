@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.radio.RadioListener;
+import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -21,12 +22,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class FrequencerBlockEntity extends BlockEntity {
     public Frequency frequency;
     public List<String> listeners = new ArrayList<>();
-    public List<String> receivers = new ArrayList<>();
+    public List<String> frequencings = new ArrayList<>();
     public List<String> frequencies = new ArrayList<>();
 
 
@@ -52,7 +52,7 @@ public class FrequencerBlockEntity extends BlockEntity {
         if (Math.round(level.getGameTime()) % 20 == 0 && !level.isClientSide) {
             blockEntity.frequencies.clear();
             blockEntity.listeners.clear();
-            blockEntity.receivers.clear();
+            blockEntity.frequencings.clear();
 
             //---- Revalidation ----\\
             if (blockEntity.frequency != null) {
@@ -65,7 +65,13 @@ public class FrequencerBlockEntity extends BlockEntity {
                 //---- Receiver gathering and parsing ----\\
                 for (RadioReceiver receiver : blockEntity.frequency.receivers) {
                     String name = parse(receiver.owner, receiver.location);
-                    if (name != null) blockEntity.receivers.add(name);
+                    if (name != null) blockEntity.frequencings.add(name);
+                }
+
+                //---- Transmitter gathering and parsing ----\\
+                for (RadioTransmitter transmitter : blockEntity.frequency.transmitters) {
+                    String name = parse(transmitter.owner, transmitter.location);
+                    if (name != null) blockEntity.frequencings.add(name);
                 }
 
                 level.sendBlockUpdated(pos, blockState, blockState, 2);
@@ -138,9 +144,9 @@ public class FrequencerBlockEntity extends BlockEntity {
         }
 
         CompoundTag receivers = tag.getCompound("receivers");
-        this.receivers.clear();
+        this.frequencings.clear();
         for (String key : receivers.getAllKeys()) {
-            this.receivers.add(receivers.getString(key));
+            this.frequencings.add(receivers.getString(key));
         }
 
         CompoundTag listeners = tag.getCompound("listeners");
@@ -163,8 +169,8 @@ public class FrequencerBlockEntity extends BlockEntity {
         }
 
         CompoundTag receivers = new CompoundTag();
-        for (int i = 0; i < this.receivers.size(); i++) {
-            receivers.putString(String.valueOf(i), this.receivers.get(i));
+        for (int i = 0; i < this.frequencings.size(); i++) {
+            receivers.putString(String.valueOf(i), this.frequencings.get(i));
         }
         tag.put("receivers", receivers);
 
