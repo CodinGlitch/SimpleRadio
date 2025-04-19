@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -34,12 +35,22 @@ public class SocketRenderer implements BlockEntityRenderer<SocketBlockEntity> {
         BlockState state = blockEntity.getBlockState();
         Block block = state.getBlock();
 
-        if (block instanceof SocketBlock socketBlock) {
+        if (block instanceof SocketBlock socketBlock && blockEntity.id != null) {
             poseStack.pushPose();
+            poseStack.translate(0.5f, 0.5f, 0.5f);
+
+            Direction facing = state.getValue(SocketBlock.FACING);
+            poseStack.mulPose(facing.getRotation());
+            poseStack.translate(0f, 1f, 0f);
+
+            poseStack.mulPose(Axis.XP.rotationDegrees(180));
+            poseStack.mulPose(Axis.YP.rotationDegrees(state.getValue(SocketBlock.ROTATED) ? 90 : 0));
+
+
 
             model.wire.visible = !blockEntity.getWires().isEmpty();
 
-            RadioRouter router = ClientRadioManager.getRouter(blockEntity.getReference());
+            RadioRouter router = ClientRadioManager.getRouter(blockEntity.id);
             if (router != null) {
                 /*float rotation = Math.toRadians(SimpleRadioBlocks.MICROPHONE.getYRotationDegrees(state) - 90);
                 float tilt = blockEntity.currentTilt - 0.5f;
