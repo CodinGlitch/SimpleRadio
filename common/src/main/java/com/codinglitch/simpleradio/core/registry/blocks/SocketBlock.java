@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Routing;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -7,6 +8,7 @@ import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -22,10 +24,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,9 +38,16 @@ import java.util.UUID;
 
 public class SocketBlock extends BaseEntityBlock implements Routing {
     public static final MapCodec<SocketBlock> CODEC = simpleCodec(SocketBlock::new);
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-    private static final VoxelShape TOP_SHAPE = Block.box(6.0, 0.0, 6.0, 10.0, 5.0, 10.0);
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final BooleanProperty EMPTY = BooleanProperty.create("empty");
+    public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
+
+    private static final VoxelShape TOP_SHAPE = Shapes.or(
+            Block.box(5.0, 0.0, 7.0, 6.0, 5.0, 9.0),
+            Block.box(10.0, 0.0, 7.0, 11.0, 5.0, 9.0),
+            Block.box(6.0, 1.0, 5.0, 10.0, 7.0, 11.0)
+    );
     private static final VoxelShape BOTTOM_SHAPE = Block.box(6.0, 11.0, 6.0, 10.0, 16.0, 10.0);
 
     private static final VoxelShape NORTH_SHAPE = Block.box(6.0, 6.0, 11.0, 10.0, 10.0, 16.0);
@@ -47,7 +58,7 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
 
     public SocketBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ROTATED, false).setValue(EMPTY, true));
     }
 
     @Override
@@ -102,7 +113,7 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        super.createBlockStateDefinition(stateBuilder.add(FACING));
+        super.createBlockStateDefinition(stateBuilder.add(FACING, ROTATED, EMPTY));
     }
 
     @Override
@@ -111,6 +122,13 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
                 .setValue(FACING, context.getClickedFace());
 
         if (state.canSurvive(context.getLevel(), context.getClickedPos())) {
+            Direction.Axis axis = context.getNearestLookingDirection().getAxis();
+            CommonSimpleRadio.info(axis.test(Direction.WEST));
+
+            state = switch (context.getClickedFace()) {
+                case NORTH, EAST, SOUTH, WEST -> state.setValue(ROTATED, axis.isHorizontal());
+                case UP, DOWN -> state.setValue(ROTATED, axis.test(Direction.WEST));
+            };
             return state;
         }
 
@@ -140,7 +158,11 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
     public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(FACING)) {
             case DOWN -> BOTTOM_SHAPE;
-            case UP -> TOP_SHAPE;
+            case UP -> Shapes.or(
+                    Block.box(5.0, 0.0, 7.0, 6.0, 5.0, 9.0),
+                    Block.box(10.0, 0.0, 7.0, 11.0, 5.0, 9.0),
+                    Block.box(6.0, 1.0, 5.0, 10.0, 7.0, 11.0)
+            );
             case NORTH -> NORTH_SHAPE;
             case SOUTH -> SOUTH_SHAPE;
             case WEST -> WEST_SHAPE;
