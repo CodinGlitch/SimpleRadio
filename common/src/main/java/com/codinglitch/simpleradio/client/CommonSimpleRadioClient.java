@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
 import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
+import com.codinglitch.simpleradio.client.core.registry.models.SocketModel;
 import com.codinglitch.simpleradio.client.core.registry.renderers.*;
 import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
