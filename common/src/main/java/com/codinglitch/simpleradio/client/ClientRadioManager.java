@@ -202,6 +202,9 @@ public class ClientRadioManager {
     public static void garbageCollect() {
         removeRouter(wrapper -> !wrapper.router.validate());
         removeRouter(wrapper -> wrapper.router.owner == null && wrapper.router.location == null);
+
+        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
+        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.owner == null && entry.getValue().router.location == null));
     }
 
     public static void tick(long gameTime) {
