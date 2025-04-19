@@ -94,7 +94,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
 
-        if (blockEntity.receiver != null) blockEntity.receiver.active = blockEntity.catalyzed;
+        if (blockEntity.receiver != null) blockEntity.receiver.active = blockEntity.catalyst != null;
 
         if (!blockEntity.catalyzed) return;
 

@@ -94,7 +94,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
 
-        if (blockEntity.transmitter != null) blockEntity.transmitter.active = blockEntity.catalyzed;
+        if (blockEntity.transmitter != null) blockEntity.transmitter.active = blockEntity.catalyst != null;
 
         if (!blockEntity.catalyzed) return;
 

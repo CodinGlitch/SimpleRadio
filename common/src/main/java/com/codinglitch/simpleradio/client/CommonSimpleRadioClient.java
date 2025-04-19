@@ -84,6 +84,7 @@ public class CommonSimpleRadioClient {
         registry.register(SimpleRadioBlockEntities.RADIO, RadioRenderer::new);
         registry.register(SimpleRadioBlockEntities.FREQUENCER, FrequencerRenderer::new);
         registry.register(SimpleRadioBlockEntities.MICROPHONE, MicrophoneRenderer::new);
+        registry.register(SimpleRadioBlockEntities.SOCKET, SocketRenderer::new);
 
         registry.register(SimpleRadioBlockEntities.TRANSMITTER, TransmitterRenderer::new);
         registry.register(SimpleRadioBlockEntities.RECEIVER, ReceiverRenderer::new);
