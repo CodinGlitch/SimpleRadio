@@ -29,8 +29,8 @@ public class SocketModel extends Model {
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
-		PartDefinition bone = partdefinition.addOrReplaceChild("bone", CubeListBuilder.create().texOffs(12, 12).addBox(-6.0F, -5.0F, 7.0F, 1.0F, 7.0F, 2.0F, new CubeDeformation(0.0F))
-				.texOffs(12, 12).mirror().addBox(-11.0F, -5.0F, 7.0F, 1.0F, 7.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(8.0F, 24.0F, -8.0F));
+		PartDefinition bone = partdefinition.addOrReplaceChild("bone", CubeListBuilder.create().texOffs(12, 12).addBox(-6F, -5.0F, 7.01F, 1.0F, 7.0F, 1.98F, new CubeDeformation(0.0F))
+				.texOffs(12, 12).mirror().addBox(-11F, -5.0F, 7.01F, 1.0F, 7.0F, 1.98F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(8.0F, 24.0F, -8.0F));
 
 		PartDefinition spool = bone.addOrReplaceChild("spool", CubeListBuilder.create().texOffs(14, 0).addBox(-1.0F, -1.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
 				.texOffs(0, 0).addBox(1.0F, -3.0F, -3.0F, 1.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
