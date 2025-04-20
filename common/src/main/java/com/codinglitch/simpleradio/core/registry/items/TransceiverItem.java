@@ -4,14 +4,11 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundTransceiverPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
-import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -35,10 +32,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         super(settings);
     }
 
-    private void transmit(ServerPlayer player, boolean started) {
-        //Services.NETWORKING.sendToPlayer(player, new ClientboundTransceiverPacket(started, player.getUUID(), this.getClass().getName()));
-    }
-
     protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
         speaker.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
@@ -58,6 +51,11 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         RadioSpeaker speaker = startSpeaking(entity, owner);
         RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
         RadioTransmitter transmitter = startTransmitting(entity, frequencyName, Frequency.modulationOf(modulation), owner);
+
+        listener.owner = entity;
+        speaker.owner = entity;
+        receiver.owner = entity;
+        transmitter.owner = entity;
 
         listener.tryAddRouter(transmitter);
         receiver.tryAddRouter(speaker);
@@ -96,8 +94,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     public void verifyTagAfterLoad(CompoundTag tag) {
         super.verifyTagAfterLoad(tag);
 
-        if (tag.contains("user"))
-            tag.remove("user");
+        if (tag.contains("activated"))
+            tag.remove("activated");
     }
 
     @Override
@@ -110,6 +108,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     public void entityTick(ItemStack stack, Entity entity) {
+        if (entity.isRemoved()) return;
+
         Level level = entity.level();
         CompoundTag tag = stack.getOrCreateTag();
 
@@ -124,20 +124,42 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             tag.putString("frequency", frequency);
         }
 
-        UUID uuid = entity.getUUID();
+        // Mode-switch deactivation (i.e. item is dropped)
+        RadioRouter activeRouter = null;
         if (tag.contains("user")) {
-            UUID currentUUID = tag.getUUID("user");
-            if (currentUUID.equals(uuid)) {
-                return;
+            activeRouter = RadioManager.getRouterSided(tag.getUUID("user"), level.isClientSide);
+        }
+
+        if (activeRouter != null && (activeRouter.owner == null || !activeRouter.owner.getUUID().equals(entity.getUUID()))) {
+            activeRouter = null;
+        }
+
+        // Transceiver activation
+        UUID activationUUID = null;
+        if (entity.level().isClientSide) {
+
+            if (tag.contains("user") && activeRouter == null) {
+                activationUUID = tag.getUUID("user");
+            }
+
+        } else {
+            if (activeRouter != null) return;
+
+            if (!tag.contains("user")) {
+                activationUUID = UUID.randomUUID();
+                tag.putUUID("user", activationUUID);
             } else {
-                inactivate(level, frequency, modulation, currentUUID);
+                activationUUID = tag.getUUID("user");
             }
         }
 
-        tag.putUUID("user", uuid);
+        if (activationUUID == null) return;
+
+        CommonSimpleRadio.debug("Activated transceiver using UUID {}!", activationUUID);
+
         frequency = tag.getString("frequency");
         modulation = tag.getString("modulation");
-        activate(level, stack, frequency, modulation, entity, uuid);
+        activate(level, stack, frequency, modulation, entity, activationUUID);
     }
 
     @Override
@@ -170,11 +192,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         );
         player.startUsingItem(hand);
 
-        // Send time using packet
-        if (!level.isClientSide) {
-            transmit((ServerPlayer) player, true);
-        }
-
         return InteractionResultHolder.consume(stack);
     }
 
@@ -197,11 +214,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                     SoundSource.PLAYERS,
                     1f,1f
             );
-
-            // Send stopped using packet
-            if (!level.isClientSide) {
-                transmit((ServerPlayer) player, false);
-            }
 
             player.getCooldowns().addCooldown(this, this.getCooldown());
         }
