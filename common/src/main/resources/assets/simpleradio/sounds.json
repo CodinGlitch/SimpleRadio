@@ -31,6 +31,12 @@
       "simpleradio:tilt_microphone/tilt_microphone3"
     ],
     "subtitle": "subtitles.simpleradio.tilt_microphone"
+  },
+  "spin_socket": {
+    "subtitle": "subtitles.simpleradio.spin_socket",
+    "sounds": [
+      "simpleradio:spin_socket"
+    ]
   }
 }
 
