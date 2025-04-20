@@ -212,12 +212,18 @@ public class ClientRadioManager {
             garbageCollect();
 
             // After garbage collection, we shall also re-request still missing routers
-            for (Map.Entry<Short, PendingRouter<?>> entry : pendingRouters.entrySet()) {
+            Iterator<Map.Entry<Short, PendingRouter<?>>> iterator = pendingRouters.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Short, PendingRouter<?>> entry = iterator.next();
+
                 short mapping = entry.getKey();
                 PendingRouter<?> pending = entry.getValue();
 
-                pending.request(mapping);
-                CommonSimpleRadio.debug("We missed a router, so re-requesting identifier for {} with mapping {} and reference {}", pending.getClass().getSimpleName(), mapping, pending.router.getReference());
+                if (pending.request(mapping)) {
+                    CommonSimpleRadio.debug("We missed a router, so re-requesting identifier for {} with mapping {} and reference {}", pending.getClass().getSimpleName(), mapping, pending.router.getReference());
+                } else {
+                    iterator.remove();
+                }
             }
         }
 
@@ -499,13 +505,15 @@ public class ClientRadioManager {
             this.router = router;
         }
 
-        public void request(short mapping) {
+        public boolean request(short mapping) {
             if (attempts > 5) {
-                pendingRouters.remove(mapping);
                 CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.location);
-                return;
+                return false;
             }
+
+            attempts++;
             ClientServices.NETWORKING.sendToServer(new ServerboundRequestRouterPacket(router.getReference(), router.getClass().getSimpleName(), mapping));
+            return true;
         }
 
         public static <R extends RadioRouter> PendingRouter<R> of(R router) {
