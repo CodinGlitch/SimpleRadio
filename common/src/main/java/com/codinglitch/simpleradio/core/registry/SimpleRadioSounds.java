@@ -12,4 +12,6 @@ public class SimpleRadioSounds {
 
     public static final SoundEvent TILT_MICROPHONE = SoundEvent.createVariableRangeEvent(new ResourceLocation(CommonSimpleRadio.ID, "tilt_microphone"));
     public static final SoundEvent PRESS_MICROPHONE = SoundEvent.createVariableRangeEvent(new ResourceLocation(CommonSimpleRadio.ID, "press_microphone"));
+
+    public static final SoundEvent SPIN_INSULATOR = SoundEvent.createVariableRangeEvent(new ResourceLocation(CommonSimpleRadio.ID, "spin_insulator"));
 }
