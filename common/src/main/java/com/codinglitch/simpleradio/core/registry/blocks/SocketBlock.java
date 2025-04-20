@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,18 +39,23 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
     public static final BooleanProperty EMPTY = BooleanProperty.create("empty");
     public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
 
-    private static final VoxelShape TOP_SHAPE = Shapes.or(
-            Block.box(5.0, 0.0, 7.0, 6.0, 5.0, 9.0),
-            Block.box(10.0, 0.0, 7.0, 11.0, 5.0, 9.0),
-            Block.box(6.0, 1.0, 5.0, 10.0, 7.0, 11.0)
-    );
-    private static final VoxelShape BOTTOM_SHAPE = Block.box(6.0, 11.0, 6.0, 10.0, 16.0, 10.0);
+    private static final VoxelShape TOP_SHAPE = Block.box(6.0, 1.0, 5.0, 10.0, 7.0, 11.0);
+    private static final VoxelShape TOP_ROTATED_SHAPE = Block.box(5.0, 1.0, 6.0, 11.0, 7.0, 10.0);
 
-    private static final VoxelShape NORTH_SHAPE = Block.box(6.0, 6.0, 11.0, 10.0, 10.0, 16.0);
-    private static final VoxelShape SOUTH_SHAPE = Block.box(6.0, 6.0, 0.0, 10.0, 10.0, 5.0);
-    
-    private static final VoxelShape EAST_SHAPE = Block.box(0.0, 6.0, 6.0, 5.0, 10.0, 10.0);
-    private static final VoxelShape WEST_SHAPE = Block.box(11.0, 6.0, 6.0, 16.0, 10.0, 10.0);
+    private static final VoxelShape BOTTOM_SHAPE = Block.box(6.0, 9.0, 5.0, 10.0, 15.0, 11.0);
+    private static final VoxelShape BOTTOM_ROTATED_SHAPE = Block.box(5.0, 9.0, 6.0, 11.0, 15.0, 10.0);
+
+    private static final VoxelShape NORTH_SHAPE = Block.box(6.0, 5.0, 9.0, 10.0, 11.0, 15.0);
+    private static final VoxelShape NORTH_ROTATED_SHAPE = Block.box(5.0, 6.0, 9.0, 11.0, 10.0, 15.0);
+
+    private static final VoxelShape SOUTH_SHAPE = Block.box(6.0, 5.0, 1.0, 10.0, 11.0, 7);
+    private static final VoxelShape SOUTH_ROTATED_SHAPE = Block.box(5.0, 6.0, 1.0, 11.0, 10.0, 7.0);
+
+    private static final VoxelShape WEST_SHAPE = Block.box(9.0, 5.0, 6.0, 15.0, 11.0, 10.0);
+    private static final VoxelShape WEST_ROTATED_SHAPE = Block.box(9.0, 6.0, 5.0, 15.0, 10.0, 11.0);
+
+    private static final VoxelShape EAST_SHAPE = Block.box(1.0, 5.0, 6.0, 7.0, 11.0, 10.0);
+    private static final VoxelShape EAST_ROTATED_SHAPE = Block.box(1.0, 6.0, 5.0, 7.0, 10.0, 11.0);
 
     public SocketBlock(Properties properties) {
         super(properties);
@@ -165,17 +169,14 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
+        boolean rotated = state.getValue(ROTATED);
         return switch (state.getValue(FACING)) {
-            case DOWN -> BOTTOM_SHAPE;
-            case UP -> Shapes.or(
-                    Block.box(5.0, 0.0, 7.0, 6.0, 5.0, 9.0),
-                    Block.box(10.0, 0.0, 7.0, 11.0, 5.0, 9.0),
-                    Block.box(6.0, 1.0, 5.0, 10.0, 7.0, 11.0)
-            );
-            case NORTH -> NORTH_SHAPE;
-            case SOUTH -> SOUTH_SHAPE;
-            case WEST -> WEST_SHAPE;
-            case EAST -> EAST_SHAPE;
+            case UP -> rotated ? TOP_ROTATED_SHAPE : TOP_SHAPE;
+            case DOWN -> rotated ? BOTTOM_ROTATED_SHAPE : BOTTOM_SHAPE;
+            case NORTH -> rotated ? NORTH_ROTATED_SHAPE : NORTH_SHAPE;
+            case SOUTH -> rotated ? SOUTH_ROTATED_SHAPE : SOUTH_SHAPE;
+            case WEST -> rotated ? WEST_ROTATED_SHAPE : WEST_SHAPE;
+            case EAST -> rotated ? EAST_ROTATED_SHAPE : EAST_SHAPE;
         };
     }
 
