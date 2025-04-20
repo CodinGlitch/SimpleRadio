@@ -46,9 +46,16 @@ public class SocketRenderer implements BlockEntityRenderer<SocketBlockEntity> {
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
             poseStack.mulPose(Axis.YP.rotationDegrees(state.getValue(SocketBlock.ROTATED) ? 90 : 0));
 
+            float rotation = 0.5f;
+            if (blockEntity.connector != null) {
+                Vec3 pos = blockEntity.getBlockPos().getCenter();
+                rotation = (float) (3f + blockEntity.connector.distanceToSqr(pos.x, pos.y, pos.z)*0.5f);
+            }
 
+            blockEntity.rotation = Math.lerp(blockEntity.rotation, rotation, Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.2f, 1));
 
-            model.wire.visible = !blockEntity.getWires().isEmpty();
+            model.wire.visible = !blockEntity.getWires().isEmpty() || blockEntity.connector != null;
+            model.spool.xRot = blockEntity.rotation;
 
             RadioRouter router = ClientRadioManager.getRouter(blockEntity.id);
             if (router != null) {

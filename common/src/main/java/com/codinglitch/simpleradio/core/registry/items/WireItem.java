@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
+import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -30,8 +31,6 @@ public class WireItem extends Item implements WorldTicking {
         BlockPos pos = context.getClickedPos();
         ItemStack stack = context.getItemInHand();
 
-        if (level.isClientSide) return super.useOn(context);
-
         BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof Socket interactingSocket) {
             CommonSimpleRadio.info(interactingSocket.getReference());
@@ -50,6 +49,10 @@ public class WireItem extends Item implements WorldTicking {
 
                         //connecting.connectTo(centralBlockEntity);
                         level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 0.8f);
+                    } else {
+                        if (connectToBlockEntity instanceof SocketBlockEntity socketBlockEntity) {
+                            socketBlockEntity.connector = null;
+                        }
                     }
 
                     tag.remove("connectTo");
@@ -61,7 +64,12 @@ public class WireItem extends Item implements WorldTicking {
                 tag.putUUID("connectTo", interactingSocket.getReference());
                 tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
 
+                if (level.isClientSide() && blockEntity instanceof SocketBlockEntity socket) {
+                    socket.connector = context.getPlayer();
+                }
+
                 level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 1.1f);
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -82,6 +90,13 @@ public class WireItem extends Item implements WorldTicking {
         if (!isHolding.get()) {
             CompoundTag tag = stack.getOrCreateTag();
             if (tag.contains("connectTo")) {
+                BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
+
+                BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
+                if (level.isClientSide && connectToBlockEntity instanceof SocketBlockEntity socketBlockEntity) {
+                    socketBlockEntity.connector = null;
+                }
+
                 tag.remove("connectTo");
             }
         }
