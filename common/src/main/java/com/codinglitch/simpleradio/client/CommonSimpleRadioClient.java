@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
-import com.codinglitch.simpleradio.client.core.registry.models.SocketModel;
+import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
 import com.codinglitch.simpleradio.client.core.registry.renderers.*;
 import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
@@ -73,7 +73,7 @@ public class CommonSimpleRadioClient {
     public static void loadLayerDefinitions(BiConsumer<ModelLayerLocation, Supplier<LayerDefinition>> registry) {
         registry.accept(RadioModel.LAYER_LOCATION, RadioModel::createBodyLayer);
         registry.accept(MicrophoneModel.LAYER_LOCATION, MicrophoneModel::createBodyLayer);
-        registry.accept(SocketModel.LAYER_LOCATION, SocketModel::createBodyLayer);
+        registry.accept(InsulatorModel.LAYER_LOCATION, InsulatorModel::createBodyLayer);
     }
 
     // -- Entity Renderers -- \\
