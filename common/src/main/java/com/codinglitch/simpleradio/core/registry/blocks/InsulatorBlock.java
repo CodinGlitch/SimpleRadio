@@ -1,14 +1,11 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Routing;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
-import com.mojang.serialization.MapCodec;
-import net.minecraft.BlockUtil;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
