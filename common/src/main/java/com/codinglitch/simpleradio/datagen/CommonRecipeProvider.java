@@ -74,7 +74,7 @@ public class CommonRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_copper_ingot", has(Items.COPPER_INGOT))
                 .save(conditionBuilder.apply(SimpleRadioItems.COPPER_WIRE));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, SimpleRadioItems.SOCKET)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, SimpleRadioItems.INSULATOR)
                 .define('I', Items.IRON_INGOT)
                 .define('N', Items.IRON_NUGGET)
                 .define('C', Items.COPPER_INGOT)
@@ -82,7 +82,7 @@ public class CommonRecipeProvider extends RecipeProvider {
                 .pattern(" I ")
                 .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
                 .unlockedBy("has_copper_ingot", has(Items.COPPER_INGOT))
-                .save(conditionBuilder.apply(SimpleRadioItems.SOCKET));
+                .save(conditionBuilder.apply(SimpleRadioItems.INSULATOR));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, SimpleRadioItems.RADIO)
                 .define('I', Items.IRON_INGOT)

@@ -1,19 +1,9 @@
 package com.codinglitch.simpleradio.core.registry;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.blocks.*;
 import com.codinglitch.simpleradio.platform.Services;
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import org.apache.logging.log4j.util.BiConsumer;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +34,8 @@ public class SimpleRadioBlockEntities {
             ReceiverBlockEntity::new, id("receiver"), SimpleRadioBlocks.RECEIVER
     );
 
-    public static final BlockEntityType<SocketBlockEntity> SOCKET = Services.REGISTRY.registerBlockEntity(
-            SocketBlockEntity::new, id("socket"), SimpleRadioBlocks.SOCKET
+    public static final BlockEntityType<InsulatorBlockEntity> INSULATOR = Services.REGISTRY.registerBlockEntity(
+            InsulatorBlockEntity::new, id("socket"), SimpleRadioBlocks.INSULATOR
     );
 
     public static final BlockEntityType<FrequencerBlockEntity> FREQUENCER = Services.REGISTRY.registerBlockEntity(

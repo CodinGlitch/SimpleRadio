@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
-import com.codinglitch.lexiconfig.events.RevisionEvent;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.registry.items.*;
@@ -31,7 +30,7 @@ public class SimpleRadioItems {
     public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)), null);
 
     public static Item ANTENNA = register(id("antenna"), new BlockItem(SimpleRadioBlocks.ANTENNA, new Item.Properties().stacksTo(16)));
-    public static Item SOCKET = register(id("socket"), new BlockItem(SimpleRadioBlocks.SOCKET, new Item.Properties().stacksTo(16)));
+    public static Item INSULATOR = register(id("insulator"), new BlockItem(SimpleRadioBlocks.INSULATOR, new Item.Properties().stacksTo(16)));
 
     // ---- Modules ---- \\
     public static Item TRANSMITTING_MODULE = register(id("transmitting_module"), new Item(new Item.Properties()));

@@ -81,7 +81,7 @@ public interface Frequencing {
      * @return The position of the base of the antenna.
      */
     default BlockPos getAntennaBase(BlockPos pos, Level level) {
-        BlockPos travelledPosition = SocketBlock.travelExtension(pos, level);
+        BlockPos travelledPosition = InsulatorBlock.travelExtension(pos, level);
         if (travelledPosition != pos) return travelledPosition.above();
 
         return pos.above();

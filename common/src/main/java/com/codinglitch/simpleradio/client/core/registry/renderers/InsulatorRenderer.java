@@ -1,13 +1,9 @@
 package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.client.core.registry.models.SocketModel;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
-import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
-import com.codinglitch.simpleradio.core.registry.blocks.SocketBlock;
-import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
+import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
+import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -21,30 +17,29 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
-import org.joml.Vector3f;
 
-public class SocketRenderer implements BlockEntityRenderer<SocketBlockEntity> {
+public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEntity> {
     private SocketModel model;
 
-    public SocketRenderer(BlockEntityRendererProvider.Context context) {
+    public InsulatorRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new SocketModel(context.bakeLayer(SocketModel.LAYER_LOCATION));
     }
 
     @Override
-    public void render(SocketBlockEntity blockEntity, float tickDelta, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
+    public void render(InsulatorBlockEntity blockEntity, float tickDelta, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
         BlockState state = blockEntity.getBlockState();
         Block block = state.getBlock();
 
-        if (block instanceof SocketBlock socketBlock && blockEntity.id != null) {
+        if (block instanceof InsulatorBlock insulatorBlock && blockEntity.id != null) {
             poseStack.pushPose();
             poseStack.translate(0.5f, 0.5f, 0.5f);
 
-            Direction facing = state.getValue(SocketBlock.FACING);
+            Direction facing = state.getValue(InsulatorBlock.FACING);
             poseStack.mulPose(facing.getRotation());
             poseStack.translate(0f, 1f, 0f);
 
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
-            poseStack.mulPose(Axis.YP.rotationDegrees(state.getValue(SocketBlock.ROTATED) ? 90 : 0));
+            poseStack.mulPose(Axis.YP.rotationDegrees(state.getValue(InsulatorBlock.ROTATED) ? 90 : 0));
 
             float rotation = 0.5f;
             if (blockEntity.connector != null) {

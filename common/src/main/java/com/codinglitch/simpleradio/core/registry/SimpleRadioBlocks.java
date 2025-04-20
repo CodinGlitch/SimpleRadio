@@ -1,14 +1,9 @@
 package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.core.registry.blocks.*;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 
 import java.util.HashMap;
@@ -46,8 +41,8 @@ public class SimpleRadioBlocks {
             Block.Properties.of().strength(2.0F, 4.0F).sound(SoundType.METAL).instabreak()
     ));
 
-    public static SocketBlock SOCKET = (SocketBlock) register(id("socket"), new SocketBlock(
-            Block.Properties.of().strength(2.0F, 4.0F).sound(SoundType.METAL).instabreak()
+    public static InsulatorBlock INSULATOR = (InsulatorBlock) register(id("insulator"), new InsulatorBlock(
+            Block.Properties.of().strength(2.0F, 4.0F).sound(SoundType.WOOD).instabreak()
     ));
 
     private static Block register(ResourceLocation location, Block block) {
