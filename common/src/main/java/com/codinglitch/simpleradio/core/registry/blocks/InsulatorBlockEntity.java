@@ -38,7 +38,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
         this.connector = connector;
 
         if (this.hasLevel() && !this.level.isClientSide) {
-            this.level.playSound(null, this.getBlockPos(), SimpleRadioSounds.SPIN_INSULATOR, SoundSource.BLOCKS, 1, 0.9f + this.level.random.nextFloat()*0.2f);
+            this.level.playSound(null, this.getBlockPos(), SimpleRadioSounds.SPIN_INSULATOR, SoundSource.BLOCKS, 0.5f, 0.9f + this.level.random.nextFloat()*0.2f);
         }
     }
 
@@ -46,7 +46,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
         this.connector = null;
 
         if (this.hasLevel() && !this.level.isClientSide) {
-            this.level.playSound(null, this.getBlockPos(), SimpleRadioSounds.SPIN_INSULATOR, SoundSource.BLOCKS, 1, 0.9f + this.level.random.nextFloat()*0.2f);
+            this.level.playSound(null, this.getBlockPos(), SimpleRadioSounds.SPIN_INSULATOR, SoundSource.BLOCKS, 0.5f, 0.9f + this.level.random.nextFloat()*0.2f);
         }
     }
 
