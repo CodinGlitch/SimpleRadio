@@ -11,14 +11,14 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
-public class SocketModel extends Model {
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(CommonSimpleRadio.id("socketmodel"), "main");
-	public static final ResourceLocation TEXTURE_LOCATION = CommonSimpleRadio.id("textures/block/socket.png");
+public class InsulatorModel extends Model {
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(CommonSimpleRadio.id("insulatormodel"), "main");
+	public static final ResourceLocation TEXTURE_LOCATION = CommonSimpleRadio.id("textures/block/insulator.png");
 	private final ModelPart bone;
 	public final ModelPart spool;
 	public final ModelPart wire;
 
-	public SocketModel(ModelPart root) {
+	public InsulatorModel(ModelPart root) {
 		super(RenderType::entitySolid);
 		this.bone = root.getChild("bone");
 		this.spool = this.bone.getChild("spool");

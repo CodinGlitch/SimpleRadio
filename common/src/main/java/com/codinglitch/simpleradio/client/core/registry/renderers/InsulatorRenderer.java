@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.client.core.registry.models.SocketModel;
+import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.radio.RadioRouter;
@@ -19,10 +19,10 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
 
 public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEntity> {
-    private SocketModel model;
+    private InsulatorModel model;
 
     public InsulatorRenderer(BlockEntityRendererProvider.Context context) {
-        this.model = new SocketModel(context.bakeLayer(SocketModel.LAYER_LOCATION));
+        this.model = new InsulatorModel(context.bakeLayer(InsulatorModel.LAYER_LOCATION));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEnti
                 );*/
             }
 
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(model.renderType(SocketModel.TEXTURE_LOCATION));
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(model.renderType(InsulatorModel.TEXTURE_LOCATION));
             model.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1, 1, 1, 1);
 
             poseStack.popPose();
