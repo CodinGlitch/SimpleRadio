@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +33,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class InsulatorBlock extends BaseEntityBlock implements Routing {
-    public static final MapCodec<InsulatorBlock> CODEC = simpleCodec(InsulatorBlock::new);
-
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty EMPTY = BooleanProperty.create("empty");
     public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
@@ -61,11 +58,6 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
     public InsulatorBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ROTATED, false).setValue(EMPTY, true));
-    }
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     public static BlockPos travelExtension(BlockPos pos, LevelAccessor level) {

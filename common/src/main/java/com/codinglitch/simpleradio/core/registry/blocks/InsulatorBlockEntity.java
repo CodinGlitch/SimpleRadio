@@ -4,7 +4,6 @@ import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
@@ -13,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,22 +30,6 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
 
     public InsulatorBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.INSULATOR, pos, state);
-    }
-
-    public void setConnector(Player connector) {
-        this.connector = connector;
-
-        if (this.hasLevel() && !this.level.isClientSide) {
-            this.level.playSound(null, this.getBlockPos(), SimpleRadioSounds.SPIN_INSULATOR, SoundSource.BLOCKS, 0.5f, 0.9f + this.level.random.nextFloat()*0.2f);
-        }
-    }
-
-    public void removeConnector() {
-        this.connector = null;
-
-        if (this.hasLevel() && !this.level.isClientSide) {
-            this.level.playSound(null, this.getBlockPos(), SimpleRadioSounds.SPIN_INSULATOR, SoundSource.BLOCKS, 0.5f, 0.9f + this.level.random.nextFloat()*0.2f);
-        }
     }
 
     @Override

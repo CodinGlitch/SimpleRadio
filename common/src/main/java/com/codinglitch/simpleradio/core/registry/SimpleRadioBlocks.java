@@ -42,7 +42,7 @@ public class SimpleRadioBlocks {
     ));
 
     public static InsulatorBlock INSULATOR = (InsulatorBlock) register(id("insulator"), new InsulatorBlock(
-            Block.Properties.of().strength(2.0F, 3.0F).sound(SoundType.WOOD).instabreak()
+            Block.Properties.of().strength(2.0F, 4.0F).sound(SoundType.WOOD).instabreak()
     ));
 
     private static Block register(ResourceLocation location, Block block) {
