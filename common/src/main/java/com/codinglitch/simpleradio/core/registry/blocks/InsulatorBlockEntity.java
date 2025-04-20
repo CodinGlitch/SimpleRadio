@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -19,11 +18,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Stream;
 
-public class SocketBlockEntity extends BlockEntity implements Socket {
+public class InsulatorBlockEntity extends BlockEntity implements Socket {
 
     public UUID id;
     public RadioRouter router;
@@ -31,8 +28,8 @@ public class SocketBlockEntity extends BlockEntity implements Socket {
     public float rotation = 0;
     public Player connector;
 
-    public SocketBlockEntity(BlockPos pos, BlockState state) {
-        super(SimpleRadioBlockEntities.SOCKET, pos, state);
+    public InsulatorBlockEntity(BlockPos pos, BlockState state) {
+        super(SimpleRadioBlockEntities.INSULATOR, pos, state);
     }
 
     @Override
@@ -89,11 +86,11 @@ public class SocketBlockEntity extends BlockEntity implements Socket {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, SocketBlockEntity blockEntity) {
+    public static void tick(Level level, BlockPos pos, BlockState state, InsulatorBlockEntity blockEntity) {
         if (blockEntity.router == null && blockEntity.id != null) {
             WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(pos, level, pos));
 
-            blockEntity.router = SimpleRadioBlocks.SOCKET.getOrCreateRouter(location, blockEntity.id, state);
+            blockEntity.router = SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, blockEntity.id, state);
         }
     }
 }

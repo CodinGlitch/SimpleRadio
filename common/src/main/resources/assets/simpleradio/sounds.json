@@ -32,10 +32,10 @@
     ],
     "subtitle": "subtitles.simpleradio.tilt_microphone"
   },
-  "spin_socket": {
-    "subtitle": "subtitles.simpleradio.spin_socket",
+  "spin_insulator": {
+    "subtitle": "subtitles.simpleradio.spin_insulator",
     "sounds": [
-      "simpleradio:spin_socket"
+      "simpleradio:spin_insulator"
     ]
   }
 }

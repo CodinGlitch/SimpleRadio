@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class SocketBlock extends BaseEntityBlock implements Routing {
-    public static final MapCodec<SocketBlock> CODEC = simpleCodec(SocketBlock::new);
+public class InsulatorBlock extends BaseEntityBlock implements Routing {
+    public static final MapCodec<InsulatorBlock> CODEC = simpleCodec(InsulatorBlock::new);
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty EMPTY = BooleanProperty.create("empty");
@@ -57,7 +57,7 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
     private static final VoxelShape EAST_SHAPE = Block.box(1.0, 5.0, 6.0, 7.0, 11.0, 10.0);
     private static final VoxelShape EAST_ROTATED_SHAPE = Block.box(1.0, 6.0, 5.0, 7.0, 10.0, 11.0);
 
-    public SocketBlock(Properties properties) {
+    public InsulatorBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ROTATED, false).setValue(EMPTY, true));
     }
@@ -72,18 +72,18 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
             BlockPos offsetPos = pos.relative(direction);
             BlockEntity blockEntity = level.getBlockEntity(offsetPos);
 
-            if (blockEntity instanceof SocketBlockEntity socketBlockEntity) {
-                List<Wire> wires = socketBlockEntity.getWires();
+            if (blockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+                List<Wire> wires = insulatorBlockEntity.getWires();
                 if (wires.isEmpty()) continue;
 
                 Wire wire = wires.get(0);
-                RadioRouter router = wire.transport(socketBlockEntity.getRouter());
+                RadioRouter router = wire.transport(insulatorBlockEntity.getRouter());
                 BlockPos routerPos = router.location.blockPos();
 
                 BlockState blockState = level.getBlockState(routerPos);
-                if (!(blockState.getBlock() instanceof SocketBlock)) continue;
+                if (!(blockState.getBlock() instanceof InsulatorBlock)) continue;
 
-                Direction routerDirection = blockState.getValue(SocketBlock.FACING);
+                Direction routerDirection = blockState.getValue(InsulatorBlock.FACING);
                 return routerPos.relative(routerDirection.getOpposite());
             }
         }
@@ -101,7 +101,7 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
         router.link = this.getClass();
         router.location = location;
 
-        Vec3i normal = state.getValue(SocketBlock.FACING).getOpposite().getNormal();
+        Vec3i normal = state.getValue(InsulatorBlock.FACING).getOpposite().getNormal();
         router.connectionOffset = new Vec3(normal.getX()*0.2f, normal.getY()*0.2f, normal.getZ()*0.2f);
 
         // Allow distribution through wires
@@ -198,12 +198,12 @@ public class SocketBlock extends BaseEntityBlock implements Routing {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new SocketBlockEntity(pos, state);
+        return new InsulatorBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, SimpleRadioBlockEntities.SOCKET, SocketBlockEntity::tick);
+        return createTickerHelper(type, SimpleRadioBlockEntities.INSULATOR, InsulatorBlockEntity::tick);
     }
 }

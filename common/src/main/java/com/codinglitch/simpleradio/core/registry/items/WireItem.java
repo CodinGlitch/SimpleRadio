@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio.core.registry.items;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
-import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
+import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -50,8 +50,8 @@ public class WireItem extends Item implements WorldTicking {
                         //connecting.connectTo(centralBlockEntity);
                         level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 0.8f);
                     } else {
-                        if (connectToBlockEntity instanceof SocketBlockEntity socketBlockEntity) {
-                            socketBlockEntity.connector = null;
+                        if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+                            insulatorBlockEntity.connector = null;
                         }
                     }
 
@@ -64,7 +64,7 @@ public class WireItem extends Item implements WorldTicking {
                 tag.putUUID("connectTo", interactingSocket.getReference());
                 tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
 
-                if (level.isClientSide() && blockEntity instanceof SocketBlockEntity socket) {
+                if (level.isClientSide() && blockEntity instanceof InsulatorBlockEntity socket) {
                     socket.connector = context.getPlayer();
                 }
 
@@ -93,8 +93,8 @@ public class WireItem extends Item implements WorldTicking {
                 BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
 
                 BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
-                if (level.isClientSide && connectToBlockEntity instanceof SocketBlockEntity socketBlockEntity) {
-                    socketBlockEntity.connector = null;
+                if (level.isClientSide && connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+                    insulatorBlockEntity.connector = null;
                 }
 
                 tag.remove("connectTo");
