@@ -162,7 +162,7 @@ public class Frequency implements Medium {
     public RadioReceiver tryAddReceiver(UUID id, WorldlyPosition location) {
         boolean isClient = location.isClientSide();
 
-        RadioReceiver receiver = isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
+        RadioReceiver receiver = null;//isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
         if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
 
         if (receiver == null)
@@ -178,7 +178,7 @@ public class Frequency implements Medium {
     public RadioReceiver tryAddReceiver(UUID id, Entity entity) {
         boolean isClient = entity.level().isClientSide;
 
-        RadioReceiver receiver = isClient ? ClientRadioManager.getReceiver(entity) : getReceiver(entity);
+        RadioReceiver receiver = null;//isClient ? ClientRadioManager.getReceiver(entity) : getReceiver(entity);
         if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
 
         if (receiver == null)
@@ -243,7 +243,7 @@ public class Frequency implements Medium {
     public RadioTransmitter tryAddTransmitter(UUID id, WorldlyPosition location) {
         boolean isClient = location.isClientSide();
 
-        RadioTransmitter transmitter = isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
+        RadioTransmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
         if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);
 
         if (transmitter == null)
@@ -259,7 +259,7 @@ public class Frequency implements Medium {
     public RadioTransmitter tryAddTransmitter(UUID id, Entity entity) {
         boolean isClient = entity.level().isClientSide;
 
-        RadioTransmitter transmitter = isClient ? ClientRadioManager.getTransmitter(entity) : getTransmitter(entity);
+        RadioTransmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(entity) : getTransmitter(entity);
         if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);
 
         if (transmitter == null)

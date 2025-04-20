@@ -225,7 +225,7 @@ public class RadioManager implements SimpleRadioApi {
     public static RadioSpeaker getOrCreateSpeaker(Entity owner, @Nullable UUID id) {
         boolean isClient = owner.level().isClientSide;
 
-        RadioSpeaker speaker = isClient ? ClientRadioManager.getSpeaker(owner) : getSpeaker(owner);
+        RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(owner) : getSpeaker(owner);
         if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : getSpeaker(id);
 
         return speaker != null ? speaker : new RadioSpeaker(owner, id);
@@ -235,7 +235,7 @@ public class RadioManager implements SimpleRadioApi {
     public static RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, @Nullable UUID id) {
         boolean isClient = location.level.isClientSide;
 
-        RadioSpeaker speaker = isClient ? ClientRadioManager.getSpeaker(location) : getSpeaker(location);
+        RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(location) : getSpeaker(location);
         if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : getSpeaker(id);
 
         return speaker != null ? speaker : new RadioSpeaker(location, id);
@@ -297,7 +297,7 @@ public class RadioManager implements SimpleRadioApi {
     public static RadioListener getOrCreateListener(Entity owner, @Nullable UUID id) {
         boolean isClient = owner.level().isClientSide;
 
-        RadioListener listener = isClient ? ClientRadioManager.getListener(owner) : getListener(owner);
+        RadioListener listener = null;//isClient ? ClientRadioManager.getListener(owner) : getListener(owner);
         if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : getListener(id);
 
         return listener != null ? listener : new RadioListener(owner, id);
@@ -306,7 +306,7 @@ public class RadioManager implements SimpleRadioApi {
     public static RadioListener getOrCreateListener(WorldlyPosition location, @Nullable UUID id) {
         boolean isClient = location.level.isClientSide;
 
-        RadioListener listener = isClient ? ClientRadioManager.getListener(location) : getListener(location);
+        RadioListener listener = null;//isClient ? ClientRadioManager.getListener(location) : getListener(location);
         if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : getListener(id);
 
         return listener != null ? listener : new RadioListener(location, id);
