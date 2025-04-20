@@ -47,7 +47,7 @@
   "block.simpleradio.frequencer": "Frequencer",
   "block.simpleradio.receiver": "Receiver",
   "block.simpleradio.transmitter": "Transmitter",
-  "block.simpleradio.socket": "Socket",
+  "block.simpleradio.insulator": "Insulator",
 
   "screen.simpleradio.frequencing.catalyst": "CATALYST",
   "screen.simpleradio.frequencing.efficiency": "EFFICIENCY: %s%%",
@@ -63,6 +63,11 @@
   "subtitles.simpleradio.radio_close": "Radio stops broadcasting",
 
   "subtitles.simpleradio.short_circuit": "Wire short-circuits",
+
+  "subtitles.simpleradio.tilt_microphone": "Microphone tilts",
+  "subtitles.simpleradio.press_microphone": "Microphone toggles",
+
+  "subtitles.simpleradio.spin_insulator": "Insulator spins",
 
   "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
   "tooltip.simpleradio.receiver_user": "User: %s"
