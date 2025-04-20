@@ -49,10 +49,10 @@ public class WireItem extends Item implements WorldTicking {
 
                         //connecting.connectTo(centralBlockEntity);
                         level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 0.8f);
-                    } else {
-                        if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
-                            insulatorBlockEntity.connector = null;
-                        }
+                    }
+
+                    if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+                        insulatorBlockEntity.removeConnector();;
                     }
 
                     tag.remove("connectTo");
@@ -64,8 +64,8 @@ public class WireItem extends Item implements WorldTicking {
                 tag.putUUID("connectTo", interactingSocket.getReference());
                 tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
 
-                if (level.isClientSide() && blockEntity instanceof InsulatorBlockEntity socket) {
-                    socket.connector = context.getPlayer();
+                if (blockEntity instanceof InsulatorBlockEntity socket) {
+                    socket.setConnector(context.getPlayer());
                 }
 
                 level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 1.1f);
@@ -93,8 +93,8 @@ public class WireItem extends Item implements WorldTicking {
                 BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
 
                 BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
-                if (level.isClientSide && connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
-                    insulatorBlockEntity.connector = null;
+                if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+                    insulatorBlockEntity.removeConnector();
                 }
 
                 tag.remove("connectTo");
