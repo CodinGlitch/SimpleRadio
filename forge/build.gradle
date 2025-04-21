@@ -40,7 +40,7 @@ minecraft {
             taskName 'Client'
             mods {
                 modClientRun {
-                    source sourceSets.main
+                    source sourceSets.development
                 }
             }
         }
@@ -51,7 +51,7 @@ minecraft {
             taskName 'Server'
             mods {
                 modServerRun {
-                    source sourceSets.main
+                    source sourceSets.development
                 }
             }
         }
@@ -63,7 +63,7 @@ minecraft {
             taskName 'Data'
             mods {
                 modDataRun {
-                    source sourceSets.main
+                    source sourceSets.development
                 }
             }
         }
@@ -97,16 +97,20 @@ dependencies {
     // Valkyrien Skies
     if (valkyrien_skies_env_versions.contains(minecraft_version)) {
         compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}"
-        compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}") // forge wont inherit the api from common for some reason
+        compileOnly "org.valkyrienskies.core:api:${valkyrien_skies_api_version}" // forge wont inherit the api from common for some reason
     }
 
     // Create
     if (create_env_versions.contains(minecraft_version)) {
-        implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
-        implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
-        compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
-        runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
-        implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
+        compileOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+        compileOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+        compileOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
+        compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+
+        devOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+        devOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+        devOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
+        devOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
     }
 
     // JEI / REI
@@ -122,7 +126,7 @@ dependencies {
 
     // Config mods
     if (config_mod == "configured") {
-        runtimeOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
+        devOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {
