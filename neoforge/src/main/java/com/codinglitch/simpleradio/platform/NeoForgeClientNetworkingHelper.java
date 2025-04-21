@@ -1,13 +1,14 @@
 package com.codinglitch.simpleradio.platform;
 
-import com.codinglitch.simpleradio.core.NeoforgeLoader;
-import com.codinglitch.simpleradio.core.central.Packeter;
 import com.codinglitch.simpleradio.platform.services.ClientNetworkingHelper;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public class NeoForgeClientNetworkingHelper implements ClientNetworkingHelper {
     @Override
-    public void sendToServer(Packeter packet) {
-        NeoforgeLoader.CHANNEL.send(PacketDistributor.SERVER.noArg(), packet);
+    public void sendToServer(CustomPacketPayload packet) {
+        if (Minecraft.getInstance().getConnection() != null) {
+            Minecraft.getInstance().getConnection().send(packet);
+        }
     }
 }

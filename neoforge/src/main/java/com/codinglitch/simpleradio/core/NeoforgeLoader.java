@@ -1,41 +1,30 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundRadioPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
+import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
-import com.codinglitch.simpleradio.platform.NeoForgeRegistryHelper;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.api.distmarker.Dist;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.NetworkEvent;
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.simple.MessageFunctions;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import org.apache.commons.lang3.function.TriConsumer;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NeoforgeLoader {
-    private static final String PROTOCOL_VERSION = "1.0";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(CommonSimpleRadio.ID, "main"), () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
-
-
     @SubscribeEvent
     public static void register(RegisterEvent event) {
         event.register(Registries.ITEM, helper -> SimpleRadioItems.ITEMS.forEach((location, itemHolder) -> helper.register(location, itemHolder.get())));
@@ -53,31 +42,32 @@ public class NeoforgeLoader {
 
     }
 
-    public static void loadPackets() {
-        int incrementer = 1;
+    @SubscribeEvent
+    public static void loadPackets(final RegisterPayloadHandlerEvent event) {
+        final IPayloadRegistrar registrar = event.registrar(CommonSimpleRadio.ID);
 
-        CHANNEL.registerMessage(incrementer++, ServerboundRadioUpdatePacket.class, ServerboundRadioUpdatePacket::encode, ServerboundRadioUpdatePacket::decode,
-                serverbound(ServerboundRadioUpdatePacket::handle));
+        SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
+            @Override
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, org.apache.logging.log4j.util.TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+                registrar.play(id, reader, payloadHandler -> payloadHandler
+                    .server((packet, context) -> {
+                        Player player = context.player().orElse(null);
+                        if (!(player instanceof ServerPlayer serverPlayer)) return;
+                        handler.accept(packet, serverPlayer.getServer(), serverPlayer);
+                    }));
+            }
+        });
 
-        CHANNEL.registerMessage(incrementer++, ClientboundRadioPacket.class, ClientboundRadioPacket::encode, ClientboundRadioPacket::decode,
-                clientbound(ClientboundRadioPacket::handle));
-    }
-
-    public static <P> MessageFunctions.MessageConsumer<P> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (packet, context) -> {
-            consumer.accept(packet, context.getSender().getServer(), context.getSender());
-            context.setPacketHandled(true);
-        };
-    }
-    public static <P> MessageFunctions.MessageConsumer<P> clientbound(Consumer<P> consumer) {
-        return (packet, context) -> {
-            consumer.accept(packet);
-            context.setPacketHandled(true);
-        };
+        SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
+            @Override
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
+                registrar.play(id, reader, payloadHandler -> payloadHandler
+                    .client((packet, context) -> handler.accept(packet)));
+            }
+        });
     }
 
     public static void load() {
         loadItems();
-        loadPackets();
     }
 }
