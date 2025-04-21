@@ -40,7 +40,7 @@ minecraft {
             taskName 'Client'
             mods {
                 modClientRun {
-                    source sourceSets.development
+                    source sourceSets.main
                 }
             }
         }
@@ -51,7 +51,7 @@ minecraft {
             taskName 'Server'
             mods {
                 modServerRun {
-                    source sourceSets.development
+                    source sourceSets.main
                 }
             }
         }
@@ -63,7 +63,7 @@ minecraft {
             taskName 'Data'
             mods {
                 modDataRun {
-                    source sourceSets.development
+                    source sourceSets.main
                 }
             }
         }
@@ -96,7 +96,7 @@ dependencies {
 
     // Valkyrien Skies
     if (valkyrien_skies_env_versions.contains(minecraft_version)) {
-        compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}"
+        compileOnly fg.deobf("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}")
         compileOnly "org.valkyrienskies.core:api:${valkyrien_skies_api_version}" // forge wont inherit the api from common for some reason
     }
 
