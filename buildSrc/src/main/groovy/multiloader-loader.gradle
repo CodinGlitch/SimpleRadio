@@ -13,6 +13,20 @@ configurations {
     apiJava {
         canBeResolved = true
     }
+
+    devOnly {
+        canBeDeclared = true
+        extendsFrom(runtimeOnly)
+    }
+}
+
+sourceSets {
+    development {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+
+        runtimeClasspath += configurations.devOnly
+    }
 }
 
 dependencies {

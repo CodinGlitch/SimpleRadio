@@ -29,9 +29,9 @@ dependencies {
 
     // Voice Chat Interaction
     modCompileOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
-    modCompileOnly include("eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}")
-    modRuntimeOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
-    modRuntimeOnly include("eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}")
+    modCompileOnly "eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}"
+    modLocalRuntime "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
+    modLocalRuntime "eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}"
 
     // Vibrative Voice
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
@@ -41,7 +41,7 @@ dependencies {
     // Valkyrien Skies
     if (valkyrien_skies_env_versions.contains(minecraft_version)) {
         modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
-        modRuntimeOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
+        modLocalRuntime("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
     }
 
     // JEI / REI
@@ -50,14 +50,14 @@ dependencies {
         modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
         modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
         // at runtime, use the full JEI jar for Fabric
-        modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+        modLocalRuntime("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
     } else if (recipe_viewer == "rei") {
         // TODO: add rei to devenv
     }
 
     // Config mods
     if (config_mod == "configured") {
-        modRuntimeOnly "com.mrcrayfish:configured-fabric:${configured_version}"
+        modLocalRuntime "com.mrcrayfish:configured-fabric:${configured_version}"
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {
