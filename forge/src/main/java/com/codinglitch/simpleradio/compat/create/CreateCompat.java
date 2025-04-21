@@ -4,8 +4,8 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlock;
-import com.codinglitch.simpleradio.core.registry.blocks.SocketBlockEntity;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
@@ -48,7 +48,7 @@ public class CreateCompat {
                 SimpleRadioBlocks.MICROPHONE,
                 SimpleRadioBlocks.RECEIVER,
                 SimpleRadioBlocks.TRANSMITTER,
-                SimpleRadioBlocks.SOCKET
+                SimpleRadioBlocks.INSULATOR
         );
     }
 
@@ -60,8 +60,8 @@ public class CreateCompat {
             centralBlockEntity.listener = null;
 
             //centralBlockEntity.frequency = null;
-        } else if (blockEntity instanceof SocketBlockEntity socketBlockEntity) {
-            socketBlockEntity.router = null;
+        } else if (blockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+            insulatorBlockEntity.router = null;
         }
     }
 
