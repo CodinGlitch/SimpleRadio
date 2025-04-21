@@ -36,7 +36,7 @@ public class SimpleRadioRecipeProvider extends RecipeProvider implements ICondit
             @Override
             public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
                 ConditionalRecipe.builder()
-                        .condition(new ItemsEnabledCondition("microphone"))
+                        .condition(new ItemsEnabledCondition(location.getPath()))
                         .recipe(id, recipe, advancementHolder)
                         .save(exporter, location);
             }
@@ -44,7 +44,7 @@ public class SimpleRadioRecipeProvider extends RecipeProvider implements ICondit
             @Override
             public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable ResourceLocation advancementId, @Nullable JsonElement advancement) {
                 ConditionalRecipe.builder()
-                        .condition(new ItemsEnabledCondition("microphone"))
+                        .condition(new ItemsEnabledCondition(location.getPath()))
                         .recipe(exporter -> exporter.accept(id, recipe, advancementId, advancement))
                         .save(exporter, location);
             }
