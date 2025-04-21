@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio;
 
 
-import com.codinglitch.simpleradio.core.NeoforgeLoader;
+import com.codinglitch.simpleradio.core.NeoForgeLoader;
 import net.neoforged.fml.common.Mod;
 
 @Mod(CommonSimpleRadio.ID)
@@ -17,6 +17,6 @@ public class SimpleRadio {
         CommonSimpleRadio.info("Hello NeoForge world!");
         CommonSimpleRadio.initialize();
 
-        NeoforgeLoader.load();
+        NeoForgeLoader.load();
     }
 }
