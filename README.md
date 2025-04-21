@@ -2,11 +2,11 @@
 <br><br>
 
 <div align="center" style="text-align:center;">
-<a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://github.com/user-attachments/assets/03a71fc7-a02a-4425-b0bf-5a16a252cfcc"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://ko-fi.com/codinglitch"><img alt="Ko-fi Badge" src="https://github.com/user-attachments/assets/9776503f-d44b-4237-a2d7-d0d8670cb5fa"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://discord.gg/8zDE5ZTqCj"><img alt="Discord Badge" src="https://github.com/user-attachments/assets/f7e24fc0-101f-41f1-b489-42873aa45e42"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Badge" src="https://github.com/user-attachments/assets/e7eccf85-61dd-4787-8e0e-ad928bd20bf4"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://modrinth.com/mod/simple-radio"><img alt="Modrinth Badge" src="https://github.com/user-attachments/assets/f1208ac6-f6d7-472f-a0bc-1482c6a27190"></a>
+<a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://github.com/user-attachments/assets/17fbbf5d-6656-4d03-b550-945d31db9937"></a>
+<a href="https://ko-fi.com/codinglitch"><img alt="Ko-fi Badge" src="https://github.com/user-attachments/assets/7d8bf901-13de-4d3b-8a07-b1126da2c4a2"></a>
+<a href="https://discord.gg/8zDE5ZTqCj"><img alt="Discord Badge" src="https://github.com/user-attachments/assets/11b0fd7b-9415-4487-abee-282fcbde3a18"></a>
+<a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Badge" src="https://github.com/user-attachments/assets/463c2b34-05b4-44b8-b4ce-da884307cc06"></a>
+<a href="https://modrinth.com/mod/simple-radio"><img alt="Modrinth Badge" src="https://github.com/user-attachments/assets/03f471ac-d5c3-4d37-8014-376e09f1b145"></a>
 </div>
 <br>
 <div align="center" style="text-align:center;">
