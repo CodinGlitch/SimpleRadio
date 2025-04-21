@@ -1,21 +1,18 @@
 <div align="center" style="text-align:center;"><img style="width:50%;" src="https://github.com/user-attachments/assets/074c208f-b8d8-472a-97d7-bf026d5638f9"></div>
-<br>
+<br><br>
 
 <div align="center" style="text-align:center;">
-<a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://img.shields.io/badge/CodinGlitch-red?style=flat-square&logo=patreon"></a>
-<a href="https://ko-fi.com/codinglitch"><img alt="Ko-fi Badge" src="https://img.shields.io/badge/CodinGlitch-white?style=flat-square&logo=kofi"></a>
-<a href="https://discord.gg/8zDE5ZTqCj"><img alt="Discord" src="https://img.shields.io/discord/1192568922185146559?style=flat-square&logo=discord&label=Discord&labelColor=222222&color=5865f2"></a>
+<a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://github.com/user-attachments/assets/17fbbf5d-6656-4d03-b550-945d31db9937"></a>
+<a href="https://ko-fi.com/codinglitch"><img alt="Ko-fi Badge" src="https://github.com/user-attachments/assets/7d8bf901-13de-4d3b-8a07-b1126da2c4a2"></a>
+<a href="https://discord.gg/8zDE5ZTqCj"><img alt="Discord Badge" src="https://github.com/user-attachments/assets/11b0fd7b-9415-4487-abee-282fcbde3a18"></a>
+<a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Badge" src="https://github.com/user-attachments/assets/463c2b34-05b4-44b8-b4ce-da884307cc06"></a>
+<a href="https://modrinth.com/mod/simple-radio"><img alt="Modrinth Badge" src="https://github.com/user-attachments/assets/03f471ac-d5c3-4d37-8014-376e09f1b145"></a>
 </div>
-
+<br>
 <div align="center" style="text-align:center;">
+<a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="Static Badge" src="https://img.shields.io/badge/License-GPLv3-darkred?style=flat-square&labelColor=222222"></a>
 <a href="https://github.com/CodinGlitch/SimpleRadio"><img alt="Github Badge" src="https://img.shields.io/badge/SimpleRadio-222222?style=flat-square&logo=github"></a>
 <a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Game Versions" src="https://img.shields.io/modrinth/game-versions/simple-radio?style=flat-square&label=Available%20for&labelColor=222222&color=white"></a>
-<a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="Static Badge" src="https://img.shields.io/badge/License-GPLv3-darkred?style=flat-square&labelColor=222222"></a>
-</div>
-
-<div align="center" style="text-align:center;">
-<a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Downloads" src="https://img.shields.io/curseforge/dt/820070?style=flat-square&logo=curseforge&label=CurseForge&labelColor=222222&color=red"></a>
-<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/simple-radio?style=flat-square&logo=modrinth&label=Modrinth&labelColor=222222&color=1bd96a"></a>
 </div>
 
 ---
