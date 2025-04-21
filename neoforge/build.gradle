@@ -70,4 +70,15 @@ dependencies {
     } else if (recipe_viewer == "rei") {
         // TODO: add rei to devenv
     }
+
+    // Config mods
+    if (config_mod == "configured") {
+        devOnly "com.mrcrayfish:configured-neoforge:${configured_version}"
+    } else if (config_mod == "cloth_config") {
+
+    } else if (config_mod == "owo") {
+
+    } else if (config_mod == "config_screens") {
+
+    }
 }
