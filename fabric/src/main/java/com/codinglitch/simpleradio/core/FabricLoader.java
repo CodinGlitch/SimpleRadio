@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
+import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.google.gson.JsonArray;
@@ -15,6 +16,7 @@ import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +24,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -41,23 +44,21 @@ public class FabricLoader {
     }
 
     public static void loadPackets() {
-        ServerPlayNetworking.registerGlobalReceiver(ServerboundRadioUpdatePacket.ID,
-                serverbound(ServerboundRadioUpdatePacket::decode, ServerboundRadioUpdatePacket::handle));
-        ServerPlayNetworking.registerGlobalReceiver(ServerboundRequestRouterPacket.ID,
-                serverbound(ServerboundRequestRouterPacket::decode, ServerboundRequestRouterPacket::handle));
+        SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
+            @Override
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+                ServerPlayNetworking.registerGlobalReceiver(id, serverbound(reader, handler));
+            }
+        });
     }
 
     public static void loadClientPackets() {
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundRegisterRouterPacket.ID,
-                clientbound(ClientboundRegisterRouterPacket::decode, ClientboundRegisterRouterPacket::handle));
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundActivityPacket.ID,
-                clientbound(ClientboundActivityPacket::decode, ClientboundActivityPacket::handle));
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundTransceiverPacket.ID,
-                clientbound(ClientboundTransceiverPacket::decode, ClientboundTransceiverPacket::handle));
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundWireEffectPacket.ID,
-                clientbound(ClientboundWireEffectPacket::decode, ClientboundWireEffectPacket::handle));
-        ClientPlayNetworking.registerGlobalReceiver(ClientboundSpeakSoundPacket.ID,
-                clientbound(ClientboundSpeakSoundPacket::decode, ClientboundSpeakSoundPacket::handle));
+        SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
+            @Override
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
+                ClientPlayNetworking.registerGlobalReceiver(id, clientbound(reader, handler));
+            }
+        });
     }
 
     public static <P> ServerPlayNetworking.PlayChannelHandler serverbound(Function<FriendlyByteBuf, P> decoder, TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {

@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
@@ -8,6 +9,9 @@ import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -26,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
@@ -74,35 +79,31 @@ public class ForgeLoader {
     public static void loadPackets() {
         AtomicInteger index = new AtomicInteger();
 
-        CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index.getAndIncrement()).decoder(ServerboundRadioUpdatePacket::decode).encoder(ServerboundRadioUpdatePacket::encode)
-                .consumerMainThread(serverbound(ServerboundRadioUpdatePacket::handle)).add();
-        CHANNEL.messageBuilder(ServerboundRequestRouterPacket.class, index.getAndIncrement()).decoder(ServerboundRequestRouterPacket::decode).encoder(ServerboundRequestRouterPacket::encode)
-                .consumerMainThread(serverbound(ServerboundRequestRouterPacket::handle)).add();
+        SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
+            @Override
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+                CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index.getAndIncrement())
+                        .decoder(ServerboundRadioUpdatePacket::read)
+                        .encoder(ServerboundRadioUpdatePacket::write)
+                        .consumerMainThread((packet, context) -> {
+                            handler.accept((P) packet, context.getSender().getServer(), context.getSender());
+                            context.setPacketHandled(true);
+                        }).add();
+            }
+        });
 
-        CHANNEL.messageBuilder(ClientboundRegisterRouterPacket.class, index.getAndIncrement()).decoder(ClientboundRegisterRouterPacket::decode).encoder(ClientboundRegisterRouterPacket::encode)
-                .consumerMainThread(clientbound(ClientboundRegisterRouterPacket::handle)).add();
-        CHANNEL.messageBuilder(ClientboundActivityPacket.class, index.getAndIncrement()).decoder(ClientboundActivityPacket::decode).encoder(ClientboundActivityPacket::encode)
-                .consumerMainThread(clientbound(ClientboundActivityPacket::handle)).add();
-        CHANNEL.messageBuilder(ClientboundTransceiverPacket.class, index.getAndIncrement()).decoder(ClientboundTransceiverPacket::decode).encoder(ClientboundTransceiverPacket::encode)
-                .consumerMainThread(clientbound(ClientboundTransceiverPacket::handle)).add();
-        CHANNEL.messageBuilder(ClientboundWireEffectPacket.class, index.getAndIncrement()).decoder(ClientboundWireEffectPacket::decode).encoder(ClientboundWireEffectPacket::encode)
-                .consumerMainThread(clientbound(ClientboundWireEffectPacket::handle)).add();
-
-        CHANNEL.messageBuilder(ClientboundSpeakSoundPacket.class, index.getAndIncrement()).decoder(ClientboundSpeakSoundPacket::decode).encoder(ClientboundSpeakSoundPacket::encode)
-                .consumerMainThread(clientbound(ClientboundSpeakSoundPacket::handle)).add();
-    }
-
-    private static <P> BiConsumer<P, CustomPayloadEvent.Context> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (packet, context) -> {
-            consumer.accept(packet, context.getSender().getServer(), context.getSender());
-            context.setPacketHandled(true);
-        };
-    }
-    public static <P> BiConsumer<P, CustomPayloadEvent.Context> clientbound(Consumer<P> consumer) {
-        return (packet, context) -> {
-            consumer.accept(packet);
-            context.setPacketHandled(true);
-        };
+        SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
+            @Override
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
+                CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index.getAndIncrement())
+                        .decoder(ServerboundRadioUpdatePacket::read)
+                        .encoder(ServerboundRadioUpdatePacket::write)
+                        .consumerMainThread((packet, context) -> {
+                            handler.accept((P) packet);
+                            context.setPacketHandled(true);
+                        }).add();
+            }
+        });
     }
 
     public static void loadItems() {
