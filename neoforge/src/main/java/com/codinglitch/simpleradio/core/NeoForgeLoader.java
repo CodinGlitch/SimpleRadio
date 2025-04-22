@@ -22,6 +22,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
 import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class NeoForgeLoader {
 
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, org.apache.logging.log4j.util.TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler, FriendlyByteBuf.Reader<P> reader) {
                 registrar.play(id, reader, payloadHandler -> payloadHandler
                     .server((packet, context) -> {
                         Player player = context.player().orElse(null);
@@ -89,7 +90,7 @@ public class NeoForgeLoader {
 
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler, FriendlyByteBuf.Reader<P> reader) {
                 registrar.play(id, reader, payloadHandler -> payloadHandler
                     .client((packet, context) -> handler.accept(packet)));
             }
