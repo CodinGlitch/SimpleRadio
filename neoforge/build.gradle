@@ -72,7 +72,7 @@ dependencies {
 
     // Config mods
     if (config_mod == "configured") {
-        devOnly "com.mrcrayfish:configured-neoforge:${configured_version}"
+        developmentRuntimeOnly "com.mrcrayfish:configured-neoforge:${configured_version}"
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {
