@@ -16,7 +16,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.ChannelBuilder;
@@ -30,7 +29,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
@@ -81,12 +79,11 @@ public class ForgeLoader {
 
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
-                CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index.getAndIncrement())
-                        .decoder(ServerboundRadioUpdatePacket::read)
-                        .encoder(ServerboundRadioUpdatePacket::write)
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler, FriendlyByteBuf.Reader<P> reader) {
+                CHANNEL.messageBuilder(packetClass, index.getAndIncrement())
+                        .decoder(reader).encoder(writer)
                         .consumerMainThread((packet, context) -> {
-                            handler.accept((P) packet, context.getSender().getServer(), context.getSender());
+                            handler.accept(packet, context.getSender().getServer(), context.getSender());
                             context.setPacketHandled(true);
                         }).add();
             }
@@ -94,12 +91,11 @@ public class ForgeLoader {
 
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
-                CHANNEL.messageBuilder(ServerboundRadioUpdatePacket.class, index.getAndIncrement())
-                        .decoder(ServerboundRadioUpdatePacket::read)
-                        .encoder(ServerboundRadioUpdatePacket::write)
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler, FriendlyByteBuf.Reader<P> reader) {
+                CHANNEL.messageBuilder(packetClass, index.getAndIncrement())
+                        .decoder(reader).encoder(writer)
                         .consumerMainThread((packet, context) -> {
-                            handler.accept((P) packet);
+                            handler.accept(packet);
                             context.setPacketHandled(true);
                         }).add();
             }
