@@ -3,7 +3,6 @@ package com.codinglitch.simpleradio.core;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
-import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,7 +45,7 @@ public class FabricLoader {
     public static void loadPackets() {
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler, FriendlyByteBuf.Reader<P> reader) {
                 ServerPlayNetworking.registerGlobalReceiver(id, serverbound(reader, handler));
             }
         });
@@ -55,7 +54,7 @@ public class FabricLoader {
     public static void loadClientPackets() {
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
+            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler, FriendlyByteBuf.Reader<P> reader) {
                 ClientPlayNetworking.registerGlobalReceiver(id, clientbound(reader, handler));
             }
         });
