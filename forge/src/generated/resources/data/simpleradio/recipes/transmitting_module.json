@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "forge:condition": {
+    "type": "simpleradio:items_enabled",
+    "item": "transmitting_module"
+  },
+  "recipes": [
+    {
+      "type": "minecraft:crafting_shaped",
+      "category": "misc",
+      "key": {
+        "A": {
+          "item": "simpleradio:antenna"
+        },
+        "C": {
+          "item": "minecraft:copper_ingot"
+        },
+        "L": {
+          "item": "minecraft:lapis_lazuli"
+        }
+      },
+      "pattern": [
+        "A",
+        "C",
+        "L"
+      ],
+      "result": {
+        "item": "simpleradio:transmitting_module"
+      }
+    }
+  ]
+}

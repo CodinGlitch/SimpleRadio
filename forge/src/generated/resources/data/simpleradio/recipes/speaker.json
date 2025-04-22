@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "forge:condition": {
+    "type": "simpleradio:items_enabled",
+    "item": "speaker"
+  },
+  "recipes": [
+    {
+      "type": "minecraft:crafting_shaped",
+      "category": "building",
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "R": {
+          "item": "minecraft:redstone"
+        },
+        "Y": {
+          "item": "simpleradio:speaker_module"
+        }
+      },
+      "pattern": [
+        "III",
+        "IRY",
+        "III"
+      ],
+      "result": {
+        "item": "simpleradio:speaker"
+      }
+    }
+  ]
+}

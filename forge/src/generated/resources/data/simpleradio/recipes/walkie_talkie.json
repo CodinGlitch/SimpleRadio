@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "forge:condition": {
+    "type": "simpleradio:items_enabled",
+    "item": "walkie_talkie"
+  },
+  "recipes": [
+    {
+      "type": "minecraft:crafting_shaped",
+      "category": "equipment",
+      "key": {
+        "B": {
+          "item": "minecraft:copper_block"
+        },
+        "C": {
+          "item": "minecraft:copper_ingot"
+        },
+        "I": {
+          "item": "minecraft:iron_ingot"
+        }
+      },
+      "pattern": [
+        " I ",
+        " B ",
+        " C "
+      ],
+      "result": {
+        "item": "simpleradio:walkie_talkie"
+      }
+    }
+  ]
+}

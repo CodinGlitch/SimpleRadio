@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "forge:condition": {
+    "type": "simpleradio:items_enabled",
+    "item": "receiving_module"
+  },
+  "recipes": [
+    {
+      "type": "minecraft:crafting_shaped",
+      "category": "misc",
+      "key": {
+        "A": {
+          "item": "simpleradio:antenna"
+        },
+        "C": {
+          "item": "minecraft:copper_ingot"
+        },
+        "M": {
+          "item": "minecraft:amethyst_shard"
+        }
+      },
+      "pattern": [
+        "A",
+        "C",
+        "M"
+      ],
+      "result": {
+        "item": "simpleradio:receiving_module"
+      }
+    }
+  ]
+}

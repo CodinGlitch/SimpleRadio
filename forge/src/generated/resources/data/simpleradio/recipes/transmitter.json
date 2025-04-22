@@ -1,0 +1,38 @@
+{
+  "type": "forge:conditional",
+  "forge:condition": {
+    "type": "simpleradio:items_enabled",
+    "item": "transmitter"
+  },
+  "recipes": [
+    {
+      "type": "minecraft:crafting_shaped",
+      "category": "building",
+      "key": {
+        "A": {
+          "item": "simpleradio:antenna"
+        },
+        "B": {
+          "item": "minecraft:iron_block"
+        },
+        "G": {
+          "item": "minecraft:gold_ingot"
+        },
+        "T": {
+          "item": "simpleradio:transmitting_module"
+        },
+        "W": {
+          "item": "simpleradio:copper_wire"
+        }
+      },
+      "pattern": [
+        " A ",
+        "GBW",
+        " T "
+      ],
+      "result": {
+        "item": "simpleradio:transmitter"
+      }
+    }
+  ]
+}
