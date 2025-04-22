@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "spuddie_talkie"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "minecraft:potato"
+    }
+  },
+  "pattern": [
+    " I ",
+    " P ",
+    " C "
+  ],
+  "result": {
+    "item": "simpleradio:spuddie_talkie"
+  }
+}

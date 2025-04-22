@@ -1,0 +1,37 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "radio"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": {
+      "item": "simpleradio:antenna"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "Y": {
+      "item": "simpleradio:speaker_module"
+    },
+    "Z": {
+      "item": "simpleradio:receiving_module"
+    }
+  },
+  "pattern": [
+    "IIA",
+    "ZYR",
+    "III"
+  ],
+  "result": {
+    "item": "simpleradio:radio"
+  }
+}

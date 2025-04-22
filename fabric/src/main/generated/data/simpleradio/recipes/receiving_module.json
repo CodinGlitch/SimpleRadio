@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "receiving_module"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "simpleradio:antenna"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "M": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "pattern": [
+    "A",
+    "C",
+    "M"
+  ],
+  "result": {
+    "item": "simpleradio:receiving_module"
+  }
+}
