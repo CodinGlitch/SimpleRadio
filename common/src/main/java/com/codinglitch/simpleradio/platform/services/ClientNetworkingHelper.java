@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.platform.services;
 
-import com.codinglitch.simpleradio.core.central.Packeter;
+import com.codinglitch.simpleradio.core.networking.CustomPacket;
 
 public interface ClientNetworkingHelper {
-    void sendToServer(Packeter packet);
+    void sendToServer(CustomPacket packet);
 }

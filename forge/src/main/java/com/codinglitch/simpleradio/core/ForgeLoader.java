@@ -1,8 +1,8 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
-import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
@@ -10,7 +10,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,7 +18,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -84,24 +82,24 @@ public class ForgeLoader {
 
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler, FriendlyByteBuf.Reader<P> reader) {
+            public <P extends CustomPacket> void register(ResourceLocation id, Class<P> packetClass, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
                 CHANNEL.messageBuilder(packetClass, index.getAndIncrement())
                         .decoder(reader).encoder(writer)
                         .consumerMainThread((packet, context) -> {
-                            handler.accept(packet, context.getSender().getServer(), context.getSender());
-                            context.setPacketHandled(true);
+                            handler.accept(packet, context.get().getSender().getServer(), context.get().getSender());
+                            context.get().setPacketHandled(true);
                         }).add();
             }
         });
 
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
-            public <P extends CustomPacketPayload> void register(ResourceLocation id, Class<P> packetClass, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler, FriendlyByteBuf.Reader<P> reader) {
+            public <P extends CustomPacket> void register(ResourceLocation id, Class<P> packetClass, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
                 CHANNEL.messageBuilder(packetClass, index.getAndIncrement())
                         .decoder(reader).encoder(writer)
                         .consumerMainThread((packet, context) -> {
                             handler.accept(packet);
-                            context.setPacketHandled(true);
+                            context.get().setPacketHandled(true);
                         }).add();
             }
         });

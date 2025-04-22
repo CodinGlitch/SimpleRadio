@@ -2,43 +2,23 @@ package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.core.central.Packeter;
-import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
+import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 
-public record ServerboundRadioUpdatePacket(String frequency, Frequency.Modulation modulation) implements Packeter {
+public record ServerboundRadioUpdatePacket(String frequency, Frequency.Modulation modulation) implements CustomPacket {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "radio_update_packet");
     @Override
-    public ResourceLocation resource() {
+    public ResourceLocation id() {
         return ID;
     }
 
-    public void encode(FriendlyByteBuf buffer) {
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeUtf(this.frequency);
         buffer.writeUtf(this.modulation.shorthand);
     }
 
-    public static ServerboundRadioUpdatePacket decode(FriendlyByteBuf buffer) {
+    public static ServerboundRadioUpdatePacket read(FriendlyByteBuf buffer) {
         return new ServerboundRadioUpdatePacket(buffer.readUtf(), Frequency.modulationOf(buffer.readUtf()));
-    }
-
-    public void handle(MinecraftServer server, ServerPlayer player) {
-        server.execute(() -> {
-            if (!Frequency.check(frequency)) return;
-
-            AbstractContainerMenu menu = player.containerMenu;
-            if (menu instanceof RadiosmitherMenu radiosmitherMenu) {
-                if (!player.containerMenu.stillValid(player)) {
-                    CommonSimpleRadio.debug("Player {} interacted with invalid menu {}", player, player.containerMenu);
-                    return;
-                }
-
-                radiosmitherMenu.updateTinkering(frequency, modulation);
-            }
-        });
     }
 }
