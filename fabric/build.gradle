@@ -81,12 +81,20 @@ loom {
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
             runDir("runs/client")
+            source sourceSets.development
         }
         server {
             server()
             setConfigName("Fabric Server")
             ideConfigGenerated(true)
             runDir("runs/server")
+            source sourceSets.development
         }
+    }
+}
+
+fabricApi {
+    configureDataGeneration() {
+        setOutputDirectory(project(":fabric").file("src/main/generated"))
     }
 }
