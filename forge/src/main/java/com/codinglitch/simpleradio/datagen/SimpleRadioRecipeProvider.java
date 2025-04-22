@@ -51,7 +51,7 @@ public class SimpleRadioRecipeProvider extends RecipeProvider implements ICondit
 
             @Override
             public Advancement.Builder advancement() {
-                return null;
+                return exporter.advancement();
             }
         };
     }
