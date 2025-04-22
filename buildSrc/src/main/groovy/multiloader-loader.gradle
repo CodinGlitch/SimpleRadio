@@ -2,6 +2,15 @@ plugins {
     id 'multiloader-common'
 }
 
+sourceSets {
+    development {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+    }
+}
+
 configurations {
     commonJava {
         canBeResolved = true
@@ -14,19 +23,8 @@ configurations {
         canBeResolved = true
     }
 
-    devOnly {
-        canBeDeclared = true
-        extendsFrom(runtimeOnly)
-    }
-}
-
-sourceSets {
-    development {
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
-
-        runtimeClasspath += configurations.devOnly
-    }
+    developmentImplementation.extendsFrom implementation
+    developmentRuntimeOnly.extendsFrom runtimeOnly
 }
 
 dependencies {

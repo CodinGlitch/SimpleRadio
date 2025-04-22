@@ -107,10 +107,10 @@ dependencies {
         compileOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
         compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
 
-        devOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        devOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-        devOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        devOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+        developmentRuntimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+        developmentRuntimeOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+        developmentRuntimeOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
+        developmentRuntimeOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
     }
 
     // JEI / REI
@@ -126,7 +126,7 @@ dependencies {
 
     // Config mods
     if (config_mod == "configured") {
-        devOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
+        developmentRuntimeOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {
