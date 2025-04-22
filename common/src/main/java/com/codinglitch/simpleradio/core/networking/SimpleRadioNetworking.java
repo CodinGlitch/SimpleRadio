@@ -23,32 +23,32 @@ public class SimpleRadioNetworking {
     public interface ServerboundRegistry {
         <P extends CustomPacket> void register(
                 ResourceLocation id, Class<P> packetClass,
+                FriendlyByteBuf.Reader<P> reader,
                 BiConsumer<P, FriendlyByteBuf> writer,
-                TriConsumer<P, MinecraftServer, ServerPlayer> handler,
-                FriendlyByteBuf.Reader<P> reader
+                TriConsumer<P, MinecraftServer, ServerPlayer> handler
         );
     }
     public interface ClientboundRegistry {
         <P extends CustomPacket> void register(
                 ResourceLocation id, Class<P> packetClass,
+                FriendlyByteBuf.Reader<P> reader,
                 BiConsumer<P, FriendlyByteBuf> writer,
-                Consumer<P> handler,
-                FriendlyByteBuf.Reader<P> reader
+                Consumer<P> handler
         );
     }
 
     // ---- Packets ---- \\
 
     public static void loadServerbound(ServerboundRegistry registry) {
-        registry.register(ServerboundRadioUpdatePacket.ID, ServerboundRadioUpdatePacket.class, ServerboundRadioUpdatePacket::write, SimpleRadioNetworking::handleRadioUpdate, ServerboundRadioUpdatePacket::read);
-        registry.register(ServerboundRequestRouterPacket.ID, ServerboundRequestRouterPacket.class, ServerboundRequestRouterPacket::write, SimpleRadioNetworking::handleRequestRouter, ServerboundRequestRouterPacket::read);
+        registry.register(ServerboundRadioUpdatePacket.ID, ServerboundRadioUpdatePacket.class, ServerboundRadioUpdatePacket::read, ServerboundRadioUpdatePacket::write, SimpleRadioNetworking::handleRadioUpdate);
+        registry.register(ServerboundRequestRouterPacket.ID, ServerboundRequestRouterPacket.class, ServerboundRequestRouterPacket::read, ServerboundRequestRouterPacket::write, SimpleRadioNetworking::handleRequestRouter);
     }
 
     public static void loadClientbound(ClientboundRegistry registry) {
-        registry.register(ClientboundActivityPacket.ID, ClientboundActivityPacket.class, ClientboundActivityPacket::write, SimpleRadioClientNetworking::handleActivityPacket, ClientboundActivityPacket::read);
-        registry.register(ClientboundRegisterRouterPacket.ID, ClientboundRegisterRouterPacket.class, ClientboundRegisterRouterPacket::write, SimpleRadioClientNetworking::handleRegisterRouter, ClientboundRegisterRouterPacket::read);
-        registry.register(ClientboundSpeakSoundPacket.ID, ClientboundSpeakSoundPacket.class, ClientboundSpeakSoundPacket::write, SimpleRadioClientNetworking::handleSpeakSound, ClientboundSpeakSoundPacket::read);
-        registry.register(ClientboundWireEffectPacket.ID, ClientboundWireEffectPacket.class, ClientboundWireEffectPacket::write, SimpleRadioClientNetworking::handleWireEffect, ClientboundWireEffectPacket::read);
+        registry.register(ClientboundActivityPacket.ID, ClientboundActivityPacket.class, ClientboundActivityPacket::read, ClientboundActivityPacket::write, SimpleRadioClientNetworking::handleActivityPacket);
+        registry.register(ClientboundRegisterRouterPacket.ID, ClientboundRegisterRouterPacket.class, ClientboundRegisterRouterPacket::read, ClientboundRegisterRouterPacket::write, SimpleRadioClientNetworking::handleRegisterRouter);
+        registry.register(ClientboundSpeakSoundPacket.ID, ClientboundSpeakSoundPacket.class, ClientboundSpeakSoundPacket::read, ClientboundSpeakSoundPacket::write, SimpleRadioClientNetworking::handleSpeakSound);
+        registry.register(ClientboundWireEffectPacket.ID, ClientboundWireEffectPacket.class, ClientboundWireEffectPacket::read, ClientboundWireEffectPacket::write, SimpleRadioClientNetworking::handleWireEffect);
     }
 
     // ---- Handlers ---- \\
