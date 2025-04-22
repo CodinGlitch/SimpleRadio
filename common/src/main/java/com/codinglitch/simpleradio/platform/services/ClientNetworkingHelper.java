@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.platform.services;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import com.codinglitch.simpleradio.core.networking.CustomPacket;
 
 public interface ClientNetworkingHelper {
-    void sendToServer(CustomPacketPayload packet);
+    void sendToServer(CustomPacket packet);
 }

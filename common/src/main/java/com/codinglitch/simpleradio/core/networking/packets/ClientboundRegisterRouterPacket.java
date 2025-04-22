@@ -1,11 +1,12 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record ClientboundRegisterRouterPacket(short mapping, short identifier) implements CustomPacketPayload {
+public record ClientboundRegisterRouterPacket(short mapping, short identifier) implements CustomPacket {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "register_router");
     @Override
     public ResourceLocation id() {

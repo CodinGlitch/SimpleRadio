@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 public class SimpleRadioNetworking {
     public interface ServerboundRegistry {
-        <P extends CustomPacketPayload> void register(
+        <P extends CustomPacket> void register(
                 ResourceLocation id, Class<P> packetClass,
                 BiConsumer<P, FriendlyByteBuf> writer,
                 TriConsumer<P, MinecraftServer, ServerPlayer> handler,
@@ -29,7 +29,7 @@ public class SimpleRadioNetworking {
         );
     }
     public interface ClientboundRegistry {
-        <P extends CustomPacketPayload> void register(
+        <P extends CustomPacket> void register(
                 ResourceLocation id, Class<P> packetClass,
                 BiConsumer<P, FriendlyByteBuf> writer,
                 Consumer<P> handler,

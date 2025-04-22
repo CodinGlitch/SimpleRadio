@@ -1,11 +1,12 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record ClientboundWireEffectPacket(int entityId, boolean reversed) implements CustomPacketPayload {
+public record ClientboundWireEffectPacket(int entityId, boolean reversed) implements CustomPacket {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "wire_effect_packet");
     @Override
     public ResourceLocation id() {
