@@ -128,7 +128,6 @@ public class CommonRadioPlugin {
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(VoicechatServerStartedEvent.class, this::onServerStarted);
         registration.registerEvent(MicrophonePacketEvent.class, microphonePacketEvent -> executor.submit(() -> RadioManager.getInstance().onMicPacket(microphonePacketEvent)));
-        registration.registerEvent(ClientReceiveSoundEvent.class, ClientRadioManager::onSoundEvent);
     }
 
     public void onServerStarted(VoicechatServerStartedEvent event) {
