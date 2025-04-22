@@ -17,26 +17,36 @@ if (at.exists()) {
     minecraft.accessTransformers.file at
 }
 runs {
-    configureEach {
-        modSource project.sourceSets.main
-    }
     client {
+        modSource project.sourceSets.main
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        idea {
+            primarySourceSet = sourceSets.development
+        }
     }
     server {
+        modSource project.sourceSets.main
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        idea {
+            primarySourceSet = sourceSets.development
+        }
     }
 
     gameTestServer {
+        modSource project.sourceSets.main
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
     data {
+        modSources project.sourceSets.main
         programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        idea {
+            primarySourceSet = sourceSets.datagen
+        }
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
     implementation "net.neoforged:neoforge:${neoforge_version}"
@@ -47,7 +57,7 @@ dependencies {
     runtimeOnly "com.codinglitch.lexiconfig:lexiconfig-neoforge:${lexiconfig_version}"
 
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    runtimeOnly "maven.modrinth:simple-voice-chat:neoforge-${minecraft_version}-${voicechat_version}"
+    developmentRuntimeOnly "maven.modrinth:simple-voice-chat:neoforge-${minecraft_version}-${voicechat_version}"
 
     // --- Compatibilities --- \\
 
@@ -81,3 +91,5 @@ dependencies {
 
     }
 }
+
+datagenClasses.finalizedBy substituteResources
