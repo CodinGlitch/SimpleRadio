@@ -3,12 +3,12 @@
     {
       "parent": "minecraft:recipes/root",
       "criteria": {
-        "has_listener_module": {
+        "has_antenna": {
           "conditions": {
             "items": [
               {
                 "items": [
-                  "simpleradio:transmitting_module"
+                  "simpleradio:antenna"
                 ]
               }
             ]
@@ -20,6 +20,18 @@
             "recipe": "simpleradio:transmitter"
           },
           "trigger": "minecraft:recipe_unlocked"
+        },
+        "has_transmitting_module": {
+          "conditions": {
+            "items": [
+              {
+                "items": [
+                  "simpleradio:transmitting_module"
+                ]
+              }
+            ]
+          },
+          "trigger": "minecraft:inventory_changed"
         }
       },
       "forge:condition": {
@@ -29,7 +41,8 @@
       "requirements": [
         [
           "has_the_recipe",
-          "has_listener_module"
+          "has_transmitting_module",
+          "has_antenna"
         ]
       ],
       "rewards": {

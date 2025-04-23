@@ -3,12 +3,12 @@
     {
       "parent": "minecraft:recipes/root",
       "criteria": {
-        "has_copper_ingot": {
+        "has_copper_wire": {
           "conditions": {
             "items": [
               {
                 "items": [
-                  "minecraft:copper_ingot"
+                  "simpleradio:copper_wire"
                 ]
               }
             ]
@@ -22,6 +22,16 @@
                 "items": [
                   "minecraft:iron_ingot"
                 ]
+              }
+            ]
+          },
+          "trigger": "minecraft:inventory_changed"
+        },
+        "has_planks": {
+          "conditions": {
+            "items": [
+              {
+                "tag": "minecraft:planks"
               }
             ]
           },
@@ -42,7 +52,8 @@
         [
           "has_the_recipe",
           "has_iron_ingot",
-          "has_copper_ingot"
+          "has_planks",
+          "has_copper_wire"
         ]
       ],
       "rewards": {
