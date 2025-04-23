@@ -10,9 +10,6 @@ apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main
 apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
 apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
 
-base {
-    archivesName = "${mod_name}-forge-${minecraft_version}"
-}
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
