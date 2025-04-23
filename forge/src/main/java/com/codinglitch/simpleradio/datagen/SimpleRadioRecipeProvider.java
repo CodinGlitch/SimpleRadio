@@ -30,7 +30,7 @@ public class SimpleRadioRecipeProvider extends RecipeProvider implements ICondit
 
         return recipe -> {
             ConditionalRecipe.builder()
-                    .addCondition(new ItemsEnabledCondition("microphone"))
+                    .addCondition(new ItemsEnabledCondition(location.getPath()))
                     .addRecipe(recipe)
                     .build(exporter, location);
         };
