@@ -92,4 +92,5 @@ dependencies {
     }
 }
 
+substituteResources.dependsOn compileDatagenJava, processDatagenResources
 datagenClasses.finalizedBy substituteResources
