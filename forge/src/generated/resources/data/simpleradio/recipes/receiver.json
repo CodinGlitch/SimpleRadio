@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "receiver"
         }
       ],
       "recipe": {
@@ -18,20 +18,20 @@
           "B": {
             "item": "minecraft:iron_block"
           },
-          "G": {
-            "item": "minecraft:gold_ingot"
+          "C": {
+            "item": "simpleradio:copper_wire"
+          },
+          "Q": {
+            "item": "minecraft:quartz"
           },
           "R": {
             "item": "simpleradio:receiving_module"
-          },
-          "W": {
-            "item": "simpleradio:copper_wire"
           }
         },
         "pattern": [
           " A ",
-          "GBW",
-          " R "
+          "QBR",
+          " C "
         ],
         "result": {
           "item": "simpleradio:receiver"

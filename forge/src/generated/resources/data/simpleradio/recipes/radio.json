@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "radio"
         }
       ],
       "recipe": {
@@ -14,6 +14,9 @@
         "key": {
           "A": {
             "item": "simpleradio:antenna"
+          },
+          "C": {
+            "item": "simpleradio:copper_wire"
           },
           "I": {
             "item": "minecraft:iron_ingot"
@@ -29,9 +32,9 @@
           }
         },
         "pattern": [
-          "IIA",
-          "ZYR",
-          "III"
+          " ZA",
+          "RIC",
+          " Y "
         ],
         "result": {
           "item": "simpleradio:radio"

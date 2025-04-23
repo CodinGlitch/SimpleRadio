@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "radiosmither"
         }
       ],
       "recipe": {
@@ -15,6 +15,9 @@
           "A": {
             "item": "minecraft:amethyst_shard"
           },
+          "C": {
+            "item": "simpleradio:copper_wire"
+          },
           "D": {
             "item": "minecraft:polished_deepslate"
           },
@@ -23,6 +26,7 @@
           }
         },
         "pattern": [
+          " C ",
           "IAI",
           "DDD"
         ],

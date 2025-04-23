@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "simpleradio:socket"
+          "name": "simpleradio:insulator"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "simpleradio:blocks/socket"
+  "random_sequence": "simpleradio:blocks/insulator"
 }

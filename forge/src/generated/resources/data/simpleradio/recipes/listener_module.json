@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "listener_module"
         }
       ],
       "recipe": {
@@ -13,19 +13,19 @@
         "category": "misc",
         "key": {
           "C": {
-            "item": "minecraft:copper_ingot"
+            "item": "simpleradio:copper_wire"
           },
-          "R": {
-            "item": "minecraft:redstone"
+          "I": {
+            "item": "minecraft:iron_ingot"
           },
           "W": {
             "tag": "minecraft:wool"
           }
         },
         "pattern": [
-          "R",
-          "C",
-          "W"
+          "W",
+          "I",
+          "C"
         ],
         "result": {
           "item": "simpleradio:listener_module"

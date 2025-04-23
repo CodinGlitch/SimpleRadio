@@ -5,29 +5,25 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "insulator"
         }
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
         "category": "building",
         "key": {
-          "C": {
-            "item": "minecraft:copper_ingot"
-          },
           "I": {
             "item": "minecraft:iron_ingot"
           },
-          "N": {
-            "item": "minecraft:iron_nugget"
+          "P": {
+            "tag": "minecraft:planks"
           }
         },
         "pattern": [
-          "NCN",
-          " I "
+          "PIP"
         ],
         "result": {
-          "item": "simpleradio:socket"
+          "item": "simpleradio:insulator"
         },
         "show_notification": true
       }
