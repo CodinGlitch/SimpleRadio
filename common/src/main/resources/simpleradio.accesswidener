@@ -1,8 +1,5 @@
 accessWidener v1 named
 
-# Result in ShapedRecipeBuilder
-accessible class net/minecraft/data/recipes/ShapedRecipeBuilder$Result
-
 # Item Model Generator in ModelBakery
 accessible field net/minecraft/client/resources/model/ModelBakery ITEM_MODEL_GENERATOR Lnet/minecraft/client/renderer/block/model/ItemModelGenerator;
 
