@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "transmitting_module"
         }
       ],
       "recipe": {
@@ -16,16 +16,19 @@
             "item": "simpleradio:antenna"
           },
           "C": {
-            "item": "minecraft:copper_ingot"
+            "item": "simpleradio:copper_wire"
+          },
+          "I": {
+            "item": "minecraft:iron_ingot"
           },
           "L": {
             "item": "minecraft:lapis_lazuli"
           }
         },
         "pattern": [
-          "A",
-          "C",
-          "L"
+          " A ",
+          "CIC",
+          " L "
         ],
         "result": {
           "item": "simpleradio:transmitting_module"

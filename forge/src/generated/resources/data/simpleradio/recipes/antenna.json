@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "antenna"
         }
       ],
       "recipe": {
@@ -21,8 +21,8 @@
         },
         "pattern": [
           " B ",
-          " I ",
-          " B "
+          " B ",
+          " I "
         ],
         "result": {
           "item": "simpleradio:antenna"

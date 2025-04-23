@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "receiving_module"
         }
       ],
       "recipe": {
@@ -16,16 +16,19 @@
             "item": "simpleradio:antenna"
           },
           "C": {
-            "item": "minecraft:copper_ingot"
+            "item": "simpleradio:copper_wire"
+          },
+          "I": {
+            "item": "minecraft:iron_ingot"
           },
           "M": {
             "item": "minecraft:amethyst_shard"
           }
         },
         "pattern": [
-          "A",
-          "C",
-          "M"
+          " A ",
+          "CIC",
+          " M "
         ],
         "result": {
           "item": "simpleradio:receiving_module"

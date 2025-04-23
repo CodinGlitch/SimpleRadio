@@ -5,7 +5,7 @@
       "conditions": [
         {
           "type": "simpleradio:items_enabled",
-          "item": "microphone"
+          "item": "spuddie_talkie"
         }
       ],
       "recipe": {
@@ -13,7 +13,7 @@
         "category": "equipment",
         "key": {
           "C": {
-            "item": "minecraft:copper_ingot"
+            "item": "simpleradio:copper_wire"
           },
           "I": {
             "item": "minecraft:iron_ingot"
