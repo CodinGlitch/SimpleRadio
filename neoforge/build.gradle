@@ -38,7 +38,7 @@ runs {
     }
 
     data {
-        modSources project.sourceSets.main
+        modSources project.sourceSets.main, project.sourceSets.datagen
         programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         idea {
             primarySourceSet = sourceSets.datagen

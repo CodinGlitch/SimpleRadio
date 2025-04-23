@@ -8,11 +8,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
     "I": {
       "item": "minecraft:iron_ingot"
     },
     "L": {
       "item": "simpleradio:listener_module"
+    },
+    "R": {
+      "item": "minecraft:redstone"
     },
     "W": {
       "tag": "minecraft:wool"
@@ -20,8 +26,8 @@
   },
   "pattern": [
     " W ",
-    " L ",
-    "I I"
+    "RLC",
+    " I "
   ],
   "result": {
     "item": "simpleradio:microphone"

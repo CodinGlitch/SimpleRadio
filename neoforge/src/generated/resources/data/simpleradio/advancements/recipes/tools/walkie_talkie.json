@@ -19,12 +19,12 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_copper_ingot": {
+    "has_copper_wire": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_ingot"
+              "simpleradio:copper_wire"
             ]
           }
         ]
@@ -55,7 +55,7 @@
       "has_the_recipe",
       "has_iron_ingot",
       "has_copper_block",
-      "has_copper_ingot"
+      "has_copper_wire"
     ]
   ],
   "rewards": {

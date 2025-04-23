@@ -8,19 +8,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
     "I": {
       "item": "minecraft:iron_ingot"
     },
-    "N": {
-      "item": "minecraft:iron_nugget"
+    "P": {
+      "tag": "minecraft:planks"
     }
   },
   "pattern": [
-    "NCN",
-    " I "
+    "PIP"
   ],
   "result": {
     "item": "simpleradio:insulator"

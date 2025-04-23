@@ -9,7 +9,7 @@
   "category": "equipment",
   "key": {
     "C": {
-      "item": "minecraft:copper_ingot"
+      "item": "simpleradio:copper_wire"
     },
     "I": {
       "item": "minecraft:iron_ingot"

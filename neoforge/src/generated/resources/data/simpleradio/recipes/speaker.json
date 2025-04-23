@@ -8,6 +8,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
     "I": {
       "item": "minecraft:iron_ingot"
     },
@@ -19,9 +22,9 @@
     }
   },
   "pattern": [
-    "III",
-    "IRY",
-    "III"
+    " Y ",
+    "ICI",
+    "RI "
   ],
   "result": {
     "item": "simpleradio:speaker"
