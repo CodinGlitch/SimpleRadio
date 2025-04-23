@@ -19,8 +19,8 @@
   },
   "pattern": [
     " B ",
-    " I ",
-    " B "
+    " B ",
+    " I "
   ],
   "result": {
     "item": "simpleradio:antenna"

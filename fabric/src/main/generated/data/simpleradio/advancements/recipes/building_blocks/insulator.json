@@ -9,12 +9,12 @@
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_ingot": {
+    "has_copper_wire": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_ingot"
+              "simpleradio:copper_wire"
             ]
           }
         ]
@@ -33,6 +33,16 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
+    "has_planks": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "minecraft:planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
     "has_the_recipe": {
       "conditions": {
         "recipe": "simpleradio:insulator"
@@ -44,7 +54,8 @@
     [
       "has_the_recipe",
       "has_iron_ingot",
-      "has_copper_ingot"
+      "has_planks",
+      "has_copper_wire"
     ]
   ],
   "rewards": {
