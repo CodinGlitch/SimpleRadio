@@ -1,8 +1,11 @@
 package com.codinglitch.simpleradio.mixin;
 
+import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.core.registry.renderers.WireRenderer;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -23,5 +26,12 @@ public abstract class MixinLevelRenderer {
     @Inject(at = @At("HEAD"), method = "renderLevel")
     private void simpleradio$renderLevel_renderWire(PoseStack poseStack, float partialTick, long $$2, boolean $$3, Camera camera, GameRenderer $$5, LightTexture $$6, Matrix4f $$7, CallbackInfo ci) {
         WireRenderer.renderPlayer(minecraft.player, this.renderBuffers.bufferSource(), poseStack, partialTick, camera);
+
+        Vector3f cameraPos = new Vector3f(camera.getPosition());
+        if (minecraft.getEntityRenderDispatcher().shouldRenderHitBoxes()) {
+            for (RadioRouter router : ClientRadioManager.getRouters()) {
+                ClientRadioManager.renderRouter(router, poseStack, this.renderBuffers.bufferSource(), cameraPos);
+            }
+        }
     }
 }

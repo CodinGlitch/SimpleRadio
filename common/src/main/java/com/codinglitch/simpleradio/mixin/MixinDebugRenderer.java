@@ -17,13 +17,6 @@ public class MixinDebugRenderer {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void simpleradio$postRender_renderRouter(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, double cameraX, double cameraY, double cameraZ, CallbackInfo ci) {
-        Minecraft minecraft = Minecraft.getInstance();
 
-        Vector3f camera = new Vector3f((float) cameraX, (float) cameraY, (float) cameraZ);
-        if (minecraft.getEntityRenderDispatcher().shouldRenderHitBoxes()) {
-            for (RadioRouter router : ClientRadioManager.getRouters()) {
-                ClientRadioManager.renderRouter(router, poseStack, bufferSource, camera);
-            }
-        }
     }
 }

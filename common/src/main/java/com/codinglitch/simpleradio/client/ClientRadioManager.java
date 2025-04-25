@@ -21,6 +21,7 @@ import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
 import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import net.minecraft.client.Minecraft;
@@ -481,18 +482,18 @@ public class ClientRadioManager {
             newOffset = new Vector3f(router.connectionOffset);
         }
 
-        //Vec3 newLocation = location.getCenter().add(new Vec3(newOffset));
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.lines());
         AABB pointBox = new AABB(
                 -0.05f, -0.05f, -0.05f,
                 0.05f, 0.05f, 0.05f
         ).move(newOffset.x(), newOffset.y(), newOffset.z());
-        DebugRenderer.renderFilledBox(pointBox, r, g, b, 0.8f);
+        LevelRenderer.renderLineBox(poseStack, consumer, pointBox, r, g, b, 0.8f);
 
         AABB boundingBox = new AABB(
                 -0.5f, -0.5f, -0.5f,
                 0.5f, 0.5f, 0.5f
         );
-        LevelRenderer.renderLineBox(poseStack, bufferSource.getBuffer(RenderType.lines()), boundingBox, r, g, b, 0.8f);
+        LevelRenderer.renderLineBox(poseStack, consumer, boundingBox, r, g, b, 0.8f);
 
         poseStack.popPose();
     }
