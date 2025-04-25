@@ -1,10 +1,9 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.core.registry.SimpleRadioModels;
+import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mixin(ModelBakery.class)
 public abstract class MixinModelBakery {

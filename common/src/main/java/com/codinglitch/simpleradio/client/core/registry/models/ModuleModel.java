@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.client.core.registry.models;
 
 import com.codinglitch.simpleradio.client.core.central.ModuleOverrides;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioModels;
+import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;

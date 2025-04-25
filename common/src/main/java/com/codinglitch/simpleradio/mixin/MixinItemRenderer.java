@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.core.registry.SimpleRadioModels;
+import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
