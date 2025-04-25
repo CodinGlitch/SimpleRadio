@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SimpleRadioModels {
-    public static final List<ModelResourceLocation> MODELS = new ArrayList<>();
+    public static final List<ResourceLocation> MODELS = new ArrayList<>();
     public static final List<ModelSubstitution<BakedModel>> SUBSTITUTIONS = new ArrayList<>();
 
     public static final List<ModelOverride> OVERRIDES = new ArrayList<>();
@@ -53,8 +53,8 @@ public class SimpleRadioModels {
         return model;
     }
 
-    public static void onModelsRegister(Consumer<ModelResourceLocation> registry) {
-        for (ModelResourceLocation model : MODELS) {
+    public static void loadModels(Consumer<ResourceLocation> registry) {
+        for (ResourceLocation model : MODELS) {
             CommonSimpleRadio.info("Adding new model for {}", model);
             registry.accept(model);
         }

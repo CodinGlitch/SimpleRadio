@@ -1,22 +1,18 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import com.codinglitch.simpleradio.core.FabricLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.impl.client.particle.ParticleFactoryRegistryImpl;
 import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-
-import java.util.function.Function;
 
 public class SimpleRadioClient implements ClientModInitializer {
     @Override
@@ -37,5 +33,6 @@ public class SimpleRadioClient implements ClientModInitializer {
             }
         });
 
+        ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> SimpleRadioModels.loadModels(out));
     }
 }
