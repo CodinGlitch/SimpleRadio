@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.core.registry.SimpleRadioModels;
+import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;

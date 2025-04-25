@@ -1,7 +1,8 @@
-package com.codinglitch.simpleradio.core.registry;
+package com.codinglitch.simpleradio.client.core.registry;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.core.registry.models.ModuleModel;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;

@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
 import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
