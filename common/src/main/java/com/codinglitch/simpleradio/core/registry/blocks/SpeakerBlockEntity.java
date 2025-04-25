@@ -27,7 +27,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, speaker.location.x, speaker.location.y, speaker.location.z,
+                    null, speaker.location.x(), speaker.location.y(), speaker.location.z(),
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -90,7 +90,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
         if (!level.isClientSide) {
             level.playSound(
-                    null, location.x, location.y, location.z,
+                    null, location.x(), location.y(), location.z(),
                     SimpleRadioSounds.RADIO_OPEN,
                     SoundSource.PLAYERS,
                     1f, 1f

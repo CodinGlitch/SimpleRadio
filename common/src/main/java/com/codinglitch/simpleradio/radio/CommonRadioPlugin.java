@@ -5,13 +5,10 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.VolumeCategory;
-import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
-import org.joml.Vector3f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -94,27 +91,6 @@ public class CommonRadioPlugin {
 
     public static double getFalloff(float distance, float range) {
         return Math.max(0, 1 - (java.lang.Math.log(1 + distance) / java.lang.Math.log(1 + range)));
-    }
-
-    public static double getDoppler(Vector3f sourcePosition, Vector3f sourceVelocity, Vector3f observerPosition, Vector3f observerVelocity) {
-        Vector3f sourceToObserver = new Vector3f(
-                observerPosition.x - sourcePosition.x,
-                observerPosition.y - sourcePosition.y,
-                observerPosition.z - sourcePosition.z
-        ).normalize();
-
-        float observerFactor = 0;
-        if (observerVelocity.x != 0 || observerVelocity.y != 0 || observerVelocity.z != 0) {
-            observerFactor = observerVelocity.normalize().dot(sourceToObserver);
-        }
-
-        float sourceFactor = 0;
-        if (sourceVelocity.x != 0 || sourceVelocity.y != 0 || sourceVelocity.z != 0) {
-            sourceFactor = sourceVelocity.normalize().dot(sourceToObserver);
-        }
-
-        return (5 + observerVelocity.length()*-observerFactor) /
-                (5 + sourceVelocity.length()*-sourceFactor);
     }
 
     public String getPluginId() {

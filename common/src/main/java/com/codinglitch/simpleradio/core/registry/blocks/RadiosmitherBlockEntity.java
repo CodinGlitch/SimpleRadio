@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class RadiosmitherBlockEntity extends BaseContainerBlockEntity {
@@ -51,14 +52,18 @@ public class RadiosmitherBlockEntity extends BaseContainerBlockEntity {
     @Override
     public ItemStack removeItem(int i, int count) {
         ItemStack stack = items.get(i);
-        ItemStack copy = stack.copyWithCount(count);
+        ItemStack copy = stack.copy();
+        copy.setCount(count);
         stack.shrink(count);
         return copy;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int i) {
-        return items.get(i).copyAndClear();
+        ItemStack stack = items.get(i);
+        ItemStack copy = stack.copy();
+        stack.setCount(0);
+        return copy;
     }
 
     @Override
@@ -68,7 +73,14 @@ public class RadiosmitherBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public boolean stillValid(Player player) {
-        return Container.stillValidBlockEntity(this, player);
+        Level level = this.getLevel();
+        if (level == null) {
+            return false;
+        } else if (level.getBlockEntity(this.getBlockPos()) != this) {
+            return false;
+        } else {
+            return player.distanceToSqr(Vec3.atCenterOf(this.getBlockPos())) <= 64d;
+        }
     }
 
     @Override

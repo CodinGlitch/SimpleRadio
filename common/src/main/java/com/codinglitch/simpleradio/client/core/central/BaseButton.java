@@ -1,10 +1,13 @@
 package com.codinglitch.simpleradio.client.core.central;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 public class BaseButton extends AbstractButton {
@@ -14,6 +17,8 @@ public class BaseButton extends AbstractButton {
     public int hoverIconY = -1;
     public int selectedIconX = -1;
     public int selectedIconY = -1;
+
+    protected Component tooltip;
 
     public boolean selected;
 
@@ -56,12 +61,20 @@ public class BaseButton extends AbstractButton {
         return texture;
     }
 
-    public void blit(GuiGraphics graphics, int iconX, int iconY) {
-        graphics.blit(this.getTexture(), this.getX(), this.getY(), iconX, iconY, this.width, this.height);
+    public void blit(PoseStack graphics, int iconX, int iconY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, this.getTexture());
+        super.blit(graphics, this.x, this.y, iconX, iconY, this.width, this.height);
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack stack, int x, int y, float $$3) {
+        super.render(stack, x, y, $$3);
+    }
+
+    @Override
+    public void renderButton(PoseStack stack, int mouseX, int mouseY, float delta) {
         int x = this.iconX;
         int y = this.iconY;
         if (selected && (selectedIconX != -1 && selectedIconY != -1)) {
@@ -72,11 +85,20 @@ public class BaseButton extends AbstractButton {
             y = hoverIconY;
         }
 
-        this.blit(graphics, x, y);
+        this.blit(stack, x, y);
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput output) {
+    protected MutableComponent createNarrationMessage() {
+        return (MutableComponent) this.getMessage();
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput output) {
         this.defaultButtonNarrationText(output);
+    }
+
+    public void setTooltip(Component tooltip) {
+        this.tooltip = tooltip;
     }
 }

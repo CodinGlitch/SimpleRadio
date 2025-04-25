@@ -63,7 +63,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     }
 
     public Vec3 getConnectionPosition() {
-        return this.getBlockPos().getCenter();
+        return Vec3.atCenterOf(this.getBlockPos());
     }
 
     public void loadFromItem(ItemStack stack) {

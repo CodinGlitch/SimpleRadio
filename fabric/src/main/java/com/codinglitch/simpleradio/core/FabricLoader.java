@@ -14,7 +14,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -30,16 +29,16 @@ import java.util.function.Function;
 public class FabricLoader {
     public static void loadItems() {
         SimpleRadioItems.ITEMS.forEach(((location, item) -> {
-            Registry.register(BuiltInRegistries.ITEM, location, item.get());
+            Registry.register(Registry.ITEM, location, item.get());
         }));
     }
 
     public static void loadBlocks() {
-        SimpleRadioBlocks.BLOCKS.forEach(((location, block) -> Registry.register(BuiltInRegistries.BLOCK, location, block)));
+        SimpleRadioBlocks.BLOCKS.forEach(((location, block) -> Registry.register(Registry.BLOCK, location, block)));
     }
 
     public static void loadParticles() {
-        SimpleRadioParticles.PARTICLES.forEach(((location, particleType) -> Registry.register(BuiltInRegistries.PARTICLE_TYPE, location, particleType)));
+        SimpleRadioParticles.PARTICLES.forEach(((location, particleType) -> Registry.register(Registry.PARTICLE_TYPE, location, particleType)));
     }
 
     public static void loadPackets() {

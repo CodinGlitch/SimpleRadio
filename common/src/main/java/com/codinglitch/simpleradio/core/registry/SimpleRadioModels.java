@@ -3,12 +3,12 @@ package com.codinglitch.simpleradio.core.registry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.core.registry.models.ModuleModel;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -78,13 +78,13 @@ public class SimpleRadioModels {
         }
     }
 
-    public static BakedModel tryOverride(ItemDisplayContext context, ItemStack stack, @Nullable Level level, @Nullable LivingEntity entity, int id, Function<ModelResourceLocation, BakedModel> retriever) {
+    public static BakedModel tryOverride(ItemTransforms.TransformType context, ItemStack stack, @Nullable Level level, @Nullable LivingEntity entity, int id, Function<ModelResourceLocation, BakedModel> retriever) {
         for (ModelOverride override : OVERRIDES) {
             if (!stack.is(override.item)) continue;
 
             boolean isInContext = false;
-            for (ItemDisplayContext overrideContext : override.contexts) {
-                if (overrideContext == context) {
+            for (ItemTransforms.TransformType overrideType : override.contexts) {
+                if (overrideType == context) {
                     isInContext = true;
                     break;
                 }
@@ -108,7 +108,7 @@ public class SimpleRadioModels {
         // ---- Overrides ---- \\
 
         register(new ModelOverride(
-                List.of(ItemDisplayContext.NONE),
+                List.of(ItemTransforms.TransformType.NONE),
                 TRANSCEIVER, SimpleRadioItems.TRANSCEIVER
         ));
     }
@@ -127,5 +127,5 @@ public class SimpleRadioModels {
         }
     }
 
-    public record ModelOverride(List<ItemDisplayContext> contexts, ModelResourceLocation location, Item item) { }
+    public record ModelOverride(List<ItemTransforms.TransformType> contexts, ModelResourceLocation location, Item item) { }
 }

@@ -103,14 +103,14 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         super.onDestroyed(itemEntity);
         CompoundTag tag = itemEntity.getItem().getOrCreateTag();
         if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("user")) {
-            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("user"));
+            inactivate(itemEntity.level, tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("user"));
         }
     }
 
     public void entityTick(ItemStack stack, Entity entity) {
         if (entity.isRemoved()) return;
 
-        Level level = entity.level();
+        Level level = entity.level;
         CompoundTag tag = stack.getOrCreateTag();
 
         String frequency = tag.getString("frequency");
@@ -136,7 +136,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         // Transceiver activation
         UUID activationUUID = null;
-        if (entity.level().isClientSide) {
+        if (entity.level.isClientSide) {
 
             if (tag.contains("user") && activeRouter == null) {
                 activationUUID = tag.getUUID("user");

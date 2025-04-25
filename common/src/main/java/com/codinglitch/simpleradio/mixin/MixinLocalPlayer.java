@@ -10,6 +10,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.ProfilePublicKey;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,8 +21,8 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = LocalPlayer.class)
 public abstract class MixinLocalPlayer extends AbstractClientPlayer {
 
-    public MixinLocalPlayer(ClientLevel level, GameProfile profile) {
-        super(level, profile);
+    public MixinLocalPlayer(ClientLevel level, GameProfile profile, ProfilePublicKey key) {
+        super(level, profile, key);
     }
 
     @Shadow public abstract boolean isUsingItem();
@@ -46,13 +47,6 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z")
     )
     private boolean simpleradio$aiStep_transceiverSlowing(LocalPlayer instance, Operation<Boolean> original) {
-        return simpleradio$willSlow_transceiverSlowing(instance, original);
-    }
-    @WrapOperation(
-            method = "canStartSprinting",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z")
-    )
-    private boolean simpleradio$canStartSprinting_transceiverSlowing(LocalPlayer instance, Operation<Boolean> original) {
         return simpleradio$willSlow_transceiverSlowing(instance, original);
     }
 }

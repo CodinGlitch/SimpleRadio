@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.particles;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -9,7 +10,6 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 public class AlignedParticle extends ActivityParticle {
     AlignedParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
@@ -30,19 +30,24 @@ public class AlignedParticle extends ActivityParticle {
         float z = (float)(Mth.lerp(partial, this.zo, this.z) - cameraPosition.z());
 
         //TODO: might be some optimizations here
-        Vector3f direction = new Vector3f((float) this.xd, (float) this.yd, (float) this.zd).normalize().mul(mult);
+        Vector3f direction = new Vector3f((float) this.xd, (float) this.yd, (float) this.zd);
+        direction.normalize();
+        direction.mul(mult);
         Vector3f up = new Vector3f(
-                x * (1 - direction.x),
-                y * (1 - direction.y),
-                z * (1 - direction.z)
-        ).normalize();
-        Vector3f left = direction.cross(up, new Vector3f()).normalize();
+                x * (1 - direction.x()),
+                y * (1 - direction.y()),
+                z * (1 - direction.z())
+        );
+        up.normalize();
+        Vector3f left = direction.copy();
+        left.cross(up);
+        left.normalize();
 
         Vector3f[] vectors = new Vector3f[] {
-                direction.negate(new Vector3f()).sub(left),
-                direction.get(new Vector3f()).sub(left),
-                direction.get(new Vector3f()).add(left),
-                direction.negate(new Vector3f()).add(left)
+                new Vector3f(-direction.x() - left.x(), -direction.y() - left.y(), -direction.z() - left.z()),
+                new Vector3f(direction.x() - left.x(), direction.y() - left.y(), direction.z() - left.z()),
+                new Vector3f(direction.x() + left.x(), direction.y() + left.y(), direction.z() + left.z()),
+                new Vector3f(-direction.x() + left.x(), -direction.y() + left.y(), -direction.z() + left.z())
         };
 
         float size = this.getQuadSize(partial);

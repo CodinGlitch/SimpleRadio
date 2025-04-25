@@ -10,6 +10,7 @@ import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -26,11 +27,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Math;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
@@ -61,11 +58,11 @@ public class WireRenderer extends EntityRenderer<Wire> {
         Vec3 lastTopRight = null;
         Vec3 lastBottomRight = null;
 
-        int fromSkyLight = level.getBrightness(LightLayer.SKY, BlockPos.containing(from));
-        int toSkyLight = level.getBrightness(LightLayer.SKY, BlockPos.containing(to));
+        int fromSkyLight = level.getBrightness(LightLayer.SKY, new BlockPos(from));
+        int toSkyLight = level.getBrightness(LightLayer.SKY, new BlockPos(to));
 
-        int fromBlockLight = level.getBrightness(LightLayer.BLOCK, BlockPos.containing(from));
-        int toBlockLight = level.getBrightness(LightLayer.BLOCK, BlockPos.containing(to));
+        int fromBlockLight = level.getBrightness(LightLayer.BLOCK, new BlockPos(from));
+        int toBlockLight = level.getBrightness(LightLayer.BLOCK, new BlockPos(to));
 
         float tile = 0f;//distance*(1f/24f)*CABLE_SIZE;
         float vOffset = ((distance/CABLE_SIZE)/SEGMENTS) * 0.065f;
@@ -107,14 +104,14 @@ public class WireRenderer extends EntityRenderer<Wire> {
             if (lastTopLeft != null) {
                 int skyLight = (int) Mth.lerp(progress, (float)fromSkyLight, (float)toSkyLight);
                 int blockLight = (int) Mth.lerp(
-                        Math.clamp(0, 1, effector),
+                        Mth.clamp(0, 1, effector),
                         Mth.lerp(progress, (float)fromBlockLight, (float)toBlockLight),
                         15f
                 );
 
                 float newTile = vOffset + ((vOffset*SEGMENTS) * progress);
 
-                int overlay = Math.clamp(0, 10, Math.round(effector*5));
+                int overlay = Mth.clamp(0, 10, Math.round(effector*5));
                 int packedLight = LightTexture.pack(blockLight, skyLight);
 
                 buildQuad(consumer, matrix, overlay, packedLight, up.normalize(), 0.0625f, vOffset, newTile, lastTopRight, topRight, topLeft, lastTopLeft);
@@ -153,7 +150,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
                 poseStack.pushPose();
                 poseStack.translate(-offset.x, -offset.y, -offset.z);
 
-                renderWire(wire.level(), source, poseStack, fromPosition, toPosition, wire, partialTick);
+                renderWire(wire.level, source, poseStack, fromPosition, toPosition, wire, partialTick);
 
                 poseStack.popPose();
             }

@@ -37,7 +37,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.transmitter != null) {
             level.playSound(
-                    null, transmitter.location.x, transmitter.location.y, transmitter.location.z,
+                    null, transmitter.location.x(), transmitter.location.y(), transmitter.location.z(),
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -125,7 +125,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
             this.transmitter = SimpleRadioBlocks.TRANSMITTER.getOrCreateTransmitter(location, frequency, id, this.getBlockState());
 
             level.playSound(
-                    null, location.x, location.y, location.z,
+                    null, location.x(), location.y(), location.z(),
                     SimpleRadioSounds.RADIO_OPEN,
                     SoundSource.PLAYERS,
                     1f, 1f

@@ -7,10 +7,12 @@ import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdat
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.platform.ClientServices;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -108,7 +110,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
             // Incrementing
             if (KNOB.selected) {
-                int centerY = KNOB.getY() + (KNOB.getHeight()/2);
+                int centerY = KNOB.y + (KNOB.getHeight()/2);
                 increment = (centerY - y) / 5;
             } else {
                 increment = 0;
@@ -124,44 +126,51 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack stack, float delta, int mouseX, int mouseY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (this.width - imageWidth) / 2;
         int y = (this.height - imageHeight) / 2;
-        graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+        this.blit(stack, x, y, 0, 0, imageWidth, imageHeight);
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(graphics);
-        super.render(graphics, mouseX, mouseY, delta);
-        renderTooltip(graphics, mouseX, mouseY);
+    public void render(PoseStack stack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(stack);
+        super.render(stack, mouseX, mouseY, delta);
+        renderTooltip(stack, mouseX, mouseY);
 
         if (modulation != null) {
             this.time = (this.time + delta * 0.1f) % 5;
 
             int x = (int) ((time/5) * 142);
 
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderTexture(0, TEXTURE);
+
             int iconX = 70;
             switch (modulation) {
                 case AMPLITUDE -> {
                     int iconY = 218;
-                    graphics.blit(TEXTURE, this.leftPos + 9, this.topPos + 46, iconX + x, iconY, 142 - x, 31, 256, 256);
-                    graphics.blit(TEXTURE, (this.leftPos + 151) - x, this.topPos + 46, iconX, iconY, x, 31, 256, 256);
+                    blit(stack, this.leftPos + 9, this.topPos + 46, iconX + x, iconY, 142 - x, 31, 256, 256);
+                    blit(stack, (this.leftPos + 151) - x, this.topPos + 46, iconX, iconY, x, 31, 256, 256);
                 }
                 case FREQUENCY -> {
                     int iconY = 184;
-                    graphics.blit(TEXTURE, this.leftPos + 9, this.topPos + 45, iconX + x, iconY, 142 - x, 34, 256, 256);
-                    graphics.blit(TEXTURE, (this.leftPos + 151) - x, this.topPos + 45, iconX, iconY, x, 34, 256, 256);
+                    blit(stack, this.leftPos + 9, this.topPos + 45, iconX + x, iconY, 142 - x, 34, 256, 256);
+                    blit(stack, (this.leftPos + 151) - x, this.topPos + 45, iconX, iconY, x, 34, 256, 256);
                 }
             }
         }
 
-        this.FREQUENCY.render(graphics, mouseX, mouseY, delta);
+        this.FREQUENCY.render(stack, mouseX, mouseY, delta);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        super.renderLabels(graphics, mouseX, mouseY);
+    protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
+        super.renderLabels(stack, mouseX, mouseY);
     }
 
     @Override
@@ -172,7 +181,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
         if (APPLY_BUTTON.isHoveredOrFocused()) {
             APPLY_BUTTON.selected = false;
-            APPLY_BUTTON.setFocused(false);
+            APPLY_BUTTON.changeFocus(false);
         }
 
         return super.mouseReleased($$0, $$1, $$2);
@@ -280,22 +289,22 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         }
 
         @Override
-        public void blit(GuiGraphics graphics, int iconX, int iconY) {
+        public void blit(PoseStack stack, int iconX, int iconY) {
             if (this.selected) {
                 if (increment != 0) {
                     if (holdingFor % 2 == 0) {
-                        super.blit(graphics, this.iconX, this.iconY);
+                        super.blit(stack, this.iconX, this.iconY);
                     } else {
-                        super.blit(graphics, this.selectedIconX, this.selectedIconY);
+                        super.blit(stack, this.selectedIconX, this.selectedIconY);
                     }
                     return;
                 } else {
-                    super.blit(graphics, this.iconX, this.iconY);
+                    super.blit(stack, this.iconX, this.iconY);
                     return;
                 }
             }
 
-            super.blit(graphics, iconX, iconY);
+            super.blit(stack, iconX, iconY);
         }
 
         @Override
@@ -307,9 +316,9 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
             if (RadiosmitherScreen.this.minecraft != null) {
                 int y = (int)(RadiosmitherScreen.this.minecraft.mouseHandler.ypos() * (double)RadiosmitherScreen.this.minecraft.getWindow().getGuiScaledHeight() / (double)RadiosmitherScreen.this.minecraft.getWindow().getScreenHeight());
 
-                if (y < (this.getY() + this.height*0.25)) {
+                if (y < (this.y + this.height*0.25)) {
                     incrementFrequency(1);
-                } else if (y > (this.getY() + this.height*0.75)) {
+                } else if (y > (this.y + this.height*0.75)) {
                     incrementFrequency(-1);
                 }
             }
@@ -324,7 +333,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         }
     }
 
-    public static class ModulationButton extends BaseButton {
+    public class ModulationButton extends BaseButton {
         public ModulationButton(int x, int y, boolean isFM, Runnable onPress) {
             super(x, y, 35, 18, isFM ? 0 : 35, 184, TEXTURE, CommonComponents.EMPTY, onPress);
             this.selectedIconX = this.iconX;
@@ -332,7 +341,12 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
             this.hoverIconX = this.iconX;
             this.hoverIconY = 220;
 
-            this.setTooltip(Tooltip.create(isFM ? FM_DESCRIPTION : AM_DESCRIPTION, null));
+            this.setTooltip(isFM ? FM_DESCRIPTION : AM_DESCRIPTION);
+        }
+
+        @Override
+        public void renderToolTip(PoseStack stack, int x, int y) {
+            RadiosmitherScreen.this.renderTooltip(stack, this.tooltip, x, y);
         }
 
         public void selected(boolean selected) {

@@ -3,11 +3,11 @@ package com.codinglitch.simpleradio.api.central;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.*;
+import com.mojang.math.Vector3f;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,18 +108,18 @@ public interface Socket {
     }
 
     static void shortAt(ServerLevel level, Vector3f location) {
-        level.playSound(null, location.x, location.y, location.z, SimpleRadioSounds.SHORT_CIRCUIT, SoundSource.BLOCKS, 0.3f, 0.9f + level.random.nextFloat()*0.2f);
+        level.playSound(null, location.x(), location.y(), location.z(), SimpleRadioSounds.SHORT_CIRCUIT, SoundSource.BLOCKS, 0.3f, 0.9f + level.random.nextFloat()*0.2f);
 
         level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                location.x, location.y, location.z, 10,
+                location.x(), location.y(), location.z(), 10,
                 -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
         );
         level.sendParticles(ParticleTypes.CRIT,
-                location.x, location.y, location.z, 8,
+                location.x(), location.y(), location.z(), 8,
                 -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
         );
         level.sendParticles(ParticleTypes.POOF,
-                location.x, location.y, location.z, 5,
+                location.x(), location.y(), location.z(), 5,
                 0.2d, 0.2d, 0.2d, 0.1d
         );
     }

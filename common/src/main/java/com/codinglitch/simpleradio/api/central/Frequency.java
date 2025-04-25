@@ -5,9 +5,9 @@ import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -101,7 +101,7 @@ public class Frequency implements Medium {
 
     public static String incrementFrequency(String frequency, int amount) {
         int rawFrequency = Integer.parseInt(frequency.replaceAll("[.]", ""));
-        String str = String.format("%0"+FREQUENCY_DIGITS+"d", Math.clamp(0, MAX_FREQUENCY-1, rawFrequency + amount));
+        String str = String.format("%0"+FREQUENCY_DIGITS+"d", Mth.clamp(0, MAX_FREQUENCY-1, rawFrequency + amount));
         return new StringBuilder(str).insert(str.length() - SimpleRadioLibrary.SERVER_CONFIG.frequency.decimalPlaces, ".").toString();
     }
 
@@ -151,7 +151,7 @@ public class Frequency implements Medium {
     public RadioReceiver addReceiver(RadioReceiver receiver) {
         boolean isClient = false;
         if (receiver.location != null) isClient = receiver.location.isClientSide();
-        else if (receiver.owner != null) isClient = receiver.owner.level().isClientSide;
+        else if (receiver.owner != null) isClient = receiver.owner.level.isClientSide;
 
         RadioManager.registerRouterSided(receiver, isClient, this);
 
@@ -176,7 +176,7 @@ public class Frequency implements Medium {
     }
 
     public RadioReceiver tryAddReceiver(UUID id, Entity entity) {
-        boolean isClient = entity.level().isClientSide;
+        boolean isClient = entity.level.isClientSide;
 
         RadioReceiver receiver = null;//isClient ? ClientRadioManager.getReceiver(entity) : getReceiver(entity);
         if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
@@ -232,7 +232,7 @@ public class Frequency implements Medium {
     public RadioTransmitter addTransmitter(RadioTransmitter transmitter) {
         boolean isClient = false;
         if (transmitter.location != null) isClient = transmitter.location.isClientSide();
-        else if (transmitter.owner != null) isClient = transmitter.owner.level().isClientSide;
+        else if (transmitter.owner != null) isClient = transmitter.owner.level.isClientSide;
 
         RadioManager.registerRouterSided(transmitter, isClient, this);
 
@@ -257,7 +257,7 @@ public class Frequency implements Medium {
     }
 
     public RadioTransmitter tryAddTransmitter(UUID id, Entity entity) {
-        boolean isClient = entity.level().isClientSide;
+        boolean isClient = entity.level.isClientSide;
 
         RadioTransmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(entity) : getTransmitter(entity);
         if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);

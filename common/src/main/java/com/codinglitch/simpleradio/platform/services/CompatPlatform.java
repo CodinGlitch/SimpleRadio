@@ -4,9 +4,9 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import com.mojang.math.Quaternion;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 import java.util.function.Predicate;
 
@@ -17,7 +17,7 @@ public interface CompatPlatform {
     void onData(RadioSpeaker channel, RadioSource source, short[] decoded);
 
     WorldlyPosition modifyPosition(WorldlyPosition position);
-    Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation);
+    Quaternion modifyRotation(WorldlyPosition position, Quaternion rotation);
 
     RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
 

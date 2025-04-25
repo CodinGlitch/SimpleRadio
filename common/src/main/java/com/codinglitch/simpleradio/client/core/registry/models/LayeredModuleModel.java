@@ -28,10 +28,8 @@ public class LayeredModuleModel implements BakedModel {
         TextureAtlas atlas = Minecraft.getInstance().getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS);
         TextureAtlasSprite sprite = atlas.getSprite(this.upgrade.texture);
 
-        if (sprite.contents().name().getPath().equals("missingno")) return;
-
         List<BlockElement> blockElements = Lists.newArrayList();
-        blockElements.addAll(ModelBakery.ITEM_MODEL_GENERATOR.processFrames(1, "layer1", sprite.contents()));
+        blockElements.addAll(ModelBakery.ITEM_MODEL_GENERATOR.processFrames(1, "layer1", sprite));
         //TODO: allow usage of multiple layers
 
         for (BlockElement element : blockElements) {

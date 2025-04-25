@@ -41,7 +41,7 @@ public class RadioListener extends RadioRouter {
         this(uuid);
         this.owner = owner;
 
-        boolean isClient = owner.level().isClientSide();
+        boolean isClient = owner.level.isClientSide();
         RadioManager.registerRouterSided(this, isClient, null);
     }
     public RadioListener(WorldlyPosition location) {

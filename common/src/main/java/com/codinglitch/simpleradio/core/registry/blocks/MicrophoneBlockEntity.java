@@ -34,7 +34,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.listener != null) {
             level.playSound(
-                    null, listener.location.x, listener.location.y, listener.location.z,
+                    null, listener.location.x(), listener.location.y(), listener.location.z(),
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -103,7 +103,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
         if (!level.isClientSide) {
             level.playSound(
-                    null, location.x, location.y, location.z,
+                    null, location.x(), location.y(), location.z(),
                     SimpleRadioSounds.RADIO_OPEN,
                     SoundSource.PLAYERS,
                     1f, 1f

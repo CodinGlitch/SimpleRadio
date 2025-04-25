@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.api.SimpleRadioApi;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.mojang.math.Vector3f;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -15,6 +16,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,8 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Math;
-import org.joml.Vector3f;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
@@ -223,7 +223,7 @@ public class RadioManager implements SimpleRadioApi {
     }
 
     public static RadioSpeaker getOrCreateSpeaker(Entity owner, @Nullable UUID id) {
-        boolean isClient = owner.level().isClientSide;
+        boolean isClient = owner.level.isClientSide;
 
         RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(owner) : getSpeaker(owner);
         if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : getSpeaker(id);
@@ -295,7 +295,7 @@ public class RadioManager implements SimpleRadioApi {
     }
 
     public static RadioListener getOrCreateListener(Entity owner, @Nullable UUID id) {
-        boolean isClient = owner.level().isClientSide;
+        boolean isClient = owner.level.isClientSide;
 
         RadioListener listener = null;//isClient ? ClientRadioManager.getListener(owner) : getListener(owner);
         if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : getListener(id);
@@ -494,10 +494,10 @@ public class RadioManager implements SimpleRadioApi {
             if (listener.location != null) {
                 position = listener.location.position();
             } else if (listener.owner != null) {
-                position = listener.owner.position().toVector3f();
+                position = new Vector3f(listener.owner.position());
             } else continue;
 
-            float distance = position.distance(at);
+            float distance = (float) Mth.length(position.x() - at.x(), position.y() - at.y(), position.z() - at.z());
             if (distance > listener.range) continue;
 
             qualified.put(distance, listener);
@@ -507,17 +507,15 @@ public class RadioManager implements SimpleRadioApi {
 
     // --- Audio Gathering --- \\
 
-    public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
-        onSoundPlayed(level, location, soundHolder, volume, pitch, 0, seed);
+    public void onSoundPlayed(ServerLevel level, Vec3 location, SoundEvent soundEvent, float volume, float pitch, long seed) {
+        onSoundPlayed(level, location, soundEvent, volume, pitch, 0, seed);
     }
-    public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
+    public void onSoundPlayed(ServerLevel level, Vec3 location, SoundEvent sound, float volume, float pitch, float offset, long seed) {
         if (level.isClientSide) return;
         if (!SimpleRadioLibrary.SERVER_CONFIG.router.soundListening) return;
-        if (!level.isLoaded(BlockPos.containing(location))) return;
+        if (!level.isLoaded(new BlockPos(location))) return;
 
-        SoundEvent sound = soundHolder.value();
-
-        TreeMap<Float, RadioListener> qualified = getListeners(location.toVector3f());
+        TreeMap<Float, RadioListener> qualified = getListeners(new Vector3f(location));
         for (Map.Entry<Float, RadioListener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = entry.getValue();
@@ -526,14 +524,14 @@ public class RadioManager implements SimpleRadioApi {
 
             RadioSource newSource = new RadioSource(
                     listener.reference,
-                    WorldlyPosition.of(location.toVector3f(), level),
+                    WorldlyPosition.of(new Vector3f(location), level),
                     sound,
                     (float) (falloff * volume)
             );
             newSource.pitch = pitch;
             newSource.offset = offset;
             newSource.seed = seed;
-            newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.range))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
+            newSource.activity = (float) (Mth.clamp(0, 15, Math.round((1 - (distance / listener.range))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
 
             listener.onSource(newSource);
         }
@@ -544,7 +542,7 @@ public class RadioManager implements SimpleRadioApi {
         if (senderConnection == null) return;
 
         ServerPlayer sender = (ServerPlayer) senderConnection.getPlayer().getPlayer();
-        ServerLevel level = sender.serverLevel();
+        ServerLevel level = (ServerLevel) sender.level;
 
         TreeMap<Float, RadioListener> qualified = getListeners(new Vector3f((float) sender.getX(), (float) sender.getY(), (float) sender.getZ()));
 
@@ -558,12 +556,12 @@ public class RadioManager implements SimpleRadioApi {
             if (listener.location != null) {
                 listenerPosition = listener.location.position();
             } else if (listener.owner != null) {
-                listenerPosition = listener.owner.position().toVector3f();
+                listenerPosition = new Vector3f(listener.owner.position());
             }
             if (listenerPosition == null) continue;
 
             byte[] data = event.getPacket().getOpusEncodedData();
-            Vector3f senderPosition = sender.position().toVector3f();
+            Vector3f senderPosition = new Vector3f(sender.position());
             RadioSource newSource = new RadioSource(
                     sender.getUUID(),
                     WorldlyPosition.of(senderPosition, level),

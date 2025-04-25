@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.core.networking;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.client.core.SimpleRadioClientNetworking;
+import com.codinglitch.simpleradio.client.SimpleRadioClientNetworking;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.Services;

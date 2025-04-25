@@ -6,7 +6,6 @@ import com.codinglitch.simpleradio.api.central.Transmitting;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
-import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -97,7 +96,8 @@ public class TransmitterBlock extends BaseEntityBlock implements Routing, Transm
         return 0;
     }
 
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof AuditoryBlockEntity auditoryBlockEntity)

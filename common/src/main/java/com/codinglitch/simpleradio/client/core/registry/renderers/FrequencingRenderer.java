@@ -6,12 +6,15 @@ import com.codinglitch.simpleradio.core.registry.blocks.CatalyzingBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.ReceiverBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Transformation;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -19,10 +22,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Math;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
-import org.joml.Vector3f;
 
 public class FrequencingRenderer {
     public static final int FRAME_RATE = 12;
@@ -31,7 +30,7 @@ public class FrequencingRenderer {
         Minecraft minecraft = Minecraft.getInstance();
 
         poseStack.translate(0.5f, 0.1f, 0.5f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-state.getValue(ReceiverBlock.FACING).toYRot()));
+        poseStack.mulPose(Vector3f.YP.rotationDegrees(-state.getValue(ReceiverBlock.FACING).toYRot()));
 
         Item item = blockEntity.catalyst.associate;
 
@@ -46,9 +45,9 @@ public class FrequencingRenderer {
             );
         } else {
             minecraft.getItemRenderer().renderStatic(
-                    new ItemStack(item), ItemDisplayContext.FIXED,
+                    new ItemStack(item), ItemTransforms.TransformType.FIXED,
                     light, overlay,
-                    poseStack, bufferSource, blockEntity.getLevel(), 0
+                    poseStack, bufferSource, 0
             );
         }
     }
@@ -68,30 +67,30 @@ public class FrequencingRenderer {
 
             String text = I18n.get("screen.simpleradio.frequencing.catalyst");
             float width = (float) (-font.width(text) / 2);
-            font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+            font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, false, 0, 255);
 
             text = "✖";
             poseStack.scale(4f, 4f, 4f);
             poseStack.translate(0, -9f, 0);
 
             width = (float) (-font.width(text) / 2);
-            font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+            font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, false, 0, 255);
 
             return;
         }
 
         float time = (level.getGameTime() + Minecraft.getInstance().getFrameTime())/20; // in SECONDS bro
-        time = Math.floor(time*FRAME_RATE)/FRAME_RATE;
+        time = (float) Mth.floor(time * FRAME_RATE) /FRAME_RATE;
 
         //--- Catalyst Display ---\\
         poseStack.pushPose();
         poseStack.translate(24f, -5f, 0f);
         poseStack.scale(10f, 10f, 0.01f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(time*60));
+        poseStack.mulPose(Vector3f.YP.rotationDegrees(time*60));
 
         minecraft.getItemRenderer().renderStatic(
-                new ItemStack(blockEntity.catalyst.associate), ItemDisplayContext.GUI, light,
-                OverlayTexture.pack((int) Math.floor((Math.sin(time * 5f) + 1) * 5), 15), poseStack, bufferSource, blockEntity.getLevel(), 0
+                new ItemStack(blockEntity.catalyst.associate), ItemTransforms.TransformType.GUI, light,
+                OverlayTexture.pack((int) Math.floor((Math.sin(time * 5f) + 1) * 5), 15), poseStack, bufferSource, 0
         );
         poseStack.popPose();
 
@@ -104,7 +103,7 @@ public class FrequencingRenderer {
                 "screen.simpleradio.frequencing.efficiency",
                 Math.round(blockEntity.catalyst.efficiency*100)
         ).getString();
-        font.drawInBatch(text, 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        font.drawInBatch(text, 0, 0, -1, false, poseStack.last().pose(), bufferSource, false, 0, 255);
         poseStack.popPose();
 
         //--- Antenna Power Display ---\\
@@ -118,7 +117,7 @@ public class FrequencingRenderer {
         poseStack.translate(-28f, 8f, 0f);
         poseStack.scale(0.4f, 0.4f, 0.4f);
 
-        font.drawInBatch(I18n.get("screen.simpleradio.frequencing.antenna_strength"), 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        font.drawInBatch(I18n.get("screen.simpleradio.frequencing.antenna_strength"), 0, 0, -1, false, poseStack.last().pose(), bufferSource, false, 0, 255);
         poseStack.popPose();
 
         poseStack.pushPose();
@@ -127,7 +126,7 @@ public class FrequencingRenderer {
 
         //antenna = String.valueOf((int) (progress * 100));
         float width = (float) (-font.width(antenna) / 2);
-        font.drawInBatch(antenna, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        font.drawInBatch(antenna, width, 0, -1, false, poseStack.last().pose(), bufferSource, false, 0, 255);
 
         poseStack.popPose();
 
@@ -135,19 +134,31 @@ public class FrequencingRenderer {
         poseStack.translate(-8, 16f, 0f);
         poseStack.scale(0.5f, 0.5f, 0.5f);
 
-        Vector3f one = poseStack.last().pose().transformPosition(new Vector3f(-40, -5, 0));
-        Vector3f two = poseStack.last().pose().transformPosition(new Vector3f(-40, 5, 0));
-        Vector3f three = poseStack.last().pose().transformPosition(new Vector3f(-40 + (progress*80), 5, 0));
-        Vector3f four = poseStack.last().pose().transformPosition(new Vector3f(-40 + (progress*80), -5, 0));
+        Matrix4f one = poseStack.last().pose().copy();
+        one.translate(new Vector3f(-40, -5, 0));
+
+        Matrix4f two = poseStack.last().pose().copy();
+        two.translate(new Vector3f(-40, 5, 0));
+
+        Matrix4f three = poseStack.last().pose().copy();
+        three.translate(new Vector3f(-40 + (progress*80), 5, 0));
+
+        Matrix4f four = poseStack.last().pose().copy();
+        four.translate(new Vector3f(-40 + (progress*80), -5, 0));
+
+        Vector3f onePos = Transformation.toAffine(one).getSecond();
+        Vector3f twoPos = Transformation.toAffine(two).getSecond();
+        Vector3f threePos = Transformation.toAffine(three).getSecond();
+        Vector3f fourPos = Transformation.toAffine(four).getSecond();
 
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutout(CommonSimpleRadio.id("textures/gui/bars.png")));
-        consumer.vertex(one.x, one.y, one.z).color(1f, 1f, 1f, 1f).uv(0f, 0f)
+        consumer.vertex(onePos.x(), onePos.y(), onePos.z()).color(1f, 1f, 1f, 1f).uv(0f, 0f)
                 .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
-        consumer.vertex(two.x, two.y, two.z).color(1f, 1f, 1f, 1f).uv(0f, 1f)
+        consumer.vertex(twoPos.x(), twoPos.y(), twoPos.z()).color(1f, 1f, 1f, 1f).uv(0f, 1f)
                 .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
-        consumer.vertex(three.x, three.y, three.z).color(1f, 1f, 1f, 1f).uv(progress, 1f)
+        consumer.vertex(threePos.x(), threePos.y(), threePos.z()).color(1f, 1f, 1f, 1f).uv(progress, 1f)
                 .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
-        consumer.vertex(four.x, four.y, four.z).color(1f, 1f, 1f, 1f).uv(progress, 0f)
+        consumer.vertex(fourPos.x(), fourPos.y(), fourPos.z()).color(1f, 1f, 1f, 1f).uv(progress, 0f)
                 .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
 
         poseStack.popPose();
@@ -159,7 +170,7 @@ public class FrequencingRenderer {
         poseStack.translate(-28f, -10f, 0f);
         poseStack.scale(0.5f, 0.5f, 0.5f);
 
-        font.drawInBatch(frequency, 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        font.drawInBatch(frequency, 0, 0, -1, false, poseStack.last().pose(), bufferSource, false, 0, 255);
         poseStack.popPose();
     }
 }

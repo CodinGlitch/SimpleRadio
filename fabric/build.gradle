@@ -57,7 +57,7 @@ dependencies {
 
     // Config mods
     if (config_mod == "configured") {
-        modLocalRuntime "com.mrcrayfish:configured-fabric:${configured_version}"
+        //modLocalRuntime "com.mrcrayfish:configured-fabric:${configured_version}"
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {

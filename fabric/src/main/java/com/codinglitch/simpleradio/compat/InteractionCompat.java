@@ -44,7 +44,7 @@ public class InteractionCompat {
                 return;
             }
 
-            if (setCooldown(player.getUUID(), player.level())) {
+            if (setCooldown(player.getUUID(), player.level)) {
                 player.gameEvent(VoicechatInteraction.VOICE_GAME_EVENT);
             }
         }

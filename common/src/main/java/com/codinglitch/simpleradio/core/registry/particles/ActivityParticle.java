@@ -1,13 +1,13 @@
 package com.codinglitch.simpleradio.core.registry.particles;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 public class ActivityParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
@@ -55,15 +55,22 @@ public class ActivityParticle extends TextureSheetParticle {
         float y = (float)(Mth.lerp(partial, this.yo, this.y) - cameraPosition.y());
         float z = (float)(Mth.lerp(partial, this.zo, this.z) - cameraPosition.z());
 
-        Vector3f direction = new Vector3f((float) this.xd, (float) this.yd, (float) this.zd).mul(mult);
-        Vector3f up = direction.cross(this.xd > 0 ? new Vector3f(0, 0, 1) : new Vector3f(1, 0, 0), new Vector3f()).normalize();
-        Vector3f left = direction.cross(up, new Vector3f()).normalize();
+        Vector3f direction = new Vector3f((float) this.xd, (float) this.yd, (float) this.zd);
+        direction.mul(mult);
+
+        Vector3f up = direction.copy();
+        up.cross(this.xd > 0 ? new Vector3f(0, 0, 1) : new Vector3f(1, 0, 0));
+        up.normalize();
+
+        Vector3f left = direction.copy();
+        left.cross(up);
+        left.normalize();
 
         Vector3f[] vectors = new Vector3f[] {
-                up.negate(new Vector3f()).sub(left),
-                up.get(new Vector3f()).sub(left),
-                up.get(new Vector3f()).add(left),
-                up.negate(new Vector3f()).add(left)
+                new Vector3f(-up.x() - left.x(), -up.y() - left.y(), -up.z() - left.z()),
+                new Vector3f(up.x() - left.x(), up.y() - left.y(), up.z() - left.z()),
+                new Vector3f(up.x() + left.x(), up.y() + left.y(), up.z() + left.z()),
+                new Vector3f(-up.x() + left.x(), -up.y() + left.y(), -up.z() + left.z())
         };
         float size = this.getQuadSize(partial);
 

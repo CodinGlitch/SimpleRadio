@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSound
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
+import com.mojang.math.Vector3f;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -15,7 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -58,7 +58,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         this(uuid);
         this.owner = owner;
 
-        RadioManager.registerRouterSided(this, owner.level().isClientSide(), null);
+        RadioManager.registerRouterSided(this, owner.level.isClientSide(), null);
     }
     public RadioSpeaker(WorldlyPosition location) {
         this(location, UUID.randomUUID());
@@ -115,7 +115,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         super.updateLocation(location);
 
         if (audioChannel != null) {
-            audioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x, location.y, location.z));
+            audioChannel.updateLocation(CommonRadioPlugin.serverApi.createPosition(location.x(), location.y(), location.z()));
         }
     }
 
@@ -144,8 +144,8 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             level = (ServerLevel) location.level;
             position = location.position();
         } else {
-            level = (ServerLevel) owner.level();
-            position = owner.position().toVector3f();
+            level = (ServerLevel) owner.level;
+            position = new Vector3f(owner.position());
         }
         if (level == null || position == null) return;
 
@@ -162,7 +162,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             for (ServerPlayer player : level.players()) {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
                     Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
-                            this.getReference(), Holder.direct(source.soundEvent),
+                            this.getReference(), source.soundEvent,
                             source.volume, source.pitch, this.effect.severity, source.offset, source.seed
                     ));
                 }
@@ -211,7 +211,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             WorldlyPosition location = this.getLocation();
             this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.reference,
                     CommonRadioPlugin.serverApi.fromServerLevel(location.level),
-                    CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
+                    CommonRadioPlugin.serverApi.createPosition(location.x() + 0.5, location.y() + 0.5, location.z() + 0.5)
             );
             audioChannel.setDistance(range);
             audioChannel.setCategory(category);

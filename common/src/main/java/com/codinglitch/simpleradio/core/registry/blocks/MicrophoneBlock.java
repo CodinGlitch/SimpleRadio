@@ -7,9 +7,11 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.RadioListener;
+import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,10 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -29,23 +28,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.RotationSegment;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
-import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.UUID;
 
 public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listening {
-    public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
-    private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 
     private static final VoxelShape SHAPE = Block.box(4.0, 0.0, 4.0, 12.0, 14.0, 12.0);
@@ -56,7 +50,7 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
     }
 
     public float getYRotationDegrees(BlockState state) {
-        return RotationSegment.convertToDegrees(state.getValue(ROTATION));
+        return -((float)(state.getValue(StandingSignBlock.ROTATION) * 360) / 16.0f);
     }
 
     @Override
@@ -65,9 +59,9 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
 
         listener.range = SimpleRadioLibrary.SERVER_CONFIG.microphone.listeningRange;
 
-        float rotation = Math.toRadians(getYRotationDegrees(state) - 90);
-        Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
-        listener.connectionOffset = new Vec3(normal.x*0.1f, -0.2f, normal.z*0.1f);
+        float rotation = (float) Math.toRadians(getYRotationDegrees(state) - 90);
+        Vector3f normal = new Vector3f(Mth.cos(rotation), 0, Mth.sin(rotation));
+        listener.connectionOffset = new Vec3(normal.x()*0.1f, -0.2f, normal.z()*0.1f);
 
         // Allow distribution through wires
         listener.allowDistribution();
@@ -83,7 +77,7 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
-                .setValue(ROTATION, RotationSegment.convertToSegment(context.getRotation() + 180.0F));
+                .setValue(ROTATION, Mth.floor((double) ((180.0F + context.getRotation()) * 16.0F / 360.0F) + 0.5D) & 15);
     }
 
     @Override
@@ -93,12 +87,12 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(ROTATION, rotation.rotate(state.getValue(ROTATION), MAX_ROTATIONS));
+        return state.setValue(ROTATION, rotation.rotate(state.getValue(ROTATION), 16));
     }
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), MAX_ROTATIONS));
+        return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), 16));
     }
 
     @Override
@@ -118,7 +112,8 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         return 0;
     }
 
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof RadioBlockEntity radioBlockEntity)

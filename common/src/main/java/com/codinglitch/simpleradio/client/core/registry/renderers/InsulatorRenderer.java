@@ -7,16 +7,16 @@ import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Math;
 
 public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEntity> {
     private InsulatorModel model;
@@ -38,16 +38,16 @@ public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEnti
             poseStack.mulPose(facing.getRotation());
             poseStack.translate(0f, 1f, 0f);
 
-            poseStack.mulPose(Axis.XP.rotationDegrees(180));
-            poseStack.mulPose(Axis.YP.rotationDegrees(state.getValue(InsulatorBlock.ROTATED) ? 90 : 0));
+            poseStack.mulPose(Vector3f.XP.rotationDegrees(180));
+            poseStack.mulPose(Vector3f.YP.rotationDegrees(state.getValue(InsulatorBlock.ROTATED) ? 90 : 0));
 
             float rotation = 0.5f;
             if (blockEntity.connector != null) {
-                Vec3 pos = blockEntity.getBlockPos().getCenter();
+                Vec3 pos = Vec3.atCenterOf(blockEntity.getBlockPos());
                 rotation = (float) (3f + blockEntity.connector.distanceToSqr(pos.x, pos.y, pos.z)*0.5f);
             }
 
-            blockEntity.rotation = Math.lerp(blockEntity.rotation, rotation, Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.2f, 1));
+            blockEntity.rotation = Mth.lerp(blockEntity.rotation, rotation, Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.2f, 1));
 
             model.wire.visible = !blockEntity.getWires().isEmpty() || blockEntity.connector != null;
             model.spool.xRot = blockEntity.rotation;

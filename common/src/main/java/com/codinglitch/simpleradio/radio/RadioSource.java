@@ -10,7 +10,7 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.sounds.SoundEvent;
-import org.joml.Math;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,10 +176,10 @@ public class RadioSource {
             base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ?
                     SimpleRadioLibrary.SERVER_CONFIG.frequency.baseFMInterference :
                     SimpleRadioLibrary.SERVER_CONFIG.frequency.baseAMInterference;
-            severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
+            severity = 1 - Mth.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);
         }
 
-        return Math.clamp(
+        return Mth.clamp(
                 0, 100,
                 base + severity * (100 - base)
         );

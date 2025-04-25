@@ -13,7 +13,7 @@ accessible method net/minecraft/client/renderer/block/model/ItemOverrides <init>
 accessible class net/minecraft/client/resources/model/ModelManager$ReloadState
 
 # processFrames method in ItemModelGenerator
-accessible method net/minecraft/client/renderer/block/model/ItemModelGenerator processFrames (ILjava/lang/String;Lnet/minecraft/client/renderer/texture/SpriteContents;)Ljava/util/List;
+accessible method net/minecraft/client/renderer/block/model/ItemModelGenerator processFrames (ILjava/lang/String;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Ljava/util/List;
 
 # bakeFace method in BlockModel
 accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace (Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BakedQuad;
@@ -31,10 +31,16 @@ accessible field net/minecraft/client/sounds/SoundEngine soundBuffers Lnet/minec
 accessible field net/minecraft/client/sounds/SoundEngine channelAccess Lnet/minecraft/client/sounds/ChannelAccess;
 
 # ResourceProvider field
-accessible field net/minecraft/client/sounds/SoundBufferLibrary resourceManager Lnet/minecraft/server/packs/resources/ResourceProvider;
+accessible field net/minecraft/client/sounds/SoundBufferLibrary resourceManager Lnet/minecraft/server/packs/resources/ResourceManager;
 
 accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
 
 accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
 
 accessible field com/mojang/blaze3d/audio/Channel source I
+
+extendable class com/mojang/math/Vector3f
+
+accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity tickCount J
+
+accessible field net/minecraft/world/level/block/entity/JukeboxBlockEntity recordStartedTick J

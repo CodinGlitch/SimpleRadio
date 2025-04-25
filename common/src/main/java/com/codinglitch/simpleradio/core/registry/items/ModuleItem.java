@@ -57,9 +57,9 @@ public class ModuleItem extends TieredItem {
                 components.add(Component.translatable("item.modifiers." + type.getName()).withStyle(ChatFormatting.GRAY));
 
                 if (I18n.exists(modulePath + "." + type.getName() + ".effects")) {
-                    components.add(CommonComponents.space().append(Component.translatable(modulePath + "." + type.getName() + ".effects").withStyle(ChatFormatting.DARK_GREEN)));
+                    components.add(Component.translatable(modulePath + "." + type.getName() + ".effects").withStyle(ChatFormatting.DARK_GREEN));
                 } else {
-                    components.add(CommonComponents.space().append(Component.translatable(modulePath + ".effects").withStyle(ChatFormatting.DARK_GREEN)));
+                    components.add(Component.translatable(modulePath + ".effects").withStyle(ChatFormatting.DARK_GREEN));
                 }
             }
         }

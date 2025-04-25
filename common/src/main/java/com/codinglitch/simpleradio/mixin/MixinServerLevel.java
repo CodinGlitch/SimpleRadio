@@ -26,17 +26,18 @@ import java.util.function.Supplier;
 @Mixin(ServerLevel.class)
 public abstract class MixinServerLevel extends Level implements WorldGenLevel {
 
-    protected MixinServerLevel(WritableLevelData $$0, ResourceKey<Level> $$1, RegistryAccess $$2, Holder<DimensionType> $$3, Supplier<ProfilerFiller> $$4, boolean $$5, boolean $$6, long $$7, int $$8) {
-        super($$0, $$1, $$2, $$3, $$4, $$5, $$6, $$7, $$8);
+
+    protected MixinServerLevel(WritableLevelData $$0, ResourceKey<Level> $$1, Holder<DimensionType> $$2, Supplier<ProfilerFiller> $$3, boolean $$4, boolean $$5, long $$6, int $$7) {
+        super($$0, $$1, $$2, $$3, $$4, $$5, $$6, $$7);
     }
 
-    @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V")
-    private void simpleradio$playSeededSound1_audioGathering(Player except, Entity entity, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
+    @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFJ)V")
+    private void simpleradio$playSeededSound1_audioGathering(Player player, Entity entity, SoundEvent sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
         RadioManager.getInstance().onSoundPlayed((ServerLevel) (Object) this, entity.position(), sound, volume, pitch, seed);
     }
 
-    @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V")
-    private void simpleradio$playSeededSound2_audioGathering(Player except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
+    @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFJ)V")
+    private void simpleradio$playSeededSound2_audioGathering(Player player, double x, double y, double z, SoundEvent sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
         RadioManager.getInstance().onSoundPlayed((ServerLevel) (Object) this, new Vec3(x, y, z), sound, volume, pitch, seed);
     }
 

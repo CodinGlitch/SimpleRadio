@@ -32,7 +32,7 @@ public class MixinExplosion {
     @Inject(at = @At("HEAD"), method = "finalizeExplosion")
     private void simpleradio$finalizeExplosion(CallbackInfo info) {
         if (this.level instanceof ServerLevel serverLevel) {
-            RadioManager.getInstance().onSoundPlayed(serverLevel, new Vec3(this.x, this.y, this.z), Holder.direct(SoundEvents.GENERIC_EXPLODE), 4, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, 1);
+            RadioManager.getInstance().onSoundPlayed(serverLevel, new Vec3(this.x, this.y, this.z), SoundEvents.GENERIC_EXPLODE, 4, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, 1);
         }
     }
 }

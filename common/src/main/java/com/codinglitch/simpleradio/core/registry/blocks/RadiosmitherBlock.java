@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -53,6 +54,11 @@ public class RadiosmitherBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(RADIOSMITHER_PART, RadiosmitherPart.MAIN));
+    }
+
+    @Override
+    public PushReaction getPistonPushReaction(BlockState $$0) {
+        return PushReaction.IGNORE;
     }
 
     @Override
@@ -160,11 +166,6 @@ public class RadiosmitherBlock extends BaseEntityBlock {
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return state.getValue(RADIOSMITHER_PART) == RadiosmitherPart.MAIN ? RenderShape.MODEL : RenderShape.INVISIBLE;
-    }
-
-    @Override
-    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        return level.getBlockState(pos.relative(state.getValue(FACING).getCounterClockWise())).canBeReplaced();
     }
 
     public enum RadiosmitherPart implements StringRepresentable {

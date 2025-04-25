@@ -12,7 +12,10 @@ import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import com.mojang.math.Vector3f;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -27,8 +30,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -139,7 +140,7 @@ public class Wire extends Entity implements Medium {
             return;
         }
 
-        Level level = this.level();
+        Level level = this.level;
         boolean isReversed = originSocket.getReference().equals(toRef);
         RadioRouter origin = isReversed ? to : from;
         RadioRouter destination = isReversed ? from : to;
@@ -201,7 +202,7 @@ public class Wire extends Entity implements Medium {
         RadioRouter to = this.getToRouter();
         if (to == null) return 0;
 
-        return from.getLocation().position().distance(to.getLocation().position());
+        return from.getLocation().rawDistance(to.getLocation());
     }
 
     @Nullable
@@ -209,7 +210,7 @@ public class Wire extends Entity implements Medium {
         UUID reference = this.getFrom().orElse(null);
         if (reference == null) return null;
 
-        return RadioManager.getRouterSided(reference, this.getFromType(), this.level().isClientSide);
+        return RadioManager.getRouterSided(reference, this.getFromType(), this.level.isClientSide);
     }
     public Optional<UUID> getFrom() {
         return this.getEntityData().get(FROM);
@@ -231,7 +232,7 @@ public class Wire extends Entity implements Medium {
         UUID reference = this.getTo().orElse(null);
         if (reference == null) return null;
 
-        return RadioManager.getRouterSided(reference, this.getToType(), this.level().isClientSide);
+        return RadioManager.getRouterSided(reference, this.getToType(), this.level.isClientSide);
     }
     public Optional<UUID> getTo() {
         return this.getEntityData().get(TO);
@@ -253,11 +254,11 @@ public class Wire extends Entity implements Medium {
     }
 
     public void shortCircuit(Vector3f at) {
-        if (level() instanceof ServerLevel level) Socket.shortAt(level, at);
+        if (level instanceof ServerLevel level) Socket.shortAt(level, at);
         this.burnOut();
     }
     public void shortCircuit() {
-        this.shortCircuit(this.position().toVector3f());
+        this.shortCircuit(new Vector3f(this.position()));
     }
 
     public void queueDemise(int time, float position) {
@@ -279,7 +280,7 @@ public class Wire extends Entity implements Medium {
 
     @Override
     public void tick() {
-        if (!this.level().isLoaded(this.blockPosition())) return;
+        if (!this.level.isLoaded(this.blockPosition())) return;
 
         this.noPhysics = true;
 
@@ -289,7 +290,7 @@ public class Wire extends Entity implements Medium {
         UUID fromRef = this.getFrom().orElse(null);
         UUID toRef = this.getTo().orElse(null);
 
-        if (this.level().isClientSide) {
+        if (this.level.isClientSide) {
             int effectDuration = Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
 
             Iterator<Effect> iterator = this.effectList.iterator();
@@ -336,14 +337,15 @@ public class Wire extends Entity implements Medium {
                     return;
                 }
 
-                if (from.getLocation().position().distance(to.getLocation().position()) > SimpleRadioLibrary.SERVER_CONFIG.wire.range) {
+                if (from.getLocation().rawDistance(to.getLocation()) > SimpleRadioLibrary.SERVER_CONFIG.wire.range) {
                     this.tickDeath();
                     return;
                 }
 
                 if (deathRowTime != -1) {
                     if (deathRowTime-- == 0) {
-                        Vector3f position = from.getLocation().position().lerp(to.getLocation().position(), deathRowPosition);
+                        Vector3f position = from.getLocation().position().copy();
+                        position.lerp(to.getLocation().position(), deathRowPosition);
 
                         this.shortCircuit(position);
                         return;
@@ -372,8 +374,8 @@ public class Wire extends Entity implements Medium {
 
     @Override
     public void remove(RemovalReason reason) {
-        ItemEntity drop = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), new ItemStack(SimpleRadioItems.COPPER_WIRE, 1));
-        this.level().addFreshEntity(drop);
+        ItemEntity drop = new ItemEntity(this.level, this.getX(), this.getY(), this.getZ(), new ItemStack(SimpleRadioItems.COPPER_WIRE, 1));
+        this.level.addFreshEntity(drop);
         cleanUp();
 
         super.remove(reason);
@@ -400,6 +402,11 @@ public class Wire extends Entity implements Medium {
     @Override
     public boolean canBeCollidedWith() {
         return false;
+    }
+
+    @Override
+    public Packet<?> getAddEntityPacket() {
+        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

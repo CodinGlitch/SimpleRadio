@@ -19,12 +19,12 @@ import java.util.function.Predicate;
 @Mixin(PlayerList.class)
 public class MixinPlayerList {
 
-    @Inject(at = @At("TAIL"), method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Ljava/util/function/Predicate;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V")
-    private void simpleradio$logChatMessage_frequencerSetting(PlayerChatMessage message, Predicate<ServerPlayer> playerPredicate, ServerPlayer player, ChatType.Bound bound, CallbackInfo info) {
-        String content = message.signedContent();
+    @Inject(at = @At("TAIL"), method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V")
+    private void simpleradio$logChatMessage_frequencerSetting(PlayerChatMessage message, ServerPlayer player, ChatType.Bound $$2, CallbackInfo ci) {
+        String content = message.signedContent().plain();
         if (content.startsWith("frequency")) {
             Frequency frequency = Frequency.tryParse(content.substring(10));
-            ServerLevel level = player.serverLevel();
+            ServerLevel level = (ServerLevel) player.level;
             BlockPos playerPosition = player.blockPosition();
 
             for (int x = -2; x < 2; x++) {

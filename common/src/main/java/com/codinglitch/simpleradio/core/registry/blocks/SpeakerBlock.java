@@ -21,12 +21,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -105,7 +104,8 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         return RenderShape.MODEL;
     }
 
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SpeakerBlockEntity speakerBlockEntity)

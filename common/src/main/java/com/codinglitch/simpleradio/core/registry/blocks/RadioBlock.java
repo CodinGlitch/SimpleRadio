@@ -8,6 +8,7 @@ import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -19,8 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.RotationSegment;
-import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Receiving {
-    public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
-    private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 
     private static final VoxelShape SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 7.0, 14.0);
@@ -62,7 +60,7 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
     }
 
     public float getYRotationDegrees(BlockState state) {
-        return RotationSegment.convertToDegrees(state.getValue(ROTATION));
+        return -((float)(state.getValue(StandingSignBlock.ROTATION) * 360) / 16.0f);
     }
 
     @Override
@@ -73,7 +71,7 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
-                .setValue(ROTATION, RotationSegment.convertToSegment(context.getRotation() + 180.0F));
+                .setValue(ROTATION, Mth.floor((double) ((180.0F + context.getRotation()) * 16.0F / 360.0F) + 0.5D) & 15);
     }
 
     @Override
@@ -83,12 +81,12 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(ROTATION, rotation.rotate(state.getValue(ROTATION), MAX_ROTATIONS));
+        return state.setValue(ROTATION, rotation.rotate(state.getValue(ROTATION), 16));
     }
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), MAX_ROTATIONS));
+        return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), 16));
     }
 
     @Override
@@ -101,7 +99,8 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
         return 0;
     }
 
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof RadioBlockEntity radioBlockEntity)

@@ -6,14 +6,14 @@ import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -60,7 +60,7 @@ public class RadioRouter implements Socket {
 
     public Class<?> link;
 
-    public Quaternionf rotation = null;
+    public Quaternion rotation = null;
     public Vec3 connectionOffset = Vec3.ZERO; // A given offset for the rendering of wires connected to it. Relative to rotation if given.
 
     public RadioRouter(UUID reference) {
@@ -129,16 +129,17 @@ public class RadioRouter implements Socket {
     }
 
     public Vec3 getConnectionPosition() {
-        Vector3f translatedOffset = rotation == null ? connectionOffset.toVector3f() : rotation.transform(connectionOffset.toVector3f());
+        Vector3f translatedOffset = new Vector3f(connectionOffset);
+        if (rotation != null) translatedOffset.transform(rotation);
 
-        return new Vec3(getLocation().position()).add(translatedOffset.x, translatedOffset.y, translatedOffset.z);
+        return new Vec3(getLocation().position()).add(translatedOffset.x(), translatedOffset.y(), translatedOffset.z());
     }
 
     public WorldlyPosition getLocation() {
         if (this.location != null) {
             return this.location;
         } else if (this.owner != null) {
-            return new WorldlyPosition((float) owner.getX(), (float) owner.getY(), (float) owner.getZ(), owner.level());
+            return new WorldlyPosition((float) owner.getX(), (float) owner.getY(), (float) owner.getZ(), owner.level);
         }
         return null;
     }
@@ -158,7 +159,7 @@ public class RadioRouter implements Socket {
     public void updateLocation(WorldlyPosition location) {
     }
 
-    public void updateRotation(Quaternionf rotation) {
+    public void updateRotation(Quaternion rotation) {
         this.rotation = rotation;
     }
 
@@ -169,13 +170,14 @@ public class RadioRouter implements Socket {
 
             Vector3f currentPosition = location.position();
             if (currentPosition != oldPosition) {
-                currentPosition.sub(oldPosition, velocity);
+                velocity = currentPosition.copy();
+                velocity.sub(oldPosition);
             } else {
-                velocity.set(0);
+                velocity.set(0, 0, 0);
             }
-            oldPosition.set(currentPosition);
+            oldPosition.set(currentPosition.x(), currentPosition.y(), currentPosition.z());
         } else if (owner != null) {
-            this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
+            this.updateLocation(WorldlyPosition.of(new Vector3f(owner.position()), owner.level));
         }
 
         if (!this.active) {
@@ -258,7 +260,7 @@ public class RadioRouter implements Socket {
     }
 
     public int getRedstoneMappedActivity() {
-        return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
+        return (int) Mth.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
     }
 
     public void compileActivity(RadioSource source) {
@@ -271,7 +273,7 @@ public class RadioRouter implements Socket {
         } else {
             compiledActivity += source.activity;
             if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
-                this.activity = Math.sqrt(compiledActivity);
+                this.activity = Mth.sqrt(compiledActivity);
                 compiledActivity = 0;
                 compiledSamples = 0;
             }
@@ -287,7 +289,7 @@ public class RadioRouter implements Socket {
         WorldlyPosition location = getLocation();
         if (!location.isClientSide()) {
             for (Player player : location.level.players()) {
-                if (location.position().distance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
+                if (location.rawDistance((float) player.getX(), (float) player.getY(), (float) player.getZ()) <= 100) {
                     Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundActivityPacket(activity, this.getIdentifier()));
                 }
             }

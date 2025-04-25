@@ -54,7 +54,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, speaker.location.x, speaker.location.y, speaker.location.z,
+                    null, speaker.location.x(), speaker.location.y(), speaker.location.z(),
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -122,7 +122,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
             this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());
 
             level.playSound(
-                    null, location.x, location.y, location.z,
+                    null, location.x(), location.y(), location.z(),
                     SimpleRadioSounds.RADIO_OPEN,
                     SoundSource.PLAYERS,
                     1f, 1f

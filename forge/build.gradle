@@ -119,7 +119,7 @@ dependencies {
 
     // Config mods
     if (config_mod == "configured") {
-        developmentRuntimeOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
+        //developmentRuntimeOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {

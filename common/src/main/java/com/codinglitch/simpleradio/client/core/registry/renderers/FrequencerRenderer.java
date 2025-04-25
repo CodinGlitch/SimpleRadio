@@ -2,12 +2,12 @@ package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.core.registry.blocks.FrequencerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import org.joml.Matrix4f;
 
 import java.awt.*;
 
@@ -29,7 +29,7 @@ public class FrequencerRenderer implements BlockEntityRenderer<FrequencerBlockEn
         Font font = minecraft.font;
         float f2 = (float)(-font.width(text) / 2);
 
-        font.drawInBatch(text, f2, 0, color, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+        font.drawInBatch(text, f2, 0, color, false, matrix4f, bufferSource, false, 0, 255);
 
         poseStack.popPose();
     }

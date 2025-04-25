@@ -1,10 +1,9 @@
 package com.codinglitch.simpleradio.api.central;
 
+import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import org.joml.Math;
-import org.joml.Options;
-import org.joml.Vector3f;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -28,16 +27,16 @@ public class WorldlyPosition extends Vector3f {
     }
 
     public static WorldlyPosition of(BlockPos pos, Level level, BlockPos realLocation) { // use this upon creation to save the 'real' location
-        return WorldlyPosition.of(pos.getCenter().toVector3f(), level, realLocation);
+        return new WorldlyPosition(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, level, realLocation);
     }
     public static WorldlyPosition of(BlockPos pos, Level level) {
-        return WorldlyPosition.of(pos.getCenter().toVector3f(), level);
+        return new WorldlyPosition(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, level);
     }
     public static WorldlyPosition of(Vector3f pos, Level level, BlockPos realLocation) { // use this upon creation to save the 'real' location
-        return new WorldlyPosition(pos.x, pos.y, pos.z, level, realLocation);
+        return new WorldlyPosition(pos.x(), pos.y(), pos.z(), level, realLocation);
     }
     public static WorldlyPosition of(Vector3f pos, Level level) {
-        return new WorldlyPosition(pos.x, pos.y, pos.z, level);
+        return new WorldlyPosition(pos.x(), pos.y(), pos.z(), level);
     }
 
     public Vector3f position() {
@@ -53,26 +52,32 @@ public class WorldlyPosition extends Vector3f {
     }
 
     public BlockPos blockPos() {
-        return new BlockPos((int) Math.floor(this.x), (int) Math.floor(this.y), (int) Math.floor(this.z));
+        return new BlockPos((int) Math.floor(this.x()), (int) Math.floor(this.y()), (int) Math.floor(this.z()));
     }
     public BlockPos realLocation() { // used in garbage collection pretty much exclusively for VS and maybe Create: Aeronautics when released
         return this.realLocation == null ? this.blockPos() : this.realLocation;
     }
 
     public Vector3f dimensionScaled() {
-        return this.position().mul((float) level.dimensionType().coordinateScale(), new Vector3f());
+        Vector3f scaled = this.position().copy();
+        scaled.mul((float) level.dimensionType().coordinateScale());
+        return scaled;
     }
 
     public float distance(WorldlyPosition other) {
-        return this.dimensionScaled().distance(other.dimensionScaled());
+        Vector3f vec = this.dimensionScaled();
+        vec.sub(other.dimensionScaled());
+        return (float) Mth.length(vec.x(), vec.y(), vec.z());
+    }
+    public float rawDistance(WorldlyPosition other) {
+        return (float) Mth.length(this.x() - other.x(), this.y() - other.y(), this.z() - other.z());
+    }
+    public float rawDistance(float x, float y, float z) {
+        return (float) Mth.length(this.x() - x, this.y() - y, this.z() - z);
     }
 
     public boolean isClientSide() {
         return this.level.isClientSide;
     }
 
-    @Override
-    public String toString() {
-        return toString(NumberFormat.getNumberInstance(Locale.ENGLISH));
-    }
 }

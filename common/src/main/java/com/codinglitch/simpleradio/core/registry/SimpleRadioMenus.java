@@ -3,11 +3,13 @@ package com.codinglitch.simpleradio.core.registry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.Services;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,15 +26,19 @@ public class SimpleRadioMenus {
     }
 
     public static final ResourceLocation RADIO_TAB_LOCATION = id("simple_radio_tab");
-    public static final CreativeModeTab RADIO_TAB = Services.REGISTRY.registerCreativeTab(RADIO_TAB_LOCATION, CreativeModeTab.builder(CreativeModeTab.Row.TOP, 7)
-            .title(Component.translatable("item_group." + CommonSimpleRadio.ID))
-            .icon(() -> new ItemStack(SimpleRadioItems.TRANSCEIVER))
-            .displayItems((params, output) -> {
-                SimpleRadioItems.ITEMS.entrySet().stream().filter(entry -> RADIO_TAB_LOCATION.equals(entry.getValue().tab))
-                        .forEach(entry -> {if (entry.getValue().enabled) output.accept(entry.getValue().get());});
-            })
-            .build()
-    );
+    public static final CreativeModeTab RADIO_TAB = Services.REGISTRY.registerCreativeTab(RADIO_TAB_LOCATION, new CreativeModeTab(7, CommonSimpleRadio.ID) {
+        public ItemStack makeIcon() {
+            return new ItemStack(SimpleRadioItems.TRANSCEIVER);
+        }
+
+        @Override
+        public void fillItemList(NonNullList<ItemStack> items) {
+            super.fillItemList(items);
+
+            SimpleRadioItems.ITEMS.entrySet().stream().filter(entry -> RADIO_TAB_LOCATION.equals(entry.getValue().tab))
+                    .forEach(entry -> { if (entry.getValue().enabled) items.add(new ItemStack(entry.getValue().get())); });
+        }
+    });
 
     public static void load() {}
 }

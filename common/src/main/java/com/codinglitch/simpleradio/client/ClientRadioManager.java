@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
@@ -20,6 +21,7 @@ import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -40,11 +42,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Math;
-import org.joml.Vector3f;
 
 import org.jetbrains.annotations.Nullable;
 import javax.sound.sampled.AudioFormat;
@@ -264,7 +263,7 @@ public class ClientRadioManager {
             if (existingChannelHandle.channelHandle.isStopped()) {
                 wrapper.removeChannel(packet.seed());
             } else {
-                if (packet.sound().value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume() == 0) {
+                if (packet.sound().getLocation().equals(SoundEvents.AMBIENT_UNDERWATER_LOOP_ADDITIONS_ULTRA_RARE.getLocation()) && packet.volume() == 0) {
                     existingChannelHandle.execute(Channel::stop);
                 } else {
                     //if (true) return;
@@ -281,9 +280,9 @@ public class ClientRadioManager {
             }
         }
 
-        if (packet.sound().value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume() == 0) return;
+        if (packet.sound().getLocation().equals(SoundEvents.AMBIENT_UNDERWATER_LOOP_ADDITIONS_ULTRA_RARE.getLocation()) && packet.volume() == 0) return;
 
-        SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound().value(), SoundSource.BLOCKS,
+        SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound(), SoundSource.BLOCKS,
                 packet.volume(), packet.pitch(),
                 RandomSource.create(packet.seed()), location.blockPos());
         instance.resolve(soundManager);
@@ -385,20 +384,21 @@ public class ClientRadioManager {
         RadioRouter mainRouter = blockEntity.getRouter();
         if (mainRouter == null) return;
 
-        float rotation = RotationSegment.convertToDegrees(state.getValue(MicrophoneBlock.ROTATION));
+        float rotation = SimpleRadioBlocks.MICROPHONE.getYRotationDegrees(state);
 
         Vector3f direction = new Vector3f(0f, 1f, 0f);
-        direction.rotateX(blockEntity.currentTilt);
-        direction.rotateY(Math.toRadians(-rotation));
+        direction.transform(Vector3f.XP.rotation(blockEntity.currentTilt));
+        direction.transform(Vector3f.YP.rotationDegrees(-rotation));
 
         WorldlyPosition position = mainRouter.getLocation();
 
         if (mainRouter.rotation != null) {
-            mainRouter.rotation.transform(direction);
+            direction.transform(mainRouter.rotation);
         }
 
-        Vector3f pos = position.add(direction.x*0.4f, direction.y*0.4f, direction.z*0.4f, new Vector3f());
-        blockEntity.getLevel().addParticle(SimpleRadioParticles.LISTEN, pos.x, pos.y, pos.z, direction.x*0.01f, direction.y*0.01f, direction.z*0.01f);
+        Vector3f pos = position.copy();
+        pos.add(direction.x()*0.4f, direction.y()*0.4f, direction.z()*0.4f);
+        blockEntity.getLevel().addParticle(SimpleRadioParticles.LISTEN, pos.x(), pos.y(), pos.z(), direction.x()*0.01f, direction.y()*0.01f, direction.z()*0.01f);
 
     }
 
@@ -412,16 +412,20 @@ public class ClientRadioManager {
         Vector3f transformedDir = new Vector3f(dir.getX(), dir.getY(), dir.getZ());
 
         WorldlyPosition position = mainRouter.getLocation();
-        Vec3 blockPosition = blockEntity.getBlockPos().getCenter();
+        Vec3 blockPosition = Vec3.atCenterOf(blockEntity.getBlockPos());
 
         if (mainRouter.rotation != null) {
-            mainRouter.rotation.transform(transformedDir);
+            transformedDir.transform(mainRouter.rotation);
         }
 
         Entity camera = Minecraft.getInstance().cameraEntity;
         if (camera == null) return;
 
-        float dot = transformedDir.normalize().dot(camera.position().toVector3f().sub(position).normalize());
+        Vector3f cameraPos = new Vector3f(camera.position());
+        cameraPos.sub(position);
+        cameraPos.normalize();
+        transformedDir.normalize();
+        float dot = transformedDir.dot(cameraPos);
         if (Math.abs(dot) > 0.65f) {
             Vec3 pos = blockPosition.relative(direction, 0.55d);
             blockEntity.getLevel().addParticle(SimpleRadioParticles.SPEAK_RING, pos.x, pos.y, pos.z, dir.getX()*0.01f, dir.getY()*0.01f, dir.getZ()*0.01f);
@@ -438,9 +442,9 @@ public class ClientRadioManager {
 
         Vector3f location = null;
         if (router.location != null) {
-            location = new Vector3f(router.location.x, router.location.y, router.location.z);
+            location = new Vector3f(router.location.x(), router.location.y(), router.location.z());
         } else if (router.owner != null) {
-            location = router.owner.position().toVector3f();
+            location = new Vector3f(router.owner.position());
         }
 
         if (location == null) return;
@@ -463,8 +467,8 @@ public class ClientRadioManager {
             g = 1f;
         }
 
-        location = location.sub(camera);
-        poseStack.translate(location.x, location.y, location.z);
+        location.sub(camera);
+        poseStack.translate(location.x(), location.y(), location.z());
 
         if (router.rotation != null) {
             poseStack.mulPose(router.rotation);
@@ -474,15 +478,15 @@ public class ClientRadioManager {
         if (router.connectionOffset == Vec3.ZERO) {
             newOffset = new Vector3f();
         } else {
-            newOffset = router.connectionOffset.toVector3f();
+            newOffset = new Vector3f(router.connectionOffset);
         }
 
         //Vec3 newLocation = location.getCenter().add(new Vec3(newOffset));
         AABB pointBox = new AABB(
                 -0.05f, -0.05f, -0.05f,
                 0.05f, 0.05f, 0.05f
-        ).move(newOffset.x, newOffset.y, newOffset.z);
-        DebugRenderer.renderFilledBox(poseStack, bufferSource, pointBox, r, g, b, 0.8f);
+        ).move(newOffset.x(), newOffset.y(), newOffset.z());
+        DebugRenderer.renderFilledBox(pointBox, r, g, b, 0.8f);
 
         AABB boundingBox = new AABB(
                 -0.5f, -0.5f, -0.5f,
