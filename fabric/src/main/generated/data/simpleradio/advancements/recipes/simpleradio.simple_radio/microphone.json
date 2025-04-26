@@ -1,12 +1,4 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "simpleradio:items_enabled",
-      "values": [
-        "microphone"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_listener_module": {
@@ -28,6 +20,14 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "microphone"
+      ]
+    }
+  ],
   "requirements": [
     [
       "has_listener_module",
@@ -38,6 +38,5 @@
     "recipes": [
       "simpleradio:microphone"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

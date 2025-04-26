@@ -1,20 +1,12 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "simpleradio:items_enabled",
-      "values": [
-        "listener_module"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_ingot": {
+    "has_antenna": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_ingot"
+              "simpleradio:antenna"
             ]
           }
         ]
@@ -23,32 +15,41 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "simpleradio:listener_module"
+        "recipe": "simpleradio:transmitter"
       },
       "trigger": "minecraft:recipe_unlocked"
     },
-    "has_wool": {
+    "has_transmitting_module": {
       "conditions": {
         "items": [
           {
-            "tag": "minecraft:wool"
+            "items": [
+              "simpleradio:transmitting_module"
+            ]
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "transmitter"
+      ]
+    }
+  ],
   "requirements": [
     [
-      "has_copper_ingot",
-      "has_wool",
+      "has_transmitting_module",
+      "has_antenna",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "simpleradio:listener_module"
+      "simpleradio:transmitter"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "equipment",
         "key": {
           "A": {
             "item": "simpleradio:antenna"
@@ -44,8 +43,7 @@
         ],
         "result": {
           "item": "simpleradio:transceiver"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

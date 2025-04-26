@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:crafting_shaped",
   "fabric:load_conditions": [
     {
       "condition": "simpleradio:items_enabled",
@@ -7,8 +8,6 @@
       ]
     }
   ],
-  "type": "minecraft:crafting_shaped",
-  "category": "building",
   "key": {
     "B": {
       "item": "minecraft:iron_bars"
@@ -19,11 +18,10 @@
   },
   "pattern": [
     " B ",
-    " I ",
-    " B "
+    " B ",
+    " I "
   ],
   "result": {
     "item": "simpleradio:antenna"
-  },
-  "show_notification": true
+  }
 }

@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "building",
         "key": {
           "C": {
             "item": "simpleradio:copper_wire"
@@ -32,8 +31,7 @@
         ],
         "result": {
           "item": "simpleradio:speaker"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

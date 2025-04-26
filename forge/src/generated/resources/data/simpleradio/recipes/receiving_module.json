@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "misc",
         "key": {
           "A": {
             "item": "simpleradio:antenna"
@@ -32,8 +31,7 @@
         ],
         "result": {
           "item": "simpleradio:receiving_module"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

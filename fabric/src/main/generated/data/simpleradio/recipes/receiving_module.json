@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:crafting_shaped",
   "fabric:load_conditions": [
     {
       "condition": "simpleradio:items_enabled",
@@ -7,26 +8,26 @@
       ]
     }
   ],
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "A": {
       "item": "simpleradio:antenna"
     },
     "C": {
-      "item": "minecraft:copper_ingot"
+      "item": "simpleradio:copper_wire"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
     },
     "M": {
       "item": "minecraft:amethyst_shard"
     }
   },
   "pattern": [
-    "A",
-    "C",
-    "M"
+    " A ",
+    "CIC",
+    " M "
   ],
   "result": {
     "item": "simpleradio:receiving_module"
-  },
-  "show_notification": true
+  }
 }

@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:crafting_shaped",
   "fabric:load_conditions": [
     {
       "condition": "simpleradio:items_enabled",
@@ -7,26 +8,23 @@
       ]
     }
   ],
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "C": {
-      "item": "minecraft:copper_ingot"
+      "item": "simpleradio:copper_wire"
     },
-    "R": {
-      "item": "minecraft:redstone"
+    "I": {
+      "item": "minecraft:iron_ingot"
     },
     "W": {
       "tag": "minecraft:wool"
     }
   },
   "pattern": [
-    "R",
-    "C",
-    "W"
+    "W",
+    "I",
+    "C"
   ],
   "result": {
     "item": "simpleradio:listener_module"
-  },
-  "show_notification": true
+  }
 }

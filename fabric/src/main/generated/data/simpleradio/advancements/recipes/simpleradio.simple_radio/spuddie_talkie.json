@@ -1,20 +1,12 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "simpleradio:items_enabled",
-      "values": [
-        "socket"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_ingot": {
+    "has_copper_wire": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_ingot"
+              "simpleradio:copper_wire"
             ]
           }
         ]
@@ -33,24 +25,44 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
+    "has_potato": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:potato"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "simpleradio:socket"
+        "recipe": "simpleradio:spuddie_talkie"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "spuddie_talkie"
+      ]
+    }
+  ],
   "requirements": [
     [
       "has_iron_ingot",
-      "has_copper_ingot",
+      "has_potato",
+      "has_copper_wire",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "simpleradio:socket"
+      "simpleradio:spuddie_talkie"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

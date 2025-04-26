@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "equipment",
         "key": {
           "B": {
             "item": "minecraft:copper_block"
@@ -29,8 +28,7 @@
         ],
         "result": {
           "item": "simpleradio:walkie_talkie"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

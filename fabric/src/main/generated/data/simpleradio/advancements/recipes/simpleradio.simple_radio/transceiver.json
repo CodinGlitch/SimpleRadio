@@ -1,12 +1,4 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "simpleradio:items_enabled",
-      "values": [
-        "transceiver"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_receiving_module": {
@@ -52,6 +44,14 @@
       "trigger": "minecraft:inventory_changed"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "transceiver"
+      ]
+    }
+  ],
   "requirements": [
     [
       "has_transmitting_module",
@@ -64,6 +64,5 @@
     "recipes": [
       "simpleradio:transceiver"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

@@ -1,32 +1,12 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "simpleradio:items_enabled",
-      "values": [
-        "walkie_talkie"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_block": {
+    "has_amethyst_shard": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_block"
-            ]
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_copper_ingot": {
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "minecraft:copper_ingot"
+              "minecraft:amethyst_shard"
             ]
           }
         ]
@@ -45,25 +25,44 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
+    "has_polished_deepslate": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:polished_deepslate"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "simpleradio:walkie_talkie"
+        "recipe": "simpleradio:radiosmither"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "radiosmither"
+      ]
+    }
+  ],
   "requirements": [
     [
       "has_iron_ingot",
-      "has_copper_block",
-      "has_copper_ingot",
+      "has_polished_deepslate",
+      "has_amethyst_shard",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "simpleradio:walkie_talkie"
+      "simpleradio:radiosmither"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

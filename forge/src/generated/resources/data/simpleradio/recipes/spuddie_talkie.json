@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "equipment",
         "key": {
           "C": {
             "item": "simpleradio:copper_wire"
@@ -29,8 +28,7 @@
         ],
         "result": {
           "item": "simpleradio:spuddie_talkie"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

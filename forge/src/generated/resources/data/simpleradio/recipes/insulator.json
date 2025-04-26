@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "building",
         "key": {
           "I": {
             "item": "minecraft:iron_ingot"
@@ -24,8 +23,7 @@
         ],
         "result": {
           "item": "simpleradio:insulator"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

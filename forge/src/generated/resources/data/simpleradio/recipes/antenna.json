@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "building",
         "key": {
           "B": {
             "item": "minecraft:iron_bars"
@@ -26,8 +25,7 @@
         ],
         "result": {
           "item": "simpleradio:antenna"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

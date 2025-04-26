@@ -4,22 +4,22 @@
     {
       "condition": "simpleradio:items_enabled",
       "values": [
-        "copper_wire"
+        "insulator"
       ]
     }
   ],
   "key": {
-    "C": {
-      "item": "minecraft:copper_ingot"
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "tag": "minecraft:planks"
     }
   },
   "pattern": [
-    " C ",
-    "C C",
-    " C "
+    "PIP"
   ],
   "result": {
-    "count": 2,
-    "item": "simpleradio:copper_wire"
+    "item": "simpleradio:insulator"
   }
 }

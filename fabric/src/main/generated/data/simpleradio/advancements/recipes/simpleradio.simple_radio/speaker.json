@@ -1,20 +1,12 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "simpleradio:items_enabled",
-      "values": [
-        "copper_wire"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_ingot": {
+    "has_speaker_module": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_ingot"
+              "simpleradio:speaker_module"
             ]
           }
         ]
@@ -23,21 +15,28 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "simpleradio:copper_wire"
+        "recipe": "simpleradio:speaker"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "speaker"
+      ]
+    }
+  ],
   "requirements": [
     [
-      "has_copper_ingot",
+      "has_speaker_module",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "simpleradio:copper_wire"
+      "simpleradio:speaker"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

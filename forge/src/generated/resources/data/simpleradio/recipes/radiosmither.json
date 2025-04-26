@@ -10,7 +10,6 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
-        "category": "building",
         "key": {
           "A": {
             "item": "minecraft:amethyst_shard"
@@ -32,8 +31,7 @@
         ],
         "result": {
           "item": "simpleradio:radiosmither"
-        },
-        "show_notification": true
+        }
       }
     }
   ]

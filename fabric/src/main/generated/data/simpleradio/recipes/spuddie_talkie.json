@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:crafting_shaped",
   "fabric:load_conditions": [
     {
       "condition": "simpleradio:items_enabled",
@@ -7,11 +8,9 @@
       ]
     }
   ],
-  "type": "minecraft:crafting_shaped",
-  "category": "equipment",
   "key": {
     "C": {
-      "item": "minecraft:copper_ingot"
+      "item": "simpleradio:copper_wire"
     },
     "I": {
       "item": "minecraft:iron_ingot"
@@ -27,6 +26,5 @@
   ],
   "result": {
     "item": "simpleradio:spuddie_talkie"
-  },
-  "show_notification": true
+  }
 }

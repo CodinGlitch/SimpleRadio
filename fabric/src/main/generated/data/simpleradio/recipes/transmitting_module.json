@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:crafting_shaped",
   "fabric:load_conditions": [
     {
       "condition": "simpleradio:items_enabled",
@@ -7,26 +8,26 @@
       ]
     }
   ],
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "A": {
       "item": "simpleradio:antenna"
     },
     "C": {
-      "item": "minecraft:copper_ingot"
+      "item": "simpleradio:copper_wire"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
     },
     "L": {
       "item": "minecraft:lapis_lazuli"
     }
   },
   "pattern": [
-    "A",
-    "C",
-    "L"
+    " A ",
+    "CIC",
+    " L "
   ],
   "result": {
     "item": "simpleradio:transmitting_module"
-  },
-  "show_notification": true
+  }
 }
