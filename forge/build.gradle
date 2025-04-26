@@ -92,22 +92,20 @@ dependencies {
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
 
     // Valkyrien Skies
-    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
+    if (valkyrien_skies_enabled.toBoolean()) {
         compileOnly fg.deobf("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}")
         compileOnly "org.valkyrienskies.core:api:${valkyrien_skies_api_version}" // forge wont inherit the api from common for some reason
     }
 
     // Create
-    if (create_env_versions.contains(minecraft_version)) {
+    if (create_enabled.toBoolean()) {
         compileOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        compileOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
         compileOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+        compileOnly fg.deobf("com.jozufozu.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
 
         developmentRuntimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        developmentRuntimeOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
         developmentRuntimeOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        developmentRuntimeOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+        developmentRuntimeOnly fg.deobf("com.jozufozu.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
     }
 
     // JEI / REI

@@ -25,6 +25,9 @@ dependencies {
 
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
 
+    localRuntime "com.electronwill.night-config:core:${night_config_version}"
+    localRuntime "com.electronwill.night-config:toml:${night_config_version}"
+
     // --- Compatibilities --- \\
 
     // Voice Chat Interaction
@@ -39,17 +42,13 @@ dependencies {
     //modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
 
     // Valkyrien Skies
-    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
+    if (valkyrien_skies_enabled.toBoolean()) {
         modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
         modLocalRuntime("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
     }
 
     // JEI / REI
     if (recipe_viewer == "jei") {
-        // compile against the JEI API but do not include it at runtime
-        modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-        modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-        // at runtime, use the full JEI jar for Fabric
         modLocalRuntime("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
     } else if (recipe_viewer == "rei") {
         // TODO: add rei to devenv
