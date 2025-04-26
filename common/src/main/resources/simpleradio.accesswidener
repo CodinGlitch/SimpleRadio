@@ -9,17 +9,11 @@ accessible field net/minecraft/client/resources/model/ModelBakery ITEM_MODEL_GEN
 # ItemOverrides constructor
 accessible method net/minecraft/client/renderer/block/model/ItemOverrides <init> ()V
 
-# ReloadState class
-accessible class net/minecraft/client/resources/model/ModelManager$ReloadState
-
 # processFrames method in ItemModelGenerator
 accessible method net/minecraft/client/renderer/block/model/ItemModelGenerator processFrames (ILjava/lang/String;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Ljava/util/List;
 
 # bakeFace method in BlockModel
 accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace (Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BakedQuad;
-
-# TextureAtlasSprite constructor
-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite <init> (Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/texture/SpriteContents;IIII)V
 
 # SoundEngine field
 accessible field net/minecraft/client/sounds/SoundManager soundEngine Lnet/minecraft/client/sounds/SoundEngine;
