@@ -8,10 +8,11 @@ import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlock;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.*;
-import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
-import com.simibubi.create.api.contraption.BlockMovementChecks;
+import com.simibubi.create.AllMovementBehaviours;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.BlockMovementChecks;
 import com.simibubi.create.content.contraptions.Contraption;
+import com.simibubi.create.content.contraptions.behaviour.MovementBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -99,8 +100,7 @@ public class CreateCompat {
 
     public static void registerMovementBehaviours() {
         for (Block centralBlock : CENTRAL_BLOCKS) {
-            if (MovementBehaviour.REGISTRY.get(centralBlock) != null) continue;
-            MovementBehaviour.REGISTRY.register(centralBlock, new CentralMovementBehaviour());
+            AllMovementBehaviours.registerBehaviour(centralBlock, new CentralMovementBehaviour());
         }
     }
 

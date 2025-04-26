@@ -1,16 +1,15 @@
 package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import com.mojang.math.Quaternion;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 import java.util.function.Predicate;
 
@@ -25,18 +24,16 @@ public class ForgeCompatPlatform implements CompatPlatform {
 
         // ---- Valkyrien Skies ---- \\
         if (CompatCore.VALKYRIEN_SKIES.enabled) {
-            return ValkyrienCompat.modifyPosition(position);
         }
 
         return position;
     }
 
     @Override
-    public Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+    public Quaternion modifyRotation(WorldlyPosition position, Quaternion rotation) {
 
         // ---- Valkyrien Skies ---- \\
         if (CompatCore.VALKYRIEN_SKIES.enabled) {
-            return ValkyrienCompat.modifyRotation(position, rotation);
         }
 
         return rotation;

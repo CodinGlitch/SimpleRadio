@@ -6,13 +6,16 @@ import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
-import net.minecraft.core.registries.Registries;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -25,10 +28,10 @@ import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
@@ -46,14 +49,17 @@ public class ForgeLoader {
 
         generator.addProvider(
                 event.includeServer(),
-                new SimpleRadioRecipeProvider(generator.getPackOutput())
+                new SimpleRadioRecipeProvider(generator)
         );
 
         generator.addProvider(
                 event.includeServer(),
-                new LootTableProvider(generator.getPackOutput(), Set.of(), List.of(
-                        new LootTableProvider.SubProviderEntry(SimpleRadioBlockLootTableProvider::new, LootContextParamSets.BLOCK)
-                ))
+                new LootTableProvider(generator) {
+                    @Override
+                    protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
+                        return List.of(Pair.of(SimpleRadioBlockLootTableProvider::new, LootContextParamSets.BLOCK));
+                    }
+                }
         );
     }
 
@@ -66,7 +72,6 @@ public class ForgeLoader {
         event.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, helper -> SimpleRadioBlockEntities.BLOCK_ENTITIES.forEach((helper::register)));
 
         event.register(ForgeRegistries.Keys.MENU_TYPES, helper -> SimpleRadioMenus.MENUS.forEach(helper::register));
-        event.register(Registries.CREATIVE_MODE_TAB, helper -> SimpleRadioMenus.CREATIVE_TABS.forEach(helper::register));
 
         event.register(ForgeRegistries.Keys.PARTICLE_TYPES, helper -> SimpleRadioParticles.PARTICLES.forEach(helper::register));
 

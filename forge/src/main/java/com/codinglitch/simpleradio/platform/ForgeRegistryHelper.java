@@ -4,13 +4,10 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.platform.services.RegistryHelper;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
@@ -18,8 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class ForgeRegistryHelper implements RegistryHelper {
@@ -43,7 +38,7 @@ public class ForgeRegistryHelper implements RegistryHelper {
 
     @Override
     public <M extends AbstractContainerMenu> MenuType<M> registerMenu(ResourceLocation resource, MenuSupplier<M> supplier) {
-        MenuType<M> menu = new MenuType<>((supplier::create), FeatureFlags.DEFAULT_FLAGS);
+        MenuType<M> menu = new MenuType<>(supplier::create);
         SimpleRadioMenus.MENUS.put(resource, menu);
         return menu;
     }

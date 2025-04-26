@@ -38,11 +38,11 @@ public abstract class MixinAbstractContraptionEntity extends Entity implements I
         if (!CompatCore.CREATE.enabled) return;
         if (this.contraption == null) return;
         for (StructureTemplate.StructureBlockInfo blockInfo : this.contraption.getBlocks().values()) {
-            BlockPos pos = transform.apply(blockInfo.pos());
-            BlockState state = transform.apply(blockInfo.state());
+            BlockPos pos = transform.apply(blockInfo.pos);
+            BlockState state = transform.apply(blockInfo.state);
 
-            if (blockInfo.nbt() != null)
-                CreateCompat.contraptionRemoveBlock(this.contraption, this.level(), pos, state, blockInfo.nbt());
+            if (blockInfo.nbt != null)
+                CreateCompat.contraptionRemoveBlock(this.contraption, this.level, pos, state, blockInfo.nbt);
         }
     }
 }

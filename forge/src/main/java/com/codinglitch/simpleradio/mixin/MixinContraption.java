@@ -29,8 +29,8 @@ public abstract class MixinContraption {
     @Shadow protected Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks;
 
     // this only runs on the server but it's kinda fine because the routers are re-created in the contraption
-    @Inject(method = "Lcom/simibubi/create/content/contraptions/Contraption;addBlock(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lorg/apache/commons/lang3/tuple/Pair;)V", at = @At("TAIL"), remap = false, require = 0)
-    private void simpleradio$addBlock(Level level, BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
+    @Inject(method = "addBlock", at = @At("TAIL"), remap = false, require = 0)
+    private void simpleradio$addBlock(BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
         if (!CompatCore.CREATE.enabled) return;
         CreateCompat.contraptionAddBlock((Contraption) (Object) this, pos, pair.getValue(), pair.getKey());
     }

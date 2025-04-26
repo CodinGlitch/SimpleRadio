@@ -4,20 +4,18 @@ import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.Routing;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.*;
-import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
+import com.jozufozu.flywheel.core.virtual.VirtualRenderWorld;
+import com.jozufozu.flywheel.util.AnimationTickHolder;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.behaviour.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
 import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
-import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
-import net.createmod.catnip.animation.AnimationTickHolder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.UUID;
 
@@ -30,16 +28,15 @@ public class CentralMovementBehaviour implements MovementBehaviour {
         }
 
         if (context.world.isClientSide) {
-            Vector3f translatedNorth = context.rotation.apply(new Vec3(0, 0, -1)).toVector3f();
-            if (router.rotation == null) router.rotation = new Quaternionf();
-
-            // theres probably a better way to do this but im stupid so this works for now
-            router.rotation.setAngleAxis(translatedNorth.angle(new Vector3f(0, 0, -1)) * -Math.signum(translatedNorth.x), 0, 1, 0);
+            Vector3f translatedNorth = new Vector3f(context.rotation.apply(new Vec3(0, 0, -1)));
+            if (router.rotation == null) {
+                router.rotation = Quaternion.ONE.copy();
+            } else {
+                router.rotation = new Quaternion(translatedNorth.x(), translatedNorth.y(), translatedNorth.z(), 0);
+            }
         }
 
-        router.location.x = newLocation.x;
-        router.location.y = newLocation.y;
-        router.location.z = newLocation.z;
+        router.location.set(newLocation.x(), newLocation.y(), newLocation.z());
         router.updateLocation(newLocation);
     }
 
@@ -57,9 +54,9 @@ public class CentralMovementBehaviour implements MovementBehaviour {
                 double partialTick = AnimationTickHolder.getPartialTicks();
                 Vec3 pos = context.position.add(context.motion.scale(partialTick));
 
-                newLocation = WorldlyPosition.of(pos.toVector3f(), context.world);
+                newLocation = WorldlyPosition.of(new Vector3f(pos), context.world);
             } else {
-                newLocation = WorldlyPosition.of(context.position.toVector3f(), context.world);
+                newLocation = WorldlyPosition.of(new Vector3f(context.position), context.world);
             }
 
 
