@@ -14,29 +14,29 @@ import static com.codinglitch.simpleradio.CommonSimpleRadio.id;
 public class SimpleRadioItems {
     public static final Map<ResourceLocation, ItemHolder<Item>> ITEMS = new LinkedHashMap<>();
 
-    public static WireItem COPPER_WIRE = register(id("copper_wire"), new WireItem(new Item.Properties().stacksTo(16)));
+    public static WireItem COPPER_WIRE = register(id("copper_wire"), new WireItem(new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
 
-    public static TransceiverItem TRANSCEIVER = register(id("transceiver"), new TransceiverItem(new Item.Properties().stacksTo(1)));
-    public static WalkieTalkieItem WALKIE_TALKIE = register(id("walkie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
-    public static WalkieTalkieItem SPUDDIE_TALKIE = register(id("spuddie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1)));
-    public static Item RADIOSMITHER = register(id("radiosmither"), new BlockItem(SimpleRadioBlocks.RADIOSMITHER, new Item.Properties()));
-    public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(16)));
-    public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(16)));
-    public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(16)));
+    public static TransceiverItem TRANSCEIVER = register(id("transceiver"), new TransceiverItem(new Item.Properties().stacksTo(1).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static WalkieTalkieItem WALKIE_TALKIE = register(id("walkie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static WalkieTalkieItem SPUDDIE_TALKIE = register(id("spuddie_talkie"), new WalkieTalkieItem(new Item.Properties().stacksTo(1).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static Item RADIOSMITHER = register(id("radiosmither"), new BlockItem(SimpleRadioBlocks.RADIOSMITHER, new Item.Properties().tab(SimpleRadioMenus.RADIO_TAB)));
+    public static RadioItem RADIO = register(id("radio"), new RadioItem(new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static SpeakerItem SPEAKER = register(id("speaker"), new SpeakerItem(new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static MicrophoneItem MICROPHONE = register(id("microphone"), new MicrophoneItem(new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
 
-    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(16)));
-    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(16)));
+    public static TransmitterItem TRANSMITTER = register(id("transmitter"), new TransmitterItem(new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static ReceiverItem RECEIVER = register(id("receiver"), new ReceiverItem(new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
 
     public static Item FREQUENCER = register(id("frequencer"), new BlockItem(SimpleRadioBlocks.FREQUENCER, new Item.Properties().stacksTo(1)), null);
 
-    public static Item ANTENNA = register(id("antenna"), new BlockItem(SimpleRadioBlocks.ANTENNA, new Item.Properties().stacksTo(16)));
-    public static Item INSULATOR = register(id("insulator"), new BlockItem(SimpleRadioBlocks.INSULATOR, new Item.Properties().stacksTo(16)));
+    public static Item ANTENNA = register(id("antenna"), new BlockItem(SimpleRadioBlocks.ANTENNA, new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
+    public static Item INSULATOR = register(id("insulator"), new BlockItem(SimpleRadioBlocks.INSULATOR, new Item.Properties().stacksTo(16).tab(SimpleRadioMenus.RADIO_TAB)));
 
     // ---- Modules ---- \\
-    public static Item TRANSMITTING_MODULE = register(id("transmitting_module"), new Item(new Item.Properties()));
-    public static Item RECEIVING_MODULE = register(id("receiving_module"), new Item(new Item.Properties()));
-    public static Item SPEAKER_MODULE = register(id("speaker_module"), new Item(new Item.Properties()));
-    public static Item LISTENER_MODULE = register(id("listener_module"), new Item(new Item.Properties()));
+    public static Item TRANSMITTING_MODULE = register(id("transmitting_module"), new Item(new Item.Properties().tab(SimpleRadioMenus.RADIO_TAB)));
+    public static Item RECEIVING_MODULE = register(id("receiving_module"), new Item(new Item.Properties().tab(SimpleRadioMenus.RADIO_TAB)));
+    public static Item SPEAKER_MODULE = register(id("speaker_module"), new Item(new Item.Properties().tab(SimpleRadioMenus.RADIO_TAB)));
+    public static Item LISTENER_MODULE = register(id("listener_module"), new Item(new Item.Properties().tab(SimpleRadioMenus.RADIO_TAB)));
 
     // --- Upgrades --- \\
     public static ModuleItem IRON_MODULE = register(id("iron_module"), new ModuleItem(Tiers.IRON, new Item.Properties()), null);
