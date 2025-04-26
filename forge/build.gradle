@@ -127,6 +127,10 @@ dependencies {
     }
 }
 
+tasks.named('jarJar') {
+    archiveClassifier = ''
+}
+jar.archiveClassifier = "slim"
 jar.finalizedBy('reobfJar')
 
 sourceSets.each {
@@ -135,7 +139,7 @@ sourceSets.each {
     it.java.destinationDirectory = dir
 }
 
-substituteResources.dependsOn compileDatagenJava, processDatagenResources
+substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
 datagenClasses.finalizedBy substituteResources
 
 
