@@ -26,7 +26,7 @@ public class SimpleRadioMenus {
     }
 
     public static final ResourceLocation RADIO_TAB_LOCATION = CommonSimpleRadio.id("simple_radio"); // hack
-    public static final CreativeModeTab RADIO_TAB = Services.REGISTRY.registerCreativeTab(RADIO_TAB_LOCATION, new CreativeModeTab(7, RADIO_TAB_LOCATION.toString()) {
+    public static final CreativeModeTab RADIO_TAB = Services.REGISTRY.registerCreativeTab(RADIO_TAB_LOCATION, new CreativeModeTab(-1, String.format("%s.%s", RADIO_TAB_LOCATION.getNamespace(), RADIO_TAB_LOCATION.getPath())) {
         public ItemStack makeIcon() {
             return new ItemStack(SimpleRadioItems.TRANSCEIVER);
         }
