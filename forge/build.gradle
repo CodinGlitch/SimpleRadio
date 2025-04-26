@@ -141,7 +141,7 @@ sourceSets.each {
     it.java.destinationDirectory = dir
 }
 
-substituteResources.dependsOn compileDatagenJava, processDatagenResources
+substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
 datagenClasses.finalizedBy substituteResources
 
 
