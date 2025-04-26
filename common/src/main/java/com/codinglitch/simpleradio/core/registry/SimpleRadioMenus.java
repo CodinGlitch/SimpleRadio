@@ -25,8 +25,8 @@ public class SimpleRadioMenus {
         RADIOSMITHER_MENU = Services.REGISTRY.registerMenu(id("radiosmither"), RadiosmitherMenu::new);
     }
 
-    public static final ResourceLocation RADIO_TAB_LOCATION = id("simple_radio_tab");
-    public static final CreativeModeTab RADIO_TAB = Services.REGISTRY.registerCreativeTab(RADIO_TAB_LOCATION, new CreativeModeTab(7, CommonSimpleRadio.ID) {
+    public static final ResourceLocation RADIO_TAB_LOCATION = CommonSimpleRadio.id("simple_radio"); // hack
+    public static final CreativeModeTab RADIO_TAB = Services.REGISTRY.registerCreativeTab(RADIO_TAB_LOCATION, new CreativeModeTab(7, RADIO_TAB_LOCATION.toString()) {
         public ItemStack makeIcon() {
             return new ItemStack(SimpleRadioItems.TRANSCEIVER);
         }
