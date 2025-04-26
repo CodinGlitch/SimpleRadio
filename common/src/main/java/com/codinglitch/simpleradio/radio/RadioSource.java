@@ -180,8 +180,8 @@ public class RadioSource {
         }
 
         return Mth.clamp(
-                0, 100,
-                base + severity * (100 - base)
+                base + severity * (100 - base),
+                0, 100
         );
     }
 

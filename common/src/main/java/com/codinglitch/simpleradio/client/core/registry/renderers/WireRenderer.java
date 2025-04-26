@@ -104,14 +104,14 @@ public class WireRenderer extends EntityRenderer<Wire> {
             if (lastTopLeft != null) {
                 int skyLight = (int) Mth.lerp(progress, (float)fromSkyLight, (float)toSkyLight);
                 int blockLight = (int) Mth.lerp(
-                        Mth.clamp(0, 1, effector),
+                        Mth.clamp(effector, 0, 1),
                         Mth.lerp(progress, (float)fromBlockLight, (float)toBlockLight),
                         15f
                 );
 
                 float newTile = vOffset + ((vOffset*SEGMENTS) * progress);
 
-                int overlay = Mth.clamp(0, 10, Math.round(effector*5));
+                int overlay = Mth.clamp(Math.round(effector*5), 0, 10);
                 int packedLight = LightTexture.pack(blockLight, skyLight);
 
                 buildQuad(consumer, matrix, overlay, packedLight, up.normalize(), 0.0625f, vOffset, newTile, lastTopRight, topRight, topLeft, lastTopLeft);

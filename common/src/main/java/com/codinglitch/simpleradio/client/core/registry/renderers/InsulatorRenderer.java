@@ -47,7 +47,7 @@ public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEnti
                 rotation = (float) (3f + blockEntity.connector.distanceToSqr(pos.x, pos.y, pos.z)*0.5f);
             }
 
-            blockEntity.rotation = Mth.lerp(blockEntity.rotation, rotation, Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.2f, 1));
+            blockEntity.rotation = Mth.lerp(Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.2f, 1), blockEntity.rotation, rotation);
 
             model.wire.visible = !blockEntity.getWires().isEmpty() || blockEntity.connector != null;
             model.spool.xRot = blockEntity.rotation;
