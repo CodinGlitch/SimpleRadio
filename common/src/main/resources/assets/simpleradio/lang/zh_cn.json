@@ -1,5 +1,5 @@
 {
-  "item_group.simpleradio": "简易无线电通讯",
+  "itemGroup.simpleradio.simple_radio": "简易无线电通讯",
 
   "item.simpleradio.transmitting_module": "无线电传输模块",
   "item.simpleradio.receiving_module": "无线电接收模块",

@@ -1,5 +1,5 @@
 {
-  "item_group.simpleradio": "Simple Radio",
+  "itemGroup.simpleradio.simple_radio": "Simple Radio",
 
   "item.simpleradio.transmitting_module": "Moduł Transmitera",
   "item.simpleradio.receiving_module": "Moduł Odbiornika",

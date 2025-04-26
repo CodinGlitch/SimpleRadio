@@ -1,5 +1,5 @@
 {
-  "item_group.simpleradio": "Simple Radio",
+  "itemGroup.simpleradio.simple_radio": "Simple Radio",
 
   "item.simpleradio.transmitting_module": "送信モジュール",
   "item.simpleradio.receiving_module": "受信モジュール",
