@@ -66,7 +66,6 @@ public class ForgeRegistryHelper implements RegistryHelper {
                         .map(holder -> new ItemStack(holder.get()))
                         .toList()
                 );
-                super.fillItemList(list);
             }
         };
 
