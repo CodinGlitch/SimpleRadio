@@ -15,6 +15,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -28,6 +30,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -58,6 +61,11 @@ public class ForgeLoader {
                     @Override
                     protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
                         return List.of(Pair.of(SimpleRadioBlockLootTableProvider::new, LootContextParamSets.BLOCK));
+                    }
+
+                    @Override
+                    protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext tracker) {
+                        map.forEach((id, table) -> LootTables.validate(tracker, id, table));
                     }
                 }
         );
