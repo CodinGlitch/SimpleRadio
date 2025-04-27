@@ -41,6 +41,10 @@ public class FabricLoader {
         SimpleRadioParticles.PARTICLES.forEach(((location, particleType) -> Registry.register(Registry.PARTICLE_TYPE, location, particleType)));
     }
 
+    public static void loadSounds() {
+        SimpleRadioSounds.SOUNDS.forEach(((location, particleType) -> Registry.register(Registry.SOUND_EVENT, location, particleType)));
+    }
+
     public static void loadPackets() {
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
@@ -108,6 +112,7 @@ public class FabricLoader {
         loadBlocks();
         loadPackets();
         loadParticles();
+        loadSounds();
 
         CommonSimpleRadio.load();
     }

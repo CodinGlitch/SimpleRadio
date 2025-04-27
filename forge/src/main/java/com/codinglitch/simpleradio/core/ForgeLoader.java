@@ -83,6 +83,8 @@ public class ForgeLoader {
 
         event.register(ForgeRegistries.Keys.PARTICLE_TYPES, helper -> SimpleRadioParticles.PARTICLES.forEach(helper::register));
 
+        event.register(ForgeRegistries.Keys.SOUND_EVENTS, helper -> SimpleRadioSounds.SOUNDS.forEach(helper::register));
+
         event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
             CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
         });
