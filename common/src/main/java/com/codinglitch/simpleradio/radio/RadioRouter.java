@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.api.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -309,13 +310,13 @@ public class RadioRouter implements Socket {
 
             boolean flag = true;
             if (this instanceof RadioSpeaker) {
-                flag = Auricular.validate(location, this.link != null ? this.link : Speaking.class);
+                flag = Auricular.validateLocation(location, this.link != null ? this.link : Speaking.class, this.reference);
             } else if (this instanceof RadioListener) {
-                flag = Auricular.validate(location, this.link != null ? this.link : Listening.class);
+                flag = Auricular.validateLocation(location, this.link != null ? this.link : Listening.class, this.reference);
             } else if (this instanceof RadioReceiver) {
-                flag = Frequencing.validate(location, this.link != null ? this.link : Receiving.class, null);
+                flag = Frequencing.validateLocation(location, this.link != null ? this.link : Receiving.class, this.reference, null);
             } else if (this instanceof RadioTransmitter) {
-                flag = Frequencing.validate(location, this.link != null ? this.link : Transmitting.class, null);
+                flag = Frequencing.validateLocation(location, this.link != null ? this.link : Transmitting.class, this.reference, null);
             } else {
                 flag = this.link != null && RadioManager.verifyLocationCollection(location, this.link);
             }
@@ -325,20 +326,18 @@ public class RadioRouter implements Socket {
                 return false;
             }
         } else {
-            boolean flag = true;
-            if (this instanceof RadioSpeaker) {
-                flag = Auricular.validate(owner, this.link != null ? this.link : Speaking.class);
-            } else if (this instanceof RadioListener) {
-                flag = Auricular.validate(owner, this.link != null ? this.link : Listening.class);
-            } else if (this instanceof RadioReceiver) {
-                flag = Frequencing.validate(owner, this.link != null ? this.link : Receiving.class, null);
-            } else if (this instanceof RadioTransmitter) {
-                flag = Frequencing.validate(owner, this.link != null ? this.link : Transmitting.class, null);
-            } else {
-                flag = this.link != null && RadioManager.verifyEntityCollection(owner, stack -> this.link.isAssignableFrom(stack.getItem().getClass()));
-            }
+            boolean isValid = RadioManager.verifyEntityCollection(owner, stack -> {
+                if (stack.isEmpty()) return false;
+                if (!stack.hasTag()) return false;
 
-            if (!flag) {
+                CompoundTag tag = stack.getTag();
+                if (!tag.contains("reference")) return false;
+                if (!tag.getUUID("reference").equals(reference)) return false;
+
+                return true;
+            });
+
+            if (!isValid) {
                 invalidate();
                 return false;
             }
