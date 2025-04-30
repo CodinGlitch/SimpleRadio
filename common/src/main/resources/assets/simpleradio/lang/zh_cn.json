@@ -35,26 +35,34 @@
   "item.modifiers.listening": "在监听无线电时:",
   "item.modifiers.powering": "在开启无线电时:",
 
-  "item.simpleradio.transceiver": "手持收发电台",
+  "item.simpleradio.transceiver": "手持电台",
   "item.simpleradio.walkie_talkie": "对讲机",
   "item.simpleradio.spuddie_talkie": "地豆对讲机",
   "block.simpleradio.radio": "收音机",
   "block.simpleradio.antenna": "天线",
-  "block.simpleradio.speaker": "无线电扬声器",
-  "block.simpleradio.microphone": "无线电麦克风",
+  "block.simpleradio.speaker": "扬声器",
+  "block.simpleradio.microphone": "麦克风",
   "block.simpleradio.radiosmither": "无线电调试台",
   "block.simpleradio.frequencer": "无线电频率监测仪",
 
   "screen.simpleradio.radiosmither": "无线电调试台",
   "screen.simpleradio.radiosmither.am": "AM",
   "screen.simpleradio.radiosmither.fm": "FM",
-  "screen.simpleradio.radiosmither.am_description": "AM调幅信号，大范围低音质",
-  "screen.simpleradio.radiosmither.fm_description": "FM调频信号，小范围高音质",
+  "screen.simpleradio.radiosmither.am_description": "AM 调幅信号，大范围低音质",
+  "screen.simpleradio.radiosmither.fm_description": "FM 调频信号，小范围高音质",
 
   "subtitles.simpleradio.radio_open": "收音机开始广播",
   "subtitles.simpleradio.radio_close": "收音机停止广播",
 
   "tooltip.simpleradio.transceiver_frequency": "频率:%s",
-  "tooltip.simpleradio.receiver_user": "使用者:%s"
-}
+  "tooltip.simpleradio.receiver_user": "使用者:%s",
 
+  "item.simpleradio.copper_wire": "铜制音频传输线",
+
+  "block.simpleradio.receiver": "无线电接收器",
+  "block.simpleradio.transmitter": "无线电发射器",
+  "block.simpleradio.insulator": "音频线绝缘子",
+  "screen.simpleradio.frequencing.efficiency": "传输效率: %s%%",
+  "screen.simpleradio.frequencing.antenna_strength": "天线强度:",
+  "screen.simpleradio.frequencing.catalyst": "缺少镶金黑石"
+}
