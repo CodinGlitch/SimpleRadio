@@ -1,17 +1,13 @@
 package com.codinglitch.simpleradio.api.central;
 
 import com.codinglitch.simpleradio.core.registry.blocks.*;
-import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
-import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,15 +18,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface Frequencing {
-    static boolean validate(WorldlyPosition position, Class<?> clazz, @Nullable Frequency frequency) {
+    static boolean validateLocation(WorldlyPosition position, Class<?> clazz, UUID reference, @Nullable Frequency frequency) {
         return RadioManager.verifyLocationCollection(position, clazz);
-    }
-    static boolean validate(Entity entity, Class<?> clazz, @Nullable Frequency frequency) {
-        return RadioManager.verifyEntityCollection(entity, stack -> {
-            if (clazz.isAssignableFrom(stack.getItem().getClass()))
-                return frequency == null || ((Frequencing) stack.getItem()).getFrequency(stack) == frequency;
-            return false;
-        });
     }
 
     /**
@@ -152,12 +141,12 @@ public interface Frequencing {
      * @param owner the UUID to validate
      * @return Whether it is present in the frequency.
      */
-    default boolean validate(String frequency, Frequency.Modulation modulation, UUID owner) {
+    default boolean validateLocation(String frequency, Frequency.Modulation modulation, UUID owner) {
         if (frequency == null) return false;
         if (modulation == null) return false;
-        return this.validate(Frequency.getOrCreateFrequency(frequency, modulation), owner);
+        return this.validateLocation(Frequency.getOrCreateFrequency(frequency, modulation), owner);
     }
-    default boolean validate(Frequency frequency, UUID owner) {
+    default boolean validateLocation(Frequency frequency, UUID owner) {
         RadioReceiver receiver = frequency.getReceiver(owner);
         return receiver != null;
     }
