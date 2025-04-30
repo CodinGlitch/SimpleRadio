@@ -37,7 +37,7 @@ public class CommonRecipeProvider extends RecipeProvider {
     public static void defineRecipes(Function<Item, Consumer<FinishedRecipe>> conditionBuilder) {
         ShapedRecipeBuilder.shaped(SimpleRadioItems.TRANSCEIVER)
                 .define('I', Items.IRON_INGOT)
-                .define('Q', Items.QUARTZ)
+                .define('Q', Items.AMETHYST_SHARD)
                 .define('C', SimpleRadioItems.COPPER_WIRE)
                 .define('A', SimpleRadioItems.ANTENNA)
                 .define('W', SimpleRadioItems.LISTENER_MODULE)
@@ -184,12 +184,12 @@ public class CommonRecipeProvider extends RecipeProvider {
                 .define('A', SimpleRadioItems.ANTENNA)
                 .define('I', Items.IRON_INGOT)
                 .define('C', SimpleRadioItems.COPPER_WIRE)
-                .define('L', Items.LAPIS_LAZULI)
+                .define('P', Items.ENDER_PEARL)
                 .pattern(" A ")
                 .pattern("CIC")
-                .pattern(" L ")
+                .pattern(" P ")
                 .unlockedBy("has_copper_wire", doesHave(SimpleRadioItems.COPPER_WIRE))
-                .unlockedBy("has_lapis_lazuli", doesHave(Items.LAPIS_LAZULI))
+                .unlockedBy("has_ender_pearl", doesHave(Items.ENDER_PEARL))
                 .save(conditionBuilder.apply(SimpleRadioItems.TRANSMITTING_MODULE));
 
         ShapedRecipeBuilder.shaped(SimpleRadioItems.SPEAKER_MODULE)
