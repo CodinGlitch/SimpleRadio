@@ -101,6 +101,8 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
+        this.listener.active = this.listening;
+
         if (!level.isClientSide) {
             level.playSound(
                     null, location.x, location.y, location.z,
