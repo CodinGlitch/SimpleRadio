@@ -107,6 +107,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
     }
 
+
+
     public void entityTick(ItemStack stack, Entity entity) {
         if (entity.isRemoved()) return;
 
@@ -130,8 +132,33 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             activeRouter = RadioManager.getRouterSided(tag.getUUID("user"), level.isClientSide);
         }
 
-        if (activeRouter != null && (activeRouter.owner == null || !activeRouter.owner.getUUID().equals(entity.getUUID()))) {
-            activeRouter = null;
+        if (activeRouter != null) {
+            if (activeRouter.owner == null) { // Invalid router, not ours
+                activeRouter = null;
+            } else if (!activeRouter.owner.getUUID().equals(entity.getUUID())) { // Found router does not match ours, discard
+                activeRouter = null;
+                //if (tag.contains("user")) tag.remove("user");
+            } else if (tag.contains("user")) { // Check for a duplicate UUID from a different ItemStack
+                Iterable<ItemStack> items = List.of();
+                if (entity instanceof Player player) {
+                    items = player.getInventory().items;
+                } else if (entity instanceof LivingEntity livingEntity) {
+                    items = livingEntity.getAllSlots();
+                }
+
+                items.forEach(slotStack -> {
+                    if (slotStack.isEmpty()) return;
+                    if (!slotStack.hasTag()) return;
+
+                    CompoundTag slotTag = slotStack.getTag();
+                    if (!slotTag.contains("user")) return;
+                    if (!slotTag.getUUID("user").equals(tag.getUUID("user"))) return;
+
+                    if (!slotStack.equals(stack)) tag.remove("user");
+                });
+
+                if (!tag.contains("user")) activeRouter = null;
+            }
         }
 
         // Transceiver activation
@@ -154,6 +181,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
 
         if (activationUUID == null) return;
+
+
 
         CommonSimpleRadio.debug("Activated transceiver using UUID {}!", activationUUID);
 
