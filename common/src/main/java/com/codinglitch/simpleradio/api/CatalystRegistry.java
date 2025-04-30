@@ -7,14 +7,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CatalystRegistry {
     private static final HashMap<ResourceLocation, Catalyst> CATALYSTS = new HashMap<>();
 
-    public static Catalyst GILDED_BLACKSTONE = register(CommonSimpleRadio.id("catalyst/gilded_blackstone"),
-            new Catalyst(Items.GILDED_BLACKSTONE)
-    );
+    public static List<Catalyst> getCatalysts() {
+        return CATALYSTS.values().stream().toList();
+    }
 
     public static Catalyst get(ResourceLocation location) {
         return CATALYSTS.get(location);
@@ -35,6 +36,4 @@ public class CatalystRegistry {
         CATALYSTS.put(location, catalyst);
         return catalyst;
     }
-
-    public static void load() {}
 }
