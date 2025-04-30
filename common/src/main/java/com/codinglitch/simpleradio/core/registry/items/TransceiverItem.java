@@ -102,8 +102,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     public void onDestroyed(ItemEntity itemEntity) {
         super.onDestroyed(itemEntity);
         CompoundTag tag = itemEntity.getItem().getOrCreateTag();
-        if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("user")) {
-            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("user"));
+        if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("reference")) {
+            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("reference"));
         }
     }
 
@@ -128,8 +128,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         // Mode-switch deactivation (i.e. item is dropped)
         RadioRouter activeRouter = null;
-        if (tag.contains("user")) {
-            activeRouter = RadioManager.getRouterSided(tag.getUUID("user"), level.isClientSide);
+        if (tag.contains("reference")) {
+            activeRouter = RadioManager.getRouterSided(tag.getUUID("reference"), level.isClientSide);
         }
 
         if (activeRouter != null) {
@@ -137,8 +137,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                 activeRouter = null;
             } else if (!activeRouter.owner.getUUID().equals(entity.getUUID())) { // Found router does not match ours, discard
                 activeRouter = null;
-                //if (tag.contains("user")) tag.remove("user");
-            } else if (tag.contains("user")) { // Check for a duplicate UUID from a different ItemStack
+                //if (tag.contains("reference")) tag.remove("reference");
+            } else if (tag.contains("reference")) { // Check for a duplicate UUID from a different ItemStack
                 Iterable<ItemStack> items = List.of();
                 if (entity instanceof Player player) {
                     items = player.getInventory().items;
@@ -151,13 +151,13 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                     if (!slotStack.hasTag()) return;
 
                     CompoundTag slotTag = slotStack.getTag();
-                    if (!slotTag.contains("user")) return;
-                    if (!slotTag.getUUID("user").equals(tag.getUUID("user"))) return;
+                    if (!slotTag.contains("reference")) return;
+                    if (!slotTag.getUUID("reference").equals(tag.getUUID("reference"))) return;
 
-                    if (!slotStack.equals(stack)) tag.remove("user");
+                    if (!slotStack.equals(stack)) tag.remove("reference");
                 });
 
-                if (!tag.contains("user")) activeRouter = null;
+                if (!tag.contains("reference")) activeRouter = null;
             }
         }
 
@@ -165,18 +165,18 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         UUID activationUUID = null;
         if (entity.level().isClientSide) {
 
-            if (tag.contains("user") && activeRouter == null) {
-                activationUUID = tag.getUUID("user");
+            if (tag.contains("reference") && activeRouter == null) {
+                activationUUID = tag.getUUID("reference");
             }
 
         } else {
             if (activeRouter != null) return;
 
-            if (!tag.contains("user")) {
+            if (!tag.contains("reference")) {
                 activationUUID = UUID.randomUUID();
-                tag.putUUID("user", activationUUID);
+                tag.putUUID("reference", activationUUID);
             } else {
-                activationUUID = tag.getUUID("user");
+                activationUUID = tag.getUUID("reference");
             }
         }
 
