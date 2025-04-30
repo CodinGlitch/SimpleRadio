@@ -259,7 +259,7 @@ public class AntennaBlock extends Block {
 
     public void notifyExtension(BlockPos pos, LevelAccessor accessor) {
         BlockPos travelledPos = InsulatorBlock.travelExtension(pos, accessor);
-        if (travelledPos == pos) return;
+        //if (travelledPos == pos) return;
 
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockPos relativePosition = travelledPos.relative(direction);
