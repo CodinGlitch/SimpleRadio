@@ -25,16 +25,6 @@ public interface Frequencing {
     static boolean validate(WorldlyPosition position, Class<?> clazz, @Nullable Frequency frequency) {
         return RadioManager.verifyLocationCollection(position, clazz);
     }
-    static boolean validate(UUID uuid, Class<?> clazz, @Nullable Frequency frequency) {
-        VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(uuid);
-        if (connection != null) return validate(connection, clazz, frequency);
-        return false;
-    }
-    static boolean validate(VoicechatConnection connection, Class<?> clazz, @Nullable Frequency frequency) {
-        ServerPlayer player = (ServerPlayer) connection.getPlayer().getPlayer();
-        if (player == null) return false;
-        return validate(player, clazz, frequency);
-    }
     static boolean validate(Entity entity, Class<?> clazz, @Nullable Frequency frequency) {
         return RadioManager.verifyEntityCollection(entity, stack -> {
             if (clazz.isAssignableFrom(stack.getItem().getClass()))
