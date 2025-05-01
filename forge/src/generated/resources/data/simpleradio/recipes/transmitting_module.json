@@ -20,14 +20,14 @@
           "I": {
             "item": "minecraft:iron_ingot"
           },
-          "L": {
-            "item": "minecraft:lapis_lazuli"
+          "P": {
+            "item": "minecraft:ender_pearl"
           }
         },
         "pattern": [
           " A ",
           "CIC",
-          " L "
+          " P "
         ],
         "result": {
           "item": "simpleradio:transmitting_module"
