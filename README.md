@@ -62,10 +62,10 @@ Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more infor
 
 | Loader       | 1.18.X | 1.19.X | 1.20.1 | 1.20.4 | 1.21.1 |
 |--------------|--------|--------|--------|--------|--------|
-| **Fabric**   | ❌      | ❌      | ✅      | ❌       | ❌       |
-| **Quilt**    | ❓      | ❓      | ❓      | ❌       | ❌       |
-| **Forge**    | ❌      | ❌      | ✅      | ❌       | ❌       |
-| **NeoForge** | ❌      | ❌      | ✅      | ❌       | ❌       |
+| **Fabric**   | ❌      | ✅      | ✅      | ✅       | ❌       |
+| **Quilt**    | ❓      | ❓      | ❓      | ❓       | ❓       |
+| **Forge**    | ❌      | ✅      | ✅      | ✅       | ❌       |
+| **NeoForge** | ❌      | ✅      | ✅      | ✅       | ❌       |
 
 
 <br>
