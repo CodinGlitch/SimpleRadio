@@ -7,7 +7,7 @@ plugins {
 apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
 
 base {
-    archivesName = "${mod_name}-api"
+    archivesName = "${mod_id}-api"
 }
 minecraft {
     version(minecraft_version)
