@@ -19,12 +19,12 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_lapis_lazuli": {
+    "has_ender_pearl": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:lapis_lazuli"
+              "minecraft:ender_pearl"
             ]
           }
         ]
@@ -42,7 +42,7 @@
     [
       "has_the_recipe",
       "has_copper_wire",
-      "has_lapis_lazuli"
+      "has_ender_pearl"
     ]
   ],
   "rewards": {
