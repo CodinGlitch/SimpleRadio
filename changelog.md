@@ -17,6 +17,7 @@
 - [Change] Transceiver redesign
 - [Change] Microphone redesign
 - [Change] Speaker redesign
+- [Change] Different recipes
 - [Fix] FFAPI recipe incompatibility
 - [Fix] Crash upon holding certain radio items
 - [Experimental] In-world audio listening config (including jukeboxes)
