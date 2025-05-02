@@ -13,11 +13,17 @@
     "A": {
       "item": "simpleradio:antenna"
     },
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
     "I": {
       "item": "minecraft:iron_ingot"
     },
-    "R": {
-      "item": "minecraft:redstone"
+    "Q": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "W": {
+      "item": "simpleradio:listener_module"
     },
     "X": {
       "item": "simpleradio:transmitting_module"
@@ -30,9 +36,9 @@
     }
   },
   "pattern": [
-    "AII",
-    "XRZ",
-    "IYI"
+    "AWC",
+    "XIZ",
+    "QYQ"
   ],
   "result": {
     "item": "simpleradio:transceiver"
