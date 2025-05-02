@@ -9,12 +9,12 @@
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_copper_ingot": {
+    "has_copper_wire": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:copper_ingot"
+              "simpleradio:copper_wire"
             ]
           }
         ]
@@ -56,7 +56,7 @@
     [
       "has_iron_ingot",
       "has_potato",
-      "has_copper_ingot",
+      "has_copper_wire",
       "has_the_recipe"
     ]
   ],
