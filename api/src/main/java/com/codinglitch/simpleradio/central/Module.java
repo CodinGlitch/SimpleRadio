@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.api.central;
+package com.codinglitch.simpleradio.central;
 
 import net.minecraft.resources.ResourceLocation;
 

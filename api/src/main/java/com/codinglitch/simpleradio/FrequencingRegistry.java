@@ -1,7 +1,7 @@
-package com.codinglitch.simpleradio.api;
+package com.codinglitch.simpleradio;
 
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
-import com.codinglitch.simpleradio.api.central.FrequencingType;
+import com.codinglitch.simpleradio.central.FrequencingType;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.resources.ResourceLocation;
 
