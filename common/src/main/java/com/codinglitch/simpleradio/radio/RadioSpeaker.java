@@ -189,7 +189,10 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
             return;
         }
         short[] decoded = decoder.decode(data);
-        playerPackets.offer(effect.apply(decoded));
+        short[] filtered = effect.apply(decoded);
+
+        if (!CommonRadioPlugin.isAudioValid(filtered)) return;
+        playerPackets.offer(filtered);
 
         // Loader-specific compat
         Services.COMPAT.onData(this, source, decoded);
