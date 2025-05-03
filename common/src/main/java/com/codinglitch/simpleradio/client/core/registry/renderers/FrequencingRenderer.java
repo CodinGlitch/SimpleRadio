@@ -1,9 +1,9 @@
 package com.codinglitch.simpleradio.client.core.registry.renderers;
 
+import com.codinglitch.simpleradio.CatalystRegistry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.CatalystRegistry;
-import com.codinglitch.simpleradio.api.central.Catalyst;
-import com.codinglitch.simpleradio.api.central.Frequencing;
+import com.codinglitch.simpleradio.central.Catalyst;
+import com.codinglitch.simpleradio.central.Frequencing;
 import com.codinglitch.simpleradio.core.registry.blocks.CatalyzingBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.ReceiverBlock;
 import com.mojang.blaze3d.vertex.PoseStack;

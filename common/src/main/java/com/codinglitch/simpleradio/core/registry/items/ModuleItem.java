@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.central.Module;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioModules;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;

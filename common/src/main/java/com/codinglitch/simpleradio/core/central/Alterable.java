@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.central;
 
+import com.codinglitch.simpleradio.central.Module;
 import com.codinglitch.simpleradio.core.registry.items.ModuleItem;
 import net.minecraft.world.item.ItemStack;
 

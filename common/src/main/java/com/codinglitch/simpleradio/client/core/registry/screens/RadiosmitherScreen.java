@@ -1,8 +1,8 @@
 package com.codinglitch.simpleradio.client.core.registry.screens;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.Frequencing;
-import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.central.Frequencing;
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.client.core.central.BaseButton;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;

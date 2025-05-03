@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.api.CatalystRegistry;
-import com.codinglitch.simpleradio.api.central.Catalyst;
+import com.codinglitch.simpleradio.CatalystRegistry;
+import com.codinglitch.simpleradio.central.Catalyst;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
