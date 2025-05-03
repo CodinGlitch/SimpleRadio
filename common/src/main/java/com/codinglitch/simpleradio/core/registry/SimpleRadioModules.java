@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.central.Module;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;

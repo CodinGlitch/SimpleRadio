@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio;
 import com.codinglitch.lexiconfig.LexiconfigApi;
 import com.codinglitch.lexiconfig.Library;
 import com.codinglitch.lexiconfig.annotations.LexiconLibrary;
-import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.blocks.AntennaBlock;
 
