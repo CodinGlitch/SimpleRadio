@@ -87,8 +87,19 @@ repositories {
     }
 }
 
+configurations {
+    apiJava {
+        canBeResolved = true
+    }
+}
+
 dependencies {
     implementation 'org.jetbrains:annotations:24.1.0'
+
+    // --- Common --- \\
+
+    implementation(project(':api'))
+    apiJava project(path: ':api', configuration: 'apiJava')
 }
 
 sourcesJar {

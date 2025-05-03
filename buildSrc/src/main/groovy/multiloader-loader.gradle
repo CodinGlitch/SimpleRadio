@@ -26,10 +26,6 @@ configurations {
         canBeResolved = true
     }
 
-    apiJava {
-        canBeResolved = true
-    }
-
     developmentImplementation.extendsFrom implementation
     developmentRuntimeOnly.extendsFrom runtimeOnly
 }
@@ -42,11 +38,6 @@ dependencies {
     }
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')
-
-    // --- Common --- \\
-
-    implementation(project(':api'))
-    apiJava project(path: ':api', configuration: 'apiJava')
 }
 
 tasks.named('compileJava', JavaCompile) {
