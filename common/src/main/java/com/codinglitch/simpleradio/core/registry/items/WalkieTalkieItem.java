@@ -42,7 +42,7 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
 
         // --- Half-duplex implementation
 
-        receiver.receiveCriteria(((source) -> {
+        receiver.setAcceptingCriteria(((source) -> {
             Entity entity = receiver.owner;
             Frequency frequency = receiver.getFrequency();
             if (frequency == null) return false;

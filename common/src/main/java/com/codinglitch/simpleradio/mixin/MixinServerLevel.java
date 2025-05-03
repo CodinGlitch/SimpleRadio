@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -14,7 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -32,12 +32,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel {
 
     @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V")
     private void simpleradio$playSeededSound1_audioGathering(Player except, Entity entity, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
-        RadioManager.getInstance().onSoundPlayed((ServerLevel) (Object) this, entity.position(), sound, volume, pitch, seed);
+        RadioManager.getInstance().sendSound(WorldlyPosition.of(entity.position().toVector3f(), this), sound, volume, pitch, seed);
     }
 
     @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V")
     private void simpleradio$playSeededSound2_audioGathering(Player except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
-        RadioManager.getInstance().onSoundPlayed((ServerLevel) (Object) this, new Vec3(x, y, z), sound, volume, pitch, seed);
+        RadioManager.getInstance().sendSound(new WorldlyPosition((float) x, (float) y, (float) z, this), sound, volume, pitch, seed);
     }
 
     @Inject(at = @At("HEAD"), method = "tick")

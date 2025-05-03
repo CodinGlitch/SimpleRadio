@@ -61,7 +61,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         this.setupRouters(listener, speaker, receiver, transmitter);
 
-        transmitter.transmitCriteria((source, router) -> {
+        transmitter.setRoutingCriteria((source, router) -> {
             if (entity instanceof Player player) {
                 ItemStack using = player.getUseItem();
                 if (!(using.getItem() instanceof TransceiverItem)) return false;
