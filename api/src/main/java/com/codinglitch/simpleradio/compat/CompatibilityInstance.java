@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.api.compat;
+package com.codinglitch.simpleradio.compat;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.platform.Services;

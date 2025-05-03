@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.api.central;
+package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;

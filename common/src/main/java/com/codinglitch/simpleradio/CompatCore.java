@@ -56,6 +56,7 @@ public class CompatCore {
     public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE.enabled) {
+            VibrativeCompat.onData(channel, source, decoded);
         }
     }
 

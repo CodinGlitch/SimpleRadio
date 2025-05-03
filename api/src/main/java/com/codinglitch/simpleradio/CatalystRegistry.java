@@ -1,7 +1,7 @@
-package com.codinglitch.simpleradio.api;
+package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.Catalyst;
+import com.codinglitch.simpleradio.central.Catalyst;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
