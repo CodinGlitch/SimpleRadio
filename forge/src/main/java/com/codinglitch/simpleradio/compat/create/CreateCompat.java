@@ -88,10 +88,10 @@ public class CreateCompat {
                 resetRouter(RadioRouter.getRouterFromReceivers(uuid), pos, level);
                 resetRouter(RadioRouter.getRouterFromTransmitters(uuid), pos, level);
 
-                resetRouter(RadioManager.getListener(uuid), pos, level);
-                resetRouter(RadioManager.getSpeaker(uuid), pos, level);
+                resetRouter(RadioManager.getInstance().getListener(uuid), pos, level);
+                resetRouter(RadioManager.getInstance().getSpeaker(uuid), pos, level);
 
-                resetRouter(RadioManager.getRouter(uuid, null), pos, level);
+                resetRouter(RadioManager.getInstance().getRouter(uuid, null), pos, level);
             }
 
         }

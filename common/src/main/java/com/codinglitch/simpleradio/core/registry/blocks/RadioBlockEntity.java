@@ -105,7 +105,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
 
     public void inactivate() {
         if (this.frequency != null) {
-            RadioManager.removeRouterSided(this.id, this.level.isClientSide);
+            RadioManager.getInstance().removeRouterSided(this.id, this.level.isClientSide);
             if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
             if (!this.level.isClientSide) stopSpeaking();
         }

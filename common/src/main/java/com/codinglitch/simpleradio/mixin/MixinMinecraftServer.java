@@ -15,7 +15,7 @@ public class MixinMinecraftServer {
 
     @Inject(at = @At("TAIL"), method = "tickServer(Ljava/util/function/BooleanSupplier;)V")
     private void simpleradio$tickServer_radioTicking(CallbackInfo info) {
-        RadioManager.serverTick(this.tickCount);
+        RadioManager.getInstance().serverTick(this.tickCount);
     }
 
     @Inject(at = @At("TAIL"), method = "close", remap = false)

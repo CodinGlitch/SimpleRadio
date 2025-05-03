@@ -129,7 +129,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         // Mode-switch deactivation (i.e. item is dropped)
         RadioRouter activeRouter = null;
         if (tag.contains("reference")) {
-            activeRouter = RadioManager.getRouterSided(tag.getUUID("reference"), level.isClientSide);
+            activeRouter = RadioManager.getInstance().getRouterSided(tag.getUUID("reference"), level.isClientSide);
         }
 
         if (activeRouter != null) {

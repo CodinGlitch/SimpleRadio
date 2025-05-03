@@ -18,7 +18,7 @@ public interface Listening extends Auricular {
      * @return The listener created.
      */
     default RadioListener startListening(Entity owner, @Nullable UUID id) {
-        return setupListener(RadioManager.getOrCreateListener(owner, id));
+        return setupListener(RadioManager.getInstance().getOrCreateListener(owner, id));
     }
     /**
      * Start listening in the world.
@@ -27,7 +27,7 @@ public interface Listening extends Auricular {
      * @return The listener created.
      */
     default RadioListener startListening(WorldlyPosition location, @Nullable UUID id) {
-        return setupListener(RadioManager.getOrCreateListener(location, id));
+        return setupListener(RadioManager.getInstance().getOrCreateListener(location, id));
     }
 
     default RadioListener setupListener(RadioListener listener) {
@@ -53,7 +53,7 @@ public interface Listening extends Auricular {
         if (isClient) {
             ClientRadioManager.removeRouter(owner);
         } else {
-            RadioManager.removeListener(owner);
+            RadioManager.getInstance().removeListener(owner);
         }
     }
 
@@ -65,7 +65,7 @@ public interface Listening extends Auricular {
         if (location.isClientSide()) {
             ClientRadioManager.removeRouter(location);
         } else {
-            RadioManager.removeListener(location);
+            RadioManager.getInstance().removeListener(location);
         }
     }
 

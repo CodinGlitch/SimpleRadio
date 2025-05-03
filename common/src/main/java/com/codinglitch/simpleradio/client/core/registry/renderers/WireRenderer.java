@@ -163,7 +163,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
     }
 
     public static void renderPlayer(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick, @Nullable Camera camera) {
-        ItemStack wire = RadioManager.isEntityHolding(player, stack -> stack.is(SimpleRadioItems.COPPER_WIRE));
+        ItemStack wire = RadioManager.getInstance().isEntityHolding(player, stack -> stack.is(SimpleRadioItems.COPPER_WIRE));
         if (wire != null) {
             CompoundTag tag = wire.getOrCreateTag();
             if (tag.contains("connectTo")) {
