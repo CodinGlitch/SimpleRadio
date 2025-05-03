@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.routers.Listener;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -24,7 +23,6 @@ public class RadioListener extends RadioRouter implements Listener {
     private final Map<UUID, OpusDecoder> decoders;
 
     public float range = 8;
-    public long lastHeader = 0;
 
     public byte[] compiledData = new byte[] {};
 
@@ -69,18 +67,6 @@ public class RadioListener extends RadioRouter implements Listener {
         this.range = range;
     }
 
-    public void tryRouteHeader() {
-        if (this.location == null) return;
-
-        long currentTime = this.location.level.getGameTime();
-        if (currentTime - lastHeader < SimpleRadioLibrary.SERVER_CONFIG.wire.headerInterval) return;
-
-        //RadioHeader header = new RadioHeader(this.location);
-        //this.route(header);
-
-        this.lastHeader = currentTime;
-    }
-
     public void transformer(UnaryOperator<RadioSource> transformer) {
         this.dataTransformer = transformer;
     }
@@ -102,7 +88,6 @@ public class RadioListener extends RadioRouter implements Listener {
 
         source.delegate(this.reference);
 
-        this.tryRouteHeader();
         this.route(source);
     }
 
