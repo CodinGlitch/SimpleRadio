@@ -8,8 +8,12 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
+import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
+import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
+import de.maxhenkel.voicechat.api.packets.LocationalSoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +23,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -539,6 +544,16 @@ public class RadioManager implements SimpleRadioApi {
         }
     }
 
+    // I mixin here instead of using the appropriate events to access the channel as well as prevent duplicates
+    public void onLocationalPacket(Level level, LocationalAudioChannel channel, byte[] data) {
+        Vector3f senderPosition = new Vector3f((float) channel.getLocation().getX(), (float) channel.getLocation().getY(), (float) channel.getLocation().getZ());
+        pushSound(level, senderPosition, channel.getId(), data);
+    }
+
+    public void onEntityPacket(Level level, EntityAudioChannel channel, EntitySoundPacket packet) {
+
+    }
+
     public void onMicPacket(MicrophonePacketEvent event) {
         VoicechatConnection senderConnection = event.getSenderConnection();
         if (senderConnection == null) return;
@@ -546,7 +561,14 @@ public class RadioManager implements SimpleRadioApi {
         ServerPlayer sender = (ServerPlayer) senderConnection.getPlayer().getPlayer();
         ServerLevel level = sender.serverLevel();
 
-        TreeMap<Float, RadioListener> qualified = getListeners(new Vector3f((float) sender.getX(), (float) sender.getY(), (float) sender.getZ()));
+
+        Vector3f senderPosition = sender.position().toVector3f();
+        pushSound(level, senderPosition, sender.getUUID(), event.getPacket().getOpusEncodedData());
+    }
+
+    public void pushSound(Level level, Vector3f senderPosition, UUID sender, byte[] data) {
+        TreeMap<Float, RadioListener> qualified = getListeners(new Vector3f(senderPosition.x(), senderPosition.y(), senderPosition.z()));
+
 
         for (Map.Entry<Float, RadioListener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
@@ -562,17 +584,15 @@ public class RadioManager implements SimpleRadioApi {
             }
             if (listenerPosition == null) continue;
 
-            byte[] data = event.getPacket().getOpusEncodedData();
-            Vector3f senderPosition = sender.position().toVector3f();
             RadioSource newSource = new RadioSource(
-                    sender.getUUID(),
+                    sender,
                     WorldlyPosition.of(senderPosition, level),
                     data,
                     (float) falloff
             );
 
             // Decoding for initial reading
-            OpusDecoder decoder = listener.getDecoder(sender.getUUID());
+            OpusDecoder decoder = listener.getDecoder(sender);
             if (data == null || data.length == 0) {
                 decoder.resetState();
             } else {
