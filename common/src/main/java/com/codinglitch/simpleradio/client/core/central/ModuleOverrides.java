@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client.core.central;
 
+import com.codinglitch.simpleradio.central.Module;
 import com.codinglitch.simpleradio.client.core.registry.models.LayeredModuleModel;
 import com.codinglitch.simpleradio.client.core.registry.models.ModuleModel;
 import com.codinglitch.simpleradio.core.registry.items.ModuleItem;
