@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiPredicate;
 
 /**
  * A type of {@link RadioRouter} that accepts {@link RadioSource}s and transmits them along its connected {@link Frequency}.
@@ -24,7 +23,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
 
     protected RadioTransmitter(Frequency frequency, UUID id) {
         super(id);
-        this.setFrequency(frequency);
+        this.frequency(frequency);
     }
     protected RadioTransmitter(Frequency frequency) {
         this(frequency, UUID.randomUUID());
@@ -45,29 +44,35 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
         this.location = location;
     }
 
-    public void setFrequency(Frequency frequency) {
+    @Override
+    public int getAntennaPower() {
+        return antennaPower;
+    }
+    @Override
+    public float getPower(Frequency.Modulation modulation) {
+        int baseTransmissionPower = frequencingType.getTransmissionPower(modulation);
+
+        return baseTransmissionPower + (antennaPower * frequencingType.antennaAptitude);
+    }
+    @Override
+    public FrequencingType getFrequencingType() {
+        return frequencingType;
+    }
+
+    @Override
+    public RadioTransmitter frequency(Frequency frequency) {
         if (this.frequency != null) {
             this.frequency.removeTransmitter(this);
         }
 
         this.frequency = frequency;
         this.routers = (List) this.frequency.receivers;
-    }
-
-    public RadioTransmitter transmitCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
-        this.routeCriteria = criteria;
         return this;
     }
 
     public RadioTransmitter frequencingType(FrequencingType type) {
         this.frequencingType = type;
         return this;
-    }
-
-    public float getPower(Frequency.Modulation modulation) {
-        int baseTransmissionPower = frequencingType.getTransmissionPower(modulation);
-
-        return baseTransmissionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
     @Nullable
