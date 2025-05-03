@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -36,9 +37,8 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
         Item item = this.getFirstItem().getItem();
 
         if (item instanceof RecordItem recordItem && level instanceof ServerLevel serverLevel) {
-            RadioManager.getInstance().onSoundPlayed(
-                    serverLevel,
-                    getBlockPos().getCenter(),
+            RadioManager.getInstance().sendSound(
+                    WorldlyPosition.of(getBlockPos().getCenter().toVector3f(), serverLevel),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
                     1, 1, this.getBlockPos().asLong()
             );
@@ -48,9 +48,8 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
     @Inject(method = "stopPlaying()V", at = @At(value = "TAIL"))
     private void simpleradio$stopPlaying_audioGathering(CallbackInfo ci) {
         if (level instanceof ServerLevel serverLevel) {
-            RadioManager.getInstance().onSoundPlayed(
-                    serverLevel,
-                    getBlockPos().getCenter(),
+            RadioManager.getInstance().sendSound(
+                    WorldlyPosition.of(getBlockPos().getCenter().toVector3f(), serverLevel),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY),
                     0, 1, this.getBlockPos().asLong()
             );
@@ -70,9 +69,8 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
         if (item instanceof RecordItem recordItem && level instanceof ServerLevel serverLevel) {
             float offset = (tickCount - recordStartedTick) / 20f;
 
-            RadioManager.getInstance().onSoundPlayed(
-                    serverLevel,
-                    getBlockPos().getCenter(),
+            RadioManager.getInstance().sendSound(
+                    WorldlyPosition.of(getBlockPos().getCenter().toVector3f(), serverLevel),
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
                     1, 1,  offset, this.getBlockPos().asLong()
             );
