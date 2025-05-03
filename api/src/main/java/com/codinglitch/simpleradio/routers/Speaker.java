@@ -1,4 +1,4 @@
 package com.codinglitch.simpleradio.routers;
 
-public interface Speaker {
+public interface Speaker extends Router  {
 }
