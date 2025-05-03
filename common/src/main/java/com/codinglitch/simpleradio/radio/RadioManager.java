@@ -2,18 +2,18 @@ package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.SimpleRadioApi;
+import com.codinglitch.simpleradio.central.ConfigHolder;
+import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
-import de.maxhenkel.voicechat.api.packets.LocationalSoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -27,19 +27,25 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.Vector3f;
 
-import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class RadioManager implements SimpleRadioApi {
+public class RadioManager implements ServerSimpleRadioApi {
     private static RadioManager INSTANCE;
 
     // double queue for the win
     private static final ArrayList<QueuedSource> pendingSources = new ArrayList<>();
     private static final ArrayList<QueuedSource> sourceQueue = new ArrayList<>();
+
+    @Override
+    public ConfigHolder getConfig() {
+        return null; //idk yet
+    }
+
     public static class QueuedSource {
         public RadioSource source;
 

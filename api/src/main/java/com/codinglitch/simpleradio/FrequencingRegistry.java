@@ -1,14 +1,11 @@
 package com.codinglitch.simpleradio;
 
-import com.codinglitch.lexiconfig.classes.LexiconPageData;
+import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.FrequencingType;
-import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
 
 public class FrequencingRegistry {
     private static short id = 0;
@@ -22,7 +19,7 @@ public class FrequencingRegistry {
         return FREQUENCING_TYPES.get(id);
     }
 
-    public static FrequencingType fromConfig(LexiconPageData page) {
+    public static FrequencingType fromConfig(ConfigHolder page) {
         FrequencingType newType = new FrequencingType();
         newType.page = page;
         newType.reload();

@@ -1,8 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.api.central.Socket;
+import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.radio.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -15,8 +14,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;

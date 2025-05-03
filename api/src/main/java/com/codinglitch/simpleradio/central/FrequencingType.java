@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import net.minecraft.resources.ResourceLocation;
 
 public class FrequencingType {
@@ -26,7 +25,7 @@ public class FrequencingType {
     public DiminishmentMethod diminishmentMethod;
     public double transmissionDiminishment;
 
-    public LexiconPageData page;
+    public ConfigHolder page;
 
     public FrequencingType() {}
 

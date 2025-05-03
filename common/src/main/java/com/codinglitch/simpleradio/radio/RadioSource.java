@@ -1,12 +1,12 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.FrequencingRegistry;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.FrequencingRegistry;
-import com.codinglitch.simpleradio.api.central.FrequencingType;
-import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.api.central.Medium;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.FrequencingType;
+import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Medium;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.sounds.SoundEvent;
