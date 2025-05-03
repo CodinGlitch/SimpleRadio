@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.radio;
 import com.codinglitch.simpleradio.central.FrequencingType;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,7 @@ import java.util.function.BiPredicate;
  * <br>
  * <b>Does route further.</b>
  */
-public class RadioTransmitter extends RadioRouter {
+public class RadioTransmitter extends RadioRouter implements Transmitter {
     public int antennaPower = 0;
     public Frequency frequency;
 
