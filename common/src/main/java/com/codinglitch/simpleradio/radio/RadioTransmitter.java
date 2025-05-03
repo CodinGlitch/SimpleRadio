@@ -113,12 +113,12 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
 
     @Override
-    public void accept(RadioSource source) {
+    public void accept(Source source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
 
         this.route(source, router -> {
-            return source.owner == null || !source.owner.equals(router.reference);
+            return source.getOwner() == null || !source.getOwner().equals(router.reference);
         });
     }
 }

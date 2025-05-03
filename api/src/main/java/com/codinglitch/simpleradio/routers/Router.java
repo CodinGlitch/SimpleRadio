@@ -2,8 +2,7 @@ package com.codinglitch.simpleradio.routers;
 
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.radio.RadioRouter;
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.Source;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +25,11 @@ public interface Router {
 
     Vec3 getConnectionPosition();
 
-    void setRoutingCriteria(BiPredicate<RadioSource, RadioRouter> criteria);
-    void setAcceptingCriteria(Predicate<RadioSource> criteria);
+    void setRoutingCriteria(BiPredicate<Source, Router> criteria);
+    void setAcceptingCriteria(Predicate<Source> criteria);
 
     double distanceTo(Router other);
+
+    void route(Source source);
+    void accept(Source source);
 }

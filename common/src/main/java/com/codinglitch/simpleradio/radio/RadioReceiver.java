@@ -84,12 +84,12 @@ public class RadioReceiver extends RadioRouter implements Receiver {
     }
 
     @Override
-    public void accept(RadioSource source) {
+    public void accept(Source source) {
         //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        if (source.transmissionPower <= 0) return;
+        if (source.getPower() <= 0) return;
 
         this.compileActivity(source);
 

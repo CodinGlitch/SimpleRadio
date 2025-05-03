@@ -43,8 +43,8 @@ public class RadioRouter implements Socket, Router {
     public List<RadioRouter> routers = new ArrayList<>();
     public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
 
-    public BiPredicate<RadioSource, RadioRouter> routeCriteria;
-    public Predicate<RadioSource> acceptCriteria;
+    public BiPredicate<Source, Router> routeCriteria;
+    public Predicate<Source> acceptCriteria;
 
     public boolean active = true;
     public boolean distributes = false;
@@ -102,11 +102,11 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public void setRoutingCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
+    public void setRoutingCriteria(BiPredicate<Source, Router> criteria) {
         this.routeCriteria = criteria;
     }
     @Override
-    public void setAcceptingCriteria(Predicate<RadioSource> criteria) {
+    public void setAcceptingCriteria(Predicate<Source> criteria) {
         this.acceptCriteria = criteria;
     }
 
@@ -224,7 +224,7 @@ public class RadioRouter implements Socket, Router {
         }
     }
 
-    public void accept(RadioSource source) {
+    public void accept(Source source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         this.route(source);
@@ -241,21 +241,22 @@ public class RadioRouter implements Socket, Router {
         return true;
     }
 
-    public void route(RadioSource source, @Nullable Predicate<RadioRouter> criteria) {
+    public void route(Source source, @Nullable Predicate<RadioRouter> criteria) {
         if (!this.active) return;
+        RadioSource radioSource = (RadioSource) source;
 
-        if (!source.isValid()) {
+        if (!radioSource.isValid()) {
             CommonSimpleRadio.warn("Invalid source; discarded");
             return;
         }
 
         if (routerAcceptor != null) {
-            if (routerAcceptor.apply(source))
-                source = source.copy();
+            if (routerAcceptor.apply(radioSource))
+                radioSource = radioSource.copy();
         }
 
         if (distributes) {
-            if (this.distribute(source)) source = source.copy();
+            if (this.distribute(radioSource)) radioSource = radioSource.copy();
         }
 
         for (int i = 0; i < routers.size(); i++) {
@@ -264,24 +265,24 @@ public class RadioRouter implements Socket, Router {
             if (criteria != null) {
                 if (!criteria.test(router)) continue;
             }
-            if (!shouldRouteTo(source, router)) continue;
+            if (!shouldRouteTo(radioSource, router)) continue;
 
-            if (routeCriteria != null && !routeCriteria.test(source, router)) continue;
+            if (routeCriteria != null && !routeCriteria.test(radioSource, router)) continue;
 
-            if (source.willShort(router)) {
+            if (radioSource.willShort(router)) {
                 router.shortCircuit();
                 continue;
             }
 
-            source = this.prepareSource(source, router);
+            radioSource = this.prepareSource(radioSource, router);
 
-            RadioSource oldSource = source;
-            if (i < routers.size()-1) source = source.copy();
+            RadioSource oldSource = radioSource;
+            if (i < routers.size()-1) radioSource = radioSource.copy();
             router.accept(oldSource);
         }
     }
 
-    public void route(RadioSource source) {
+    public void route(Source source) {
         this.route(source, null);
     }
 
@@ -289,15 +290,15 @@ public class RadioRouter implements Socket, Router {
         return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
     }
 
-    public void compileActivity(RadioSource source) {
+    public void compileActivity(Source source) {
         if (!this.active) return;
 
-        if (source.data == null) {
-            this.activity = source.activity;
+        if (source.getData() == null) {
+            this.activity = source.getActivity();
             compiledActivity = 0;
             compiledSamples = 0;
         } else {
-            compiledActivity += source.activity;
+            compiledActivity += source.getActivity();
             if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
                 this.activity = Math.sqrt(compiledActivity);
                 compiledActivity = 0;
