@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -27,7 +28,7 @@ import java.util.function.Predicate;
 /**
  * Routes RadioSources to other routers.
  */
-public class RadioRouter implements Socket {
+public class RadioRouter implements Socket, Router {
     public static class Compiled<E> extends LinkedList<E> {
         @Override
         public boolean add(E value) {
@@ -110,6 +111,7 @@ public class RadioRouter implements Socket {
         return this.reference;
     }
 
+    @Override
     public short getIdentifier() {
         return this.identifier;
     }
@@ -124,20 +126,12 @@ public class RadioRouter implements Socket {
     }
 
     @Nullable
+    @Override
     public Frequency getFrequency() {
         return null;
     }
 
-    public double distanceTo(RadioRouter other) {
-        return this.getLocation().distance(other.getLocation());
-    }
-
-    public Vec3 getConnectionPosition() {
-        Vector3f translatedOffset = rotation == null ? connectionOffset.toVector3f() : rotation.transform(connectionOffset.toVector3f());
-
-        return new Vec3(getLocation().position()).add(translatedOffset.x, translatedOffset.y, translatedOffset.z);
-    }
-
+    @Override
     public WorldlyPosition getLocation() {
         if (this.location != null) {
             return this.location;
@@ -147,15 +141,36 @@ public class RadioRouter implements Socket {
         return null;
     }
 
+    @Override
+    public RadioRouter getRouter(UUID id) {
+        return routers.stream().filter(router -> router.reference.equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Vec3 getConnectionPosition() {
+        Vector3f translatedOffset = rotation == null ? connectionOffset.toVector3f() : rotation.transform(connectionOffset.toVector3f());
+
+        return new Vec3(getLocation().position()).add(translatedOffset.x, translatedOffset.y, translatedOffset.z);
+    }
+
+    @Override
+    public double distanceTo(Router other) {
+        return distanceTo((RadioRouter) other);
+    }
+    public double distanceTo(RadioRouter other) {
+        return this.getLocation().distance(other.getLocation());
+    }
+
+    @Override
+    public Router tryAddRouter(Router router) {
+        return tryAddRouter((RadioRouter) router);
+    }
     public RadioRouter tryAddRouter(RadioRouter router) {
         RadioRouter existingRouter = getRouter(router.reference);
         if (existingRouter != null) return existingRouter;
 
         routers.add(router);
         return router;
-    }
-    public RadioRouter getRouter(UUID id) {
-        return routers.stream().filter(router -> router.reference.equals(id)).findFirst().orElse(null);
     }
 
     //this method is so dumb bro
