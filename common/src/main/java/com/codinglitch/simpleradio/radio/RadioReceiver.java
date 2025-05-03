@@ -8,7 +8,6 @@ import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * A type of {@link RadioRouter} that accepts {@link RadioSource}s from its connected {@link Frequency}.
@@ -49,7 +48,7 @@ public class RadioReceiver extends RadioRouter implements Receiver {
         return antennaPower;
     }
     @Override
-    public double getPower() {
+    public float getPower() {
         return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
     }
     @Override
@@ -64,12 +63,6 @@ public class RadioReceiver extends RadioRouter implements Receiver {
         }
 
         this.frequency = frequency;
-        return this;
-    }
-
-    @Override
-    public RadioReceiver receiveCriteria(Predicate<RadioSource> criteria) {
-        this.acceptCriteria = criteria;
         return this;
     }
 
