@@ -8,6 +8,7 @@ import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.routers.Listener;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
@@ -498,8 +499,8 @@ public class RadioManager implements ServerSimpleRadioApi {
         return null;
     }
 
-    public TreeMap<Float, RadioListener> getListeners(Vector3f at) {
-        TreeMap<Float, RadioListener> qualified = new TreeMap<>();
+    public Map<Float, Listener> getListeners(Vector3f at) {
+        TreeMap<Float, Listener> qualified = new TreeMap<>();
         for (RadioListener listener : getListeners()) {
             Vector3f position;
             if (listener.location != null) {
@@ -528,15 +529,15 @@ public class RadioManager implements ServerSimpleRadioApi {
 
         SoundEvent sound = soundHolder.value();
 
-        TreeMap<Float, RadioListener> qualified = getListeners(location.toVector3f());
-        for (Map.Entry<Float, RadioListener> entry : qualified.entrySet()) {
+        Map<Float, Listener> qualified = getListeners(location.toVector3f());
+        for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
-            RadioListener listener = entry.getValue();
+            RadioListener listener = (RadioListener) entry.getValue();
 
-            double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
+            double falloff = CommonRadioPlugin.getFalloff(distance, listener.getRange());
 
             RadioSource newSource = new RadioSource(
-                    listener.reference,
+                    listener.getReference(),
                     WorldlyPosition.of(location.toVector3f(), level),
                     sound,
                     (float) (falloff * volume)
@@ -544,7 +545,7 @@ public class RadioManager implements ServerSimpleRadioApi {
             newSource.pitch = pitch;
             newSource.offset = offset;
             newSource.seed = seed;
-            newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.range))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
+            newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.getRange()))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
 
             listener.onSource(newSource);
         }
@@ -573,8 +574,7 @@ public class RadioManager implements ServerSimpleRadioApi {
     }
 
     public void pushSound(Level level, Vector3f senderPosition, UUID sender, byte[] data) {
-        TreeMap<Float, RadioListener> qualified = getListeners(new Vector3f(senderPosition.x(), senderPosition.y(), senderPosition.z()));
-
+        Map<Float, RadioListener> qualified = getListeners(new Vector3f(senderPosition.x(), senderPosition.y(), senderPosition.z()));
 
         for (Map.Entry<Float, RadioListener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
