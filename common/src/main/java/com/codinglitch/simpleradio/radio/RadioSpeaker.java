@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSound
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
+import com.codinglitch.simpleradio.routers.Speaker;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -27,7 +28,7 @@ import java.util.function.Supplier;
  * <br>
  * <b>Does not route further.</b>
  */
-public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
+public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Speaker {
     // migrated to locational audio channels only due to alternatives not having range property
     public LocationalAudioChannel audioChannel;
     public AudioPlayer audioPlayer;

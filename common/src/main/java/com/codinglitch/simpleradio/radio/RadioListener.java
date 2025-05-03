@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.routers.Listener;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.world.entity.Entity;
 
@@ -17,7 +18,7 @@ import java.util.function.UnaryOperator;
  * <br>
  * <b>Does route further.</b>
  */
-public class RadioListener extends RadioRouter {
+public class RadioListener extends RadioRouter implements Listener {
 
     private UnaryOperator<RadioSource> dataTransformer;
     private final Map<UUID, OpusDecoder> decoders;
