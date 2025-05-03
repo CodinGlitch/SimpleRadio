@@ -17,7 +17,7 @@ public interface Speaking extends Auricular {
      * @return The speaker created.
      */
     default RadioSpeaker startSpeaking(Entity owner, @Nullable UUID id) {
-        return setupSpeaker(RadioManager.getOrCreateSpeaker(owner, id));
+        return setupSpeaker(RadioManager.getInstance().getOrCreateSpeaker(owner, id));
     }
     /**
      * Start speaking in the world.
@@ -26,7 +26,7 @@ public interface Speaking extends Auricular {
      * @return The speaker created.
      */
     default RadioSpeaker startSpeaking(WorldlyPosition location, @Nullable UUID id) {
-        return setupSpeaker(RadioManager.getOrCreateSpeaker(location, id));
+        return setupSpeaker(RadioManager.getInstance().getOrCreateSpeaker(location, id));
     }
 
     default RadioSpeaker setupSpeaker(RadioSpeaker speaker) {
@@ -44,7 +44,7 @@ public interface Speaking extends Auricular {
         if (isClient) {
             ClientRadioManager.removeRouter(owner);
         } else {
-            RadioManager.removeSpeaker(owner);
+            RadioManager.getInstance().removeSpeaker(owner);
         }
     }
 
@@ -56,7 +56,7 @@ public interface Speaking extends Auricular {
         if (location.isClientSide()) {
             ClientRadioManager.removeRouter(location);
         } else {
-            RadioManager.removeSpeaker(location);
+            RadioManager.getInstance().removeSpeaker(location);
         }
     }
 

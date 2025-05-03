@@ -86,7 +86,7 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
 
     @Override
     public RadioRouter getOrCreateRouter(WorldlyPosition location, UUID id, BlockState state) {
-        RadioRouter router = RadioManager.getRouterSided(id, location.isClientSide());
+        RadioRouter router = RadioManager.getInstance().getRouterSided(id, location.isClientSide());
         if (router != null) return router;
 
         router = new RadioRouter(id);
@@ -100,7 +100,7 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
         // Allow distribution through wires
         router.allowDistribution();
 
-        RadioManager.registerRouterSided(router, location.isClientSide(), null);
+        RadioManager.getInstance().registerRouterSided(router, location.isClientSide(), null);
 
         return router;
     }

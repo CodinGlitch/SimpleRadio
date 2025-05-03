@@ -62,7 +62,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
     @Override
     public void setRemoved() {
         if (router != null) {
-            RadioManager.removeRouterSided(router, this.level.isClientSide);
+            RadioManager.getInstance().removeRouterSided(router, this.level.isClientSide);
         }
 
         super.setRemoved();
@@ -70,7 +70,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
 
     @Override
     public RadioRouter getRouter() {
-        return router != null ? router : (this.hasLevel() ? RadioManager.getRouterSided(this.id, this.level.isClientSide) : null);
+        return router != null ? router : (this.hasLevel() ? RadioManager.getInstance().getRouterSided(this.id, this.level.isClientSide) : null);
     }
 
     @Override

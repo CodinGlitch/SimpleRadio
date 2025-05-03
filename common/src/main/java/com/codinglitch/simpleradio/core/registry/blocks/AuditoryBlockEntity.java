@@ -57,7 +57,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     @Override
     public RadioRouter getRouter() {
         return Stream.of(listener, speaker, transmitter, receiver).filter(Objects::nonNull).findFirst().orElseGet(() -> {
-            if (this.id != null && this.hasLevel()) return RadioManager.getRouterSided(this.id, this.level.isClientSide);
+            if (this.id != null && this.hasLevel()) return RadioManager.getInstance().getRouterSided(this.id, this.level.isClientSide);
             return null;
         });
     }

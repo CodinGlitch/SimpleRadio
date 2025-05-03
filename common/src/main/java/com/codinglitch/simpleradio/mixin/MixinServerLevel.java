@@ -42,6 +42,6 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel {
 
     @Inject(at = @At("HEAD"), method = "tick")
     private void simpleradio$tick_serverLevelTicking(BooleanSupplier supplier, CallbackInfo ci) {
-        RadioManager.levelTick(this.getLevel());
+        RadioManager.getInstance().levelTick(this.getLevel());
     }
 }

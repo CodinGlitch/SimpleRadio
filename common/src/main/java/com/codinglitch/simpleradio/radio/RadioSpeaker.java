@@ -58,7 +58,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         this(uuid);
         this.owner = owner;
 
-        RadioManager.registerRouterSided(this, owner.level().isClientSide(), null);
+        RadioManager.getInstance().registerRouterSided(this, owner.level().isClientSide(), null);
     }
     public RadioSpeaker(WorldlyPosition location) {
         this(location, UUID.randomUUID());
@@ -67,7 +67,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]> {
         this(uuid);
         this.location = location;
 
-        RadioManager.registerRouterSided(this, location.isClientSide(), null);
+        RadioManager.getInstance().registerRouterSided(this, location.isClientSide(), null);
     }
 
     public void setRange(float range) {

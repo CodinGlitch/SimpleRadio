@@ -318,7 +318,7 @@ public class RadioRouter implements Socket {
             } else if (this instanceof RadioTransmitter) {
                 flag = Frequencing.validateLocation(location, this.link != null ? this.link : Transmitting.class, this.reference, null);
             } else {
-                flag = this.link != null && RadioManager.verifyLocationCollection(location, this.link);
+                flag = this.link != null && RadioManager.getInstance().verifyLocationCollection(location, this.link);
             }
 
             if (!flag) {
@@ -326,7 +326,7 @@ public class RadioRouter implements Socket {
                 return false;
             }
         } else {
-            boolean isValid = RadioManager.verifyEntityCollection(owner, stack -> {
+            boolean isValid = RadioManager.getInstance().verifyEntityCollection(owner, stack -> {
                 if (stack.isEmpty()) return false;
                 if (!stack.hasTag()) return false;
 

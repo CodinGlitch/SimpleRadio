@@ -6,6 +6,6 @@ import java.util.UUID;
 
 public interface Auricular {
     static boolean validateLocation(WorldlyPosition position, Class<?> clazz, UUID reference) {
-        return RadioManager.verifyLocationCollection(position, clazz);
+        return RadioManager.getInstance().verifyLocationCollection(position, clazz);
     }
 }

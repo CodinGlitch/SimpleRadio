@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public interface Frequencing {
     static boolean validateLocation(WorldlyPosition position, Class<?> clazz, UUID reference, @Nullable Frequency frequency) {
-        return RadioManager.verifyLocationCollection(position, clazz);
+        return RadioManager.getInstance().verifyLocationCollection(position, clazz);
     }
 
     /**

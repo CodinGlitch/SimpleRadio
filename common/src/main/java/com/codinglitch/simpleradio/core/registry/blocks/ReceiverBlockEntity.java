@@ -111,7 +111,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
     public void inactivate() {
         if (this.frequency != null) {
-            RadioManager.removeRouterSided(this.id, this.getLevel().isClientSide);
+            RadioManager.getInstance().removeRouterSided(this.id, this.getLevel().isClientSide);
             if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
         }
 

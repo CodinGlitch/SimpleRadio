@@ -111,7 +111,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
     public void inactivate() {
         if (this.frequency != null) {
-            RadioManager.removeRouterSided(this.id, this.level.isClientSide);
+            RadioManager.getInstance().removeRouterSided(this.id, this.level.isClientSide);
             if (!this.level.isClientSide) stopTransmitting(frequency.frequency, frequency.modulation, this.id);
         }
 

@@ -153,7 +153,7 @@ public class Frequency implements Medium {
         if (receiver.location != null) isClient = receiver.location.isClientSide();
         else if (receiver.owner != null) isClient = receiver.owner.level().isClientSide;
 
-        RadioManager.registerRouterSided(receiver, isClient, this);
+        RadioManager.getInstance().registerRouterSided(receiver, isClient, this);
 
         CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.reference, this.frequency);
         return receiver;
@@ -234,7 +234,7 @@ public class Frequency implements Medium {
         if (transmitter.location != null) isClient = transmitter.location.isClientSide();
         else if (transmitter.owner != null) isClient = transmitter.owner.level().isClientSide;
 
-        RadioManager.registerRouterSided(transmitter, isClient, this);
+        RadioManager.getInstance().registerRouterSided(transmitter, isClient, this);
 
         CommonSimpleRadio.debug("Added transmitter {} to frequency {}", transmitter.reference, this.frequency);
         return transmitter;
