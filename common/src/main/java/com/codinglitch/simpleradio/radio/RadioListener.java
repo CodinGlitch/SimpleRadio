@@ -59,6 +59,12 @@ public class RadioListener extends RadioRouter implements Listener {
         RadioManager.getInstance().registerRouterSided(this, isClient, null);
     }
 
+    @Override
+    public float getRange() {
+        return range;
+    }
+
+    @Override
     public void setRange(float range) {
         this.range = range;
     }
