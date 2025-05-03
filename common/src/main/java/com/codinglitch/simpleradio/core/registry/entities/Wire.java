@@ -2,9 +2,9 @@ package com.codinglitch.simpleradio.core.registry.entities;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.api.central.Medium;
-import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Wire extends Entity implements Medium {
+public class Wire extends Entity implements Wiring {
     private static final EntityDataAccessor<Optional<UUID>> FROM = SynchedEntityData.defineId(Wire.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<String> FROM_TYPE = SynchedEntityData.defineId(Wire.class, EntityDataSerializers.STRING);
 
