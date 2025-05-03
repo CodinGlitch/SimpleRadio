@@ -102,6 +102,15 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
+    public void setRoutingCriteria(BiPredicate<RadioSource, RadioRouter> criteria) {
+        this.routeCriteria = criteria;
+    }
+    @Override
+    public void setAcceptingCriteria(Predicate<RadioSource> criteria) {
+        this.acceptCriteria = criteria;
+    }
+
+    @Override
     public RadioRouter getRouter() {
         return this;
     }
