@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.menus;
 
-import com.codinglitch.simpleradio.api.central.Frequencing;
-import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.central.Frequencing;
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlockEntity;
 import net.minecraft.nbt.CompoundTag;

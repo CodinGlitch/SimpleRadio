@@ -1,11 +1,11 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.api.central.FrequencingType;
-import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.FrequencingType;
+import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import net.minecraft.world.entity.Entity;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;

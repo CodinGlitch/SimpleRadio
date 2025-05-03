@@ -1,7 +1,5 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
-import com.codinglitch.simpleradio.api.central.Listening;
-import com.codinglitch.simpleradio.api.central.Module;
 import com.codinglitch.simpleradio.core.central.Alterable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioModules;

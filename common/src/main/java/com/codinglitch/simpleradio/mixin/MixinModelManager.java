@@ -1,7 +1,9 @@
 package com.codinglitch.simpleradio.mixin;
 
 import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;

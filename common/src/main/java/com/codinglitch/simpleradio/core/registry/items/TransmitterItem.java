@@ -1,9 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.api.central.Frequencing;
-import com.codinglitch.simpleradio.api.central.Transmitting;
-import com.codinglitch.simpleradio.core.central.*;
-import com.codinglitch.simpleradio.api.central.Module;
+import com.codinglitch.simpleradio.core.central.Alterable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioModules;
 import net.minecraft.network.chat.Component;

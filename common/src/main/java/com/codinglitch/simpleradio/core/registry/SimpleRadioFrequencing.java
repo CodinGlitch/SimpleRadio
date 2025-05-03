@@ -1,16 +1,9 @@
 package com.codinglitch.simpleradio.core.registry;
 
-import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.FrequencingRegistry;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.SimpleRadioServerConfig;
-import com.codinglitch.simpleradio.api.FrequencingRegistry;
-import com.codinglitch.simpleradio.api.central.FrequencingType;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioRouter;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.HashMap;
+import com.codinglitch.simpleradio.central.FrequencingType;
 
 public class SimpleRadioFrequencing {
     public static FrequencingType WALKIE_TALKIE = FrequencingRegistry.register(

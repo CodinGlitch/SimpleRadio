@@ -1,7 +1,5 @@
 package com.codinglitch.simpleradio.radio.effects;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-
 import java.util.Random;
 
 public class BaseAudioEffect extends AudioEffect {

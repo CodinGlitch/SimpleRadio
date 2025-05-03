@@ -1,9 +1,6 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.storage.LevelData;
 import org.spongepowered.asm.mixin.Mixin;

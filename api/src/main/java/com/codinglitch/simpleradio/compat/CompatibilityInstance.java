@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.compat;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.platform.Services;
 
 import java.util.List;
@@ -75,7 +76,7 @@ public class CompatibilityInstance {
     }
 
     // interface for uhh idk something
-    public interface CompatibilityConfig {
+    public interface CompatibilityConfig extends ConfigHolder {
         boolean isEnabled();
     }
 }

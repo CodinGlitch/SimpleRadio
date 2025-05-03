@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio.client.core.central;
 
 import com.codinglitch.simpleradio.client.core.registry.models.LayeredModuleModel;
 import com.codinglitch.simpleradio.client.core.registry.models.ModuleModel;
-import com.codinglitch.simpleradio.api.central.Module;
 import com.codinglitch.simpleradio.core.registry.items.ModuleItem;
 import com.google.common.collect.Maps;
 import net.minecraft.client.multiplayer.ClientLevel;

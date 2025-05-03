@@ -6,7 +6,6 @@ import com.codinglitch.simpleradio.api.central.Transmitting;
 import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
-import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
