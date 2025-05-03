@@ -71,8 +71,29 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         RadioManager.getInstance().registerRouterSided(this, location.isClientSide(), null);
     }
 
+    @Override
+    public float getRange() {
+        return range;
+    }
+
+    @Override
     public void setRange(float range) {
         this.range = range;
+    }
+
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public int getSpeakingTime() {
+        return speakingTime;
     }
 
     @Override
