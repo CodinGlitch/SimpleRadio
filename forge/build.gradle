@@ -76,9 +76,10 @@ dependencies {
     // --- Dependencies --- \\
 
     compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    runtimeOnly fg.deobf("com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}")
+    developmentRuntimeOnly fg.deobf("com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}:slim")
 
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    compileOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
     developmentRuntimeOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
