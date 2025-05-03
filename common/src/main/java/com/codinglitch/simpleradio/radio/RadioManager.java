@@ -17,6 +17,7 @@ import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Position;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -27,7 +28,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.Vector3f;
@@ -499,7 +499,7 @@ public class RadioManager implements ServerSimpleRadioApi {
         return null;
     }
 
-    public Map<Float, Listener> getListeners(Vector3f at) {
+    public Map<Float, Listener> getListeners(WorldlyPosition at) {
         TreeMap<Float, Listener> qualified = new TreeMap<>();
         for (RadioListener listener : getListeners()) {
             Vector3f position;
@@ -519,42 +519,10 @@ public class RadioManager implements ServerSimpleRadioApi {
 
     // --- Audio Gathering --- \\
 
-    public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
-        onSoundPlayed(level, location, soundHolder, volume, pitch, 0, seed);
-    }
-    public void onSoundPlayed(ServerLevel level, Vec3 location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
-        if (level.isClientSide) return;
-        if (!SimpleRadioLibrary.SERVER_CONFIG.router.soundListening) return;
-        if (!level.isLoaded(BlockPos.containing(location))) return;
-
-        SoundEvent sound = soundHolder.value();
-
-        Map<Float, Listener> qualified = getListeners(location.toVector3f());
-        for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
-            float distance = entry.getKey();
-            RadioListener listener = (RadioListener) entry.getValue();
-
-            double falloff = CommonRadioPlugin.getFalloff(distance, listener.getRange());
-
-            RadioSource newSource = new RadioSource(
-                    listener.getReference(),
-                    WorldlyPosition.of(location.toVector3f(), level),
-                    sound,
-                    (float) (falloff * volume)
-            );
-            newSource.pitch = pitch;
-            newSource.offset = offset;
-            newSource.seed = seed;
-            newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.getRange()))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
-
-            listener.onSource(newSource);
-        }
-    }
-
     // I mixin here instead of using the appropriate events to access the channel as well as prevent duplicates
     public void onLocationalPacket(Level level, LocationalAudioChannel channel, byte[] data) {
         Vector3f senderPosition = new Vector3f((float) channel.getLocation().getX(), (float) channel.getLocation().getY(), (float) channel.getLocation().getZ());
-        pushSound(level, senderPosition, channel.getId(), data);
+        sendAudio(WorldlyPosition.of(senderPosition, level), channel.getId(), data);
     }
 
     public void onEntityPacket(Level level, EntityAudioChannel channel, EntitySoundPacket packet) {
@@ -570,15 +538,51 @@ public class RadioManager implements ServerSimpleRadioApi {
 
 
         Vector3f senderPosition = sender.position().toVector3f();
-        pushSound(level, senderPosition, sender.getUUID(), event.getPacket().getOpusEncodedData());
+        sendAudio(WorldlyPosition.of(senderPosition, level), sender.getUUID(), event.getPacket().getOpusEncodedData());
     }
 
-    public void pushSound(Level level, Vector3f senderPosition, UUID sender, byte[] data) {
-        Map<Float, RadioListener> qualified = getListeners(new Vector3f(senderPosition.x(), senderPosition.y(), senderPosition.z()));
+    public void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
+        sendSound(location, soundHolder, volume, pitch, 0, seed);
+    }
+    public void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
+        Level level = location.level;
 
-        for (Map.Entry<Float, RadioListener> entry : qualified.entrySet()) {
+        if (level.isClientSide) return;
+        if (!SimpleRadioLibrary.SERVER_CONFIG.router.soundListening) return;
+        if (!level.isLoaded(BlockPos.containing((Position) location))) return;
+
+        SoundEvent sound = soundHolder.value();
+
+        Map<Float, Listener> qualified = getListeners(location);
+        for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
-            RadioListener listener = entry.getValue();
+            RadioListener listener = (RadioListener) entry.getValue();
+
+            double falloff = CommonRadioPlugin.getFalloff(distance, listener.getRange());
+
+            RadioSource newSource = new RadioSource(
+                    listener.getReference(),
+                    WorldlyPosition.of(location, level),
+                    sound,
+                    (float) (falloff * volume)
+            );
+            newSource.pitch = pitch;
+            newSource.offset = offset;
+            newSource.seed = seed;
+            newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.getRange()))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
+
+            listener.onSource(newSource);
+        }
+    }
+
+    @Override
+    public void sendAudio(WorldlyPosition location, UUID sender, byte[] data) {
+        Level level = location.level;
+        Map<Float, Listener> qualified = getListeners(location);
+
+        for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
+            float distance = entry.getKey();
+            RadioListener listener = (RadioListener) entry.getValue();
 
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
 
@@ -592,7 +596,7 @@ public class RadioManager implements ServerSimpleRadioApi {
 
             RadioSource newSource = new RadioSource(
                     sender,
-                    WorldlyPosition.of(senderPosition, level),
+                    WorldlyPosition.of(location, level),
                     data,
                     (float) falloff
             );
