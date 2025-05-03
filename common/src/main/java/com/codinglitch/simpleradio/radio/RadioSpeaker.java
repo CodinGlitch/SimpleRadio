@@ -149,15 +149,16 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     }
 
     @Override
-    public void accept(RadioSource source) {
+    public void accept(Source source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         super.accept(source);
         speak(source);
     }
 
-    public void speak(RadioSource source) {
+    public void speak(Source source) {
         this.compileActivity(source);
+        RadioSource radioSource = (RadioSource) source;
 
         // Severity calculation
         ServerLevel level = null;
@@ -171,21 +172,21 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         }
         if (level == null || position == null) return;
 
-        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != source.origin.level) return;
+        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != radioSource.origin.level) return;
 
-        this.effect.severity = (float) source.computeSeverity();
-        this.effect.volume = source.volume;
+        this.effect.severity = (float) radioSource.computeSeverity();
+        this.effect.volume = radioSource.volume;
         if (this.effect.severity >= 100) return;
 
         // Parsing sound event
-        if (source.data == null) {
-            if (source.soundEvent == null) return;
+        if (radioSource.data == null) {
+            if (radioSource.soundEvent == null) return;
 
             for (ServerPlayer player : level.players()) {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
                     Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
-                            this.getReference(), Holder.direct(source.soundEvent),
-                            source.volume, source.pitch, this.effect.severity, source.offset, source.seed
+                            this.getReference(), Holder.direct(radioSource.soundEvent),
+                            radioSource.volume, radioSource.pitch, this.effect.severity, radioSource.offset, radioSource.seed
                     ));
                 }
             }
@@ -194,8 +195,8 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         }
 
         // Packet buffer
-        Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(source.owner, k -> new HashMap<>());
-        Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(source.originalOwner, k -> new LinkedList<>());
+        Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(radioSource.owner, k -> new HashMap<>());
+        Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(radioSource.originalOwner, k -> new LinkedList<>());
         if (playerPackets.isEmpty()) {
             for (int i = 0; i < SimpleRadioLibrary.SERVER_CONFIG.frequency.packetBuffer; i++) {
                 //playerPackets.offer(null);
@@ -203,9 +204,9 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         }
 
         // Decoding
-        byte[] data = source.data;
+        byte[] data = radioSource.data;
 
-        OpusDecoder decoder = getDecoder(source.owner);
+        OpusDecoder decoder = getDecoder(radioSource.owner);
         if (data == null || data.length == 0) {
             decoder.resetState();
             return;
@@ -217,10 +218,10 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         playerPackets.offer(filtered);
 
         // Loader-specific compat
-        Services.COMPAT.onData(this, source, decoded);
+        Services.COMPAT.onData(this, radioSource, decoded);
 
         // Common compat
-        CompatCore.onData(this, source, decoded);
+        CompatCore.onData(this, radioSource, decoded);
 
         if (this.audioPlayer == null)
             getAudioPlayer().startPlaying();
