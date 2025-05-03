@@ -52,6 +52,10 @@ public class CommonRadioPlugin {
         });
     }
 
+    public static boolean isAudioValid(short[] data) {
+        return analyzeActivity(data) > 10f;
+    }
+
     public static float analyzeActivity(short[] data) {
         float activity = 0;
         for (short datum : data) {
