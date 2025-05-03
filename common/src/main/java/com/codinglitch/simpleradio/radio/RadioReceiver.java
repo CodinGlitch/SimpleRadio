@@ -23,7 +23,7 @@ public class RadioReceiver extends RadioRouter implements Receiver {
 
     protected RadioReceiver(Frequency frequency, UUID id) {
         super(id);
-        this.setFrequency(frequency);
+        this.frequency(frequency);
     }
     protected RadioReceiver(Frequency frequency) {
         this(frequency, UUID.randomUUID());
@@ -44,26 +44,39 @@ public class RadioReceiver extends RadioRouter implements Receiver {
         this.location = location;
     }
 
-    public void setFrequency(Frequency frequency) {
+    @Override
+    public int getAntennaPower() {
+        return antennaPower;
+    }
+    @Override
+    public double getPower() {
+        return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
+    }
+    @Override
+    public FrequencingType getFrequencingType() {
+        return frequencingType;
+    }
+
+    @Override
+    public RadioReceiver frequency(Frequency frequency) {
         if (this.frequency != null) {
             this.frequency.removeReceiver(this);
         }
 
         this.frequency = frequency;
+        return this;
     }
 
+    @Override
     public RadioReceiver receiveCriteria(Predicate<RadioSource> criteria) {
         this.acceptCriteria = criteria;
         return this;
     }
 
+    @Override
     public RadioReceiver frequencingType(FrequencingType type) {
         this.frequencingType = type;
         return this;
-    }
-
-    public double getPower() {
-        return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
     @Override
