@@ -219,22 +219,6 @@ public class RadioManager extends ServerSimpleRadioApi {
             }
         }
     }
-    @Override
-    public void removeRouterSided(UUID uuid, boolean isClient) {
-        if (isClient) {
-            ClientRadioManager.removeRouter(uuid);
-        } else {
-            removeRouter(uuid);
-        }
-    }
-    @Override
-    public void removeRouterSided(Router router, boolean isClient) {
-        if (isClient) {
-            ClientRadioManager.removeRouter(router);
-        } else {
-            removeRouter(router);
-        }
-    }
 
     // -------- \\
 
@@ -243,6 +227,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         SpeakersImpl.close();
         ListenersImpl.close();
+
         routers.clear();
     }
 
