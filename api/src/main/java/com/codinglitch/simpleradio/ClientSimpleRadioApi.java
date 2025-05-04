@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
-    private static ServerSimpleRadioApi INSTANCE;
-    public ServerSimpleRadioApi() {
+public abstract class ClientSimpleRadioApi extends SimpleRadioApi {
+    private static ClientSimpleRadioApi INSTANCE;
+    public ClientSimpleRadioApi() {
         INSTANCE = this;
     }
 
-    public static ServerSimpleRadioApi getInstance() {
+    public static ClientSimpleRadioApi getInstance() {
         return INSTANCE;
     }
 

@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.core.registry.renderers;
 
-import com.codinglitch.simpleradio.CatalystRegistry;
+import com.codinglitch.simpleradio.core.registry.CatalystRegistry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Catalyst;
 import com.codinglitch.simpleradio.central.Frequencing;

@@ -20,9 +20,9 @@ public class VibrativeCompat {
         if (type == null) return;
 
         if (connection == null) {
-            if (channel.location == null) return;
+            if (channel.position == null) return;
 
-            WorldlyPosition location = channel.location;
+            WorldlyPosition location = channel.position;
             //VibrativeVoiceApi.INSTANCE.trySendVibration(channel.owner, location.blockPos(), location.level, type);
         } else {
             if (connection.getPlayer().getPlayer() instanceof ServerPlayer player) {

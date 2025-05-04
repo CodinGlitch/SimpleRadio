@@ -50,7 +50,7 @@ public class RadioListener extends RadioRouter implements Listener {
     }
     public RadioListener(WorldlyPosition location, UUID uuid) {
         this(uuid);
-        this.location = location;
+        this.position = location;
 
 
         boolean isClient = location.isClientSide();

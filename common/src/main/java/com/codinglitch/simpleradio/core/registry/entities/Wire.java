@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.central.Wiring;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
@@ -12,6 +13,8 @@ import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -75,10 +78,10 @@ public class Wire extends Entity implements Wiring {
     public static Wire connect(Socket from, Socket to, Level level) {
         if (from.equals(to)) return null;
 
-        RadioRouter fromRouter = from.getRouter();
+        Router fromRouter = from.getRouter();
         if (fromRouter == null) return null;
 
-        RadioRouter toRouter = to.getRouter();
+        Router toRouter = to.getRouter();
         if (toRouter == null) return null;
 
         UUID fromRef = fromRouter.getReference();
@@ -88,7 +91,7 @@ public class Wire extends Entity implements Wiring {
         if (to.hasWire(fromRef, toRef)) return null;
 
         Wire wire = new Wire(level);
-        wire.moveTo(new Vec3(fromRouter.location));
+        wire.moveTo(new Vec3(fromRouter.getLocation()));
         wire.setFrom(fromRouter);
         wire.setTo(toRouter);
 
@@ -100,11 +103,8 @@ public class Wire extends Entity implements Wiring {
         return wire;
     }
 
-    /**
-     * Get the router opposite to the one provided.
-     * @param source The originating router
-     */
-    public RadioRouter transport(RadioRouter source) {
+    @Override
+    public RadioRouter transport(Router source) {
         RadioRouter from = this.getFromRouter();
         RadioRouter to = this.getToRouter();
 
@@ -114,13 +114,9 @@ public class Wire extends Entity implements Wiring {
         return null;
     }
 
-    /**
-     * Relay a {@link RadioSource} along this wire.
-     * @param source The {@link RadioSource} to relay
-     * @param originSocket The {@link Socket} the source came from
-     */
-    public void relay(RadioSource source, Socket originSocket) {
-        if (!this.isAlive()) return;
+    @Override
+    public void relay(Source source, Socket originSocket) {
+        if (!this.isValid()) return;
 
         UUID fromRef = this.getFrom().orElse(null);
         UUID toRef = this.getTo().orElse(null);
@@ -173,14 +169,14 @@ public class Wire extends Entity implements Wiring {
             }
         }
 
-        if (!level.isClientSide() && !effectCooldowns.containsKey(source.owner) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
+        if (!level.isClientSide() && !effectCooldowns.containsKey(source.getOwner()) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
             for (Player player : level.players()) {
                 if (player.distanceTo(this) <= 100) {
                     Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundWireEffectPacket(this.getId(), isReversed));
                 }
             }
 
-            this.effectCooldowns.put(source.owner, SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
+            this.effectCooldowns.put(source.getOwner(), SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
         }
 
         //CommonSimpleRadio.info("Relaying from {} to {}", origin, destination);
@@ -226,6 +222,7 @@ public class Wire extends Entity implements Wiring {
             this.getEntityData().set(FROM_TYPE, from.getClass().getSimpleName());
     }
 
+    @Override
     @Nullable
     public RadioRouter getToRouter() {
         UUID reference = this.getTo().orElse(null);
@@ -233,27 +230,32 @@ public class Wire extends Entity implements Wiring {
 
         return RadioManager.getInstance().getRouterSided(reference, this.getToType(), this.level().isClientSide);
     }
+    @Override
     public Optional<UUID> getTo() {
         return this.getEntityData().get(TO);
     }
+    @Override
     @Nullable
     public String getToType() {
         String type = this.getEntityData().get(TO_TYPE);
         return type.isEmpty() ? null : type;
     }
-    public void setTo(RadioRouter to) {
+    @Override
+    public void setTo(Router to) {
         this.getEntityData().set(TO, Optional.of(to.getReference()));
         if (to.getClass() != RadioRouter.class)
             this.getEntityData().set(TO_TYPE, to.getClass().getSimpleName());
     }
 
+    @Override
     public void burnOut() {
         RadioManager.getInstance().dequeueSource(queuedSource -> queuedSource.source.wireMedium == this);
         this.kill();
     }
 
+    @Override
     public void shortCircuit(Vector3f at) {
-        if (level() instanceof ServerLevel level) Socket.shortAt(level, at);
+        if (level() instanceof ServerLevel level) RadioManager.getInstance().shortAt(WorldlyPosition.of(at, level));
         this.burnOut();
     }
     public void shortCircuit() {

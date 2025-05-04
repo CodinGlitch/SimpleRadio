@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.core.registry;
 
-import com.codinglitch.simpleradio.CatalystRegistry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Catalyst;
 import com.codinglitch.simpleradio.core.registry.catalysts.GildedBlackstoneCatalyst;

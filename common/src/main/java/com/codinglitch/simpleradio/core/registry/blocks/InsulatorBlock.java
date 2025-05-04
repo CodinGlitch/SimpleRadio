@@ -70,7 +70,7 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
 
                 Wire wire = wires.get(0);
                 RadioRouter router = wire.transport(insulatorBlockEntity.getRouter());
-                BlockPos routerPos = router.location.blockPos();
+                BlockPos routerPos = router.position.blockPos();
 
                 BlockState blockState = level.getBlockState(routerPos);
                 if (!(blockState.getBlock() instanceof InsulatorBlock)) continue;
@@ -91,7 +91,7 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
         router = new RadioRouter(id);
 
         router.link = this.getClass();
-        router.location = location;
+        router.position = location;
 
         Vec3i normal = state.getValue(InsulatorBlock.FACING).getOpposite().getNormal();
         router.connectionOffset = new Vec3(normal.getX()*0.2f, normal.getY()*0.2f, normal.getZ()*0.2f);

@@ -105,7 +105,7 @@ public class ClientRadioManager {
         return ClientRadioManager.getRouter(router -> owner.equals(router.owner));
     }
     public static RadioRouter getRouter(WorldlyPosition location) {
-        return ClientRadioManager.getRouter(router -> location.equals(router.location));
+        return ClientRadioManager.getRouter(router -> location.equals(router.position));
     }
 
     public static RadioListener getListener(UUID uuid) {
@@ -115,7 +115,7 @@ public class ClientRadioManager {
         return (RadioListener) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioListener);
     }
     public static RadioListener getListener(WorldlyPosition location) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioListener);
+        return (RadioListener) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioListener);
     }
 
     public static RadioSpeaker getSpeaker(UUID uuid) {
@@ -125,7 +125,7 @@ public class ClientRadioManager {
         return (RadioSpeaker) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioSpeaker);
     }
     public static RadioSpeaker getSpeaker(WorldlyPosition location) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioSpeaker);
+        return (RadioSpeaker) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioSpeaker);
     }
 
     public static RadioReceiver getReceiver(UUID uuid) {
@@ -135,7 +135,7 @@ public class ClientRadioManager {
         return (RadioReceiver) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioReceiver);
     }
     public static RadioReceiver getReceiver(WorldlyPosition location) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioReceiver);
+        return (RadioReceiver) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioReceiver);
     }
 
     public static RadioTransmitter getTransmitter(UUID uuid) {
@@ -145,7 +145,7 @@ public class ClientRadioManager {
         return (RadioTransmitter) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioTransmitter);
     }
     public static RadioTransmitter getTransmitter(WorldlyPosition location) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioTransmitter);
+        return (RadioTransmitter) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioTransmitter);
     }
 
     public static void finalizeRouter(short mapping, short identifier) {
@@ -196,15 +196,15 @@ public class ClientRadioManager {
         removeRouter(wrapper -> owner.equals(wrapper.router.owner));
     }
     public static void removeRouter(WorldlyPosition location) {
-        removeRouter(wrapper -> wrapper.router.location != null && location.equals(wrapper.router.location));
+        removeRouter(wrapper -> wrapper.router.position != null && location.equals(wrapper.router.position));
     }
 
     public static void garbageCollect() {
         removeRouter(wrapper -> !wrapper.router.validate());
-        removeRouter(wrapper -> wrapper.router.owner == null && wrapper.router.location == null);
+        removeRouter(wrapper -> wrapper.router.owner == null && wrapper.router.position == null);
 
         pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
-        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.owner == null && entry.getValue().router.location == null));
+        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.owner == null && entry.getValue().router.position == null));
     }
 
     public static void tick(long gameTime) {
@@ -437,8 +437,8 @@ public class ClientRadioManager {
         poseStack.pushPose();
 
         Vector3f location = null;
-        if (router.location != null) {
-            location = new Vector3f(router.location.x, router.location.y, router.location.z);
+        if (router.position != null) {
+            location = new Vector3f(router.position.x, router.position.y, router.position.z);
         } else if (router.owner != null) {
             location = router.owner.position().toVector3f();
         }
@@ -507,7 +507,7 @@ public class ClientRadioManager {
 
         public boolean request(short mapping) {
             if (attempts > 5) {
-                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.location);
+                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.position);
                 return false;
             }
 

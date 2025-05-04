@@ -15,7 +15,7 @@ minecraft {
 }
 
 dependencies {
-    compileOnly project(":common")
+    //compileOnly project(":common")
 }
 
 configurations {

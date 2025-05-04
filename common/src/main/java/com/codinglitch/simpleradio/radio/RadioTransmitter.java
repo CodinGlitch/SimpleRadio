@@ -41,7 +41,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
     public RadioTransmitter(Frequency frequency, WorldlyPosition location, UUID uuid) {
         this(frequency, uuid);
-        this.location = location;
+        this.position = location;
     }
 
     @Override

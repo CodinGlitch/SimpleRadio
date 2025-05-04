@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.CatalystRegistry;
+import com.codinglitch.simpleradio.core.registry.CatalystRegistry;
 import com.codinglitch.simpleradio.central.Catalyst;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

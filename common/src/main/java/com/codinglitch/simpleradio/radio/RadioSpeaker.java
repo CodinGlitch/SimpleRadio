@@ -66,7 +66,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     }
     public RadioSpeaker(WorldlyPosition location, UUID uuid) {
         this(uuid);
-        this.location = location;
+        this.position = location;
 
         RadioManager.getInstance().registerRouterSided(this, location.isClientSide(), null);
     }
@@ -163,9 +163,9 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         // Severity calculation
         ServerLevel level = null;
         Vector3f position = null;
-        if (location != null) {
-            level = (ServerLevel) location.level;
-            position = location.position();
+        if (this.position != null) {
+            level = (ServerLevel) this.position.level;
+            position = this.position.position();
         } else {
             level = (ServerLevel) owner.level();
             position = owner.position().toVector3f();
