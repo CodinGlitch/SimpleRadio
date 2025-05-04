@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.routers;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.Source;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,6 +22,13 @@ public interface Router {
     WorldlyPosition getLocation();
 
     Router tryAddRouter(Router router);
+
+    @Nullable
+    WorldlyPosition getPosition();
+
+    @Nullable
+    Entity getOwner();
+
     Router getRouter(UUID id);
 
     Vec3 getConnectionPosition();
@@ -32,4 +40,6 @@ public interface Router {
 
     void route(Source source);
     void accept(Source source);
+
+    boolean validate();
 }

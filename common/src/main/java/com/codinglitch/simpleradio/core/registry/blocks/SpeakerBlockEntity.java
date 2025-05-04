@@ -26,7 +26,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, speaker.location.x, speaker.location.y, speaker.location.z,
+                    null, speaker.position.x, speaker.position.y, speaker.position.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f

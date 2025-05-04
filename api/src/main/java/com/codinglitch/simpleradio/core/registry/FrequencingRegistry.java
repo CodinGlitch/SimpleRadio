@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio;
+package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.FrequencingType;

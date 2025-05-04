@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio;
+package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.central.Catalyst;
 import net.minecraft.resources.ResourceLocation;

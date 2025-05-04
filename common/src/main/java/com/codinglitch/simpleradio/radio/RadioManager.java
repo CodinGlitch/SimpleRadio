@@ -1,14 +1,19 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.*;
 import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.core.Frequencies;
+import com.codinglitch.simpleradio.core.Listeners;
+import com.codinglitch.simpleradio.core.Speakers;
+import com.codinglitch.simpleradio.core.central.FrequencyChannel;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.routers.Listener;
+import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.RouterContainer;
+import com.codinglitch.simpleradio.routers.Speaker;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
@@ -18,9 +23,11 @@ import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Position;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -35,24 +42,23 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class RadioManager implements ServerSimpleRadioApi {
-    private static RadioManager INSTANCE;
+public class RadioManager extends ServerSimpleRadioApi {
+    private static final RadioManager INSTANCE = new RadioManager();
+
+    private static final Frequencies FREQUENCIES = new FrequenciesImpl();
+    private static final Speakers SPEAKERS = new SpeakersImpl();
+    private static final Listeners LISTENERS = new ListenersImpl();
 
     // double queue for the win
     private static final ArrayList<QueuedSource> pendingSources = new ArrayList<>();
     private static final ArrayList<QueuedSource> sourceQueue = new ArrayList<>();
 
-    @Override
-    public ConfigHolder getConfig() {
-        return null; //idk yet
-    }
-
     public static class QueuedSource {
-        public RadioSource source;
+        public Source source;
 
-        public RadioRouter router;
+        public Router router;
         public int time;
-        public QueuedSource(RadioSource source, RadioRouter router, int time) {
+        public QueuedSource(Source source, Router router, int time) {
             this.source = source;
             this.router = router;
             this.time = time;
@@ -63,18 +69,36 @@ public class RadioManager implements ServerSimpleRadioApi {
     private static final Map<UUID, Vector3f> playerVelocities = new HashMap<>();
 
     private static final Queue<Runnable> pendingModifications = new LinkedList<>();
-    private static final RouterContainer<RadioSpeaker> speakers = new RouterContainer<>();
-    private static final RouterContainer<RadioListener> listeners = new RouterContainer<>();
-    static final Map<Short, RadioRouter> routers = new HashMap<>();
+    private static final RouterContainer<Listener> listeners = new RouterContainer<>();
+    static final Map<Short, Router> routers = new HashMap<>();
 
     public static RadioManager getInstance() {
-        if (INSTANCE == null) INSTANCE = new RadioManager();
         return INSTANCE;
     }
 
     public RadioManager() {}
 
-    public static <R extends RadioRouter> void putRouter(@Nullable RouterContainer<R> container, R router) {
+    @Override
+    public Frequencies frequencies() {
+        return FREQUENCIES;
+    }
+
+    @Override
+    public Speakers speakers() {
+        return SPEAKERS;
+    }
+
+    @Override
+    public Listeners listeners() {
+        return LISTENERS;
+    }
+
+    @Override
+    public ConfigHolder getConfig() {
+        return null; //idk yet
+    }
+
+    public <R extends Router> void putRouter(@Nullable RouterContainer<R> container, R router) {
         if (container != null) {
             container.add(router);
         } else {
@@ -82,15 +106,16 @@ public class RadioManager implements ServerSimpleRadioApi {
         }
     }
 
-    public static short pushRouter(RadioRouter router) {
+    public <R extends Router> short pushRouter(R router) {
         return pushRouter(routers, router);
     }
-    public static short pushRouter(Map<Short, RadioRouter> map, RadioRouter router) {
+    public <R extends Router> short pushRouter(Map<Short, R> map, R router) {
+        RadioRouter radioRouter = (RadioRouter) router;
         for (short identifier = Short.MIN_VALUE; identifier < Short.MAX_VALUE; identifier++) {
             if (map.containsKey(identifier)) continue;
 
-            router.identifier = identifier;
-            map.put(identifier, router);
+            radioRouter.identifier = identifier;
+            map.put(identifier, (R) radioRouter);
 
             return identifier;
         }
@@ -98,78 +123,96 @@ public class RadioManager implements ServerSimpleRadioApi {
         return Short.MAX_VALUE;
     }
 
-    public static short getIdentifier(Predicate<RadioRouter> filter) {
-        Optional<Map.Entry<Short, RadioRouter>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
+    public short getIdentifier(Predicate<Router> filter) {
+        Optional<Map.Entry<Short, Router>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getKey).orElse(Short.MAX_VALUE);
     }
 
-    public static List<RadioRouter> getRouters() {
+    // ---- Routers ---- \\
+
+    @Override
+    public List<Router> getRouters() {
         return routers.values().stream().toList();
     }
 
-    public static void removeRouter(RadioRouter router) {
+    @Override
+    public void removeRouter(Router router) {
         removeRouter(router::equals);
     }
-    public static void removeRouter(Predicate<RadioRouter> criteria) {
+    @Override
+    public void removeRouter(Predicate<Router> criteria) {
         routers.entrySet().removeIf(entry -> criteria.test(entry.getValue()));
     }
-    public static void removeRouter(short identifier) {
+    @Override
+    public void removeRouter(short identifier) {
         routers.remove(identifier);
     }
 
-    public static void removeRouter(UUID uuid) {
-        removeRouter(router -> router.reference.equals(uuid));
+    @Override
+    public void removeRouter(UUID uuid) {
+        removeRouter(router -> router.getReference().equals(uuid));
     }
-    public static void removeRouter(Entity owner) {
-        removeRouter(router -> router.owner == owner);
+    @Override
+    public void removeRouter(Entity owner) {
+        removeRouter(router -> router.getOwner() == owner);
     }
-    public static void removeRouter(WorldlyPosition location) {
-        removeRouter(router -> router.location != null && router.location.equals(location));
+    @Override
+    public void removeRouter(WorldlyPosition location) {
+        removeRouter(router -> router.getPosition() != null && router.getPosition().equals(location));
     }
 
-
-    public RadioRouter getRouter(Predicate<RadioRouter> filter) {
-        Optional<Map.Entry<Short, RadioRouter>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
+    @Override
+    public Router getRouter(Predicate<Router> filter) {
+        Optional<Map.Entry<Short, Router>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getValue).orElse(null);
     }
-    public RadioRouter getRouter(short identifier) {
+    @Override
+    public Router getRouter(short identifier) {
         return routers.get(identifier);
     }
 
-    public RadioRouter getRouter(UUID reference, @Nullable String type) {
+    @Override
+    public Router getRouter(UUID reference, @Nullable String type) {
         return getRouter(router ->
-                router.reference.equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
+                router.getReference().equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
         );
     }
-    public RadioRouter getRouter(UUID reference) {
-        return getRouter(router -> router.reference.equals(reference));
+    @Override
+    public Router getRouter(UUID reference) {
+        return getRouter(router -> router.getReference().equals(reference));
     }
-    public RadioRouter getRouter(Entity owner) {
-        return getRouter(router -> owner.equals(router.owner));
+    @Override
+    public Router getRouter(Entity owner) {
+        return getRouter(router -> owner.equals(router.getOwner()));
     }
-    public RadioRouter getRouter(WorldlyPosition location) {
-        return getRouter(router -> location.equals(router.location));
+    @Override
+    public Router getRouter(WorldlyPosition location) {
+        return getRouter(router -> location.equals(router.getPosition()));
     }
 
-    public void registerRouter(RadioRouter router) {
+    @Override
+    public void registerRouter(Router router) {
         putRouter(null, router);
     }
 
-    public RadioRouter getRouterSided(UUID reference, boolean isClient) {
+    @Override
+    public Router getRouterSided(UUID reference, boolean isClient) {
         return isClient ? ClientRadioManager.getRouter(reference) : getRouter(reference);
     }
-    public RadioRouter getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
+    @Override
+    public Router getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
         return isClient ? ClientRadioManager.getRouter(reference, type) : getRouter(reference, type);
     }
-    public void registerRouterSided(RadioRouter router, boolean isClient, @Nullable Frequency frequency) {
-        CommonSimpleRadio.debug("Adding {} of reference {}", router.getClass().getSimpleName(), router.reference);
+    @Override
+    public void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency) {
+        CommonSimpleRadio.debug("Adding {} of reference {}", router.getClass().getSimpleName(), router.getReference());
         if (isClient) {
             ClientRadioManager.registerRouter(router);
         } else {
             if (router instanceof RadioSpeaker speaker) {
-                registerSpeaker(speaker);
+                SPEAKERS.register(speaker);
             } else if (router instanceof RadioListener listener) {
-                registerListener(listener);
+                LISTENERS.register(listener);
             } else if (router instanceof RadioReceiver receiver) {
                 if (frequency != null) frequency.registerReceiver(receiver);
             } else if (router instanceof RadioTransmitter transmitter) {
@@ -179,6 +222,7 @@ public class RadioManager implements ServerSimpleRadioApi {
             }
         }
     }
+    @Override
     public void removeRouterSided(UUID uuid, boolean isClient) {
         if (isClient) {
             ClientRadioManager.removeRouter(uuid);
@@ -186,7 +230,8 @@ public class RadioManager implements ServerSimpleRadioApi {
             removeRouter(uuid);
         }
     }
-    public void removeRouterSided(RadioRouter router, boolean isClient) {
+    @Override
+    public void removeRouterSided(Router router, boolean isClient) {
         if (isClient) {
             ClientRadioManager.removeRouter(router);
         } else {
@@ -194,172 +239,29 @@ public class RadioManager implements ServerSimpleRadioApi {
         }
     }
 
-    // ---- Speakers ---- \\
-
-    public List<RadioSpeaker> getSpeakers() {
-        return speakers.stream().toList();
-    }
-
-    public void removeSpeaker(RadioSpeaker speaker) {
-        removeSpeaker(speaker::equals);
-    }
-    public void removeSpeaker(Predicate<RadioSpeaker> criteria) {
-        speakers.removeIf(criteria);
-    }
-    public void removeSpeaker(short identifier) {
-        speakers.remove(identifier);
-    }
-
-    public void removeSpeaker(Entity owner) {
-        removeSpeaker(speaker -> owner.equals(speaker.owner));
-    }
-    public void removeSpeaker(WorldlyPosition location) {
-        removeSpeaker(speaker -> location.equals(speaker.location));
-    }
-    public void removeSpeaker(UUID id) {
-        removeSpeaker(speaker -> id.equals(speaker.reference));
-    }
-
-    public RadioSpeaker getSpeaker(Entity owner) {
-        return getSpeaker(speaker -> owner.equals(speaker.owner));
-    }
-    public RadioSpeaker getSpeaker(WorldlyPosition location) {
-        return getSpeaker(speaker -> location.equals(speaker.location));
-    }
-    public RadioSpeaker getSpeaker(UUID id) {
-        return getSpeaker(speaker -> id.equals(speaker.reference));
-    }
-    public RadioSpeaker getSpeaker(Predicate<RadioSpeaker> filter) {
-        Optional<RadioSpeaker> result = speakers.stream().filter(filter).findFirst();
-        return result.orElse(null);
-    }
-
-    public RadioSpeaker getOrCreateSpeaker(Entity owner, @Nullable UUID id) {
-        boolean isClient = owner.level().isClientSide;
-
-        RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(owner) : getSpeaker(owner);
-        if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : getSpeaker(id);
-
-        return speaker != null ? speaker : new RadioSpeaker(owner, id);
-    }
-
-    public RadioSpeaker getOrCreateSpeaker(Entity owner) { return getOrCreateSpeaker(owner, null); }
-    public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, @Nullable UUID id) {
-        boolean isClient = location.level.isClientSide;
-
-        RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(location) : getSpeaker(location);
-        if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : getSpeaker(id);
-
-        return speaker != null ? speaker : new RadioSpeaker(location, id);
-    }
-    public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location) { return getOrCreateSpeaker(location, null); }
-
-    public RadioSpeaker registerSpeaker(RadioSpeaker speaker) {
-        if (speaker.location != null) {
-            if (speaker.location.isClientSide()) {
-                CommonSimpleRadio.warn("Attempted to register a client-sided speaker on the server; cancelling");
-                return null;
-            }
-        }
-
-        putRouter(speakers, speaker);
-        return speaker;
-    }
-
-    // ---- Listeners ---- \\
-
-    public static List<RadioListener> getListeners() {
-        return listeners.stream().toList();
-    }
-
-    public void removeListener(RadioListener listener) {
-        removeListener(listener::equals);
-    }
-    public void removeListener(Predicate<RadioListener> criteria) {
-        listeners.removeIf(criteria);
-    }
-    public void removeListener(short identifier) {
-        listeners.remove(identifier);
-    }
-
-    public void removeListener(Entity owner) {
-        removeListener(listener -> owner.equals(listener.owner));
-    }
-    public void removeListener(WorldlyPosition location) {
-        removeListener(listener -> location.equals(listener.location));
-    }
-    public void removeListener(UUID id) {
-        removeListener(listener -> id.equals(listener.reference));
-    }
-
-    public RadioListener getListener(Entity owner) {
-        return getListener(listener -> owner.equals(listener.owner));
-    }
-    public RadioListener getListener(WorldlyPosition location) {
-        return getListener(listener -> location.equals(listener.location));
-    }
-    public RadioListener getListener(UUID id) {
-        return getListener(listener -> id.equals(listener.reference));
-    }
-    public RadioListener getListener(Predicate<RadioListener> filter) {
-        Optional<RadioListener> result = listeners.stream().filter(filter).findFirst();
-        return result.orElse(null);
-    }
-
-    public RadioListener getOrCreateListener(Entity owner, @Nullable UUID id) {
-        boolean isClient = owner.level().isClientSide;
-
-        RadioListener listener = null;//isClient ? ClientRadioManager.getListener(owner) : getListener(owner);
-        if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : getListener(id);
-
-        return listener != null ? listener : new RadioListener(owner, id);
-    }
-    public RadioListener getOrCreateListener(Entity owner) { return getOrCreateListener(owner, null); }
-    public RadioListener getOrCreateListener(WorldlyPosition location, @Nullable UUID id) {
-        boolean isClient = location.level.isClientSide;
-
-        RadioListener listener = null;//isClient ? ClientRadioManager.getListener(location) : getListener(location);
-        if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : getListener(id);
-
-        return listener != null ? listener : new RadioListener(location, id);
-    }
-    public RadioListener getOrCreateListener(WorldlyPosition location) { return getOrCreateListener(location, null); }
-
-    public RadioListener registerListener(RadioListener listener) {
-        if (listener.location != null) {
-            if (listener.location.isClientSide()) {
-                CommonSimpleRadio.warn("Attempted to register a client-sided listener on the server; cancelling");
-                return null;
-            }
-        }
-
-        putRouter(listeners, listener);
-        return listener;
-    }
-
     // -------- \\
 
     public static void close() {
-        Frequency.close();
+        FrequenciesImpl.close();
 
-        speakers.clear();
-        listeners.clear();
+        SpeakersImpl.close();
+        ListenersImpl.close();
         routers.clear();
     }
 
-    public static <R extends RadioRouter> void validate(List<R> container) {
-        container.removeIf(Predicate.not(RadioRouter::validate));
-        container.removeIf(entry -> entry.owner == null && entry.location == null);
+    public static <R extends Router> void validate(List<R> container) {
+        container.removeIf(Predicate.not(Router::validate));
+        container.removeIf(entry -> entry.getOwner() == null && entry.getPosition() == null);
     }
 
     public static void garbageCollect() {
-        Frequency.garbageCollect();
+        FrequenciesImpl.garbageCollect();
 
-        validate(speakers);
-        validate(listeners);
+        SpeakersImpl.garbageCollect();
+        ListenersImpl.garbageCollect();
 
         routers.entrySet().removeIf(entry -> !entry.getValue().validate());
-        routers.entrySet().removeIf(entry -> entry.getValue().owner == null && entry.getValue().location == null);
+        routers.entrySet().removeIf(entry -> entry.getValue().getOwner() == null && entry.getValue().getPosition() == null);
     }
 
     public void levelTick(ServerLevel level) {
@@ -378,16 +280,16 @@ public class RadioManager implements ServerSimpleRadioApi {
         }
 
         // -- Receiver, Transmitter and Listener ticking -- \\
-        List<Frequency> frequencies = Frequency.getFrequencies();
+        List<Frequency> frequencies = FREQUENCIES.get();
         for (Frequency frequency : frequencies) {
-            frequency.serverTick(tickCount);
+            ((FrequencyChannel) frequency).serverTick(tickCount);
         }
 
-        for (RadioListener listener : listeners) {
-            listener.tick(tickCount);
+        for (Listener listener : LISTENERS.get()) {
+            ((RadioListener) listener).tick(tickCount);
         }
-        for (RadioSpeaker speaker : speakers) {
-            speaker.tick(tickCount);
+        for (Speaker speaker : SPEAKERS.get()) {
+            ((RadioSpeaker) speaker).tick(tickCount);
         }
 
         applyModifications();
@@ -421,7 +323,7 @@ public class RadioManager implements ServerSimpleRadioApi {
         }
     }
 
-    public void queueSource(RadioSource source, RadioRouter destination, int delay) {
+    public void queueSource(Source source, Router destination, int delay) {
         pendingSources.add(new QueuedSource(source, destination, delay));
     }
     public void dequeueSource(Predicate<QueuedSource> criteria) {
@@ -438,6 +340,27 @@ public class RadioManager implements ServerSimpleRadioApi {
         }
 
         return false;
+    }
+
+    @Override
+    public void shortAt(WorldlyPosition location) {
+        Level level = location.level;
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(null, location.x, location.y, location.z, SimpleRadioSounds.SHORT_CIRCUIT, SoundSource.BLOCKS, 0.3f, 0.9f + level.random.nextFloat()*0.2f);
+
+            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                    location.x, location.y, location.z, 10,
+                    -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
+            );
+            serverLevel.sendParticles(ParticleTypes.CRIT,
+                    location.x, location.y, location.z, 8,
+                    -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, -0.2+level.random.nextDouble()*0.4, 1
+            );
+            serverLevel.sendParticles(ParticleTypes.POOF,
+                    location.x, location.y, location.z, 5,
+                    0.2d, 0.2d, 0.2d, 0.1d
+            );
+        }
     }
 
     public enum CollectionResult {
@@ -499,23 +422,7 @@ public class RadioManager implements ServerSimpleRadioApi {
         return null;
     }
 
-    public Map<Float, Listener> getListeners(WorldlyPosition at) {
-        TreeMap<Float, Listener> qualified = new TreeMap<>();
-        for (RadioListener listener : getListeners()) {
-            Vector3f position;
-            if (listener.location != null) {
-                position = listener.location.position();
-            } else if (listener.owner != null) {
-                position = listener.owner.position().toVector3f();
-            } else continue;
 
-            float distance = position.distance(at);
-            if (distance > listener.range) continue;
-
-            qualified.put(distance, listener);
-        }
-        return qualified;
-    }
 
     // --- Audio Gathering --- \\
 
@@ -553,7 +460,7 @@ public class RadioManager implements ServerSimpleRadioApi {
 
         SoundEvent sound = soundHolder.value();
 
-        Map<Float, Listener> qualified = getListeners(location);
+        Map<Float, Listener> qualified = LISTENERS.getAt(location);
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
@@ -578,7 +485,7 @@ public class RadioManager implements ServerSimpleRadioApi {
     @Override
     public void sendAudio(WorldlyPosition location, UUID sender, byte[] data) {
         Level level = location.level;
-        Map<Float, Listener> qualified = getListeners(location);
+        Map<Float, Listener> qualified = LISTENERS.getAt(location);
 
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
@@ -587,8 +494,8 @@ public class RadioManager implements ServerSimpleRadioApi {
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
 
             Vector3f listenerPosition = null;
-            if (listener.location != null) {
-                listenerPosition = listener.location.position();
+            if (listener.position != null) {
+                listenerPosition = listener.position.position();
             } else if (listener.owner != null) {
                 listenerPosition = listener.owner.position().toVector3f();
             }

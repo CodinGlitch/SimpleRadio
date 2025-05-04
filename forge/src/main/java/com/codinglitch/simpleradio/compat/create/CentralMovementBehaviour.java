@@ -34,9 +34,9 @@ public class CentralMovementBehaviour implements MovementBehaviour {
             router.rotation.setAngleAxis(translatedNorth.angle(new Vector3f(0, 0, -1)) * -Math.signum(translatedNorth.x), 0, 1, 0);
         }
 
-        router.location.x = newLocation.x;
-        router.location.y = newLocation.y;
-        router.location.z = newLocation.z;
+        router.position.x = newLocation.x;
+        router.position.y = newLocation.y;
+        router.position.z = newLocation.z;
         router.updateLocation(newLocation);
     }
 

@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.ConfigHolder;
 
-public interface SimpleRadioApi {
+public abstract class SimpleRadioApi {
 
-    ConfigHolder getConfig();
+    public abstract ConfigHolder getConfig();
 }

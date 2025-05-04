@@ -1,12 +1,14 @@
-package com.codinglitch.simpleradio.radio;
+package com.codinglitch.simpleradio.routers;
+
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-public class RouterContainer<R extends RadioRouter> extends ArrayList<R> {
+public class RouterContainer<R extends Router> extends ArrayList<R> {
     @Override
     public boolean add(R router) {
-        RadioManager.pushRouter(router);
+        ServerSimpleRadioApi.getInstance().pushRouter(router);
 
         return super.add(router);
     }
@@ -17,7 +19,7 @@ public class RouterContainer<R extends RadioRouter> extends ArrayList<R> {
             if (router == null) return true;
 
             if (filter.test(router)) {
-                RadioManager.removeRouter(router.getIdentifier());
+                ServerSimpleRadioApi.getInstance().removeRouter(router.getIdentifier());
                 return true;
             }
             return false;

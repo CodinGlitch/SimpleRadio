@@ -64,13 +64,13 @@ public class FrequencerBlockEntity extends BlockEntity {
             if (blockEntity.frequency != null) {
                 //---- Receiver gathering and parsing ----\\
                 for (RadioReceiver receiver : blockEntity.frequency.receivers) {
-                    String name = parse(receiver.owner, receiver.location);
+                    String name = parse(receiver.owner, receiver.position);
                     if (name != null) blockEntity.frequencings.add(name);
                 }
 
                 //---- Transmitter gathering and parsing ----\\
                 for (RadioTransmitter transmitter : blockEntity.frequency.transmitters) {
-                    String name = parse(transmitter.owner, transmitter.location);
+                    String name = parse(transmitter.owner, transmitter.position);
                     if (name != null) blockEntity.frequencings.add(name);
                 }
 
@@ -80,7 +80,7 @@ public class FrequencerBlockEntity extends BlockEntity {
                     //---- Listener gathering ----\\
                     List<RadioListener> listeners = RadioManager.getListeners();
                     for (RadioListener listener : listeners) {
-                        String name = parse(listener.owner, listener.location);
+                        String name = parse(listener.owner, listener.position);
                         if (name != null) blockEntity.listeners.add(name);
                     }
                 } else {

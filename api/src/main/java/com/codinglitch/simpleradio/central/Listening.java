@@ -1,9 +1,5 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
-import com.codinglitch.simpleradio.radio.RadioListener;
-import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.world.entity.Entity;
 
 import org.jetbrains.annotations.Nullable;

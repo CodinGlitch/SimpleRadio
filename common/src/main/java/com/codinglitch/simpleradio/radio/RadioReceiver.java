@@ -40,7 +40,7 @@ public class RadioReceiver extends RadioRouter implements Receiver {
     }
     public RadioReceiver(Frequency frequency, WorldlyPosition location, UUID uuid) {
         this(frequency, uuid);
-        this.location = location;
+        this.position = location;
     }
 
     @Override

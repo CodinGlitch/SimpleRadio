@@ -69,7 +69,7 @@ public class CreateCompat {
     private static void resetRouter(RadioRouter router, BlockPos pos, Level level) {
         if (router == null) return;
         router.owner = null;
-        router.location = Services.COMPAT.modifyPosition(WorldlyPosition.of(pos, level, pos));
+        router.position = Services.COMPAT.modifyPosition(WorldlyPosition.of(pos, level, pos));
     }
 
     public static void contraptionRemoveBlock(Contraption contraption, Level level, BlockPos pos, BlockState state, CompoundTag tag) {

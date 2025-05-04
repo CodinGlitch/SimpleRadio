@@ -36,7 +36,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.receiver != null) {
             level.playSound(
-                    null, receiver.location.x, receiver.location.y, receiver.location.z,
+                    null, receiver.position.x, receiver.position.y, receiver.position.z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f

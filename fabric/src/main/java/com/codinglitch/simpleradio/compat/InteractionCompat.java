@@ -28,9 +28,9 @@ public class InteractionCompat {
         }
 
         if (connection == null) {
-            if (channel.location == null) return;
+            if (channel.position == null) return;
 
-            WorldlyPosition location = channel.location;
+            WorldlyPosition location = channel.position;
             location.level.getServer().execute(() -> {
                 if (setCooldown(channel.reference, location.level)) {
                     BlockState state = location.level.getBlockState(location.blockPos());
