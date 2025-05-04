@@ -66,10 +66,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     }
 
-    private static final Map<UUID, Vector3f> playerVelocities = new HashMap<>();
-
     private static final Queue<Runnable> pendingModifications = new LinkedList<>();
-    private static final RouterContainer<Listener> listeners = new RouterContainer<>();
     static final Map<Short, Router> routers = new HashMap<>();
 
     public static RadioManager getInstance() {
@@ -265,13 +262,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     public void levelTick(ServerLevel level) {
-        for (ServerPlayer player : level.players()) {
-            playerVelocities.compute(player.getUUID(), (uuid, vector) -> {
-                if (vector == null) vector = new Vector3f();
-                vector.set((float) (player.getX() - player.xOld), (float) (player.getY() - player.yOld), (float) (player.getZ() - player.zOld));
-                return vector;
-            });
-        }
+
     }
 
     public void serverTick(int tickCount) {
