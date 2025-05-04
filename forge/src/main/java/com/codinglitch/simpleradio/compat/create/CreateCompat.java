@@ -77,7 +77,7 @@ public class CreateCompat {
             UUID uuid = tag.getUUID("uuid");
 
             if (level.isClientSide) {
-                resetRouter(ClientRadioManager.getReceiver(uuid), pos, level);
+                resetRouter(ClientRadioManager.getInstance().getReceiver(uuid), pos, level);
                 resetRouter(ClientRadioManager.getTransmitter(uuid), pos, level);
 
                 resetRouter(ClientRadioManager.getListener(uuid), pos, level);

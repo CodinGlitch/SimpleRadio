@@ -1,13 +1,31 @@
 package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.ConfigHolder;
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.routers.Router;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public abstract class SimpleRadioApi {
 
     public abstract ConfigHolder getConfig();
+
+    public Router getRouterSided(UUID reference, boolean isClient) {
+        return isClient ? ClientSimpleRadioApi.getInstance().getRouter(reference) : ServerSimpleRadioApi.getInstance().getRouter(reference);
+    }
+
+    public Router getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
+        return isClient ? ClientSimpleRadioApi.getInstance().getRouter(reference, type) : ServerSimpleRadioApi.getInstance().getRouter(reference, type);
+    }
+
+    public void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency) {
+        if (isClient) {
+            ClientSimpleRadioApi.getInstance().registerRouter(router);
+        } else {
+            ServerSimpleRadioApi.getInstance().registerRouter(router, frequency);
+        }
+    }
 
     public static void removeRouterSided(UUID uuid, boolean isClient) {
         if (isClient) {

@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.core.central;
 
-import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.audio.Channel;
 
 import java.util.HashMap;
@@ -8,13 +8,13 @@ import java.util.Map;
 
 public class ClientRouterWrapper {
     public final HashMap<Long, ChannelHandleWrapper> audioChannels = new HashMap<>();
-    public final RadioRouter router;
+    public final Router router;
 
-    public ClientRouterWrapper(RadioRouter router) {
+    public ClientRouterWrapper(Router router) {
         this.router = router;
     }
 
-    public static ClientRouterWrapper of(RadioRouter router) {
+    public static ClientRouterWrapper of(Router router) {
         return new ClientRouterWrapper(router);
     }
 

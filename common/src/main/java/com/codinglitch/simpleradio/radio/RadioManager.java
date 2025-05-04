@@ -4,7 +4,6 @@ import com.codinglitch.simpleradio.*;
 import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.Speakers;
@@ -193,30 +192,17 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public Router getRouterSided(UUID reference, boolean isClient) {
-        return isClient ? ClientRadioManager.getRouter(reference) : getRouter(reference);
-    }
-    @Override
-    public Router getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
-        return isClient ? ClientRadioManager.getRouter(reference, type) : getRouter(reference, type);
-    }
-    @Override
-    public void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency) {
-        CommonSimpleRadio.debug("Adding {} of reference {}", router.getClass().getSimpleName(), router.getReference());
-        if (isClient) {
-            ClientRadioManager.registerRouter(router);
+    public void registerRouter(Router router, @Nullable Frequency frequency) {
+        if (router instanceof RadioSpeaker speaker) {
+            SPEAKERS.register(speaker);
+        } else if (router instanceof RadioListener listener) {
+            LISTENERS.register(listener);
+        } else if (router instanceof RadioReceiver receiver) {
+            if (frequency != null) frequency.registerReceiver(receiver);
+        } else if (router instanceof RadioTransmitter transmitter) {
+            if (frequency != null) frequency.registerTransmitter(transmitter);
         } else {
-            if (router instanceof RadioSpeaker speaker) {
-                SPEAKERS.register(speaker);
-            } else if (router instanceof RadioListener listener) {
-                LISTENERS.register(listener);
-            } else if (router instanceof RadioReceiver receiver) {
-                if (frequency != null) frequency.registerReceiver(receiver);
-            } else if (router instanceof RadioTransmitter transmitter) {
-                if (frequency != null) frequency.registerTransmitter(transmitter);
-            } else {
-                registerRouter(router);
-            }
+            registerRouter(router);
         }
     }
 
