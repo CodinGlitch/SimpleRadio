@@ -49,15 +49,10 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
     public abstract Router getRouter(UUID reference);
     public abstract Router getRouter(Entity owner);
     public abstract Router getRouter(WorldlyPosition location);
-    public abstract Router getRouterSided(UUID reference, boolean isClient);
-    public abstract Router getRouterSided(UUID reference, @Nullable String type, boolean isClient);
 
     public abstract void registerRouter(Router router);
+    public abstract void registerRouter(Router router, @Nullable Frequency frequency);
 
-    public abstract void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency);
-    public abstract void removeRouterSided(UUID uuid, boolean isClient);
-    public abstract void removeRouterSided(Router router, boolean isClient);
-    
     // ---- Audio ---- \\
 
     public abstract void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed);

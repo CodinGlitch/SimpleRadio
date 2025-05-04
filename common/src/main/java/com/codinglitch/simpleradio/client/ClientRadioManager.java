@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
@@ -16,11 +18,11 @@ import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
-import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -56,112 +58,120 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Predicate;
 
-public class ClientRadioManager {
-    // do NOT FORGET THIS
-    // pending routers are added when initially registered
-    // packet will lookup a pending router by reference
-    // it will then assign the given identifier before registering it
-    // but what about identical reference?
-    // i dont know bruh
+public class ClientRadioManager extends ClientSimpleRadioApi {
+    private static final ClientRadioManager INSTANCE = new ClientRadioManager();
+
     private static final Map<Short, PendingRouter<?>> pendingRouters = new HashMap<>();
     private static final Map<Short, ClientRouterWrapper> routers = new HashMap<>();
 
-    public static List<RadioRouter> getRouters() {
-        return routers.values().stream().map(wrapper -> wrapper.router).toList();
+    // im, losing it
+
+    public ClientRouterWrapper getWrapper(Predicate<ClientRouterWrapper> criteria) {
+        Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
+        return result.map(Map.Entry::getValue).orElse(null);
+    }
+    public ClientRouterWrapper getWrapper(UUID uuid) {
+        return getWrapper(wrapper -> uuid.equals(wrapper.router.getReference()));
+    }
+    public ClientRouterWrapper getWrapper(RadioRouter router) {
+        return getWrapper(wrapper -> router.equals(wrapper.router));
     }
 
-    public static RadioRouter getRouter(Predicate<RadioRouter> criteria) {
+    @Override
+    public ConfigHolder getConfig() {
+        return null;
+    }
+
+    @Override
+    public List<Router> getRouters() {
+        return routers.values().stream().map(wrapper -> (Router) wrapper.router).toList();
+    }
+
+    @Override
+    public Router getRouter(Predicate<Router> criteria) {
         Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue().router)).findFirst();
 
         return result.map(Map.Entry::getValue).map(wrapper -> wrapper.router).orElse(null);
     }
 
-    // im, losing it
-
-    public static ClientRouterWrapper getWrapper(Predicate<ClientRouterWrapper> criteria) {
-        Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
-        return result.map(Map.Entry::getValue).orElse(null);
-    }
-    public static ClientRouterWrapper getWrapper(UUID uuid) {
-        return getWrapper(wrapper -> uuid.equals(wrapper.router.reference));
-    }
-    public static ClientRouterWrapper getWrapper(RadioRouter router) {
-        return getWrapper(wrapper -> router.equals(wrapper.router));
-    }
-
-    public static RadioRouter getRouter(short identifier) {
+    @Override
+    public Router getRouter(short identifier) {
         ClientRouterWrapper wrapper = routers.get(identifier);
         return wrapper == null ? null : wrapper.router;
     }
-    public static RadioRouter getRouter(UUID reference, @Nullable String type) {
+    @Override
+    public Router getRouter(UUID reference, @Nullable String type) {
         return getRouter(router ->
-                router.reference.equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
+                router.getReference().equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
         );
     }
-    public static RadioRouter getRouter(UUID reference) {
-        return ClientRadioManager.getRouter(router -> reference.equals(router.reference));
+    @Override
+    public Router getRouter(UUID reference) {
+        return getRouter(router -> reference.equals(router.getReference()));
     }
-    public static RadioRouter getRouter(Entity owner) {
-        return ClientRadioManager.getRouter(router -> owner.equals(router.owner));
+    @Override
+    public Router getRouter(Entity owner) {
+        return getRouter(router -> owner.equals(router.getOwner()));
     }
-    public static RadioRouter getRouter(WorldlyPosition location) {
-        return ClientRadioManager.getRouter(router -> location.equals(router.position));
-    }
-
-    public static RadioListener getListener(UUID uuid) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioListener);
-    }
-    public static RadioListener getListener(Entity owner) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioListener);
-    }
-    public static RadioListener getListener(WorldlyPosition location) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioListener);
+    @Override
+    public Router getRouter(WorldlyPosition location) {
+        return getRouter(router -> location.equals(router.getPosition()));
     }
 
-    public static RadioSpeaker getSpeaker(UUID uuid) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioSpeaker);
+    @Override
+    public RadioListener getListener(UUID uuid) {
+        return (RadioListener) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioListener);
     }
-    public static RadioSpeaker getSpeaker(Entity owner) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioSpeaker);
+    @Override
+    public RadioListener getListener(Entity owner) {
+        return (RadioListener) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioListener);
     }
-    public static RadioSpeaker getSpeaker(WorldlyPosition location) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioSpeaker);
-    }
-
-    public static RadioReceiver getReceiver(UUID uuid) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioReceiver);
-    }
-    public static RadioReceiver getReceiver(Entity owner) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioReceiver);
-    }
-    public static RadioReceiver getReceiver(WorldlyPosition location) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioReceiver);
+    @Override
+    public RadioListener getListener(WorldlyPosition location) {
+        return (RadioListener) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioListener);
     }
 
-    public static RadioTransmitter getTransmitter(UUID uuid) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioTransmitter);
+    @Override
+    public RadioSpeaker getSpeaker(UUID uuid) {
+        return (RadioSpeaker) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioSpeaker);
     }
-    public static RadioTransmitter getTransmitter(Entity owner) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioTransmitter);
+    @Override
+    public RadioSpeaker getSpeaker(Entity owner) {
+        return (RadioSpeaker) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioSpeaker);
     }
-    public static RadioTransmitter getTransmitter(WorldlyPosition location) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> location.equals(router.position) && router instanceof RadioTransmitter);
-    }
-
-    public static void finalizeRouter(short mapping, short identifier) {
-        CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
-
-        PendingRouter<?> pending = pendingRouters.remove(mapping);
-        if (pending == null) {
-            CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
-            return;
-        }
-
-        pending.router.identifier = identifier;
-        routers.put(identifier, ClientRouterWrapper.of(pending.router));
+    @Override
+    public RadioSpeaker getSpeaker(WorldlyPosition location) {
+        return (RadioSpeaker) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioSpeaker);
     }
 
-    public static <R extends RadioRouter> void registerRouter(R router) {
+    @Override
+    public RadioReceiver getReceiver(UUID uuid) {
+        return (RadioReceiver) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioReceiver);
+    }
+    @Override
+    public RadioReceiver getReceiver(Entity owner) {
+        return (RadioReceiver) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioReceiver);
+    }
+    @Override
+    public RadioReceiver getReceiver(WorldlyPosition location) {
+        return (RadioReceiver) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioReceiver);
+    }
+
+    @Override
+    public RadioTransmitter getTransmitter(UUID uuid) {
+        return (RadioTransmitter) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioTransmitter);
+    }
+    @Override
+    public RadioTransmitter getTransmitter(Entity owner) {
+        return (RadioTransmitter) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioTransmitter);
+    }
+    @Override
+    public RadioTransmitter getTransmitter(WorldlyPosition location) {
+        return (RadioTransmitter) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioTransmitter);
+    }
+
+    @Override
+    public <R extends Router> void registerRouter(R router) {
         PendingRouter<R> pendingRouter = PendingRouter.of(router);
 
         short mapping = Short.MAX_VALUE;
@@ -176,9 +186,9 @@ public class ClientRadioManager {
 
         CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
-    public static void removeRouter(Predicate<ClientRouterWrapper> predicate) {
+    public void removeRouter(Predicate<Router> predicate) {
         routers.entrySet().removeIf(entry -> {
-            if (predicate.test(entry.getValue())) {
+            if (predicate.test(entry.getValue().router)) {
                 entry.getValue().close();
                 return true;
             }
@@ -186,25 +196,42 @@ public class ClientRadioManager {
             return false;
         });
     }
-    public static void removeRouter(RadioRouter router) {
-        removeRouter(wrapper -> wrapper.router == router);
+    @Override
+    public void removeRouter(Router router) {
+        removeRouter(otherRouter -> otherRouter == router);
     }
-    public static void removeRouter(UUID uuid) {
-        removeRouter(wrapper -> uuid.equals(wrapper.router.reference));
+    @Override
+    public void removeRouter(UUID uuid) {
+        removeRouter(router -> uuid.equals(router.getReference()));
     }
-    public static void removeRouter(Entity owner) {
-        removeRouter(wrapper -> owner.equals(wrapper.router.owner));
+    @Override
+    public void removeRouter(Entity owner) {
+        removeRouter(router -> owner.equals(router.getOwner()));
     }
-    public static void removeRouter(WorldlyPosition location) {
-        removeRouter(wrapper -> wrapper.router.position != null && location.equals(wrapper.router.position));
+    @Override
+    public void removeRouter(WorldlyPosition location) {
+        removeRouter(router -> router.getPosition() != null && location.equals(router.getPosition()));
+    }
+
+    public static void finalizeRouter(short mapping, short identifier) {
+        CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
+
+        PendingRouter<?> pending = pendingRouters.remove(mapping);
+        if (pending == null) {
+            CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
+            return;
+        }
+
+        ((RadioRouter) pending.router).identifier = identifier;
+        routers.put(identifier, ClientRouterWrapper.of(pending.router));
     }
 
     public static void garbageCollect() {
-        removeRouter(wrapper -> !wrapper.router.validate());
-        removeRouter(wrapper -> wrapper.router.owner == null && wrapper.router.position == null);
+        INSTANCE.removeRouter(router -> !router.validate());
+        INSTANCE.removeRouter(router -> router.getOwner() == null && router.getPosition() == null);
 
         pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
-        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.owner == null && entry.getValue().router.position == null));
+        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.getOwner() == null && entry.getValue().router.getPosition() == null));
     }
 
     public static void tick(long gameTime) {
@@ -229,7 +256,7 @@ public class ClientRadioManager {
 
         for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : routers.entrySet()) {
             ClientRouterWrapper wrapper = wrapperEntry.getValue();
-            wrapper.router.tick(0);
+            ((RadioRouter) wrapper.router).tick(0);
 
             for (Map.Entry<Long, ChannelHandleWrapper> entry : wrapper.audioChannels.entrySet()) {
                 entry.getValue().execute(channel -> {
@@ -250,10 +277,10 @@ public class ClientRadioManager {
         SoundManager soundManager = mc.getSoundManager();
         SoundEngine soundEngine = soundManager.soundEngine;
 
-        ClientRouterWrapper wrapper = ClientRadioManager.getWrapper(packet.routerID());
+        ClientRouterWrapper wrapper = INSTANCE.getWrapper(packet.routerID());
         if (wrapper == null) return;
 
-        RadioRouter router = wrapper.router;
+        Router router = wrapper.router;
         if (router == null) return;
 
         WorldlyPosition location = router.getLocation();
@@ -493,11 +520,7 @@ public class ClientRadioManager {
         poseStack.popPose();
     }
 
-    public static void onSoundEvent(ClientReceiveSoundEvent receiveSoundEvent) {
-        CommonSimpleRadio.info(receiveSoundEvent.getId());
-    }
-
-    public static class PendingRouter<R extends RadioRouter> {
+    public static class PendingRouter<R extends Router> {
         public final R router;
         public int attempts = 0;
 
@@ -507,7 +530,7 @@ public class ClientRadioManager {
 
         public boolean request(short mapping) {
             if (attempts > 5) {
-                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.position);
+                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.getPosition());
                 return false;
             }
 
@@ -516,7 +539,7 @@ public class ClientRadioManager {
             return true;
         }
 
-        public static <R extends RadioRouter> PendingRouter<R> of(R router) {
+        public static <R extends Router> PendingRouter<R> of(R router) {
             return new PendingRouter<>(router);
         }
     }
