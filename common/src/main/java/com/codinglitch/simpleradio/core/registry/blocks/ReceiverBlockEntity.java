@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Receiving;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -111,7 +112,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
     public void inactivate() {
         if (this.frequency != null) {
-            RadioManager.getInstance().removeRouterSided(this.id, this.getLevel().isClientSide);
+            SimpleRadioApi.removeRouterSided(this.id, this.getLevel().isClientSide);
             if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
         }
 
