@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.central.ConfigHolder;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
@@ -78,8 +78,13 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     @Override
-    public ConfigHolder getConfig() {
-        return null;
+    public <T> Optional<T> getConfig(String path) {
+        return CommonSimpleRadio.getConfigFrom(SimpleRadioLibrary.CLIENT_CONFIG, path);
+    }
+
+    @Override
+    public <T> void setConfig(String path, T value) {
+        CommonSimpleRadio.setConfigFrom(SimpleRadioLibrary.CLIENT_CONFIG, path, value);
     }
 
     @Override

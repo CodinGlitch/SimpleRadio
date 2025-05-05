@@ -1,25 +1,26 @@
 package com.codinglitch.simpleradio;
 
-import com.codinglitch.simpleradio.central.ConfigHolder;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.routers.Router;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class SimpleRadioApi {
 
-    public abstract ConfigHolder getConfig();
+    public abstract <T> Optional<T> getConfig(String path);
+    public abstract <T> void setConfig(String path, T value);
 
-    public Router getRouterSided(UUID reference, boolean isClient) {
+    public static Router getRouterSided(UUID reference, boolean isClient) {
         return isClient ? ClientSimpleRadioApi.getInstance().getRouter(reference) : ServerSimpleRadioApi.getInstance().getRouter(reference);
     }
 
-    public Router getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
+    public static Router getRouterSided(UUID reference, @Nullable String type, boolean isClient) {
         return isClient ? ClientSimpleRadioApi.getInstance().getRouter(reference, type) : ServerSimpleRadioApi.getInstance().getRouter(reference, type);
     }
 
-    public void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency) {
+    public static void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency) {
         if (isClient) {
             ClientSimpleRadioApi.getInstance().registerRouter(router);
         } else {
@@ -41,5 +42,7 @@ public abstract class SimpleRadioApi {
         } else {
             ServerSimpleRadioApi.getInstance().removeRouter(router);
         }
+
+        ServerSimpleRadioApi.getInstance().getConfigEntry("router/soundListening");
     }
 }
