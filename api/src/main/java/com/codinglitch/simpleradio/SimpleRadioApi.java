@@ -9,7 +9,24 @@ import java.util.UUID;
 
 public abstract class SimpleRadioApi {
 
+    /**
+     * Gets a config entry from a specified path
+     * <p>
+     * To get the <b>soundListening</b> entry from the <b>router</b> config:
+     * <pre>{@code ServerSimpleRadioApi.getInstance().getConfig("router/soundListening");}</pre>
+     * @param path The path to the config entry
+     * @return An optional containing the value, if found
+     */
     public abstract <T> Optional<T> getConfig(String path);
+
+    /**
+     * Sets a config entry from a specified path
+     * <p>
+     * To set the <b>soundListening</b> entry from the <b>router</b> config:
+     * <pre>{@code ServerSimpleRadioApi.getInstance().getConfig("router/soundListening", true);}</pre>
+     * @param path The path to the config entry
+     * @param value The value to set the config entry to
+     */
     public abstract <T> void setConfig(String path, T value);
 
     public static Router getRouterSided(UUID reference, boolean isClient) {
@@ -42,7 +59,5 @@ public abstract class SimpleRadioApi {
         } else {
             ServerSimpleRadioApi.getInstance().removeRouter(router);
         }
-
-        ServerSimpleRadioApi.getInstance().getConfigEntry("router/soundListening");
     }
 }
