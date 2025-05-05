@@ -1,7 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.*;
-import com.codinglitch.simpleradio.central.ConfigHolder;
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Frequencies;
@@ -90,10 +92,16 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public ConfigHolder getConfig() {
-        return null; //idk yet
+    public <T> Optional<T> getConfig(String path) {
+        return CommonSimpleRadio.getConfigFrom(SimpleRadioLibrary.SERVER_CONFIG, path);
     }
 
+    @Override
+    public <T> void setConfig(String path, T value) {
+        CommonSimpleRadio.setConfigFrom(SimpleRadioLibrary.SERVER_CONFIG, path, value);
+    }
+
+    @Override
     public <R extends Router> void putRouter(@Nullable RouterContainer<R> container, R router) {
         if (container != null) {
             container.add(router);
@@ -102,9 +110,11 @@ public class RadioManager extends ServerSimpleRadioApi {
         }
     }
 
+    @Override
     public <R extends Router> short pushRouter(R router) {
         return pushRouter(routers, router);
     }
+    @Override
     public <R extends Router> short pushRouter(Map<Short, R> map, R router) {
         RadioRouter radioRouter = (RadioRouter) router;
         for (short identifier = Short.MIN_VALUE; identifier < Short.MAX_VALUE; identifier++) {
@@ -119,6 +129,7 @@ public class RadioManager extends ServerSimpleRadioApi {
         return Short.MAX_VALUE;
     }
 
+    @Override
     public short getIdentifier(Predicate<Router> filter) {
         Optional<Map.Entry<Short, Router>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getKey).orElse(Short.MAX_VALUE);
