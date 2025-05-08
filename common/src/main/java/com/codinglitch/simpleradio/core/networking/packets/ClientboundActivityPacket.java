@@ -1,21 +1,19 @@
 package com.codinglitch.simpleradio.core.networking.packets;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
-import com.codinglitch.simpleradio.radio.RadioRouter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundActivityPacket(float activity, short identifier) implements CustomPacket {
-    public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "activity");
+    public static CustomPacketPayload.Type<ClientboundActivityPacket> TYPE = new CustomPacketPayload.Type<>(CommonSimpleRadio.id("activity"));
+    public static StreamCodec<FriendlyByteBuf, ClientboundActivityPacket> STREAM_CODEC = StreamCodec.ofMember(
+            ClientboundActivityPacket::write, ClientboundActivityPacket::read
+    );
+
     @Override
-    public ResourceLocation id() {
-        return ID;
-    }
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public void write(FriendlyByteBuf buffer) {
         buffer.writeFloat(this.activity);

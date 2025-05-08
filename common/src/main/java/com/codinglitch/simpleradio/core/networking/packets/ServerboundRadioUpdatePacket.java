@@ -4,15 +4,17 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundRadioUpdatePacket(String frequency, Frequency.Modulation modulation) implements CustomPacket {
-    public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "radio_update_packet");
+    public static CustomPacketPayload.Type<ServerboundRadioUpdatePacket> TYPE = new CustomPacketPayload.Type<>(CommonSimpleRadio.id("radio_update"));
+    public static StreamCodec<FriendlyByteBuf, ServerboundRadioUpdatePacket> STREAM_CODEC = StreamCodec.ofMember(
+            ServerboundRadioUpdatePacket::write, ServerboundRadioUpdatePacket::read
+    );
+
     @Override
-    public ResourceLocation id() {
-        return ID;
-    }
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public void write(FriendlyByteBuf buffer) {
         buffer.writeUtf(this.frequency);

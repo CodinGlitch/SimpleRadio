@@ -3,26 +3,25 @@ package com.codinglitch.simpleradio.core.networking.packets;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
 import java.util.UUID;
 
 public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> sound, float volume, float pitch, float severity, float offset, long seed) implements CustomPacket {
-    public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "speak_sound_packet");
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
+    public static CustomPacketPayload.Type<ClientboundSpeakSoundPacket> TYPE = new CustomPacketPayload.Type<>(CommonSimpleRadio.id("speak_sound"));
+    public static StreamCodec<RegistryFriendlyByteBuf, ClientboundSpeakSoundPacket> STREAM_CODEC = StreamCodec.ofMember(
+            ClientboundSpeakSoundPacket::write, ClientboundSpeakSoundPacket::read
+    );
 
-    public void write(FriendlyByteBuf buffer) {
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
+    public void write(RegistryFriendlyByteBuf buffer) {
         buffer.writeUUID(routerID);
-        buffer.writeId(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), this.sound, (byteBuf, event) -> {
-            event.writeToNetwork(byteBuf);
-        });
+        SoundEvent.STREAM_CODEC.encode(buffer, this.sound);
         buffer.writeFloat(this.volume);
         buffer.writeFloat(this.pitch);
         buffer.writeFloat(this.severity);
@@ -30,9 +29,9 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
         buffer.writeLong(this.seed);
     }
 
-    public static ClientboundSpeakSoundPacket read(FriendlyByteBuf buffer) {
+    public static ClientboundSpeakSoundPacket read(RegistryFriendlyByteBuf buffer) {
         return new ClientboundSpeakSoundPacket(
-                buffer.readUUID(), buffer.readById(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), SoundEvent::readFromNetwork),
+                buffer.readUUID(), SoundEvent.STREAM_CODEC.decode(buffer),
                 buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readLong()
         );
     }

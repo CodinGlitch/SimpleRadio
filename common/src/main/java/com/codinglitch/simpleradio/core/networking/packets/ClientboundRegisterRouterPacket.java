@@ -3,15 +3,17 @@ package com.codinglitch.simpleradio.core.networking.packets;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
 public record ClientboundRegisterRouterPacket(short mapping, short identifier) implements CustomPacket {
-    public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "register_router");
+    public static CustomPacketPayload.Type<ClientboundRegisterRouterPacket> TYPE = new CustomPacketPayload.Type<>(CommonSimpleRadio.id("register_router"));
+    public static StreamCodec<FriendlyByteBuf, ClientboundRegisterRouterPacket> STREAM_CODEC = StreamCodec.ofMember(
+            ClientboundRegisterRouterPacket::write, ClientboundRegisterRouterPacket::read
+    );
+
     @Override
-    public ResourceLocation id() {
-        return ID;
-    }
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public void write(FriendlyByteBuf buffer) {
         buffer.writeShort(this.mapping);
