@@ -2,16 +2,18 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
 public record ItemsEnabledCondition(String item) implements ICondition {
-    public static final Codec<ItemsEnabledCondition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+    public static final MapCodec<ItemsEnabledCondition> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
             Codec.STRING.fieldOf("item").forGetter(ItemsEnabledCondition::item)
     ).apply(builder, ItemsEnabledCondition::new));
 
     @Override
-    public boolean test(ICondition.IContext context) {
+    public boolean test(ICondition.IContext context, DynamicOps<?> ops) {
         return SimpleRadioItems.getByName(item).enabled;
     }
 
@@ -21,7 +23,7 @@ public record ItemsEnabledCondition(String item) implements ICondition {
     }
 
     @Override
-    public Codec<? extends ICondition> codec() {
+    public MapCodec<? extends ICondition> codec() {
         return CODEC;
     }
 }
