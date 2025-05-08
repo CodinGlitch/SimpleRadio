@@ -20,7 +20,6 @@ import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
-import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -491,10 +490,6 @@ public class ClientRadioManager {
         LevelRenderer.renderLineBox(poseStack, bufferSource.getBuffer(RenderType.lines()), boundingBox, r, g, b, 0.8f);
 
         poseStack.popPose();
-    }
-
-    public static void onSoundEvent(ClientReceiveSoundEvent receiveSoundEvent) {
-        CommonSimpleRadio.info(receiveSoundEvent.getId());
     }
 
     public static class PendingRouter<R extends RadioRouter> {
