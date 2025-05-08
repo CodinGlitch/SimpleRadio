@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class SimpleRadioBlockLootTableProvider extends BlockLootSubProvider {
 
-    public SimpleRadioBlockLootTableProvider() {
-        super(Set.of(), FeatureFlags.DEFAULT_FLAGS);
+    public SimpleRadioBlockLootTableProvider(HolderLookup.Provider provider) {
+        super(Set.of(), FeatureFlags.DEFAULT_FLAGS, provider);
     }
 
     @Override
