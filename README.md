@@ -81,3 +81,8 @@ This amazing resource pack aims to make the blocks and items fit aesthetically w
 ![Simple Radio Redone](https://cdn.modrinth.com/data/cached_images/7c816071a7f11f8a20e17724f8b0b72f3d1ff63d.png)
 
 Another resource pack which remakes the textures of the mod to give it a fresh look while maintaining the original style!
+
+## [Simple Frequency](https://modrinth.com/datapack/simple-frequency)
+![Simple Frequency](https://cdn.modrinth.com/data/JUDvxSi8/e5a1d2732ee178e3207558300852cfae5ce3a206_96.webp)
+
+This datapack adds the ability to change the frequency and modulation of various Simple Radio items by using a simple command!
