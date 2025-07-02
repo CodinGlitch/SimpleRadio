@@ -26,7 +26,7 @@
   "upgrade.simpleradio.battery": "Батарея",
   "upgrade.simpleradio.battery.effects": "Хранит больше энергии в аккумуляторе",
 
-  "upgrade.simpleradio.solar": "Оолнечная панель",
+  "upgrade.simpleradio.solar": "Солнечная панель",
   "upgrade.simpleradio.solar.effects": "Заряжает аккумулятор при солнечном свете",
 
   "item.modifiers.transmitting": "Во время передачи:",
@@ -52,7 +52,7 @@
   "screen.simpleradio.frequencing.catalyst": "ФИЛЬТР СИГНАЛА",
   "screen.simpleradio.frequencing.efficiency": "ЭФФЕКТИВНОСТЬ: %s%%",
   "screen.simpleradio.frequencing.antenna_strength": "МОЩНОСТЬ АНТЕННЫ:",
-  
+
   "screen.simpleradio.radiosmither": "Радиотехнический стол",
   "screen.simpleradio.radiosmither.am": "AM",
   "screen.simpleradio.radiosmither.fm": "FM",
