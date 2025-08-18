@@ -149,6 +149,6 @@ public class FrequenciesImpl implements Frequencies {
             RadioManager.validate(frequencyChannel.transmitters);
         }
 
-        FREQUENCIES.entrySet().removeIf(entry -> ((FrequencyChannel) entry.getValue()).validate());
+        FREQUENCIES.entrySet().removeIf(entry -> !((FrequencyChannel) entry.getValue()).validate());
     }
 }
