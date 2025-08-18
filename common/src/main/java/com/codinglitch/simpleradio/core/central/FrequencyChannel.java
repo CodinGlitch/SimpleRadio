@@ -1,17 +1,19 @@
 package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.core.Frequencies;
+import com.codinglitch.simpleradio.radio.FrequenciesImpl;
+import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.RouterContainer;
 import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.world.entity.Entity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,8 +29,8 @@ public class FrequencyChannel implements Frequency {
     public final Modulation modulation;
     public final String frequency;
 
-    public final RouterContainer<RadioReceiver> receivers;
-    public final RouterContainer<RadioTransmitter> transmitters;
+    public final RouterContainer<Receiver> receivers;
+    public final RouterContainer<Transmitter> transmitters;
 
     public FrequencyChannel(String frequency, Modulation modulation) {
         Frequencies frequencies = RadioManager.getInstance().frequencies();
@@ -62,12 +64,12 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public List<Receiver> getReceivers() {
-        return new ArrayList<>(this.receivers);
+        return this.receivers.getContent();
     }
 
     @Override
     public List<Transmitter> getTransmitters() {
-        return new ArrayList<>(this.transmitters);
+        return this.transmitters.getContent();
     }
 
     //---- Receivers ----\\
@@ -75,7 +77,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public Receiver getReceiver(Predicate<Receiver> filter) {
-        Optional<RadioReceiver> result = receivers.stream().filter(filter).findFirst();
+        Optional<Receiver> result = receivers.getContent().stream().filter(filter).findFirst();
         return result.orElse(null);
     }
     @Override
@@ -171,7 +173,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public Transmitter getTransmitter(Predicate<Transmitter> filter) {
-        Optional<RadioTransmitter> result = transmitters.stream().filter(filter).findFirst();
+        Optional<Transmitter> result = transmitters.getContent().stream().filter(filter).findFirst();
         return result.orElse(null);
     }
     @Override
@@ -264,18 +266,18 @@ public class FrequencyChannel implements Frequency {
     }
 
     public void serverTick(int tickCount) {
-        for (RadioTransmitter transmitter : transmitters) {
-            transmitter.tick(tickCount);
+        for (Transmitter transmitter : transmitters) {
+            ((RadioTransmitter) transmitter).tick(tickCount);
         }
-        for (RadioReceiver receiver : receivers) {
-            receiver.tick(tickCount);
+        for (Receiver receiver : receivers) {
+            ((RadioReceiver) receiver).tick(tickCount);
         }
 
         // retired the 'pending' thing it was pretty stupid in hindsight
     }
 
     public boolean validate() {
-        if (this.receivers.isEmpty() && this.transmitters.isEmpty()) {
+        if (this.receivers.getContent().isEmpty() && this.transmitters.getContent().isEmpty()) {
             this.invalidate();
             return false;
         }
