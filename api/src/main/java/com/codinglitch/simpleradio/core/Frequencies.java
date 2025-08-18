@@ -2,12 +2,15 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.central.Frequency;
 import net.minecraft.nbt.CompoundTag;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import oshi.util.tuples.Pair;
 
 import java.util.List;
 
 public interface Frequencies {
+    String defaultFrequency();
+    Frequency.Modulation defaultModulation();
+
     List<Frequency> get();
 
     Frequency get(String frequency, Frequency.Modulation modulation);

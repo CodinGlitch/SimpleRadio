@@ -1,8 +1,8 @@
-package com.codinglitch.simpleradio.core.registry.blocks;
+package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.central.Frequency;
-import com.codinglitch.simpleradio.central.Socket;
-import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
+import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -29,16 +29,16 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     public UUID id;
 
     @Nullable
-    public RadioReceiver receiver;
+    public Receiver receiver;
 
     @Nullable
-    public RadioTransmitter transmitter;
+    public Transmitter transmitter;
 
     @Nullable
-    public RadioListener listener;
+    public Listener listener;
 
     @Nullable
-    public RadioSpeaker speaker;
+    public Speaker speaker;
 
     public AuditoryBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
@@ -54,9 +54,9 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     }
 
     @Override
-    public RadioRouter getRouter() {
+    public Router getRouter() {
         return Stream.of(listener, speaker, transmitter, receiver).filter(Objects::nonNull).findFirst().orElseGet(() -> {
-            if (this.id != null && this.hasLevel()) return RadioManager.getInstance().getRouterSided(this.id, this.level.isClientSide);
+            if (this.id != null && this.hasLevel()) return SimpleRadioApi.getRouterSided(this.id, this.level.isClientSide);
             return null;
         });
     }
@@ -72,8 +72,8 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     public void loadTag(CompoundTag tag) {
         if (tag.contains("frequency")) {
             String frequencyName = tag.getString("frequency");
-            Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-            this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
+            Frequency.Modulation modulation = ServerSimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+            this.frequency = ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
         }
 
         if (tag.contains("uuid")) {
@@ -83,8 +83,8 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
 
     public void saveTag(CompoundTag tag) {
         if (this.frequency != null) {
-            tag.putString("frequency", this.frequency.frequency);
-            tag.putString("modulation", this.frequency.modulation.shorthand);
+            tag.putString("frequency", this.frequency.getFrequency());
+            tag.putString("modulation", this.frequency.getModulation().shorthand);
         }
 
         if (this.id != null) {

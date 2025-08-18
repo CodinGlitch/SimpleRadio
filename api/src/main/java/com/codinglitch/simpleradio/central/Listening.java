@@ -1,8 +1,12 @@
 package com.codinglitch.simpleradio.central;
 
+import com.codinglitch.simpleradio.ClientSimpleRadioApi;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.routers.Listener;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.world.entity.Entity;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.UUID;
 
 public interface Listening extends Auricular {
@@ -13,8 +17,8 @@ public interface Listening extends Auricular {
      * @param id the UUID of the listener
      * @return The listener created.
      */
-    default RadioListener startListening(Entity owner, @Nullable UUID id) {
-        return setupListener(RadioManager.getInstance().getOrCreateListener(owner, id));
+    default Listener startListening(Entity owner, @Nullable UUID id) {
+        return setupListener(ServerSimpleRadioApi.getInstance().listeners().getOrCreate(owner, id));
     }
     /**
      * Start listening in the world.
@@ -22,11 +26,11 @@ public interface Listening extends Auricular {
      * @param id the UUID of the listener
      * @return The listener created.
      */
-    default RadioListener startListening(WorldlyPosition location, @Nullable UUID id) {
-        return setupListener(RadioManager.getInstance().getOrCreateListener(location, id));
+    default Listener startListening(WorldlyPosition location, @Nullable UUID id) {
+        return setupListener(ServerSimpleRadioApi.getInstance().listeners().getOrCreate(location, id));
     }
 
-    default RadioListener setupListener(RadioListener listener) {
+    default Listener setupListener(Listener listener) {
         if (this instanceof AuditoryBlockEntity blockEntity) {
             listener.transformer(source -> {
                 source.delegate(blockEntity.id);
@@ -46,11 +50,13 @@ public interface Listening extends Auricular {
      * @param isClient if to remove in client
      */
     default void stopListening(UUID owner, boolean isClient) {
+        Router router;
         if (isClient) {
-            ClientRadioManager.removeRouter(owner);
+            router = ClientSimpleRadioApi.getInstance().removeRouter(owner, "RadioListener");
         } else {
-            RadioManager.getInstance().removeListener(owner);
+            router = ServerSimpleRadioApi.getInstance().listeners().remove(owner);
         }
+        if (router != null) router.invalidate();
     }
 
     /**
@@ -58,11 +64,13 @@ public interface Listening extends Auricular {
      * @param location the location of the listener to remove
      */
     default void stopListening(WorldlyPosition location) {
+        Router router;
         if (location.isClientSide()) {
-            ClientRadioManager.removeRouter(location);
+            router = ClientSimpleRadioApi.getInstance().removeRouter(location, "RadioListener");
         } else {
-            RadioManager.getInstance().removeListener(location);
+            router = ServerSimpleRadioApi.getInstance().listeners().remove(location);
         }
+        if (router != null) router.invalidate();
     }
 
     /**
@@ -71,8 +79,7 @@ public interface Listening extends Auricular {
     default void stopListening() {
         if (this instanceof AuditoryBlockEntity blockEntity) {
             if (blockEntity.listener != null) {
-                stopListening(blockEntity.listener.location);
-                blockEntity.listener.invalidate();
+                stopListening(blockEntity.listener.getLocation());
             }
         }
     }

@@ -1,8 +1,7 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.core.registry.blocks.*;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -29,7 +28,7 @@ public interface Frequencing {
 
     /**
      * Get the current cached antenna power.
-     * Only works if the instance has overriden this method.
+     * Only works if the instance has overridden this method.
      * Use this method instead of {@link Frequencing#calculateAntennaPower(BlockPos, Level)} whenever possible.
      * @return The antenna power
      */
@@ -46,8 +45,8 @@ public interface Frequencing {
         BlockPos basePosition = this.getAntennaBase(corePosition, level);
         BlockState state = level.getBlockState(basePosition);
 
-        if (state.getBlock() instanceof AntennaBlock antennaBlock) {
-            return antennaBlock.climbAntenna(basePosition, level);
+        if (state.getBlock() instanceof Antennal antennal) {
+            return antennal.climbAntenna(basePosition, level);
         }
 
         return 0;
@@ -60,7 +59,7 @@ public interface Frequencing {
      * @return The position of the base of the antenna.
      */
     default BlockPos getAntennaBase(BlockPos pos, Level level) {
-        BlockPos travelledPosition = InsulatorBlock.travelExtension(pos, level);
+        BlockPos travelledPosition = ServerSimpleRadioApi.getInstance().travelExtension(pos, level);
         if (travelledPosition != pos) return travelledPosition.above();
 
         return pos.above();
@@ -89,7 +88,7 @@ public interface Frequencing {
      * @param modulation the modulation type of the frequency
      */
     default void setFrequency(BlockEntity blockEntity, String frequencyName, Frequency.Modulation modulation) {
-        setFrequency(blockEntity, Frequency.getOrCreateFrequency(frequencyName, modulation));
+        setFrequency(blockEntity, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation));
     }
     /**
      * Sets the frequency for a BlockEntity.
@@ -112,8 +111,8 @@ public interface Frequencing {
         if (!tag.contains("frequency") || !tag.contains("modulation")) return null;
 
         String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-        return Frequency.getOrCreateFrequency(frequencyName, modulation);
+        Frequency.Modulation modulation = ServerSimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+        return ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
     }
     /**
      * Gets the frequency for a BlockEntity.
@@ -127,11 +126,11 @@ public interface Frequencing {
     }
 
     default String getDefaultFrequency() {
-        return Frequency.DEFAULT_FREQUENCY;
+        return ServerSimpleRadioApi.getInstance().frequencies().defaultFrequency();
     }
 
     default Frequency.Modulation getDefaultModulation() {
-        return Frequency.DEFAULT_MODULATION;
+        return ServerSimpleRadioApi.getInstance().frequencies().defaultModulation();
     }
 
     /**
@@ -144,10 +143,10 @@ public interface Frequencing {
     default boolean validateLocation(String frequency, Frequency.Modulation modulation, UUID owner) {
         if (frequency == null) return false;
         if (modulation == null) return false;
-        return this.validateLocation(Frequency.getOrCreateFrequency(frequency, modulation), owner);
+        return this.validateLocation(ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequency, modulation), owner);
     }
     default boolean validateLocation(Frequency frequency, UUID owner) {
-        RadioReceiver receiver = frequency.getReceiver(owner);
+        Receiver receiver = frequency.getReceiver(owner);
         return receiver != null;
     }
 

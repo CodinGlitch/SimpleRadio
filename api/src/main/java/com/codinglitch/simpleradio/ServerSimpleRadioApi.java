@@ -6,12 +6,15 @@ import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.Speakers;
 import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.RouterContainer;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -30,17 +33,26 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
     public abstract Speakers speakers();
     public abstract Listeners listeners();
 
+    public abstract boolean verifyLocationCollection(WorldlyPosition position, Class<?> clazz);
+    public abstract boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> itemCriteria);
+
     // ---- Routers ---- \\
+
+    public abstract <R extends Router> void putRouter(@Nullable RouterContainer<R> container, R router);
+    public abstract <R extends Router> short pushRouter(R router);
+    public abstract <R extends Router> short pushRouter(Map<Short, R> map, R router);
+
+    public abstract short getIdentifier(Predicate<Router> filter);
 
     public abstract List<Router> getRouters();
 
-    public abstract void removeRouter(Router router);
-    public abstract void removeRouter(Predicate<Router> criteria);
-    public abstract void removeRouter(short identifier);
+    public abstract Router removeRouter(Router router);
+    public abstract Router removeRouter(Predicate<Router> criteria);
+    public abstract Router removeRouter(short identifier);
 
-    public abstract void removeRouter(UUID uuid);
-    public abstract void removeRouter(Entity owner);
-    public abstract void removeRouter(WorldlyPosition location);
+    public abstract Router removeRouter(UUID uuid);
+    public abstract Router removeRouter(Entity owner);
+    public abstract Router removeRouter(WorldlyPosition location);
 
     public abstract Router getRouter(Predicate<Router> filter);
     public abstract Router getRouter(short identifier);

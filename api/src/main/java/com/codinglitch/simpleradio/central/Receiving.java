@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.world.entity.Entity;
 
 import java.util.UUID;
@@ -16,13 +16,13 @@ public interface Receiving extends Frequencing {
      * @param id the UUID that will listen
      * @return The channel created from the listener.
      */
-    default RadioReceiver startReceiving(WorldlyPosition location, String frequencyName, Frequency.Modulation modulation, UUID id) {
-        return startReceiving(location, Frequency.getOrCreateFrequency(frequencyName, modulation), id);
+    default Receiver startReceiving(WorldlyPosition location, String frequencyName, Frequency.Modulation modulation, UUID id) {
+        return startReceiving(location, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
     }
-    default RadioReceiver startReceiving(WorldlyPosition location, Frequency frequency) {
+    default Receiver startReceiving(WorldlyPosition location, Frequency frequency) {
         return startReceiving(location, frequency, UUID.randomUUID());
     }
-    default RadioReceiver startReceiving(WorldlyPosition location, Frequency frequency, UUID id) {
+    default Receiver startReceiving(WorldlyPosition location, Frequency frequency, UUID id) {
         return frequency.tryAddReceiver(id, location);
     }
 
@@ -34,13 +34,13 @@ public interface Receiving extends Frequencing {
      * @param id the UUID that will listen
      * @return The channel created from the listener.
      */
-    default RadioReceiver startReceiving(Entity entity, String frequencyName, Frequency.Modulation modulation, UUID id) {
-        return startReceiving(entity, Frequency.getOrCreateFrequency(frequencyName, modulation), id);
+    default Receiver startReceiving(Entity entity, String frequencyName, Frequency.Modulation modulation, UUID id) {
+        return startReceiving(entity, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
     }
-    default RadioReceiver startReceiving(Entity entity, Frequency frequency) {
+    default Receiver startReceiving(Entity entity, Frequency frequency) {
         return startReceiving(entity, frequency, UUID.randomUUID());
     }
-    default RadioReceiver startReceiving(Entity entity, Frequency frequency, UUID id) {
+    default Receiver startReceiving(Entity entity, Frequency frequency, UUID id) {
         return frequency.tryAddReceiver(id, entity);
     }
 
@@ -52,7 +52,7 @@ public interface Receiving extends Frequencing {
      * @param owner the UUID to remove
      */
     default void stopReceiving(String frequencyName, Frequency.Modulation modulation, UUID owner) {
-        Frequency frequency = Frequency.getFrequency(frequencyName, modulation);
+        Frequency frequency = ServerSimpleRadioApi.getInstance().frequencies().get(frequencyName, modulation);
         if (frequency != null) {
             frequency.removeReceiver(owner);
         }
@@ -61,12 +61,12 @@ public interface Receiving extends Frequencing {
     /**
      * Stop receiving. Infers information from itself.
      */
-    default void stopReceiving() {
+    /*default void stopReceiving() {
         if (this instanceof AuditoryBlockEntity blockEntity) {
             if (blockEntity.receiver != null && blockEntity.receiver.frequency != null) {
                 stopReceiving(blockEntity.receiver.frequency.frequency, blockEntity.receiver.frequency.modulation, blockEntity.id);
                 blockEntity.receiver.invalidate();
             }
         }
-    }
+    }*/
 }

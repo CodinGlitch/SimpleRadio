@@ -11,13 +11,34 @@ import java.util.function.Predicate;
 public interface RouterHolder<R extends Router> {
     List<R> get();
 
-    void remove(R R);
-    void remove(Predicate<R> criteria);
-    void remove(short identifier);
+    default R remove(Predicate<R> criteria) {
+        List<R> list = get();
+        List<R> removal = list.stream()
+                .filter(criteria)
+                .toList();
 
-    void remove(Entity owner);
-    void remove(WorldlyPosition location);
-    void remove(UUID id);
+        if (removal.isEmpty()) return null;
+
+        removal.forEach(list::remove);
+        return removal.stream().findFirst().get();
+    }
+    default R remove(R R) {
+        get().remove(R);
+        return R;
+    }
+    default R remove(short identifier) {
+        return get().remove(identifier);
+    }
+
+    default R remove(Entity owner) {
+        return remove(entry -> owner.equals(entry.getOwner()));
+    }
+    default R remove(WorldlyPosition location) {
+        return remove(entry -> location.equals(entry.getPosition()));
+    }
+    default R remove(UUID id) {
+        return remove(entry -> id.equals(entry.getReference()));
+    }
 
     R get(Entity owner);
     R get(WorldlyPosition location);
