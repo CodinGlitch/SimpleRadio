@@ -102,6 +102,8 @@ public interface Socket {
     Router getRouter();
 
     default List<Wiring> getWires() {
-        return getRouter().getWires();
+        Router router = getRouter();
+        if (router == null) return List.of();
+        return router.getWires();
     }
 }
