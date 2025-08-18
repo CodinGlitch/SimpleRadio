@@ -43,7 +43,7 @@ public class RadioListener extends RadioRouter implements Listener {
         this.owner = owner;
 
         boolean isClient = owner.level().isClientSide();
-        RadioManager.getInstance().registerRouterSided(this, isClient, null);
+        RadioManager.registerRouterSided(this, isClient, null);
     }
     public RadioListener(WorldlyPosition location) {
         this(location, UUID.randomUUID());
@@ -54,7 +54,7 @@ public class RadioListener extends RadioRouter implements Listener {
 
 
         boolean isClient = location.isClientSide();
-        RadioManager.getInstance().registerRouterSided(this, isClient, null);
+        RadioManager.registerRouterSided(this, isClient, null);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
-import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.Router;
@@ -40,7 +39,7 @@ public class RadioRouter implements Socket, Router {
         }
     }
 
-    public List<Wire> wires = new ArrayList<>();
+    public List<Wiring> wires = new ArrayList<>();
 
     public List<RadioRouter> routers = new ArrayList<>();
     public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
@@ -144,7 +143,7 @@ public class RadioRouter implements Socket, Router {
 
     @Override
     public List<Wiring> getWires() {
-        return new ArrayList<>(this.wires);
+        return this.wires;
     }
 
 
