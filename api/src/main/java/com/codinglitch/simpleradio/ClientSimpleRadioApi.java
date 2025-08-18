@@ -24,9 +24,12 @@ public abstract class ClientSimpleRadioApi extends SimpleRadioApi {
     public abstract Router getRouter(Predicate<Router> criteria);
 
     public abstract Router getRouter(short identifier);
+
     public abstract Router getRouter(UUID reference, @Nullable String type);
     public abstract Router getRouter(UUID reference);
+
     public abstract Router getRouter(Entity owner);
+
     public abstract Router getRouter(WorldlyPosition location);
 
     public abstract Listener getListener(UUID uuid);
@@ -47,9 +50,16 @@ public abstract class ClientSimpleRadioApi extends SimpleRadioApi {
 
     public abstract <R extends Router> void registerRouter(R router);
 
-    public abstract void removeRouter(Predicate<Router> predicate);
-    public abstract void removeRouter(Router router);
-    public abstract void removeRouter(UUID uuid);
-    public abstract void removeRouter(Entity owner);
-    public abstract void removeRouter(WorldlyPosition location);
+    public abstract Router removeRouter(Predicate<Router> predicate);
+
+    public abstract Router removeRouter(Router router);
+
+    public abstract Router removeRouter(UUID reference);
+    public abstract Router removeRouter(UUID reference, @Nullable String type);
+
+    public abstract Router removeRouter(Entity owner);
+    public abstract Router removeRouter(Entity owner, @Nullable String type);
+
+    public abstract Router removeRouter(WorldlyPosition location);
+    public abstract Router removeRouter(WorldlyPosition location, @Nullable String type);
 }

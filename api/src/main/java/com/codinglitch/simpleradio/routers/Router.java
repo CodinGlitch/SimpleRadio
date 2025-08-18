@@ -6,6 +6,8 @@ import com.codinglitch.simpleradio.radio.Source;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.UUID;
 import java.util.function.BiPredicate;
@@ -22,17 +24,30 @@ public interface Router {
     WorldlyPosition getLocation();
 
     Router tryAddRouter(Router router);
+    Router addRouter(Router router);
 
     @Nullable
     WorldlyPosition getPosition();
 
     @Nullable
     Entity getOwner();
-
     Router getRouter(UUID id);
-
     Vec3 getConnectionPosition();
 
+    boolean isActive();
+    Vec3 getConnectionOffset();
+    Class<?> getLink();
+    Vector3f getVelocity();
+    float getActivity();
+    int getRedstoneMappedActivity();
+    Quaternionf getRotation();
+
+    void allowDistribution();
+    void setOwner(Entity owner);
+    void setActive(boolean active);
+    void setLink(Class<?> link);
+    void setConnectionOffset(Vec3 connectionOffset);
+    void setPosition(WorldlyPosition position);
     void setRoutingCriteria(BiPredicate<Source, Router> criteria);
     void setAcceptingCriteria(Predicate<Source> criteria);
 
@@ -42,4 +57,5 @@ public interface Router {
     void accept(Source source);
 
     boolean validate();
+    void invalidate();
 }

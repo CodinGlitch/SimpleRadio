@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.Source;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
@@ -19,8 +19,8 @@ public class Catalyst {
         return this;
     }
 
-    public RadioSource acceptSource(RadioSource source) {
-        source.transmissionPower *= efficiency;
+    public Source acceptSource(Source source) {
+        source.addPower(source.getPower() * (efficiency - 1));
         return source;
     }
 }

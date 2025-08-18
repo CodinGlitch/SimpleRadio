@@ -1,12 +1,12 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
+import com.codinglitch.simpleradio.ClientSimpleRadioApi;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.world.entity.Entity;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.UUID;
 
 public interface Speaking extends Auricular {
@@ -16,8 +16,8 @@ public interface Speaking extends Auricular {
      * @param id the UUID of the speaker
      * @return The speaker created.
      */
-    default RadioSpeaker startSpeaking(Entity owner, @Nullable UUID id) {
-        return setupSpeaker(RadioManager.getInstance().getOrCreateSpeaker(owner, id));
+    default Speaker startSpeaking(Entity owner, @Nullable UUID id) {
+        return setupSpeaker(ServerSimpleRadioApi.getInstance().speakers().getOrCreate(owner, id));
     }
     /**
      * Start speaking in the world.
@@ -25,11 +25,11 @@ public interface Speaking extends Auricular {
      * @param id the UUID of the speaker
      * @return The speaker created.
      */
-    default RadioSpeaker startSpeaking(WorldlyPosition location, @Nullable UUID id) {
-        return setupSpeaker(RadioManager.getInstance().getOrCreateSpeaker(location, id));
+    default Speaker startSpeaking(WorldlyPosition location, @Nullable UUID id) {
+        return setupSpeaker(ServerSimpleRadioApi.getInstance().speakers().getOrCreate(location, id));
     }
 
-    default RadioSpeaker setupSpeaker(RadioSpeaker speaker) {
+    default Speaker setupSpeaker(Speaker speaker) {
         //RadioManager.registerSpeaker(speaker);
 
         return speaker;
@@ -41,11 +41,13 @@ public interface Speaking extends Auricular {
      * @param isClient if to remove in client
      */
     default void stopSpeaking(UUID owner, boolean isClient) {
+        Router router;
         if (isClient) {
-            ClientRadioManager.removeRouter(owner);
+            router = ClientSimpleRadioApi.getInstance().removeRouter(owner, "RadioSpeaker");
         } else {
-            RadioManager.getInstance().removeSpeaker(owner);
+            router = ServerSimpleRadioApi.getInstance().listeners().remove(owner);
         }
+        if (router != null) router.invalidate();
     }
 
     /**
@@ -53,11 +55,13 @@ public interface Speaking extends Auricular {
      * @param location the location of the speaker to remove
      */
     default void stopSpeaking(WorldlyPosition location) {
+        Router router;
         if (location.isClientSide()) {
-            ClientRadioManager.removeRouter(location);
+            router = ClientSimpleRadioApi.getInstance().removeRouter(location, "RadioSpeaker");
         } else {
-            RadioManager.getInstance().removeSpeaker(location);
+            router = ServerSimpleRadioApi.getInstance().listeners().remove(location);
         }
+        if (router != null) router.invalidate();
     }
 
     /**
@@ -66,8 +70,7 @@ public interface Speaking extends Auricular {
     default void stopSpeaking() {
         if (this instanceof AuditoryBlockEntity blockEntity) {
             if (blockEntity.speaker != null) {
-                stopSpeaking(blockEntity.speaker.location);
-                blockEntity.speaker.invalidate();
+                stopSpeaking(blockEntity.speaker.getLocation());
             }
         }
     }
