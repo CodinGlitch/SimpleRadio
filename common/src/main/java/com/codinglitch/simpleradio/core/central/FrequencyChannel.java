@@ -93,7 +93,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public void registerReceiver(Receiver receiver) {
-        RadioManager.putRouter(receivers, (RadioReceiver) receiver);
+        RadioManager.getInstance().putRouter(receivers, (RadioReceiver) receiver);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class FrequencyChannel implements Frequency {
         boolean isClient = location.isClientSide();
 
         Receiver receiver = null;//isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
-        if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
+        if (receiver == null) receiver = isClient ? ClientRadioManager.getInstance().getReceiver(id) : getReceiver(id);
 
         if (receiver == null)
             return addReceiver(id, location);
@@ -131,7 +131,7 @@ public class FrequencyChannel implements Frequency {
         boolean isClient = entity.level().isClientSide;
 
         Receiver receiver = null;//isClient ? ClientRadioManager.getReceiver(entity) : getReceiver(entity);
-        if (receiver == null) receiver = isClient ? ClientRadioManager.getReceiver(id) : getReceiver(id);
+        if (receiver == null) receiver = isClient ? ClientRadioManager.getInstance().getReceiver(id) : getReceiver(id);
 
         if (receiver == null)
             return addReceiver(id, entity);
@@ -189,7 +189,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public void registerTransmitter(Transmitter transmitter) {
-        RadioManager.putRouter(transmitters, (RadioTransmitter) transmitter);
+        RadioManager.getInstance().putRouter(transmitters, (RadioTransmitter) transmitter);
     }
 
     @Override
@@ -209,7 +209,7 @@ public class FrequencyChannel implements Frequency {
         boolean isClient = location.isClientSide();
 
         Transmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
-        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);
+        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getInstance().getTransmitter(id) : getTransmitter(id);
 
         if (transmitter == null)
             return addTransmitter(id, location);
@@ -227,7 +227,7 @@ public class FrequencyChannel implements Frequency {
         boolean isClient = entity.level().isClientSide;
 
         Transmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(entity) : getTransmitter(entity);
-        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getTransmitter(id) : getTransmitter(id);
+        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getInstance().getTransmitter(id) : getTransmitter(id);
 
         if (transmitter == null)
             return addTransmitter(id, entity);

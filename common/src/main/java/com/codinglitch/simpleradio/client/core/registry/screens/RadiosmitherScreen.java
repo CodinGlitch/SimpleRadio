@@ -7,6 +7,8 @@ import com.codinglitch.simpleradio.client.core.central.BaseButton;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.ClientServices;
+import com.codinglitch.simpleradio.radio.FrequenciesImpl;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
@@ -42,7 +44,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
     public EditBox FREQUENCY;
 
-    protected String lastValidFrequency = Frequency.DEFAULT_FREQUENCY;
+    protected String lastValidFrequency = FrequenciesImpl.DEFAULT_FREQUENCY;
     public Frequency.Modulation modulation;
 
     protected int holdingFor = 0;
@@ -58,7 +60,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     }
 
     private void updateFrequency(String input) {
-        if (Frequency.check(input)) {
+        if (RadioManager.getInstance().frequencies().check(input)) {
             this.lastValidFrequency = input;
         }
     }
@@ -84,7 +86,7 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
     protected void incrementFrequency(int increment) {
         String freq = this.FREQUENCY.getValue();
         if (!freq.isEmpty()) {
-            this.FREQUENCY.setValue(Frequency.incrementFrequency(freq, increment));
+            this.FREQUENCY.setValue(RadioManager.getInstance().frequencies().incrementFrequency(freq, increment));
         }
     }
 
@@ -94,8 +96,8 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
 
         ItemStack tinkering = this.menu.getTinkering();
         if (tinkering != null && tinkering.getItem() instanceof Frequencing) {
-            if (!FREQUENCY.isFocused() && !Frequency.check(FREQUENCY.getValue())) {
-                if (!Frequency.check(lastValidFrequency)) lastValidFrequency = Frequency.DEFAULT_FREQUENCY;
+            if (!FREQUENCY.isFocused() && !RadioManager.getInstance().frequencies().check(FREQUENCY.getValue())) {
+                if (!RadioManager.getInstance().frequencies().check(lastValidFrequency)) lastValidFrequency = FrequenciesImpl.DEFAULT_FREQUENCY;
                 FREQUENCY.setValue(lastValidFrequency);
             }
         } else {
@@ -187,11 +189,11 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         this.FREQUENCY.setTextColorUneditable(-1);
         this.FREQUENCY.setCanLoseFocus(true);
         this.FREQUENCY.setBordered(false);
-        this.FREQUENCY.setMaxLength(Frequency.FREQUENCY_DIGITS + 1);
+        this.FREQUENCY.setMaxLength(FrequenciesImpl.FREQUENCY_DIGITS + 1);
         this.FREQUENCY.setResponder(this::updateFrequency);
         this.FREQUENCY.setValue("");
         this.FREQUENCY.setFilter(s -> s.isEmpty() || s.matches("^\\d[.\\d]*$"));
-        this.lastValidFrequency = Frequency.DEFAULT_FREQUENCY;
+        this.lastValidFrequency = FrequenciesImpl.DEFAULT_FREQUENCY;
         this.addWidget(FREQUENCY);
         this.FREQUENCY.setEditable(this.menu.getSlot(0).hasItem());
 
@@ -247,14 +249,14 @@ public class RadiosmitherScreen extends AbstractContainerScreen<RadiosmitherMenu
         if (slot == 0) {
             if (!stack.isEmpty() && stack.getItem() instanceof Frequencing frequencing) {
                 Frequency frequency = frequencing.getFrequency(stack);
-                String numbers = frequency.frequency;
+                String numbers = frequency.getFrequency();
                 this.lastValidFrequency = numbers;
 
                 this.FREQUENCY.setValue(numbers);
                 this.FREQUENCY.setEditable(true);
                 this.setFocused(this.FREQUENCY);
 
-                setModulation(frequency.modulation);
+                setModulation(frequency.getModulation());
             } else {
                 this.FREQUENCY.setValue("");
                 this.FREQUENCY.setEditable(false);

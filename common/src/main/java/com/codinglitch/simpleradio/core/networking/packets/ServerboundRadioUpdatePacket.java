@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.networking.packets;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
@@ -19,6 +20,6 @@ public record ServerboundRadioUpdatePacket(String frequency, Frequency.Modulatio
     }
 
     public static ServerboundRadioUpdatePacket read(FriendlyByteBuf buffer) {
-        return new ServerboundRadioUpdatePacket(buffer.readUtf(), Frequency.modulationOf(buffer.readUtf()));
+        return new ServerboundRadioUpdatePacket(buffer.readUtf(), RadioManager.getInstance().frequencies().modulationOf(buffer.readUtf()));
     }
 }

@@ -5,6 +5,10 @@ import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.routers.Listener;
+import com.codinglitch.simpleradio.routers.Receiver;
+import com.codinglitch.simpleradio.routers.Speaker;
+import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
@@ -27,23 +31,23 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     private Random RANDOM = new Random();
 
     @Override
-    protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
-        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange;
-        listener.range = SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange;
-        speaker.category = CommonRadioPlugin.WALKIES_CATEGORY;
+    protected void setupRouters(Listener listener, Speaker speaker, Receiver receiver, Transmitter transmitter) {
+        speaker.setRange(SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.speakingRange);
+        listener.setRange(SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.listeningRange);
+        speaker.setCategory(CommonRadioPlugin.WALKIES_CATEGORY);
 
         transmitter.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
         receiver.frequencingType(SimpleRadioFrequencing.WALKIE_TALKIE);
 
-        listener.link = this.getClass();
-        speaker.link = this.getClass();
-        receiver.link = this.getClass();
-        transmitter.link = this.getClass();
+        listener.setLink(this.getClass());
+        speaker.setLink(this.getClass());
+        receiver.setLink(this.getClass());
+        transmitter.setLink(this.getClass());
 
         // --- Half-duplex implementation
 
         receiver.setAcceptingCriteria(((source) -> {
-            Entity entity = receiver.owner;
+            Entity entity = receiver.getOwner();
             Frequency frequency = receiver.getFrequency();
             if (frequency == null) return false;
 
@@ -54,8 +58,8 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
                 if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return true;
 
                 if (!(using.getItem() instanceof TransceiverItem)) return true;
-                if (!usingTag.getString("frequency").equals(frequency.frequency)) return true;
-                return !usingTag.getString("modulation").equals(frequency.modulation.shorthand);
+                if (!usingTag.getString("frequency").equals(frequency.getFrequency())) return true;
+                return !usingTag.getString("modulation").equals(frequency.getModulation().shorthand);
             }
 
             return true;

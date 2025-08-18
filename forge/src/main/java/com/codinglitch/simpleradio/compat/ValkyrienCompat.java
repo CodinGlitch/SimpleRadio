@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.compat;
 
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import net.minecraft.server.level.ServerLevel;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import org.joml.Quaternionf;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 

@@ -8,9 +8,8 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -37,7 +36,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.transmitter != null) {
             level.playSound(
-                    null, transmitter.position.x, transmitter.position.y, transmitter.position.z,
+                    null, transmitter.getPosition().x, transmitter.getPosition().y, transmitter.getPosition().z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -94,13 +93,13 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
 
-        if (blockEntity.transmitter != null) blockEntity.transmitter.active = blockEntity.catalyst != null;
+        if (blockEntity.transmitter != null) blockEntity.transmitter.setActive(blockEntity.catalyst != null);
 
         if (!blockEntity.catalyzed) return;
 
         if (blockEntity.isDirty && level.getGameTime() % 200 == 0 && !level.isClientSide) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
-            RadioRouter router = blockEntity.getRouter();
+            Router router = blockEntity.getRouter();
             if (router instanceof RadioTransmitter transmitter) transmitter.antennaPower = blockEntity.antennaPower;
 
             level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS);
@@ -112,7 +111,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     public void inactivate() {
         if (this.frequency != null) {
             SimpleRadioApi.removeRouterSided(this.id, this.level.isClientSide);
-            if (!this.level.isClientSide) stopTransmitting(frequency.frequency, frequency.modulation, this.id);
+            if (!this.level.isClientSide) stopTransmitting(frequency.getFrequency(), frequency.getModulation(), this.id);
         }
 
         this.isActive = false;
@@ -132,7 +131,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
             );
         } else {
             this.transmitter = new RadioTransmitter(frequency, location, id);
-            ClientRadioManager.registerRouter(transmitter);
+            ClientRadioManager.getInstance().registerRouter(transmitter);
         }
 
         this.isActive = true;

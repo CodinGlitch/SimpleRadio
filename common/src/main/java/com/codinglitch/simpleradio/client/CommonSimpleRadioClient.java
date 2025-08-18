@@ -11,7 +11,7 @@ import com.codinglitch.simpleradio.core.registry.particles.ListenParticle;
 import com.codinglitch.simpleradio.core.registry.particles.SpeakLineParticle;
 import com.codinglitch.simpleradio.core.registry.particles.SpeakRingParticle;
 import com.codinglitch.simpleradio.platform.ClientServices;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleEngine;
@@ -50,10 +50,10 @@ public class CommonSimpleRadioClient {
                 if (!tag.contains("user")) return 0;
 
                 UUID uuid = tag.getUUID("user");
-                RadioReceiver receiver = ClientRadioManager.getReceiver(uuid);
+                Receiver receiver = ClientRadioManager.getInstance().getReceiver(uuid);
                 if (receiver == null) return 0;
 
-                return receiver.activityTime > 0 ? 1 : 0;
+                return receiver.getActivityTime() > 0 ? 1 : 0;
             }
         );
 

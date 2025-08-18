@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Listening;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -33,7 +34,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.listener != null) {
             level.playSound(
-                    null, listener.position.x, listener.position.y, listener.position.z,
+                    null, listener.getPosition().x, listener.getPosition().y, listener.getPosition().z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -69,12 +70,12 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.listener != null && blockEntity.listener.activityTime >= 0) {
-            if (blockEntity.listener.activityTime % SimpleRadioLibrary.SERVER_CONFIG.microphone.redstonePolling == 0) {
+        if (blockEntity.listener != null && blockEntity.listener.getActivityTime() >= 0) {
+            if (blockEntity.listener.getActivityTime() % SimpleRadioLibrary.SERVER_CONFIG.microphone.redstonePolling == 0) {
                 level.updateNeighborsAt(pos, SimpleRadioBlocks.MICROPHONE);
             }
             if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
-                if (blockEntity.level.isClientSide && blockEntity.listener.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.microphone.particleInterval == 0) {
+                if (blockEntity.level.isClientSide && blockEntity.listener.getActivityTime() % SimpleRadioLibrary.CLIENT_CONFIG.microphone.particleInterval == 0) {
                     ClientRadioManager.handleListenParticle(state, blockEntity);
                 }
             }
@@ -86,7 +87,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     }
     public void setListening(boolean listening) {
         this.listening = listening;
-        if (this.listener != null) this.listener.active = this.listening;
+        if (this.listener != null) this.listener.setActive(this.listening);
     }
 
     public void inactivate() {
@@ -100,7 +101,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
-        this.listener.active = this.listening;
+        this.listener.setActive(this.listening);
 
         if (!level.isClientSide) {
             level.playSound(

@@ -1,12 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.central.Frequency;
-import com.codinglitch.simpleradio.central.Receiving;
-import com.codinglitch.simpleradio.central.Routing;
-import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
+import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -49,8 +46,8 @@ public class ReceiverBlock extends BaseEntityBlock implements Routing, Receiving
     }
 
     @Override
-    public RadioReceiver getOrCreateReceiver(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
-        RadioReceiver receiver = startReceiving(location, frequency, id);
+    public Receiver getOrCreateReceiver(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
+        Receiver receiver = startReceiving(location, frequency, id);
 
         // Allow distribution through wires
         receiver.allowDistribution();

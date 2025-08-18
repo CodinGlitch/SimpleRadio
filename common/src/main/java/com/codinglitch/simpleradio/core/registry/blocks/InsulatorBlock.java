@@ -1,11 +1,11 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Routing;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
-import com.codinglitch.simpleradio.core.registry.entities.Wire;
-import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -28,7 +28,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.UUID;
 
 public class InsulatorBlock extends BaseEntityBlock implements Routing {
@@ -59,47 +58,23 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ROTATED, false).setValue(EMPTY, true));
     }
 
-    public static BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
-        for (Direction direction : Direction.values()) {
-            BlockPos offsetPos = pos.relative(direction);
-            BlockEntity blockEntity = level.getBlockEntity(offsetPos);
-
-            if (blockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
-                List<Wire> wires = insulatorBlockEntity.getWires();
-                if (wires.isEmpty()) continue;
-
-                Wire wire = wires.get(0);
-                RadioRouter router = wire.transport(insulatorBlockEntity.getRouter());
-                BlockPos routerPos = router.position.blockPos();
-
-                BlockState blockState = level.getBlockState(routerPos);
-                if (!(blockState.getBlock() instanceof InsulatorBlock)) continue;
-
-                Direction routerDirection = blockState.getValue(InsulatorBlock.FACING);
-                return routerPos.relative(routerDirection.getOpposite());
-            }
-        }
-
-        return pos;
-    }
-
     @Override
-    public RadioRouter getOrCreateRouter(WorldlyPosition location, UUID id, BlockState state) {
-        RadioRouter router = RadioManager.getInstance().getRouterSided(id, location.isClientSide());
+    public Router getOrCreateRouter(WorldlyPosition location, UUID id, BlockState state) {
+        Router router = SimpleRadioApi.getRouterSided(id, location.isClientSide());
         if (router != null) return router;
 
         router = new RadioRouter(id);
 
-        router.link = this.getClass();
-        router.position = location;
+        router.setLink(this.getClass());
+        router.setPosition(location);
 
         Vec3i normal = state.getValue(InsulatorBlock.FACING).getOpposite().getNormal();
-        router.connectionOffset = new Vec3(normal.getX()*0.2f, normal.getY()*0.2f, normal.getZ()*0.2f);
+        router.setConnectionOffset(new Vec3(normal.getX()*0.2f, normal.getY()*0.2f, normal.getZ()*0.2f));
 
         // Allow distribution through wires
         router.allowDistribution();
 
-        RadioManager.getInstance().registerRouterSided(router, location.isClientSide(), null);
+        SimpleRadioApi.registerRouterSided(router, location.isClientSide(), null);
 
         return router;
     }

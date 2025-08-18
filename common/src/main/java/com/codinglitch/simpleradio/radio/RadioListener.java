@@ -19,7 +19,7 @@ import java.util.function.UnaryOperator;
  */
 public class RadioListener extends RadioRouter implements Listener {
 
-    private UnaryOperator<RadioSource> dataTransformer;
+    private UnaryOperator<Source> dataTransformer;
     private final Map<UUID, OpusDecoder> decoders;
 
     public float range = 8;
@@ -67,7 +67,8 @@ public class RadioListener extends RadioRouter implements Listener {
         this.range = range;
     }
 
-    public void transformer(UnaryOperator<RadioSource> transformer) {
+    @Override
+    public void transformer(UnaryOperator<Source> transformer) {
         this.dataTransformer = transformer;
     }
 
@@ -81,7 +82,7 @@ public class RadioListener extends RadioRouter implements Listener {
 
     public void onSource(RadioSource source) {
         if (dataTransformer != null) {
-            source = dataTransformer.apply(source);
+            source = (RadioSource) dataTransformer.apply(source);
         }
 
         this.compileActivity(source);

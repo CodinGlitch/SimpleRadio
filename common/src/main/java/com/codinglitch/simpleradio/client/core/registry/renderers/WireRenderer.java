@@ -6,7 +6,7 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
@@ -133,13 +133,13 @@ public class WireRenderer extends EntityRenderer<Wire> {
         Optional<UUID> toRef = wire.getTo();
 
         if (fromRef.isPresent()) {
-            RadioRouter from = ClientRadioManager.getRouter(fromRef.get());
+            Router from = ClientRadioManager.getInstance().getRouter(fromRef.get());
             if (from == null) return;
 
             //wire.setPos(new Vec3(from.getLocation().position()));
 
             if (toRef.isPresent()) {
-                RadioRouter to = ClientRadioManager.getRouter(toRef.get());
+                Router to = ClientRadioManager.getInstance().getRouter(toRef.get());
                 if (to == null) return;
 
                 Vec3 fromPosition = from.getConnectionPosition();
@@ -164,7 +164,7 @@ public class WireRenderer extends EntityRenderer<Wire> {
         if (wire != null) {
             CompoundTag tag = wire.getOrCreateTag();
             if (tag.contains("connectTo")) {
-                RadioRouter router = ClientRadioManager.getRouter(tag.getUUID("connectTo"));
+                Router router = ClientRadioManager.getInstance().getRouter(tag.getUUID("connectTo"));
                 if (router == null) return;
 
                 ClientLevel level = player.clientLevel;

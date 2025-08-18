@@ -31,32 +31,6 @@ public class SpeakersImpl implements Speakers {
     }
 
     @Override
-    public void remove(Speaker speaker) {
-        remove(speaker::equals);
-    }
-    @Override
-    public void remove(Predicate<Speaker> criteria) {
-        SPEAKERS.removeIf(criteria);
-    }
-    @Override
-    public void remove(short identifier) {
-        SPEAKERS.remove(identifier);
-    }
-
-    @Override
-    public void remove(Entity owner) {
-        remove(speaker -> owner.equals(speaker.getOwner()));
-    }
-    @Override
-    public void remove(WorldlyPosition location) {
-        remove(speaker -> location.equals(speaker.getPosition()));
-    }
-    @Override
-    public void remove(UUID id) {
-        remove(speaker -> id.equals(speaker.getReference()));
-    }
-
-    @Override
     public RadioSpeaker get(Entity owner) {
         return get(speaker -> owner.equals(speaker.getOwner()));
     }
@@ -79,7 +53,7 @@ public class SpeakersImpl implements Speakers {
         boolean isClient = owner.level().isClientSide;
 
         RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(owner) : getSpeaker(owner);
-        if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : get(id);
+        if (speaker == null) speaker = isClient ? ClientRadioManager.INSTANCE.getSpeaker(id) : get(id);
 
         return speaker != null ? speaker : new RadioSpeaker(owner, id);
     }
@@ -91,7 +65,7 @@ public class SpeakersImpl implements Speakers {
         boolean isClient = location.level.isClientSide;
 
         RadioSpeaker speaker = null;//isClient ? ClientRadioManager.getSpeaker(location) : getSpeaker(location);
-        if (speaker == null) speaker = isClient ? ClientRadioManager.getSpeaker(id) : get(id);
+        if (speaker == null) speaker = isClient ? ClientRadioManager.INSTANCE.getSpeaker(id) : get(id);
 
         return speaker != null ? speaker : new RadioSpeaker(location, id);
     }

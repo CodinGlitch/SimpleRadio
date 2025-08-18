@@ -34,6 +34,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +42,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.phys.AABB;
@@ -59,12 +61,16 @@ import java.util.concurrent.CompletionException;
 import java.util.function.Predicate;
 
 public class ClientRadioManager extends ClientSimpleRadioApi {
-    private static final ClientRadioManager INSTANCE = new ClientRadioManager();
+    public static final ClientRadioManager INSTANCE = new ClientRadioManager();
 
     private static final Map<Short, PendingRouter<?>> pendingRouters = new HashMap<>();
     private static final Map<Short, ClientRouterWrapper> routers = new HashMap<>();
 
     // im, losing it
+
+    private boolean routerMatches(Router router, @Nullable String type) {
+        return (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type));
+    }
 
     public ClientRouterWrapper getWrapper(Predicate<ClientRouterWrapper> criteria) {
         Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
@@ -85,6 +91,11 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     @Override
     public <T> void setConfig(String path, T value) {
         CommonSimpleRadio.setConfigFrom(SimpleRadioLibrary.CLIENT_CONFIG, path, value);
+    }
+
+    @Override
+    public BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
+        return RadioManager.getInstance().travelExtension(pos, level);
     }
 
     @Override
@@ -191,31 +202,50 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
-    public void removeRouter(Predicate<Router> predicate) {
-        routers.entrySet().removeIf(entry -> {
-            if (predicate.test(entry.getValue().router)) {
-                entry.getValue().close();
-                return true;
-            }
+    public Router removeRouter(Predicate<Router> predicate) {
+        List<Map.Entry<Short, ClientRouterWrapper>> removal = routers.entrySet().stream()
+                .filter(entry -> predicate.test(entry.getValue().router))
+                .toList();
 
-            return false;
+        if (removal.isEmpty()) return null;
+
+        removal.forEach(entry -> {
+            entry.getValue().close();
+            routers.remove(entry.getKey());
         });
+
+        return removal.stream().findFirst().get().getValue().router;
     }
     @Override
-    public void removeRouter(Router router) {
-        removeRouter(otherRouter -> otherRouter == router);
+    public Router removeRouter(Router router) {
+        return removeRouter(otherRouter -> otherRouter == router);
+    }
+
+    @Override
+    public Router removeRouter(UUID reference) {
+        return removeRouter(router -> reference.equals(router.getReference()));
     }
     @Override
-    public void removeRouter(UUID uuid) {
-        removeRouter(router -> uuid.equals(router.getReference()));
+    public Router removeRouter(UUID reference, @Nullable String type) {
+        return removeRouter(router -> reference.equals(router.getReference()) && routerMatches(router, type));
+    }
+
+    @Override
+    public Router removeRouter(Entity owner) {
+        return removeRouter(router -> owner.equals(router.getOwner()));
     }
     @Override
-    public void removeRouter(Entity owner) {
-        removeRouter(router -> owner.equals(router.getOwner()));
+    public Router removeRouter(Entity owner, @Nullable String type) {
+        return removeRouter(router -> owner.equals(router.getOwner()) && routerMatches(router, type));
+    }
+
+    @Override
+    public Router removeRouter(WorldlyPosition location) {
+        return removeRouter(router -> location.equals(router.getPosition()));
     }
     @Override
-    public void removeRouter(WorldlyPosition location) {
-        removeRouter(router -> router.getPosition() != null && location.equals(router.getPosition()));
+    public Router removeRouter(WorldlyPosition location, @Nullable String type) {
+        return removeRouter(router -> location.equals(router.getPosition()) && routerMatches(router, type));
     }
 
     public static void finalizeRouter(short mapping, short identifier) {
@@ -414,7 +444,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     public static void handleListenParticle(BlockState state, MicrophoneBlockEntity blockEntity) {
-        RadioRouter mainRouter = blockEntity.getRouter();
+        RadioRouter mainRouter = (RadioRouter) blockEntity.getRouter();
         if (mainRouter == null) return;
 
         float rotation = RotationSegment.convertToDegrees(state.getValue(MicrophoneBlock.ROTATION));
@@ -435,7 +465,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     public static void handleSpeakParticle(BlockState state, SpeakerBlockEntity blockEntity) {
-        RadioRouter mainRouter = blockEntity.getRouter();
+        RadioRouter mainRouter = (RadioRouter) blockEntity.getRouter();
         if (mainRouter == null) return;
 
         Direction direction = state.getValue(SpeakerBlock.FACING);

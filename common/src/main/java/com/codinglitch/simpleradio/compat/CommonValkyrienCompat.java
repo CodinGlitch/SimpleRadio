@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.compat;
 
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import net.minecraft.core.BlockPos;
 import org.joml.Matrix4dc;
 import org.joml.Quaternionf;

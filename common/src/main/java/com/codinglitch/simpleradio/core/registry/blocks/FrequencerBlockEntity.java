@@ -3,10 +3,10 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
-import com.codinglitch.simpleradio.radio.RadioListener;
 import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioTransmitter;
+import com.codinglitch.simpleradio.routers.Listener;
+import com.codinglitch.simpleradio.routers.Receiver;
+import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -56,21 +56,21 @@ public class FrequencerBlockEntity extends BlockEntity {
 
             //---- Revalidation ----\\
             if (blockEntity.frequency != null) {
-                Frequency frequency = Frequency.getFrequency(blockEntity.frequency.frequency, blockEntity.frequency.modulation);
+                Frequency frequency = RadioManager.getInstance().frequencies().get(blockEntity.frequency.getFrequency(), blockEntity.frequency.getModulation());
                 if (frequency != blockEntity.frequency && frequency != null)
                     blockEntity.frequency = frequency;
             }
 
             if (blockEntity.frequency != null) {
                 //---- Receiver gathering and parsing ----\\
-                for (RadioReceiver receiver : blockEntity.frequency.receivers) {
-                    String name = parse(receiver.owner, receiver.position);
+                for (Receiver receiver : blockEntity.frequency.getReceivers()) {
+                    String name = parse(receiver.getOwner(), receiver.getPosition());
                     if (name != null) blockEntity.frequencings.add(name);
                 }
 
                 //---- Transmitter gathering and parsing ----\\
-                for (RadioTransmitter transmitter : blockEntity.frequency.transmitters) {
-                    String name = parse(transmitter.owner, transmitter.position);
+                for (Transmitter transmitter : blockEntity.frequency.getTransmitters()) {
+                    String name = parse(transmitter.getOwner(), transmitter.getPosition());
                     if (name != null) blockEntity.frequencings.add(name);
                 }
 
@@ -78,16 +78,16 @@ public class FrequencerBlockEntity extends BlockEntity {
             } else {
                 if (level.getBlockState(blockEntity.getBlockPos().below()).is(Blocks.DIAMOND_BLOCK)) {
                     //---- Listener gathering ----\\
-                    List<RadioListener> listeners = RadioManager.getListeners();
-                    for (RadioListener listener : listeners) {
-                        String name = parse(listener.owner, listener.position);
+                    List<Listener> listeners = RadioManager.getInstance().listeners().get();
+                    for (Listener listener : listeners) {
+                        String name = parse(listener.getOwner(), listener.getPosition());
                         if (name != null) blockEntity.listeners.add(name);
                     }
                 } else {
                     //---- Frequency gathering ----\\
-                    List<Frequency> frequencies = Frequency.getFrequencies();
+                    List<Frequency> frequencies = RadioManager.getInstance().frequencies().get();
                     for (Frequency frequency : frequencies) {
-                        blockEntity.frequencies.add(frequency.frequency + frequency.modulation.shorthand);
+                        blockEntity.frequencies.add(frequency.getFrequency() + frequency.getModulation().shorthand);
                     }
                 }
 
@@ -137,8 +137,8 @@ public class FrequencerBlockEntity extends BlockEntity {
     public void loadTag(CompoundTag tag) {
         if (tag.contains("frequency")) {
             String frequencyName = tag.getString("frequency");
-            Frequency.Modulation modulation = Frequency.modulationOf(tag.getString("modulation"));
-            this.frequency = Frequency.getOrCreateFrequency(frequencyName, modulation);
+            Frequency.Modulation modulation = RadioManager.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+            this.frequency = RadioManager.getInstance().frequencies().getOrCreate(frequencyName, modulation);
         } else {
             this.frequency = null;
         }
@@ -164,8 +164,8 @@ public class FrequencerBlockEntity extends BlockEntity {
 
     public void saveTag(CompoundTag tag) {
         if (this.frequency != null) {
-            tag.putString("frequency", this.frequency.frequency);
-            tag.putString("modulation", this.frequency.modulation.shorthand);
+            tag.putString("frequency", this.frequency.getFrequency());
+            tag.putString("modulation", this.frequency.getModulation().shorthand);
         }
 
         CompoundTag receivers = new CompoundTag();

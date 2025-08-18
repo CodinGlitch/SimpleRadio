@@ -5,7 +5,7 @@ import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
-import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -44,17 +44,17 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
 
             model.body.xRot = blockEntity.currentTilt;
 
-            RadioRouter router = ClientRadioManager.getRouter(blockEntity.id); // workaround for create
+            Router router = ClientRadioManager.getInstance().getRouter(blockEntity.id); // workaround for create
             if (router != null) {
                 float rotation = Math.toRadians(SimpleRadioBlocks.MICROPHONE.getYRotationDegrees(state) - 90);
                 float tilt = blockEntity.currentTilt - 0.5f;
                 Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
 
-                router.connectionOffset = new Vec3(
+                router.setConnectionOffset(new Vec3(
                         normal.x * Math.cos(tilt)*0.25f,
                         Math.sin(tilt)*0.25f,
                         normal.z * Math.cos(tilt)*0.25f
-                );
+                ));
             }
 
             VertexConsumer vertexConsumer = bufferSource.getBuffer(model.renderType(blockEntity.isListening() ? MicrophoneModel.ACTIVE_LOCATION : MicrophoneModel.TEXTURE_LOCATION));

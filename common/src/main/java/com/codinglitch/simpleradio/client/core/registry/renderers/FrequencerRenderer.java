@@ -59,7 +59,7 @@ public class FrequencerRenderer implements BlockEntityRenderer<FrequencerBlockEn
         }
 
         int color = blockEntity.frequencings.size() == 0 ? Color.red.getRGB() : Color.cyan.getRGB();
-        draw(blockEntity.frequency.frequency + blockEntity.frequency.modulation.shorthand, 0, color, poseStack, bufferSource);
+        draw(blockEntity.frequency.getFrequency() + blockEntity.frequency.getModulation().shorthand, 0, color, poseStack, bufferSource);
         for (int i = 0; i < blockEntity.frequencings.size(); i++) {
             String listener = blockEntity.frequencings.get(i);
 

@@ -1,7 +1,8 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.api.central.Frequency;
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.blocks.FrequencerBlockEntity;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.PlayerChatMessage;
@@ -23,7 +24,7 @@ public class MixinPlayerList {
     private void simpleradio$logChatMessage_frequencerSetting(PlayerChatMessage message, Predicate<ServerPlayer> playerPredicate, ServerPlayer player, ChatType.Bound bound, CallbackInfo info) {
         String content = message.signedContent();
         if (content.startsWith("frequency")) {
-            Frequency frequency = Frequency.tryParse(content.substring(10));
+            Frequency frequency = RadioManager.getInstance().frequencies().tryParse(content.substring(10));
             ServerLevel level = player.serverLevel();
             BlockPos playerPosition = player.blockPosition();
 

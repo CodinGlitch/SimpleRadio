@@ -218,7 +218,7 @@ public class RadioSource implements Source {
             if (fromPos.level.dimensionType() != toPos.level.dimensionType()) {
                 if (SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional) {
                     double interference = SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalInterference;
-                    transmissionDiminishment += frequency.modulation == Frequency.Modulation.FREQUENCY ? interference : interference/2;
+                    transmissionDiminishment += frequency.getModulation() == Frequency.Modulation.FREQUENCY ? interference : interference/2;
                 } else {
                     this.transmissionPower = 0;
                     transmissionDiminishment = 0;
@@ -242,9 +242,9 @@ public class RadioSource implements Source {
         double base = 0;
         double severity = 0;
         if (this.frequencyMedium != null) {
-            double diminishThreshold = this.getFrequencingType().getDiminishThreshold(frequencyMedium.modulation);
+            double diminishThreshold = this.getFrequencingType().getDiminishThreshold(frequencyMedium.getModulation());
 
-            base = frequencyMedium.modulation == Frequency.Modulation.FREQUENCY ?
+            base = frequencyMedium.getModulation() == Frequency.Modulation.FREQUENCY ?
                     SimpleRadioLibrary.SERVER_CONFIG.frequency.baseFMInterference :
                     SimpleRadioLibrary.SERVER_CONFIG.frequency.baseAMInterference;
             severity = 1 - Math.clamp(0f, 1f,  this.transmissionPower / diminishThreshold);

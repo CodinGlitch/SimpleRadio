@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.core.networking;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.Frequency;
 import com.codinglitch.simpleradio.client.core.SimpleRadioClientNetworking;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
@@ -54,7 +53,7 @@ public class SimpleRadioNetworking {
 
     public static void handleRadioUpdate(ServerboundRadioUpdatePacket packet, MinecraftServer server, ServerPlayer player) {
         server.execute(() -> {
-            if (!Frequency.check(packet.frequency())) return;
+            if (!RadioManager.getInstance().frequencies().check(packet.frequency())) return;
 
             AbstractContainerMenu menu = player.containerMenu;
             if (menu instanceof RadiosmitherMenu radiosmitherMenu) {
@@ -74,7 +73,7 @@ public class SimpleRadioNetworking {
         short mapping = packet.mapping();
 
         server.execute(() -> {
-            short identifier = RadioManager.getIdentifier(r -> reference.equals(r.reference) && r.getClass().getSimpleName().equals(type));
+            short identifier = RadioManager.getInstance().getIdentifier(router -> reference.equals(router.getReference()) && router.getClass().getSimpleName().equals(type));
             if (identifier == Short.MAX_VALUE) {
                 CommonSimpleRadio.warn("We could not find the {} with reference {} for mapping {}!", type, reference, mapping);
                 return;

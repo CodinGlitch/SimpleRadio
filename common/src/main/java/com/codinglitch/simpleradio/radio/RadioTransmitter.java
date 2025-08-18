@@ -66,7 +66,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
         }
 
         this.frequency = frequency;
-        this.routers = (List) this.frequency.receivers;
+        this.routers = (List) this.frequency.getReceivers();
         return this;
     }
 
@@ -87,7 +87,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
             if (source.willShort(receiver)) return false;
 
             FrequencingType type = source.frequencingType == -1 ? this.frequencingType : source.getFrequencingType();
-            double transmissionPower = source.frequencingType == -1 ? this.getPower(this.frequency.modulation) : source.transmissionPower;
+            double transmissionPower = source.frequencingType == -1 ? this.getPower(this.frequency.getModulation()) : source.transmissionPower;
 
             double distance = this.getLocation().distance(receiver.getLocation());
             double cost = distance * type.transmissionDiminishment;
@@ -101,7 +101,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     @Override
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
         if (source.frequencingType == -1) {
-            float transmissionPower = getPower(frequency.modulation);
+            float transmissionPower = getPower(frequency.getModulation());
 
             source.frequencingType = this.frequencingType.id;
             source.transmissionCap = transmissionPower;

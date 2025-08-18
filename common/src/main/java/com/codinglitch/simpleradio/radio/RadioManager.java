@@ -5,12 +5,15 @@ import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.Speakers;
 import com.codinglitch.simpleradio.core.central.FrequencyChannel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
+import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
+import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.Router;
 import com.codinglitch.simpleradio.routers.RouterContainer;
@@ -22,8 +25,8 @@ import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Position;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,7 +37,9 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -44,7 +49,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class RadioManager extends ServerSimpleRadioApi {
-    private static final RadioManager INSTANCE = new RadioManager();
+    public static final RadioManager INSTANCE = new RadioManager();
 
     private static final Frequencies FREQUENCIES = new FrequenciesImpl();
     private static final Speakers SPEAKERS = new SpeakersImpl();
@@ -102,6 +107,31 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
+    public BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
+        for (Direction direction : Direction.values()) {
+            BlockPos offsetPos = pos.relative(direction);
+            BlockEntity blockEntity = level.getBlockEntity(offsetPos);
+
+            if (blockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
+                List<Wiring> wires = insulatorBlockEntity.getWires();
+                if (wires.isEmpty()) continue;
+
+                Wiring wire = wires.get(0);
+                Router router = wire.transport(insulatorBlockEntity.getRouter());
+                BlockPos routerPos = router.getPosition().blockPos();
+
+                BlockState blockState = level.getBlockState(routerPos);
+                if (!(blockState.getBlock() instanceof InsulatorBlock)) continue;
+
+                Direction routerDirection = blockState.getValue(InsulatorBlock.FACING);
+                return routerPos.relative(routerDirection.getOpposite());
+            }
+        }
+
+        return pos;
+    }
+
+    @Override
     public <R extends Router> void putRouter(@Nullable RouterContainer<R> container, R router) {
         if (container != null) {
             container.add(router);
@@ -143,29 +173,36 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public void removeRouter(Router router) {
-        removeRouter(router::equals);
+    public Router removeRouter(Router router) {
+        return removeRouter(router::equals);
     }
     @Override
-    public void removeRouter(Predicate<Router> criteria) {
-        routers.entrySet().removeIf(entry -> criteria.test(entry.getValue()));
+    public Router removeRouter(Predicate<Router> criteria) {
+        List<Map.Entry<Short, Router>> removal = routers.entrySet().stream()
+                .filter(entry -> criteria.test(entry.getValue()))
+                .toList();
+
+        if (removal.isEmpty()) return null;
+
+        removal.forEach(routers.entrySet()::remove);
+        return removal.stream().findFirst().get().getValue();
     }
     @Override
-    public void removeRouter(short identifier) {
-        routers.remove(identifier);
+    public Router removeRouter(short identifier) {
+        return routers.remove(identifier);
     }
 
     @Override
-    public void removeRouter(UUID uuid) {
-        removeRouter(router -> router.getReference().equals(uuid));
+    public Router removeRouter(UUID uuid) {
+        return removeRouter(router -> router.getReference().equals(uuid));
     }
     @Override
-    public void removeRouter(Entity owner) {
-        removeRouter(router -> router.getOwner() == owner);
+    public Router removeRouter(Entity owner) {
+        return removeRouter(router -> router.getOwner() == owner);
     }
     @Override
-    public void removeRouter(WorldlyPosition location) {
-        removeRouter(router -> router.getPosition() != null && router.getPosition().equals(location));
+    public Router removeRouter(WorldlyPosition location) {
+        return removeRouter(router -> router.getPosition() != null && router.getPosition().equals(location));
     }
 
     @Override
@@ -342,6 +379,7 @@ public class RadioManager extends ServerSimpleRadioApi {
         COLLECT
     }
 
+    @Override
     public boolean verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {
         BlockPos pos = position.realLocation();
 
@@ -365,6 +403,7 @@ public class RadioManager extends ServerSimpleRadioApi {
         return clazz.isAssignableFrom(block.getClass()) || clazz.isAssignableFrom(block.asItem().getClass());
     }
 
+    @Override
     public boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> itemCriteria) {
         CollectionResult result = CompatCore.verifyEntityCollection(entity, itemCriteria);
         if (result == CollectionResult.IGNORE) {
@@ -429,7 +468,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         if (level.isClientSide) return;
         if (!SimpleRadioLibrary.SERVER_CONFIG.router.soundListening) return;
-        if (!level.isLoaded(BlockPos.containing((Position) location))) return;
+        if (!level.isLoaded(location.blockPos())) return;
 
         SoundEvent sound = soundHolder.value();
 

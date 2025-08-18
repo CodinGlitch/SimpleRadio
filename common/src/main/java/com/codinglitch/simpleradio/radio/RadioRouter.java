@@ -54,9 +54,11 @@ public class RadioRouter implements Socket, Router {
 
     public short identifier;
     public UUID reference;
+
     public Entity owner;
     public WorldlyPosition position;
     public Vector3f oldPosition = new Vector3f();
+
     public Vector3f velocity = new Vector3f();
 
     public float activity = 0;
@@ -128,13 +130,23 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
+    public boolean isActive() {
+        return active;
+    }
+    @Override
+    public Vec3 getConnectionOffset() {
+        return connectionOffset;
+    }
+    @Override
+    public Class<?> getLink() {
+        return link;
+    }
+
+    @Override
     public List<Wiring> getWires() {
         return new ArrayList<>(this.wires);
     }
 
-    public void allowDistribution() {
-        this.distributes = true;
-    }
 
     @Nullable
     @Override
@@ -177,6 +189,62 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+
+    @Override
+    public float getActivity() {
+        return activity;
+    }
+
+    @Override
+    public int getActivityTime() {
+        return activityTime;
+    }
+
+    @Override
+    public int getRedstoneMappedActivity() {
+        return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
+    }
+
+    @Override
+    public Quaternionf getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public void allowDistribution() {
+        this.distributes = true;
+    }
+
+    @Override
+    public void setOwner(Entity owner) {
+        this.owner = owner;
+    }
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    @Override
+    public void setLink(Class<?> link) {
+        this.link = link;
+    }
+    @Override
+    public void setConnectionOffset(Vec3 connectionOffset) {
+        this.connectionOffset = connectionOffset;
+    }
+    @Override
+    public void setPosition(WorldlyPosition position) {
+        this.position = position;
+    }
+    @Override
+    public void setRotation(Quaternionf rotation) {
+        this.rotation = rotation;
+    }
+
+
+    @Override
     public double distanceTo(Router other) {
         return distanceTo((RadioRouter) other);
     }
@@ -192,8 +260,20 @@ public class RadioRouter implements Socket, Router {
         RadioRouter existingRouter = getRouter(router.reference);
         if (existingRouter != null) return existingRouter;
 
-        routers.add(router);
+        return (RadioRouter) addRouter(router);
+    }
+
+    @Override
+    public Router addRouter(Router router) {
+        routers.add((RadioRouter) router);
         return router;
+    }
+
+    @Override
+    public void accept(Source source) {
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
+        this.route(source);
     }
 
     //this method is so dumb bro
@@ -236,13 +316,6 @@ public class RadioRouter implements Socket, Router {
                 this.activityTime = -1;
             }
         }
-    }
-
-    @Override
-    public void accept(Source source) {
-        if (!this.active) return;
-        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        this.route(source);
     }
 
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
@@ -302,10 +375,6 @@ public class RadioRouter implements Socket, Router {
         this.route(source, null);
     }
 
-    public int getRedstoneMappedActivity() {
-        return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
-    }
-
     public void compileActivity(Source source) {
         if (!this.active) return;
 
@@ -339,6 +408,7 @@ public class RadioRouter implements Socket, Router {
         }
     }
 
+    @Override
     public void invalidate() {
         this.valid = false;
     }

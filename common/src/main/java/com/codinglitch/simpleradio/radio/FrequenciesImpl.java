@@ -1,13 +1,13 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.central.FrequencyChannel;
 import net.minecraft.nbt.CompoundTag;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
-import oshi.util.tuples.Pair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +27,16 @@ public class FrequenciesImpl implements Frequencies {
 
     public static void close() {
         FREQUENCIES.clear();
+    }
+
+    @Override
+    public String defaultFrequency() {
+        return DEFAULT_FREQUENCY;
+    }
+
+    @Override
+    public Frequency.Modulation defaultModulation() {
+        return DEFAULT_MODULATION;
     }
 
     @Override
@@ -92,7 +102,7 @@ public class FrequenciesImpl implements Frequencies {
 
         return IntStream.range(frequencyIndex - distance, frequencyIndex + distance).boxed().toList().stream().map(index -> {
             Frequency found = FREQUENCIES.get(index);
-            if (found != null) return new Pair<>(index - frequencyIndex, found);
+            if (found != null) return Pair.of(index - frequencyIndex, found);
             return null;
         }).filter(Objects::nonNull).toList();
     }

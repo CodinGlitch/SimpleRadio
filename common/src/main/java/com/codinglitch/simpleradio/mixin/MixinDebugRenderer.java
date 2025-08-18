@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.mixin;
 
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,8 +22,8 @@ public class MixinDebugRenderer {
 
         Vector3f camera = new Vector3f((float) cameraX, (float) cameraY, (float) cameraZ);
         if (minecraft.getEntityRenderDispatcher().shouldRenderHitBoxes()) {
-            for (RadioRouter router : ClientRadioManager.getRouters()) {
-                ClientRadioManager.renderRouter(router, poseStack, bufferSource, camera);
+            for (Router router : ClientRadioManager.getInstance().getRouters()) {
+                ClientRadioManager.renderRouter((RadioRouter) router, poseStack, bufferSource, camera);
             }
         }
     }

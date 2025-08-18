@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.core.registry.CatalystRegistry;
 import com.codinglitch.simpleradio.central.Catalyst;
 import net.minecraft.core.BlockPos;
