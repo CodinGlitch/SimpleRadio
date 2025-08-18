@@ -78,6 +78,11 @@ Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more infor
 This amazing resource pack aims to make the blocks and items fit aesthetically with the Create mod!
 
 ## [Simple Radio Redone](https://modrinth.com/resourcepack/simple-radio-redone)
-![Simple Radio Redone](https://cdn.modrinth.com/data/cached_images/7c816071a7f11f8a20e17724f8b0b72f3d1ff63d.png)
+![Simple Radio Redone](https://github.com/user-attachments/assets/3c2e5ae6-e2d0-484e-9867-166e234762c2)
 
 Another resource pack which remakes the textures of the mod to give it a fresh look while maintaining the original style!
+
+## [Simple Frequency](https://modrinth.com/datapack/simple-frequency)
+![Simple Frequency](https://github.com/user-attachments/assets/7be0d544-e7a3-4b94-ac78-360fa8d8c47c)
+
+This datapack adds the ability to change the frequency and modulation of various Simple Radio items by using a simple command!
