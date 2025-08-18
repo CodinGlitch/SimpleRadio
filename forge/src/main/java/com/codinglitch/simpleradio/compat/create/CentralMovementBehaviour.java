@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Routing;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.routers.Router;
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
@@ -19,25 +20,26 @@ import org.joml.Vector3f;
 import java.util.UUID;
 
 public class CentralMovementBehaviour implements MovementBehaviour {
-    public void updateRouter(MovementContext context, RadioRouter router, WorldlyPosition newLocation, AbstractContraptionEntity contraption) {
+    public void updateRouter(MovementContext context, Router router, WorldlyPosition newLocation, AbstractContraptionEntity contraption) {
         if (router == null) return;
 
-        if (router.owner != contraption) {
-            router.owner = contraption;
+        if (router.getOwner() != contraption) {
+            router.setOwner(contraption);
         }
 
         if (context.world.isClientSide) {
             Vector3f translatedNorth = context.rotation.apply(new Vec3(0, 0, -1)).toVector3f();
-            if (router.rotation == null) router.rotation = new Quaternionf();
+            if (router.getRotation() == null) router.setRotation(new Quaternionf());
 
             // theres probably a better way to do this but im stupid so this works for now
-            router.rotation.setAngleAxis(translatedNorth.angle(new Vector3f(0, 0, -1)) * -Math.signum(translatedNorth.x), 0, 1, 0);
+            router.getRotation().setAngleAxis(translatedNorth.angle(new Vector3f(0, 0, -1)) * -Math.signum(translatedNorth.x), 0, 1, 0);
         }
 
-        router.position.x = newLocation.x;
-        router.position.y = newLocation.y;
-        router.position.z = newLocation.z;
-        router.updateLocation(newLocation);
+        WorldlyPosition position = router.getPosition();
+        position.x = newLocation.x;
+        position.y = newLocation.y;
+        position.z = newLocation.z;
+        //((RadioRouter) router).updateLocation(newLocation);
     }
 
     public void update(MovementContext context) {
@@ -60,7 +62,7 @@ public class CentralMovementBehaviour implements MovementBehaviour {
             }
 
 
-            Frequency frequency = Frequency.fromTag(context.blockEntityData);
+            Frequency frequency = RadioManager.getInstance().frequencies().fromTag(context.blockEntityData);
             if (frequency != null) {
                 updateRouter(context, routing.getOrCreateReceiver(newLocation, frequency, id, context.state), newLocation, contraptionEntity);
                 updateRouter(context, routing.getOrCreateTransmitter(newLocation, frequency, id, context.state), newLocation, contraptionEntity);

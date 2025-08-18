@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -44,8 +45,8 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     protected RadioSpeaker(UUID id) {
         super(id);
 
-        packetBuffer = new HashMap<>();
-        decoders = new HashMap<>();
+        packetBuffer = new ConcurrentHashMap<>();
+        decoders = new ConcurrentHashMap<>();
         effect = new BaseAudioEffect();
     }
     protected RadioSpeaker() {
@@ -195,7 +196,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         }
 
         // Packet buffer
-        Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(radioSource.owner, k -> new HashMap<>());
+        Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(radioSource.owner, k -> new ConcurrentHashMap<>());
         Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(radioSource.originalOwner, k -> new LinkedList<>());
         if (playerPackets.isEmpty()) {
             for (int i = 0; i < SimpleRadioLibrary.SERVER_CONFIG.frequency.packetBuffer; i++) {

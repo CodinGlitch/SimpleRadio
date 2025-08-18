@@ -6,8 +6,7 @@ import com.codinglitch.simpleradio.central.Routing;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
-import com.codinglitch.simpleradio.radio.RadioListener;
-import com.mojang.serialization.MapCodec;
+import com.codinglitch.simpleradio.routers.Listener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -44,7 +43,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listening {
-    public static final MapCodec<MicrophoneBlock> CODEC = simpleCodec(MicrophoneBlock::new);
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
@@ -56,24 +54,19 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         this.registerDefaultState(this.defaultBlockState().setValue(ROTATION, 0));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
-
     public float getYRotationDegrees(BlockState state) {
         return RotationSegment.convertToDegrees(state.getValue(ROTATION));
     }
 
     @Override
-    public RadioListener getOrCreateListener(WorldlyPosition location, UUID id, BlockState state) {
-        RadioListener listener = startListening(location, id);
+    public Listener getOrCreateListener(WorldlyPosition location, UUID id, BlockState state) {
+        Listener listener = startListening(location, id);
 
-        listener.range = SimpleRadioLibrary.SERVER_CONFIG.microphone.listeningRange;
+        listener.setRange(SimpleRadioLibrary.SERVER_CONFIG.microphone.listeningRange);
 
         float rotation = Math.toRadians(getYRotationDegrees(state) - 90);
         Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
-        listener.connectionOffset = new Vec3(normal.x*0.1f, -0.2f, normal.z*0.1f);
+        listener.setConnectionOffset(new Vec3(normal.x*0.1f, -0.2f, normal.z*0.1f));
 
         // Allow distribution through wires
         listener.allowDistribution();
@@ -141,7 +134,7 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
                 mic.tilt = (mic.tilt + 0.1f) % 3;
 
                 if (!level.isClientSide)
-                 level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.TILT_MICROPHONE, SoundSource.BLOCKS, 0.1f, 0.9f + level.random.nextFloat()*0.2f);
+                    level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.TILT_MICROPHONE, SoundSource.BLOCKS, 0.1f, 0.9f + level.random.nextFloat()*0.2f);
 
 
                 return InteractionResult.SUCCESS;

@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Speaking;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -26,7 +27,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, speaker.position.x, speaker.position.y, speaker.position.z,
+                    null, speaker.getPosition().x, speaker.getPosition().y, speaker.getPosition().z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -62,12 +63,12 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.speaker != null && blockEntity.speaker.activityTime >= 0) {
-            if (blockEntity.speaker.activityTime % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
+        if (blockEntity.speaker != null && blockEntity.speaker.getActivityTime() >= 0) {
+            if (blockEntity.speaker.getActivityTime() % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
                 level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
             }
             if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
-                if (blockEntity.level.isClientSide && blockEntity.speaker.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
+                if (blockEntity.level.isClientSide && blockEntity.speaker.getActivityTime() % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
                     ClientRadioManager.handleSpeakParticle(state, blockEntity);
                 }
             }

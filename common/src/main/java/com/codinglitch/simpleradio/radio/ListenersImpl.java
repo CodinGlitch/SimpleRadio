@@ -1,9 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.RouterContainer;
 import net.minecraft.world.entity.Entity;
@@ -48,32 +48,6 @@ public class ListenersImpl implements Listeners {
     }
 
     @Override
-    public void remove(Listener Listener) {
-        remove(Listener::equals);
-    }
-    @Override
-    public void remove(Predicate<Listener> criteria) {
-        LISTENERS.removeIf(criteria);
-    }
-    @Override
-    public void remove(short identifier) {
-        LISTENERS.remove(identifier);
-    }
-
-    @Override
-    public void remove(Entity owner) {
-        remove(listener -> owner.equals(listener.getOwner()));
-    }
-    @Override
-    public void remove(WorldlyPosition location) {
-        remove(listener -> location.equals(listener.getPosition()));
-    }
-    @Override
-    public void remove(UUID id) {
-        remove(listener -> id.equals(listener.getReference()));
-    }
-
-    @Override
     public RadioListener get(Entity owner) {
         return get(listener -> owner.equals(listener.getOwner()));
     }
@@ -96,7 +70,7 @@ public class ListenersImpl implements Listeners {
         boolean isClient = owner.level().isClientSide;
 
         RadioListener listener = null;//isClient ? ClientRadioManager.getListener(owner) : getListener(owner);
-        if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : get(id);
+        if (listener == null) listener = isClient ? ClientRadioManager.INSTANCE.getListener(id) : get(id);
 
         return listener != null ? listener : new RadioListener(owner, id);
     }
@@ -108,7 +82,7 @@ public class ListenersImpl implements Listeners {
         boolean isClient = location.level.isClientSide;
 
         RadioListener listener = null;//isClient ? ClientRadioManager.getListener(location) : getListener(location);
-        if (listener == null) listener = isClient ? ClientRadioManager.getListener(id) : get(id);
+        if (listener == null) listener = isClient ? ClientRadioManager.INSTANCE.getListener(id) : get(id);
 
         return listener != null ? listener : new RadioListener(location, id);
     }

@@ -12,7 +12,6 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
-import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.nbt.CompoundTag;
@@ -128,8 +127,8 @@ public class Wire extends Entity implements Wiring {
             return;
         }
 
-        RadioRouter from = RadioManager.getInstance().getRouter(fromRef, fromType);
-        RadioRouter to = RadioManager.getInstance().getRouter(toRef, toType);
+        RadioRouter from = (RadioRouter) RadioManager.getInstance().getRouter(fromRef, fromType);
+        RadioRouter to = (RadioRouter) RadioManager.getInstance().getRouter(toRef, toType);
         if (from == null || to == null) {
             CommonSimpleRadio.warn("Relaying cancelled; either end was unable to be found.");
             return;
@@ -151,7 +150,7 @@ public class Wire extends Entity implements Wiring {
             AtomicInteger timeUntilDemise = new AtomicInteger();
             AtomicReference<Float> placeOfDemise = new AtomicReference<>((float) 0);
             if (RadioManager.getInstance().readQueue(queued -> {
-                if (queued.source.wireMedium.equals(this) && queued.router.equals(origin)) {
+                if (queued.source.getWireMedium().equals(this) && queued.router.equals(origin)) {
                     int maxProgress = Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength());
                     float progress = (float) queued.time / maxProgress;
 
@@ -205,7 +204,7 @@ public class Wire extends Entity implements Wiring {
         UUID reference = this.getFrom().orElse(null);
         if (reference == null) return null;
 
-        return RadioManager.getInstance().getRouterSided(reference, this.getFromType(), this.level().isClientSide);
+        return (RadioRouter) RadioManager.getRouterSided(reference, this.getFromType(), this.level().isClientSide);
     }
     public Optional<UUID> getFrom() {
         return this.getEntityData().get(FROM);
@@ -216,7 +215,8 @@ public class Wire extends Entity implements Wiring {
         String type = this.getEntityData().get(FROM_TYPE);
         return type.isEmpty() ? null : type;
     }
-    public void setFrom(RadioRouter from) {
+    @Override
+    public void setFrom(Router from) {
         this.getEntityData().set(FROM, Optional.of(from.getReference()));
         if (from.getClass() != RadioRouter.class)
             this.getEntityData().set(FROM_TYPE, from.getClass().getSimpleName());
@@ -228,7 +228,7 @@ public class Wire extends Entity implements Wiring {
         UUID reference = this.getTo().orElse(null);
         if (reference == null) return null;
 
-        return RadioManager.getInstance().getRouterSided(reference, this.getToType(), this.level().isClientSide);
+        return (RadioRouter) RadioManager.getRouterSided(reference, this.getToType(), this.level().isClientSide);
     }
     @Override
     public Optional<UUID> getTo() {
@@ -248,8 +248,13 @@ public class Wire extends Entity implements Wiring {
     }
 
     @Override
+    public boolean isValid() {
+        return this.isAlive();
+    }
+
+    @Override
     public void burnOut() {
-        RadioManager.getInstance().dequeueSource(queuedSource -> queuedSource.source.wireMedium == this);
+        RadioManager.getInstance().dequeueSource(queuedSource -> queuedSource.source.getWireMedium() == this);
         this.kill();
     }
 
@@ -307,8 +312,8 @@ public class Wire extends Entity implements Wiring {
                 effect.progress += effect.direction;
             }
 
-            RadioRouter from = ClientRadioManager.getRouter(fromRef);
-            RadioRouter to = ClientRadioManager.getRouter(toRef);
+            RadioRouter from = (RadioRouter) ClientRadioManager.getInstance().getRouter(fromRef);
+            RadioRouter to = (RadioRouter) ClientRadioManager.getInstance().getRouter(toRef);
 
             if (from != null && !from.hasWire(this)) from.connect(this);
             if (to != null && !to.hasWire(this)) to.connect(this);
@@ -323,8 +328,8 @@ public class Wire extends Entity implements Wiring {
                     return;
                 }
 
-                RadioRouter from = RadioManager.getInstance().getRouter(fromRef, fromType);
-                RadioRouter to = RadioManager.getInstance().getRouter(toRef, toType);
+                RadioRouter from = (RadioRouter) RadioManager.getInstance().getRouter(fromRef, fromType);
+                RadioRouter to = (RadioRouter) RadioManager.getInstance().getRouter(toRef, toType);
 
                 if (from == null) {
                     if (to != null) this.moveTo(new Vec3(to.getLocation().position()));

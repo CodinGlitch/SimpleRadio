@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.routers;
 
 import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.Source;
 import net.minecraft.world.entity.Entity;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -34,11 +36,16 @@ public interface Router {
     Router getRouter(UUID id);
     Vec3 getConnectionPosition();
 
+    List<Wiring> getWires();
+
     boolean isActive();
     Vec3 getConnectionOffset();
     Class<?> getLink();
     Vector3f getVelocity();
     float getActivity();
+
+    int getActivityTime();
+
     int getRedstoneMappedActivity();
     Quaternionf getRotation();
 
@@ -48,6 +55,7 @@ public interface Router {
     void setLink(Class<?> link);
     void setConnectionOffset(Vec3 connectionOffset);
     void setPosition(WorldlyPosition position);
+    void setRotation(Quaternionf position);
     void setRoutingCriteria(BiPredicate<Source, Router> criteria);
     void setAcceptingCriteria(Predicate<Source> criteria);
 

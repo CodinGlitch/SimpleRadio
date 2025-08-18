@@ -5,9 +5,8 @@ import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import com.mojang.serialization.MapCodec;
+import com.codinglitch.simpleradio.routers.Receiver;
+import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Receiving {
-    public static final MapCodec<RadioBlock> CODEC = simpleCodec(RadioBlock::new);
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
@@ -49,22 +47,17 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
     }
 
     @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
-
-    @Override
-    public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
-        RadioSpeaker speaker = startSpeaking(location, id);
-        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.radio.speakingRange;
-        speaker.category = CommonRadioPlugin.RADIOS_CATEGORY;
+    public Speaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
+        Speaker speaker = startSpeaking(location, id);
+        speaker.setRange(SimpleRadioLibrary.SERVER_CONFIG.radio.speakingRange);
+        speaker.setCategory(CommonRadioPlugin.RADIOS_CATEGORY);
 
         return speaker;
     }
 
     @Override
-    public RadioReceiver getOrCreateReceiver(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
-        RadioReceiver receiver = startReceiving(location, frequency, id);
+    public Receiver getOrCreateReceiver(WorldlyPosition location, Frequency frequency, UUID id, BlockState state) {
+        Receiver receiver = startReceiving(location, frequency, id);
 
         // Allow distribution through wires
         receiver.allowDistribution();
