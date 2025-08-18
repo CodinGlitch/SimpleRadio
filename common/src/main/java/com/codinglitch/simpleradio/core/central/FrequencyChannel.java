@@ -42,7 +42,7 @@ public class FrequencyChannel implements Frequency {
         this.receivers = new RouterContainer<>();
         this.transmitters = new RouterContainer<>();
 
-        frequencies.remove(this);
+        frequencies.add(this);
     }
 
     @Override

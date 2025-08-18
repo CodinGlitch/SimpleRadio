@@ -68,12 +68,12 @@ public class FrequenciesImpl implements Frequencies {
 
     @Override
     public void add(Frequency frequency) {
-
+        FREQUENCIES.put(frequency.getIndex(), frequency);
     }
 
     @Override
     public void remove(Frequency frequency) {
-
+        FREQUENCIES.remove(frequency.getIndex());
     }
 
     @Override
