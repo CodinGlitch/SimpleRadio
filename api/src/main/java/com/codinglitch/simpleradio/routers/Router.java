@@ -77,10 +77,10 @@ public interface Router {
      * @param data The data to send, in raw PCM format.
      * @param volume The overall volume of the audio.
      */
-    void send(WorldlyPosition at, UUID sender, short[] data, float volume);
-    void send(WorldlyPosition at, short[] data, float volume);
-    void send(UUID sender, short[] data, float volume);
-    void send(short[] data, float volume);
+    Source send(WorldlyPosition at, UUID sender, short[] data, float volume);
+    Source send(WorldlyPosition at, short[] data, float volume);
+    Source send(UUID sender, short[] data, float volume);
+    Source send(short[] data, float volume);
 
     /**
      * Builds a {@link Source} and sends it to this router.
@@ -89,10 +89,10 @@ public interface Router {
      * @param data The data to send, in Opus-encoded format.
      * @param volume The overall volume of the audio.
      */
-    void send(WorldlyPosition at, UUID sender, byte[] data, float volume);
-    void send(WorldlyPosition at, byte[] data, float volume);
-    void send(UUID sender, byte[] data, float volume);
-    void send(byte[] data, float volume);
+    Source send(WorldlyPosition at, UUID sender, byte[] data, float volume);
+    Source send(WorldlyPosition at, byte[] data, float volume);
+    Source send(UUID sender, byte[] data, float volume);
+    Source send(byte[] data, float volume);
 
     boolean validate();
     void invalidate();
