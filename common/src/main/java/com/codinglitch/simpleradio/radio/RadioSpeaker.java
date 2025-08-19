@@ -197,7 +197,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
 
         // Packet buffer
         Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(radioSource.owner, k -> new ConcurrentHashMap<>());
-        Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(radioSource.originalOwner, k -> new LinkedList<>());
+        Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(radioSource.getRealOwner(), k -> new LinkedList<>());
         if (playerPackets.isEmpty()) {
             for (int i = 0; i < SimpleRadioLibrary.SERVER_CONFIG.frequency.packetBuffer; i++) {
                 //playerPackets.offer(null);

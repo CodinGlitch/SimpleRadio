@@ -305,47 +305,49 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public void send(WorldlyPosition at, UUID sender, short[] data, float volume) {
+    public Source send(WorldlyPosition at, UUID sender, short[] data, float volume) {
         OpusEncoder encoder = this.getEncoder(sender);
 
         RadioSource newSource = new RadioSource(sender, at, encoder.encode(data), volume);
         newSource.activity = CommonRadioPlugin.analyzeActivity(data);
 
         this.accept(newSource);
+        return newSource;
     }
     @Override
-    public void send(WorldlyPosition at, short[] data, float volume) {
-        this.send(at, this.reference, data, volume);
+    public Source send(WorldlyPosition at, short[] data, float volume) {
+        return this.send(at, this.reference, data, volume);
     }
     @Override
-    public void send(UUID sender, short[] data, float volume) {
-        this.send(this.getLocation(), sender, data, volume);
+    public Source send(UUID sender, short[] data, float volume) {
+        return this.send(this.getLocation(), sender, data, volume);
     }
     @Override
-    public void send(short[] data, float volume) {
-        this.send(this.getLocation(), this.reference, data, volume);
+    public Source send(short[] data, float volume) {
+        return this.send(this.getLocation(), this.reference, data, volume);
     }
 
     @Override
-    public void send(WorldlyPosition at, UUID sender, byte[] data, float volume) {
+    public Source send(WorldlyPosition at, UUID sender, byte[] data, float volume) {
         OpusDecoder decoder = this.getDecoder(sender);
 
         RadioSource newSource = new RadioSource(sender, at, data, volume);
         newSource.activity = CommonRadioPlugin.analyzeActivity(decoder.decode(data));
 
         this.accept(newSource);
+        return newSource;
     }
     @Override
-    public void send(WorldlyPosition at, byte[] data, float volume) {
-        this.send(at, this.reference, data, volume);
+    public Source send(WorldlyPosition at, byte[] data, float volume) {
+        return this.send(at, this.reference, data, volume);
     }
     @Override
-    public void send(UUID sender, byte[] data, float volume) {
-        this.send(this.getLocation(), sender, data, volume);
+    public Source send(UUID sender, byte[] data, float volume) {
+        return this.send(this.getLocation(), sender, data, volume);
     }
     @Override
-    public void send(byte[] data, float volume) {
-        this.send(this.getLocation(), this.reference, data, volume);
+    public Source send(byte[] data, float volume) {
+        return this.send(this.getLocation(), this.reference, data, volume);
     }
 
     //this method is so dumb bro
