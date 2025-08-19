@@ -8,8 +8,12 @@ import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.Router;
 import com.codinglitch.simpleradio.routers.Transmitter;
+import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import de.maxhenkel.voicechat.api.opus.OpusEncoder;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -18,10 +22,8 @@ import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -39,8 +41,10 @@ public class RadioRouter implements Socket, Router {
         }
     }
 
-    public List<Wiring> wires = new ArrayList<>();
+    private Map<UUID, OpusDecoder> decoders;
+    private Map<UUID, OpusEncoder> encoders;
 
+    public List<Wiring> wires = new ArrayList<>();
     public List<RadioRouter> routers = new ArrayList<>();
     public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
 
@@ -146,6 +150,15 @@ public class RadioRouter implements Socket, Router {
         return this.wires;
     }
 
+    public OpusDecoder getDecoder(UUID sender) {
+        if (decoders == null) decoders = new ConcurrentHashMap<>();
+        return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
+    }
+
+    public OpusEncoder getEncoder(UUID sender) {
+        if (encoders == null) encoders = new ConcurrentHashMap<>();
+        return encoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createEncoder());
+    }
 
     @Nullable
     @Override
@@ -273,6 +286,66 @@ public class RadioRouter implements Socket, Router {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         this.route(source);
+    }
+
+    @Override
+    public void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
+        this.send(at, sender, soundHolder, volume, pitch, 0, seed);
+    }
+
+    @Override
+    public void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
+        RadioSource newSource = new RadioSource(sender, at, soundHolder.value(), volume);
+        newSource.pitch = pitch;
+        newSource.offset = offset;
+        newSource.seed = seed;
+        newSource.activity = (float) (Math.clamp(0, 15, volume*15) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
+
+        this.accept(newSource);
+    }
+
+    @Override
+    public void send(WorldlyPosition at, UUID sender, short[] data, float volume) {
+        OpusEncoder encoder = this.getEncoder(sender);
+
+        RadioSource newSource = new RadioSource(sender, at, encoder.encode(data), volume);
+        newSource.activity = CommonRadioPlugin.analyzeActivity(data);
+
+        this.accept(newSource);
+    }
+    @Override
+    public void send(WorldlyPosition at, UUID sender, short[] data) {
+        this.send(at, sender, data, 1);
+    }
+    @Override
+    public void send(WorldlyPosition at, short[] data, float volume) {
+        this.send(at, this.reference, data, volume);
+    }
+    @Override
+    public void send(WorldlyPosition at, short[] data) {
+        this.send(at, this.reference, data, 1);
+    }
+
+    @Override
+    public void send(WorldlyPosition at, UUID sender, byte[] data, float volume) {
+        OpusDecoder decoder = this.getDecoder(sender);
+
+        RadioSource newSource = new RadioSource(sender, at, data, volume);
+        newSource.activity = CommonRadioPlugin.analyzeActivity(decoder.decode(data));
+
+        this.accept(newSource);
+    }
+    @Override
+    public void send(WorldlyPosition at, UUID sender, byte[] data) {
+        this.send(at, sender, data, 1);
+    }
+    @Override
+    public void send(WorldlyPosition at, byte[] data, float volume) {
+        this.send(at, this.reference, data, volume);
+    }
+    @Override
+    public void send(WorldlyPosition at, byte[] data) {
+        this.send(at, this.reference, data, 1);
     }
 
     //this method is so dumb bro

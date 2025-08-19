@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -64,6 +65,7 @@ public abstract class SimpleRadioApi {
      */
     public abstract Router newRouter(UUID reference, WorldlyPosition position);
 
+    public abstract Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume);
 
     // ---- Sided Methods ---- \\
 
