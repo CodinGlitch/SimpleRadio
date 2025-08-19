@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Socket;
-import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.UUID;
 
 public class InsulatorBlockEntity extends BlockEntity implements Socket {
@@ -73,11 +71,6 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
     @Override
     public RadioRouter getRouter() {
         return router != null ? router : (this.hasLevel() ? (RadioRouter) SimpleRadioApi.getRouterSided(this.id, this.level.isClientSide) : null);
-    }
-
-    @Override
-    public List<Wiring> getWires() {
-        return getRouter().getWires();
     }
 
     @Override

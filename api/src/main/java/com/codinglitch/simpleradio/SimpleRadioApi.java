@@ -11,6 +11,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public abstract class SimpleRadioApi {
+    private static SimpleRadioApi INSTANCE;
+    public SimpleRadioApi() {
+        INSTANCE = this;
+    }
+
+    public static SimpleRadioApi getInstance() {
+        return INSTANCE;
+    }
 
     /**
      * Gets a config entry from a specified path
@@ -33,6 +41,31 @@ public abstract class SimpleRadioApi {
     public abstract <T> void setConfig(String path, T value);
 
     public abstract BlockPos travelExtension(BlockPos pos, LevelAccessor level);
+
+    /**
+     * Creates a blank Router with the specified reference.
+     * @param reference The reference. If you are creating a block entity with a router, this should be equivalent to a UUID you store and save.
+     * @return The created router.
+     */
+    public abstract Router newRouter(UUID reference);
+
+    /**
+     * Creates a blank Router at the specified location with a random UUID. Most of the time, you should instead use {@link #newRouter(UUID)} or {@link #newRouter(UUID, WorldlyPosition)}.
+     * @param position The location of the router.
+     * @return The created router
+     */
+    public abstract Router newRouter(WorldlyPosition position);
+
+    /**
+     * Creates a blank Router at the specified location with the specified reference.
+     * @param reference The reference. If you are creating a block entity with a router, this should be equivalent to a UUID you store and save.
+     * @param position The location of the router.
+     * @return The created router
+     */
+    public abstract Router newRouter(UUID reference, WorldlyPosition position);
+
+
+    // ---- Sided Methods ---- \\
 
     public static Router getRouterSided(UUID reference, boolean isClient) {
         return isClient ? ClientSimpleRadioApi.getInstance().getRouter(reference) : ServerSimpleRadioApi.getInstance().getRouter(reference);
