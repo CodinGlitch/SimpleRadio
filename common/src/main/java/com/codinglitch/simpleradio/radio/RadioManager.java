@@ -75,6 +75,9 @@ public class RadioManager extends ServerSimpleRadioApi {
     private static final Queue<Runnable> pendingModifications = new LinkedList<>();
     static final Map<Short, Router> routers = new HashMap<>();
 
+    public static void load() {
+    }
+
     public static RadioManager getInstance() {
         return INSTANCE;
     }
@@ -104,6 +107,19 @@ public class RadioManager extends ServerSimpleRadioApi {
     @Override
     public <T> void setConfig(String path, T value) {
         CommonSimpleRadio.setConfigFrom(SimpleRadioLibrary.SERVER_CONFIG, path, value);
+    }
+
+    @Override
+    public Router newRouter(UUID reference) {
+        return new RadioRouter(reference);
+    }
+    @Override
+    public Router newRouter(WorldlyPosition position) {
+        return new RadioRouter(position);
+    }
+    @Override
+    public Router newRouter(UUID reference, WorldlyPosition position) {
+        return new RadioRouter(position, reference);
     }
 
     @Override

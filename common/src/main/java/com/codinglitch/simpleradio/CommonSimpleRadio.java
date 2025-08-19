@@ -4,6 +4,7 @@ import com.codinglitch.lexiconfig.classes.LexiconData;
 import com.codinglitch.lexiconfig.classes.LexiconEntryData;
 import com.codinglitch.lexiconfig.classes.LexiconSubstrate;
 import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.radio.RadioManager;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,5 +84,7 @@ public class CommonSimpleRadio {
 
         SimpleRadioCatalysts.load();
         SimpleRadioFrequencing.load();
+
+        RadioManager.load();
     }
 }
