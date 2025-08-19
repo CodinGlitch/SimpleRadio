@@ -314,16 +314,16 @@ public class RadioRouter implements Socket, Router {
         this.accept(newSource);
     }
     @Override
-    public void send(WorldlyPosition at, UUID sender, short[] data) {
-        this.send(at, sender, data, 1);
-    }
-    @Override
     public void send(WorldlyPosition at, short[] data, float volume) {
         this.send(at, this.reference, data, volume);
     }
     @Override
-    public void send(WorldlyPosition at, short[] data) {
-        this.send(at, this.reference, data, 1);
+    public void send(UUID sender, short[] data, float volume) {
+        this.send(this.getLocation(), sender, data, volume);
+    }
+    @Override
+    public void send(short[] data, float volume) {
+        this.send(this.getLocation(), this.reference, data, volume);
     }
 
     @Override
@@ -336,16 +336,16 @@ public class RadioRouter implements Socket, Router {
         this.accept(newSource);
     }
     @Override
-    public void send(WorldlyPosition at, UUID sender, byte[] data) {
-        this.send(at, sender, data, 1);
-    }
-    @Override
     public void send(WorldlyPosition at, byte[] data, float volume) {
         this.send(at, this.reference, data, volume);
     }
     @Override
-    public void send(WorldlyPosition at, byte[] data) {
-        this.send(at, this.reference, data, 1);
+    public void send(UUID sender, byte[] data, float volume) {
+        this.send(this.getLocation(), sender, data, volume);
+    }
+    @Override
+    public void send(byte[] data, float volume) {
+        this.send(this.getLocation(), this.reference, data, volume);
     }
 
     //this method is so dumb bro
