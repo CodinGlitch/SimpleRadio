@@ -10,4 +10,6 @@ public interface Listener extends Router {
     void setRange(float range);
 
     void transformer(UnaryOperator<Source> transformer);
+
+    void listen(Source source);
 }

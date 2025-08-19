@@ -123,6 +123,11 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
+    public Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+        return new RadioSource(owner, location, data, volume);
+    }
+
+    @Override
     public BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
         for (Direction direction : Direction.values()) {
             BlockPos offsetPos = pos.relative(direction);
@@ -506,7 +511,7 @@ public class RadioManager extends ServerSimpleRadioApi {
             newSource.seed = seed;
             newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.getRange()))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
 
-            listener.onSource(newSource);
+            listener.listen(newSource);
         }
     }
 
@@ -545,7 +550,7 @@ public class RadioManager extends ServerSimpleRadioApi {
                 newSource.activity = CommonRadioPlugin.analyzeActivity(decoded);
             }
 
-            listener.onSource(newSource);
+            listener.listen(newSource);
         }
     }
 }

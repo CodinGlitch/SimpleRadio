@@ -4,6 +4,8 @@ import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.Source;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -61,8 +63,36 @@ public interface Router {
 
     double distanceTo(Router other);
 
+
     void route(Source source);
     void accept(Source source);
+
+    void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed);
+    void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed);
+
+    /**
+     * Builds a {@link Source} and sends it to this router.
+     * @param at The location to send it from.
+     * @param sender The sender of the audio.
+     * @param data The data to send, in raw PCM format.
+     * @param volume The overall volume of the audio.
+     */
+    void send(WorldlyPosition at, UUID sender, short[] data, float volume);
+    void send(WorldlyPosition at, short[] data, float volume);
+    void send(UUID sender, short[] data, float volume);
+    void send(short[] data, float volume);
+
+    /**
+     * Builds a {@link Source} and sends it to this router.
+     * @param at The location to send it from.
+     * @param sender The sender of the audio.
+     * @param data The data to send, in Opus-encoded format.
+     * @param volume The overall volume of the audio.
+     */
+    void send(WorldlyPosition at, UUID sender, byte[] data, float volume);
+    void send(WorldlyPosition at, byte[] data, float volume);
+    void send(UUID sender, byte[] data, float volume);
+    void send(byte[] data, float volume);
 
     boolean validate();
     void invalidate();

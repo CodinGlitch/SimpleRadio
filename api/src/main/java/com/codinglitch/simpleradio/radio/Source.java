@@ -1,9 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.central.FrequencingType;
-import com.codinglitch.simpleradio.central.Frequency;
-import com.codinglitch.simpleradio.central.Medium;
-import com.codinglitch.simpleradio.central.Wiring;
+import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.routers.Router;
 
 import java.util.List;

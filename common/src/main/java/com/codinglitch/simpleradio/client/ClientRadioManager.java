@@ -110,6 +110,11 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     @Override
+    public Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+        return new RadioSource(owner, location, data, volume);
+    }
+
+    @Override
     public BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
         return RadioManager.getInstance().travelExtension(pos, level);
     }
