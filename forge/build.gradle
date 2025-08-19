@@ -6,15 +6,22 @@ plugins {
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
-
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
     config("${mod_id}.mixins.json")
     config("${mod_id}.forge.mixins.json")
+}
+
+artifacts {
+    apiElements tasks.named("jarJar")
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
+    skip()
 }
 
 minecraft {
@@ -130,8 +137,10 @@ dependencies {
     }
 }
 
+
 tasks.named('jarJar') {
     archiveClassifier = ''
+    //finalizedBy reobfJarJar
 }
 jar.archiveClassifier = "slim"
 jar.finalizedBy('reobfJar')
@@ -145,4 +154,6 @@ sourceSets.each {
 substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
 datagenClasses.finalizedBy substituteResources
 
-
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'

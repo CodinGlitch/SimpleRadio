@@ -5,11 +5,12 @@ plugins {
 
 base {
     archivesName = "${mod_id}-${project.name}"
-    version = "${version}-${minecraft_version}"
+    version = "${minecraft_version}-${version}"
 }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+
     withSourcesJar()
     withJavadocJar()
 }
@@ -169,5 +170,3 @@ tasks.withType(ProcessResources).configureEach {
     inputs.properties(expandProps)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-
-publishing {}
