@@ -22,6 +22,9 @@ dependencies {
 
     // --- Compatibilities --- \\
 
+    // ComputerCraft
+    compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-common-api:$cc_version")
+
     // Vibrative Voice
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
 
