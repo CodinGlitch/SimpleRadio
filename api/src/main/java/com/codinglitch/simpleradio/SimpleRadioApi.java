@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public abstract class SimpleRadioApi {
     private static SimpleRadioApi INSTANCE;
@@ -40,6 +42,11 @@ public abstract class SimpleRadioApi {
      * @param value The value to set the config entry to
      */
     public abstract <T> void setConfig(String path, T value);
+
+    /**
+     *
+     */
+    public abstract <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener);
 
     public abstract BlockPos travelExtension(BlockPos pos, LevelAccessor level);
 
