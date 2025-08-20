@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.platform;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
+import com.codinglitch.simpleradio.compat.cc.CCCompat;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
@@ -70,6 +71,10 @@ public class ForgeCompatPlatform implements CompatPlatform {
     public void postInitialize() {
         if (CompatCore.CREATE.isLoaded && CompatCore.CREATE.fitsVersion) {
             CreateCompat.postInitialize();
+        }
+
+        if (CompatCore.COMPUTER_CRAFT.isLoaded && CompatCore.COMPUTER_CRAFT.fitsVersion) {
+            CCCompat.postInitialize();
         }
     }
 }
