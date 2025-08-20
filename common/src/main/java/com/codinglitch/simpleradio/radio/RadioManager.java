@@ -9,6 +9,7 @@ import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
+import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.Speakers;
 import com.codinglitch.simpleradio.core.central.FrequencyChannel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -46,14 +47,18 @@ import org.joml.Math;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class RadioManager extends ServerSimpleRadioApi {
     public static final RadioManager INSTANCE = new RadioManager();
 
+    private static final Map<Consumer<? extends SimpleRadioEvent>, Class<? extends SimpleRadioEvent>> EVENT_LISTENERS = new HashMap<>();
+
     private static final Frequencies FREQUENCIES = new FrequenciesImpl();
     private static final Speakers SPEAKERS = new SpeakersImpl();
     private static final Listeners LISTENERS = new ListenersImpl();
+
 
     // double queue for the win
     private static final ArrayList<QueuedSource> pendingSources = new ArrayList<>();
@@ -83,6 +88,20 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     public RadioManager() {}
+
+    @Override
+    public <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener) {
+        EVENT_LISTENERS.put(listener, event);
+    }
+
+    public static <E extends SimpleRadioEvent> void post(E event) {
+        Class<?> type = event.getClass();
+        for (Map.Entry<Consumer<? extends SimpleRadioEvent>, Class<? extends SimpleRadioEvent>> entry : EVENT_LISTENERS.entrySet()) {
+            if (!type.equals(entry.getValue())) continue;
+            Consumer<E> listener = (Consumer<E>) entry.getKey();
+            listener.accept(event);
+        }
+    }
 
     @Override
     public Frequencies frequencies() {

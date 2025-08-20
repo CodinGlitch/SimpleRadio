@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
+import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
@@ -58,6 +59,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class ClientRadioManager extends ClientSimpleRadioApi {
@@ -84,6 +86,11 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
     public ClientRouterWrapper getWrapper(RadioRouter router) {
         return getWrapper(wrapper -> router.equals(wrapper.router));
+    }
+
+    @Override
+    public <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener) {
+        RadioManager.getInstance().listen(event, listener);
     }
 
     @Override
