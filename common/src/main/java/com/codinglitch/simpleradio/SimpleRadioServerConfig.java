@@ -313,5 +313,18 @@ public class SimpleRadioServerConfig extends LexiconData {
             @Override
             public boolean isEnabled() { return enabled; }
         }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency CC: Tweaked.")
+        public CCTweaked cc_tweaked = new CCTweaked();
+
+        public static class CCTweaked extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for CC: Tweaked. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
     }
 }
