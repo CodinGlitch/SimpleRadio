@@ -29,6 +29,9 @@ public class CompatCore {
     public static CompatibilityInstance CREATE = new CompatibilityInstance(
             "Create", "create", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create, "[6.0,)"
     );
+    public static CompatibilityInstance COMPUTER_CRAFT = new CompatibilityInstance(
+            "CC:Tweaked", "computercraft", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create
+    );
 
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
@@ -40,6 +43,7 @@ public class CompatCore {
 
         VALKYRIEN_SKIES.spout();
         CREATE.spout();
+        COMPUTER_CRAFT.spout();
 
         if (!initialized) {
             initialized = true;

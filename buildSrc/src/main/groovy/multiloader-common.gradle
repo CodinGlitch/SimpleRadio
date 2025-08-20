@@ -62,6 +62,13 @@ repositories {
     maven { url = "https://maven.tterrag.com" }
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
 
+    maven {
+        url "https://maven.squiddev.cc"
+        content {
+            includeGroup("cc.tweaked")
+        }
+    }
+
     exclusiveContent {
         forRepository {
             maven {

@@ -27,6 +27,10 @@ dependencies {
 
     // --- Compatibilities --- \\
 
+    // ComputerCraft
+    modCompileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-fabric-api:${cc_version}")
+    modRuntimeOnly("cc.tweaked:cc-tweaked-${minecraft_version}-fabric:${cc_version}")
+
     // Voice Chat Interaction
     modCompileOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
     modCompileOnly "eu.pb4:polymer-reg-sync-manipulator:${polymer_version}+${minecraft_version}"
