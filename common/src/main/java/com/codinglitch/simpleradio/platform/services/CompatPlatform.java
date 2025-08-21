@@ -20,6 +20,5 @@ public interface CompatPlatform {
     Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation);
 
     RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
-
     RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria);
 }

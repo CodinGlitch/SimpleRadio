@@ -1,7 +1,8 @@
-package com.codinglitch.simpleradio.compat.cc;
+package com.codinglitch.simpleradio.compat;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.compat.cc.SocketPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
