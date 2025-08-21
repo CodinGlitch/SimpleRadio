@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.InteractionCompat;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
@@ -48,7 +49,9 @@ public class FabricCompatPlatform implements CompatPlatform {
 
     @Override
     public void postInitialize() {
-
+        if (CompatCore.COMPUTER_CRAFT.isLoaded) {
+            CCCompat.postInitialize();
+        }
     }
 
     @Override
