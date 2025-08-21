@@ -3,12 +3,14 @@ package com.codinglitch.simpleradio;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
+import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -30,7 +32,13 @@ public class CompatCore {
             "Create", "create", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create, "[6.0,)"
     );
     public static CompatibilityInstance COMPUTER_CRAFT = new CompatibilityInstance(
-            "CC:Tweaked", "computercraft", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create
+            "CC:Tweaked", "computercraft", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.cc_tweaked
+    );
+    public static CompatibilityInstance ETCHED = new CompatibilityInstance(
+            "Etched", "etched", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.etched
+    );
+    public static CompatibilityInstance AUDIO_PLAYER = new CompatibilityInstance(
+            "AudioPlayer", "audioplayer", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.audioplayer
     );
 
     public static void postInitialize() {
@@ -44,6 +52,9 @@ public class CompatCore {
         VALKYRIEN_SKIES.spout();
         CREATE.spout();
         COMPUTER_CRAFT.spout();
+
+        ETCHED.spout();
+        AUDIO_PLAYER.spout();
 
         if (!initialized) {
             initialized = true;
@@ -62,6 +73,12 @@ public class CompatCore {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE.enabled) {
             VibrativeCompat.onData(channel, source, decoded);
+        }
+    }
+
+    public static void removeBlockEntity(BlockEntity blockEntity) {
+        if (CompatCore.COMPUTER_CRAFT.isLoaded) {
+            CommonCCCompat.removePeripheral(blockEntity);
         }
     }
 

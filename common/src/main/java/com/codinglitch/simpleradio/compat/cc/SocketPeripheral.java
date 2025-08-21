@@ -3,22 +3,36 @@ package com.codinglitch.simpleradio.compat.cc;
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.lua.*;
+import dan200.computercraft.api.peripheral.AttachedComputerSet;
+import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
 public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeripheral {
+    private final AttachedComputerSet computers = new AttachedComputerSet();
     private final T socket;
 
     public SocketPeripheral(BlockEntity socket) {
         this.socket = (T) socket; // funny cast
+        CommonCCCompat.putPeripheral(socket, this);
+    }
+
+    @Override
+    public void attach(IComputerAccess computer) {
+        this.computers.add(computer);
+    }
+
+    @Override
+    public void detach(IComputerAccess computer) {
+        this.computers.remove(computer);
     }
 
     @Override
@@ -58,14 +72,12 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         } else if (length > 131072) {
             throw new LuaException("Audio data is too large");
         } else {
-            // converting to 16-bit
-
             for (int x = 0; x < Math.floor(length/960d); x++) {
                 short[] data = new short[960];
                 for (int i = 1; i < 960; i++) {
                     int level = audio.getInt(x*960 + i);
                     if (level < Short.MIN_VALUE || level > Short.MAX_VALUE) {
-                        throw new LuaException("table item #" + i + " must be between -128 and 127"); // perhaps allow SR peripherals 16-bit instead?
+                        throw new LuaException("table item #" + i + " must be between -32768 and 32767");
                     }
 
                     data[i] = (short) level;
