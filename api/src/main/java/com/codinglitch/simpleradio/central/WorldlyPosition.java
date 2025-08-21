@@ -2,8 +2,9 @@ package com.codinglitch.simpleradio.central;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Math;
-import org.joml.Options;
 import org.joml.Vector3f;
 
 import java.text.NumberFormat;
@@ -69,6 +70,14 @@ public class WorldlyPosition extends Vector3f {
 
     public boolean isClientSide() {
         return this.level.isClientSide;
+    }
+
+    public BlockEntity getBlockEntity() {
+        return level.getBlockEntity(blockPos());
+    }
+
+    public BlockState getBlockState() {
+        return level.getBlockState(blockPos());
     }
 
     @Override
