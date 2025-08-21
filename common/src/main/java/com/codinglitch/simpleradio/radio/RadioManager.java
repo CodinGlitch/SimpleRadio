@@ -61,8 +61,8 @@ public class RadioManager extends ServerSimpleRadioApi {
 
 
     // double queue for the win
-    private static final ArrayList<QueuedSource> pendingSources = new ArrayList<>();
-    private static final ArrayList<QueuedSource> sourceQueue = new ArrayList<>();
+    private static final List<QueuedSource> pendingSources = new ArrayList<>();
+    private static final List<QueuedSource> sourceQueue = new ArrayList<>();
 
     public static class QueuedSource {
         public Source source;
@@ -158,7 +158,9 @@ public class RadioManager extends ServerSimpleRadioApi {
 
                 Wiring wire = wires.get(0);
                 Router router = wire.transport(insulatorBlockEntity.getRouter());
-                BlockPos routerPos = router.getPosition().blockPos();
+                if (router == null) continue;
+
+                BlockPos routerPos = router.getLocation().blockPos();
 
                 BlockState blockState = level.getBlockState(routerPos);
                 if (!(blockState.getBlock() instanceof InsulatorBlock)) continue;
@@ -352,8 +354,12 @@ public class RadioManager extends ServerSimpleRadioApi {
         Iterator<QueuedSource> iterator = sourceQueue.iterator();
         while (iterator.hasNext()) {
             QueuedSource source = iterator.next();
-            source.time--;
+            if (source == null) {
+                iterator.remove();
+                continue;
+            }
 
+            source.time--;
             if (source.time <= 0) {
                 acceptedSources.add(source);
                 iterator.remove();
@@ -383,9 +389,11 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     public boolean readQueue(Predicate<QueuedSource> filter) {
         for (QueuedSource source : sourceQueue) {
+            if (source == null) continue;
             if (filter.test(source)) return true;
         }
         for (QueuedSource source : pendingSources) {
+            if (source == null) continue;
             if (filter.test(source)) return true;
         }
 
