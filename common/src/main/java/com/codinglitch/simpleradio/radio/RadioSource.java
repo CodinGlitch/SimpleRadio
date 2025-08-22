@@ -83,6 +83,11 @@ public class RadioSource implements Source {
     }
 
     @Override
+    public SoundEvent getSound() {
+        return soundEvent;
+    }
+
+    @Override
     public UUID getOwner() {
         return owner;
     }
