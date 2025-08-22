@@ -521,6 +521,8 @@ public class RadioManager extends ServerSimpleRadioApi {
         SoundEvent sound = soundHolder.value();
 
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
+
+        Map<Listener, Source> sources = new HashMap<>();
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
@@ -538,8 +540,10 @@ public class RadioManager extends ServerSimpleRadioApi {
             newSource.seed = seed;
             newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.getRange()))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
 
-            listener.listen(newSource);
+            sources.put(listener, newSource);
         }
+
+        level.getServer().execute(() -> sources.forEach(Listener::listen));
     }
 
     @Override
@@ -547,6 +551,7 @@ public class RadioManager extends ServerSimpleRadioApi {
         Level level = location.level;
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
 
+        Map<Listener, Source> sources = new HashMap<>();
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
@@ -577,7 +582,9 @@ public class RadioManager extends ServerSimpleRadioApi {
                 newSource.activity = CommonRadioPlugin.analyzeActivity(decoded);
             }
 
-            listener.listen(newSource);
+            sources.put(listener, newSource);
         }
+
+        level.getServer().execute(() -> sources.forEach(Listener::listen));
     }
 }

@@ -11,12 +11,13 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,15 +34,21 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         RadioRouter radioRouter = (RadioRouter) router;
         OpusDecoder decoder = radioRouter.getDecoder(source.getOwner());
 
-        short[] data;
-        SoundEvent sound;
+        LuaTable<?, ?> data;
+        String sound;
         byte[] encodedData = source.getData();
         if (encodedData == null) {
             data = null;
-            sound = source.getSound();
+            sound = source.getSound().getLocation().toString();
         } else {
             sound = null;
-            data = decoder.decode(source.getData());
+
+            short[] decoded = decoder.decode(source.getData());
+            Map<Integer, Short> mapped = new HashMap<>();
+            for (int i = 0; i < decoded.length; i++) {
+                mapped.put(i, decoded[i]);
+            }
+            data = new ObjectLuaTable(mapped);
         }
 
         float power = source.getPower();
