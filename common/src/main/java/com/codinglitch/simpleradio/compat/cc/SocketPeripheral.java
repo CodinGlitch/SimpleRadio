@@ -1,13 +1,17 @@
 package com.codinglitch.simpleradio.compat.cc;
 
 import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.lua.*;
 import dan200.computercraft.api.peripheral.AttachedComputerSet;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +27,28 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
     public SocketPeripheral(BlockEntity socket) {
         this.socket = (T) socket; // funny cast
         CommonCCCompat.putPeripheral(socket, this);
+    }
+
+    public void accept(Router router, Source source) {
+        RadioRouter radioRouter = (RadioRouter) router;
+        OpusDecoder decoder = radioRouter.getDecoder(source.getOwner());
+
+        short[] data;
+        SoundEvent sound;
+        byte[] encodedData = source.getData();
+        if (encodedData == null) {
+            data = null;
+            sound = source.getSound();
+        } else {
+            sound = null;
+            data = decoder.decode(source.getData());
+        }
+
+        float power = source.getPower();
+
+        computers.forEach((computer) -> {
+            computer.queueEvent("receive_signal", data == null ? sound : data, power);
+        });
     }
 
     @Override
@@ -93,5 +119,4 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
     public boolean equals(@Nullable IPeripheral other) {
         return other instanceof SocketPeripheral<?> o && socket == o.socket;
     }
-
 }

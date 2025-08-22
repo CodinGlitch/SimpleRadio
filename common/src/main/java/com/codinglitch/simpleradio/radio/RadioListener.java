@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.routers.Listener;
 import net.minecraft.world.entity.Entity;
@@ -80,6 +81,7 @@ public class RadioListener extends RadioRouter implements Listener {
 
         source.delegate(this.reference);
 
+        CompatCore.acceptSource(this, source);
         this.route(source);
     }
 

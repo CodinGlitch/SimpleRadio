@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
@@ -283,6 +284,11 @@ public class RadioRouter implements Socket, Router {
 
     @Override
     public void accept(Source source) {
+        CompatCore.acceptSource(this, source);
+        this.take(source);
+    }
+
+    public void take(Source source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         this.route(source);
