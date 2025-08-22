@@ -113,7 +113,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
 
     @Override
-    public void accept(Source source) {
+    public void take(Source source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
 

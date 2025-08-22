@@ -150,10 +150,10 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     }
 
     @Override
-    public void accept(Source source) {
+    public void take(Source source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        super.accept(source);
+        super.take(source);
         speak(source);
     }
 
