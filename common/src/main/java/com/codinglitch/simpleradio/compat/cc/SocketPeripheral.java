@@ -46,7 +46,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
             short[] decoded = decoder.decode(source.getData());
             Map<Integer, Short> mapped = new HashMap<>();
             for (int i = 0; i < decoded.length; i++) {
-                mapped.put(i, decoded[i]);
+                mapped.put(i+1, decoded[i]);
             }
             data = new ObjectLuaTable(mapped);
         }
