@@ -72,17 +72,22 @@ Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more infor
 
 # Related Projects
 
-## [Simple Create Radios](https://modrinth.com/resourcepack/simple-create-radios)
-![Simple Create Radios](https://github.com/CodinGlitch/SimpleRadio/assets/22829873/a602e295-2de6-42e5-b182-71404b7625de)
+## [Simple Create Radios](https://modrinth.com/resourcepack/simple-create-radios) [2.0-3.0]
+![Simple Create Radios](https://github.com/user-attachments/assets/0780737d-c100-4c64-b378-ffd055168f0b)
 
 This amazing resource pack aims to make the blocks and items fit aesthetically with the Create mod!
 
-## [Simple Radio Redone](https://modrinth.com/resourcepack/simple-radio-redone)
+## [Simple Radio Redone](https://modrinth.com/resourcepack/simple-radio-redone) [2.0]
 ![Simple Radio Redone](https://github.com/user-attachments/assets/3c2e5ae6-e2d0-484e-9867-166e234762c2)
 
 Another resource pack which remakes the textures of the mod to give it a fresh look while maintaining the original style!
 
-## [Simple Frequency](https://modrinth.com/datapack/simple-frequency)
+## [Simple Radio Reworked](https://modrinth.com/resourcepack/simple-radio-reworked) [2.0]
+![Simple Radio Reworked](https://cdn.modrinth.com/data/RulQ09iD/f23146870d98237fae289f2f6340d018ddc52daf_96.webp)
+
+This resource pack gives a fresh view on the blocks and items to make them look more vanilla-friendly!
+
+## [Simple Frequency](https://modrinth.com/datapack/simple-frequency) [2.0-3.0]
 ![Simple Frequency](https://github.com/user-attachments/assets/7be0d544-e7a3-4b94-ac78-360fa8d8c47c)
 
 This datapack adds the ability to change the frequency and modulation of various Simple Radio items by using a simple command!
