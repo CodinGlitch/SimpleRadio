@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.Speakers;
 import com.codinglitch.simpleradio.routers.Router;
@@ -27,8 +26,6 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
     public static ServerSimpleRadioApi getInstance() {
         return INSTANCE;
     }
-
-    public abstract Frequencies frequencies();
 
     public abstract Speakers speakers();
     public abstract Listeners listeners();

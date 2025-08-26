@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.world.entity.Entity;
 
@@ -17,7 +17,7 @@ public interface Transmitting extends Frequencing {
      * @return The channel created from the listener.
      */
     default Transmitter startTransmitting(WorldlyPosition location, String frequencyName, Frequency.Modulation modulation, UUID id) {
-        return startTransmitting(location, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
+        return startTransmitting(location, SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
     }
     default Transmitter startTransmitting(WorldlyPosition location, Frequency frequency, UUID id) {
         return frequency.tryAddTransmitter(id, location);
@@ -35,7 +35,7 @@ public interface Transmitting extends Frequencing {
      * @return The channel created from the listener.
      */
     default Transmitter startTransmitting(Entity entity, String frequencyName, Frequency.Modulation modulation, UUID id) {
-        return startTransmitting(entity, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
+        return startTransmitting(entity, SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
     }
     default Transmitter startTransmitting(Entity entity, Frequency frequency, UUID id) {
         return frequency.tryAddTransmitter(id, entity);
@@ -51,7 +51,7 @@ public interface Transmitting extends Frequencing {
      * @param owner the UUID to remove
      */
     default void stopTransmitting(String frequencyName, Frequency.Modulation modulation, UUID owner) {
-        Frequency frequency = ServerSimpleRadioApi.getInstance().frequencies().get(frequencyName, modulation);
+        Frequency frequency = SimpleRadioApi.getInstance().frequencies().get(frequencyName, modulation);
         if (frequency != null) {
             frequency.removeTransmitter(owner);
         }

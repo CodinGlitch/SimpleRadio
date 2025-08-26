@@ -3,11 +3,13 @@ package com.codinglitch.simpleradio.client;
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
+import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
@@ -91,6 +93,11 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
     public ClientRouterWrapper getWrapper(RadioRouter router) {
         return getWrapper(wrapper -> router.equals(wrapper.router));
+    }
+
+    @Override
+    public Frequencies frequencies() {
+        return RadioManager.INSTANCE.frequencies();
     }
 
     @Override
@@ -220,6 +227,17 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     @Override
+    public <R extends Router> void registerRouter(R router, @Nullable Frequency frequency) {
+        this.registerRouter(router);
+
+        if (router instanceof RadioReceiver receiver) {
+            if (frequency != null) frequency.registerReceiver(receiver);
+        } else if (router instanceof RadioTransmitter transmitter) {
+            if (frequency != null) frequency.registerTransmitter(transmitter);
+        }
+    }
+
+    @Override
     public <R extends Router> void registerRouter(R router) {
         PendingRouter<R> pendingRouter = PendingRouter.of(router);
 
@@ -335,6 +353,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     public static void close() {
+        FrequenciesImpl.close();
+
         pendingRouters.clear();
         routers.clear();
     }

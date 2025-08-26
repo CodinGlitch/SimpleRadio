@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -88,7 +89,7 @@ public interface Frequencing {
      * @param modulation the modulation type of the frequency
      */
     default void setFrequency(BlockEntity blockEntity, String frequencyName, Frequency.Modulation modulation) {
-        setFrequency(blockEntity, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation));
+        setFrequency(blockEntity, SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation));
     }
     /**
      * Sets the frequency for a BlockEntity.
@@ -111,8 +112,8 @@ public interface Frequencing {
         if (!tag.contains("frequency") || !tag.contains("modulation")) return null;
 
         String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = ServerSimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
-        return ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
+        Frequency.Modulation modulation = SimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+        return SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
     }
     /**
      * Gets the frequency for a BlockEntity.
@@ -126,11 +127,11 @@ public interface Frequencing {
     }
 
     default String getDefaultFrequency() {
-        return ServerSimpleRadioApi.getInstance().frequencies().defaultFrequency();
+        return SimpleRadioApi.getInstance().frequencies().defaultFrequency();
     }
 
     default Frequency.Modulation getDefaultModulation() {
-        return ServerSimpleRadioApi.getInstance().frequencies().defaultModulation();
+        return SimpleRadioApi.getInstance().frequencies().defaultModulation();
     }
 
     /**
@@ -143,7 +144,7 @@ public interface Frequencing {
     default boolean validateLocation(String frequency, Frequency.Modulation modulation, UUID owner) {
         if (frequency == null) return false;
         if (modulation == null) return false;
-        return this.validateLocation(ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequency, modulation), owner);
+        return this.validateLocation(SimpleRadioApi.getInstance().frequencies().getOrCreate(frequency, modulation), owner);
     }
     default boolean validateLocation(Frequency frequency, UUID owner) {
         Receiver receiver = frequency.getReceiver(owner);

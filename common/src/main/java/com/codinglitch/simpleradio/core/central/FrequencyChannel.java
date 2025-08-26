@@ -104,7 +104,7 @@ public class FrequencyChannel implements Frequency {
         if (receiver.getPosition() != null) isClient = receiver.getPosition().isClientSide();
         else if (receiver.getOwner() != null) isClient = receiver.getOwner().level().isClientSide;
 
-        RadioManager.getInstance().registerRouterSided(receiver, isClient, this);
+        RadioManager.registerRouterSided(receiver, isClient, this);
 
         CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.getReference(), this.frequency);
         return receiver;
@@ -115,7 +115,7 @@ public class FrequencyChannel implements Frequency {
         boolean isClient = location.isClientSide();
 
         Receiver receiver = null;//isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
-        if (receiver == null) receiver = isClient ? ClientRadioManager.getInstance().getReceiver(id) : getReceiver(id);
+        if (receiver == null) receiver = getReceiver(id);
 
         if (receiver == null)
             return addReceiver(id, location);
@@ -191,7 +191,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public void registerTransmitter(Transmitter transmitter) {
-        RadioManager.getInstance().putRouter(transmitters, (RadioTransmitter) transmitter);
+        RadioManager.getInstance().putRouter(transmitters, transmitter);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class FrequencyChannel implements Frequency {
         if (transmitter.getPosition() != null) isClient = transmitter.getPosition().isClientSide();
         else if (transmitter.getOwner() != null) isClient = transmitter.getOwner().level().isClientSide;
 
-        RadioManager.getInstance().registerRouterSided(transmitter, isClient, this);
+        RadioManager.registerRouterSided(transmitter, isClient, this);
 
         CommonSimpleRadio.debug("Added transmitter {} to frequency {}", transmitter.getReference(), this.frequency);
         return transmitter;
@@ -211,7 +211,7 @@ public class FrequencyChannel implements Frequency {
         boolean isClient = location.isClientSide();
 
         Transmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
-        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getInstance().getTransmitter(id) : getTransmitter(id);
+        if (transmitter == null) transmitter = getTransmitter(id);
 
         if (transmitter == null)
             return addTransmitter(id, location);

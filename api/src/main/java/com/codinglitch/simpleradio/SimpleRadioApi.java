@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
@@ -22,6 +23,8 @@ public abstract class SimpleRadioApi {
     public static SimpleRadioApi getInstance() {
         return INSTANCE;
     }
+
+    public abstract Frequencies frequencies();
 
     /**
      * Gets a config entry from a specified path
@@ -86,7 +89,7 @@ public abstract class SimpleRadioApi {
 
     public static void registerRouterSided(Router router, boolean isClient, @Nullable Frequency frequency) {
         if (isClient) {
-            ClientSimpleRadioApi.getInstance().registerRouter(router);
+            ClientSimpleRadioApi.getInstance().registerRouter(router, frequency);
         } else {
             ServerSimpleRadioApi.getInstance().registerRouter(router, frequency);
         }

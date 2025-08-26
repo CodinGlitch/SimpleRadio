@@ -3,7 +3,6 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Transmitting;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -111,7 +110,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     public void inactivate() {
         if (this.frequency != null) {
             SimpleRadioApi.removeRouterSided(this.id, this.level.isClientSide);
-            if (!this.level.isClientSide) stopTransmitting(frequency.getFrequency(), frequency.getModulation(), this.id);
+            stopTransmitting(frequency.getFrequency(), frequency.getModulation(), this.id);
         }
 
         this.isActive = false;
@@ -120,18 +119,14 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
+        this.transmitter = SimpleRadioBlocks.TRANSMITTER.getOrCreateTransmitter(location, frequency, id, this.getBlockState());
         if (!level.isClientSide) {
-            this.transmitter = SimpleRadioBlocks.TRANSMITTER.getOrCreateTransmitter(location, frequency, id, this.getBlockState());
-
             level.playSound(
                     null, location.x, location.y, location.z,
                     SimpleRadioSounds.RADIO_OPEN,
                     SoundSource.PLAYERS,
                     1f, 1f
             );
-        } else {
-            this.transmitter = new RadioTransmitter(frequency, location, id);
-            ClientRadioManager.getInstance().registerRouter(transmitter);
         }
 
         this.isActive = true;
