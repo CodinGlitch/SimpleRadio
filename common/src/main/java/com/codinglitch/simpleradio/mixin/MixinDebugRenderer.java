@@ -22,9 +22,7 @@ public class MixinDebugRenderer {
 
         Vector3f camera = new Vector3f((float) cameraX, (float) cameraY, (float) cameraZ);
         if (minecraft.getEntityRenderDispatcher().shouldRenderHitBoxes()) {
-            for (Router router : ClientRadioManager.getInstance().getRouters()) {
-                ClientRadioManager.renderRouter((RadioRouter) router, poseStack, bufferSource, camera);
-            }
+            ClientRadioManager.renderDebug(poseStack, bufferSource, camera);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.client;
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
@@ -24,6 +25,7 @@ import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -50,7 +52,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import oshi.util.tuples.Pair;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
@@ -128,7 +133,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
     @Override
     public List<Router> getRouters() {
-        return routers.values().stream().map(wrapper -> (Router) wrapper.router).toList();
+        return routers.values().stream().map(wrapper -> wrapper.router).toList();
     }
 
     @Override
@@ -522,19 +527,16 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     //
+    private static final List<Pair<UUID, UUID>> connections = new ArrayList<>();
 
-    public static void renderRouter(RadioRouter router, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
-        poseStack.pushPose();
-
-        Vector3f location = null;
-        if (router.position != null) {
-            location = new Vector3f(router.position.x, router.position.y, router.position.z);
-        } else if (router.owner != null) {
-            location = router.owner.position().toVector3f();
+    public static void renderDebug(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
+        connections.clear();
+        for (Router router : ClientRadioManager.getInstance().getRouters()) {
+            ClientRadioManager.renderRouter((RadioRouter) router, poseStack, bufferSource, camera);
         }
+    }
 
-        if (location == null) return;
-
+    public static float[] getRouterColor(RadioRouter router) {
         float r = 0.1f;
         float g = 0.1f;
         float b = 0.1f;
@@ -553,7 +555,94 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
             g = 1f;
         }
 
-        location = location.sub(camera);
+        return new float[] {r,g,b};
+    }
+
+    public static void drawRouterConnection(RadioRouter from, RadioRouter to, @Nullable Wiring wiring, PoseStack poseStack, VertexConsumer consumer, Vector3f camera) {
+        if (from == null || to == null) return;
+
+        if (from.reference.equals(to.reference)) return;
+        if (!from.active) return;
+        if (wiring != null && !from.distributes) return;
+
+        float[] color = getRouterColor(from);
+        float r = color[0];
+        float g = color[1];
+        float b = color[2];
+
+        Vector3f location = from.getLocation().position();
+
+        WorldlyPosition worldly = to.getLocation();
+        if (worldly != null) {
+
+            boolean hasOppositeConnection = false;
+            connections.add(new Pair<>(from.reference, to.reference));
+            for (Pair<UUID, UUID> connection : connections) {
+                if (connection.getA().equals(to.reference) && connection.getB().equals(from.reference)) {
+                    hasOppositeConnection = true;
+                    break;
+                }
+            }
+
+            Matrix4f lastPose = poseStack.last().pose();
+            Matrix3f normalMatrix = poseStack.last().normal();
+
+            Vector3f pos = worldly.position().sub(location, new Vector3f());
+            Vector3f dir = pos.normalize(new Vector3f());
+
+            Vector3f cameraDirection = camera.sub(location, new Vector3f()).normalize();
+            Vector3f side = cameraDirection.cross(dir).normalize();
+
+            if (hasOppositeConnection) {
+                poseStack.translate(side.x*0.1f, side.y*0.1f, side.z*0.1f);
+            }
+
+            // Main line
+            consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, dir.x, dir.y, dir.z).endVertex();
+            consumer.vertex(lastPose, pos.x, pos.y, pos.z).color(r, g, b, 1f).normal(normalMatrix, dir.x, dir.y, dir.z).endVertex();
+
+            // Arrow
+            int arrowCount = (int) Math.floor(pos.length());
+            for (int i = 0; i < arrowCount; i++) {
+                float factor = (0.5f+i) / arrowCount;
+
+                Vector3f center = pos.mul(factor, new Vector3f());
+
+                poseStack.translate(center.x, center.y, center.z);
+
+                Vector3f arrowLine1 = dir.negate(new Vector3f()).add(side).normalize();
+                consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, arrowLine1.x, arrowLine1.y, arrowLine1.z).endVertex();
+                consumer.vertex(lastPose, arrowLine1.x*0.1f, arrowLine1.y*0.1f, arrowLine1.z*0.1f).color(r, g, b, 1f).normal(normalMatrix, arrowLine1.x, arrowLine1.y, arrowLine1.z).endVertex();
+
+                Vector3f arrowLine2 = dir.negate(new Vector3f()).sub(side).normalize();
+                consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, arrowLine2.x, arrowLine2.y, arrowLine2.z).endVertex();
+                consumer.vertex(lastPose, arrowLine2.x*0.1f, arrowLine2.y*0.1f, arrowLine2.z*0.1f).color(r, g, b, 1f).normal(normalMatrix, arrowLine2.x, arrowLine2.y, arrowLine2.z).endVertex();
+
+                poseStack.translate(-center.x, -center.y, -center.z);
+            }
+
+
+        }
+    }
+
+    public static void renderRouter(RadioRouter router, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
+        poseStack.pushPose();
+        poseStack.translate(-camera.x, -camera.y, -camera.z);
+
+        Vector3f location = null;
+        if (router.position != null) {
+            location = new Vector3f(router.position.x, router.position.y, router.position.z);
+        } else if (router.owner != null) {
+            location = router.owner.position().toVector3f();
+        }
+
+        if (location == null) return;
+
+        float[] color = getRouterColor(router);
+        float r = color[0];
+        float g = color[1];
+        float b = color[2];
+
         poseStack.translate(location.x, location.y, location.z);
 
         if (router.rotation != null) {
@@ -574,11 +663,23 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         ).move(newOffset.x, newOffset.y, newOffset.z);
         DebugRenderer.renderFilledBox(poseStack, bufferSource, pointBox, r, g, b, 0.8f);
 
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.lines());
+
         AABB boundingBox = new AABB(
                 -0.5f, -0.5f, -0.5f,
                 0.5f, 0.5f, 0.5f
         );
-        LevelRenderer.renderLineBox(poseStack, bufferSource.getBuffer(RenderType.lines()), boundingBox, r, g, b, 0.8f);
+        LevelRenderer.renderLineBox(poseStack, consumer, boundingBox, r, g, b, 0.8f);
+
+        // Drawing wire/router connections
+        for (RadioRouter otherRouter : new ArrayList<>(router.routers)) {
+            drawRouterConnection(router, otherRouter, null, poseStack, consumer, camera);
+        }
+        for (Wiring wire : new ArrayList<>(router.wires)) {
+            Router otherRouter = wire.transport(router);
+            if (otherRouter == null) continue;
+            drawRouterConnection(router, (RadioRouter) otherRouter, wire, poseStack, consumer, camera);
+        }
 
         poseStack.popPose();
     }
