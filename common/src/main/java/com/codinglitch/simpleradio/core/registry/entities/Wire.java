@@ -312,12 +312,13 @@ public class Wire extends Entity implements Wiring {
                 effect.progress += effect.direction;
             }
 
-            RadioRouter from = (RadioRouter) ClientRadioManager.getInstance().getRouter(fromRef);
-            RadioRouter to = (RadioRouter) ClientRadioManager.getInstance().getRouter(toRef);
+            if (fromRef != null && toRef != null) {
+                RadioRouter from = (RadioRouter) ClientRadioManager.getInstance().getRouter(fromRef);
+                RadioRouter to = (RadioRouter) ClientRadioManager.getInstance().getRouter(toRef);
 
-            if (from != null && !from.hasWire(this)) from.connect(this);
-            if (to != null && !to.hasWire(this)) to.connect(this);
-
+                if (from != null && !from.hasWire(this)) from.connect(this);
+                if (to != null && !to.hasWire(this)) to.connect(this);
+            }
         } else {
             String fromType = this.getFromType();
             String toType = this.getToType();
