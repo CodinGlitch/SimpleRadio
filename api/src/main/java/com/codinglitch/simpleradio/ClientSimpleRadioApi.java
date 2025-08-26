@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.world.entity.Entity;
@@ -49,6 +50,7 @@ public abstract class ClientSimpleRadioApi extends SimpleRadioApi {
     public abstract Transmitter getTransmitter(WorldlyPosition location);
 
     public abstract <R extends Router> void registerRouter(R router);
+    public abstract <R extends Router> void registerRouter(R router, @Nullable Frequency frequency);
 
     public abstract Router removeRouter(Predicate<Router> predicate);
 

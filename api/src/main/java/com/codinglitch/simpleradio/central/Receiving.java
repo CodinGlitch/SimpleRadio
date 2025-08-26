@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.world.entity.Entity;
 
@@ -17,7 +17,7 @@ public interface Receiving extends Frequencing {
      * @return The channel created from the listener.
      */
     default Receiver startReceiving(WorldlyPosition location, String frequencyName, Frequency.Modulation modulation, UUID id) {
-        return startReceiving(location, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
+        return startReceiving(location, SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
     }
     default Receiver startReceiving(WorldlyPosition location, Frequency frequency) {
         return startReceiving(location, frequency, UUID.randomUUID());
@@ -35,7 +35,7 @@ public interface Receiving extends Frequencing {
      * @return The channel created from the listener.
      */
     default Receiver startReceiving(Entity entity, String frequencyName, Frequency.Modulation modulation, UUID id) {
-        return startReceiving(entity, ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
+        return startReceiving(entity, SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation), id);
     }
     default Receiver startReceiving(Entity entity, Frequency frequency) {
         return startReceiving(entity, frequency, UUID.randomUUID());
@@ -52,7 +52,7 @@ public interface Receiving extends Frequencing {
      * @param owner the UUID to remove
      */
     default void stopReceiving(String frequencyName, Frequency.Modulation modulation, UUID owner) {
-        Frequency frequency = ServerSimpleRadioApi.getInstance().frequencies().get(frequencyName, modulation);
+        Frequency frequency = SimpleRadioApi.getInstance().frequencies().get(frequencyName, modulation);
         if (frequency != null) {
             frequency.removeReceiver(owner);
         }

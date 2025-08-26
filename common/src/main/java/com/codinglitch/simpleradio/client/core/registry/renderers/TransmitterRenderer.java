@@ -18,7 +18,7 @@ public class TransmitterRenderer implements BlockEntityRenderer<TransmitterBlock
         if (!blockEntity.hasLevel()) return;
 
         BlockState state = blockEntity.getLevel().getBlockState(blockEntity.getBlockPos());
-        if (state.isAir()) return;
+        if (state.isAir() || !(state.getBlock() instanceof TransmitterBlock)) return;
 
         if (blockEntity.catalyst != null) {
             poseStack.pushPose();

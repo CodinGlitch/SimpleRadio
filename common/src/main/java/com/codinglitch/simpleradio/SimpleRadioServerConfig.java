@@ -326,5 +326,31 @@ public class SimpleRadioServerConfig extends LexiconData {
             @Override
             public boolean isEnabled() { return enabled; }
         }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency Etched.")
+        public Etched etched = new Etched();
+
+        public static class Etched extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for Etched. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency AudioPlayer.")
+        public AudioPlayer audioplayer = new AudioPlayer();
+
+        public static class AudioPlayer extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for AudioPlayer. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
     }
 }

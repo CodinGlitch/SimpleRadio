@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.core.BlockPos;
@@ -72,8 +71,8 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     public void loadTag(CompoundTag tag) {
         if (tag.contains("frequency")) {
             String frequencyName = tag.getString("frequency");
-            Frequency.Modulation modulation = ServerSimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
-            this.frequency = ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
+            Frequency.Modulation modulation = SimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+            this.frequency = SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
         }
 
         if (tag.contains("uuid")) {

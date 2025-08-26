@@ -19,7 +19,7 @@ public class ReceiverRenderer implements BlockEntityRenderer<ReceiverBlockEntity
         if (!blockEntity.hasLevel()) return;
 
         BlockState state = blockEntity.getLevel().getBlockState(blockEntity.getBlockPos());
-        if (state.isAir()) return;
+        if (state.isAir() || !(state.getBlock() instanceof ReceiverBlock)) return;
 
         if (blockEntity.catalyst != null) {
             poseStack.pushPose();
