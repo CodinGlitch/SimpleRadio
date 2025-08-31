@@ -27,6 +27,9 @@ dependencies {
 
     // --- Compatibilities --- \\
 
+    // Audio Player
+    //modImplementation "maven.modrinth:audioplayer:fabric-${minecraft_version}-${audioplayer_version}"
+
     // ComputerCraft
     modCompileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-fabric-api:${cc_version}")
     modRuntimeOnly("cc.tweaked:cc-tweaked-${minecraft_version}-fabric:${cc_version}")
@@ -45,7 +48,14 @@ dependencies {
     // Valkyrien Skies
     if (valkyrien_skies_env_versions.contains(minecraft_version)) {
         modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
-        modLocalRuntime("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
+        modLocalRuntime("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}") {
+            exclude group: "com.simibubi.create" // create 5 💔💔
+        }
+    }
+
+    // Create
+    if (create_env_versions.contains(minecraft_version)) {
+        //modLocalRuntime("com.simibubi.create:create-fabric-$minecraft_version:$create_fabric_version")
     }
 
     // JEI / REI
