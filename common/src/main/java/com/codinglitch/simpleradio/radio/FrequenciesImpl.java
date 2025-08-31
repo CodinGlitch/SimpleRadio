@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 
 public class FrequenciesImpl implements Frequencies {
     // negative for AM, positive for FM; this will need to be changed if we add PM
-    private static final Map<Integer, Frequency> FREQUENCIES = new HashMap<>();
+    private final Map<Integer, Frequency> FREQUENCIES = new HashMap<>();
 
     public static String DEFAULT_FREQUENCY = "000.00FM";
     public static Frequency.Modulation DEFAULT_MODULATION = Frequency.Modulation.FREQUENCY;
@@ -25,7 +25,7 @@ public class FrequenciesImpl implements Frequencies {
     public static int MAX_FREQUENCY = 100000;
     public static String FREQUENCY_PATTERN = "auto-generate";
 
-    public static void close() {
+    public void close() {
         FREQUENCIES.clear();
     }
 
@@ -57,7 +57,7 @@ public class FrequenciesImpl implements Frequencies {
         Frequency found = get(frequency, modulation);
         if (found != null) return found;
 
-        return new FrequencyChannel(frequency, modulation);
+        return new FrequencyChannel(this, frequency, modulation);
     }
 
     @Override
@@ -142,11 +142,11 @@ public class FrequenciesImpl implements Frequencies {
         }
     }
 
-    public static void garbageCollect() {
+    public void garbageCollect() {
         for (Frequency frequency : FREQUENCIES.values()) {
             FrequencyChannel frequencyChannel = (FrequencyChannel) frequency;
-            RadioManager.validate(frequencyChannel.receivers.getContent());
-            RadioManager.validate(frequencyChannel.transmitters.getContent());
+            //RadioManager.validate(frequencyChannel.receivers.getContent());
+            //RadioManager.validate(frequencyChannel.transmitters.getContent());
         }
 
         FREQUENCIES.entrySet().removeIf(entry -> !((FrequencyChannel) entry.getValue()).validate());

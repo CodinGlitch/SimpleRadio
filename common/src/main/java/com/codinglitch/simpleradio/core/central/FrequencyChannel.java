@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -32,8 +33,7 @@ public class FrequencyChannel implements Frequency {
     public final RouterContainer<Receiver> receivers;
     public final RouterContainer<Transmitter> transmitters;
 
-    public FrequencyChannel(String frequency, Modulation modulation) {
-        Frequencies frequencies = RadioManager.getInstance().frequencies();
+    public FrequencyChannel(Frequencies frequencies, String frequency, Modulation modulation) {
         if (!frequencies.check(frequency)) {
             CommonSimpleRadio.warn("{} does not follow frequency pattern! Replacing with default pattern {}", frequency, DEFAULT_FREQUENCY);
             frequency = DEFAULT_FREQUENCY;

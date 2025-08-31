@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
@@ -56,7 +57,7 @@ public class FrequencerBlockEntity extends BlockEntity {
 
             //---- Revalidation ----\\
             if (blockEntity.frequency != null) {
-                Frequency frequency = RadioManager.getInstance().frequencies().get(blockEntity.frequency.getFrequency(), blockEntity.frequency.getModulation());
+                Frequency frequency = ServerSimpleRadioApi.getInstance().frequencies().get(blockEntity.frequency.getFrequency(), blockEntity.frequency.getModulation());
                 if (frequency != blockEntity.frequency && frequency != null)
                     blockEntity.frequency = frequency;
             }
@@ -76,16 +77,17 @@ public class FrequencerBlockEntity extends BlockEntity {
 
                 level.sendBlockUpdated(pos, blockState, blockState, 2);
             } else {
-                if (level.getBlockState(blockEntity.getBlockPos().below()).is(Blocks.DIAMOND_BLOCK)) {
+                BlockState state = level.getBlockState(blockEntity.getBlockPos().below());
+                if (state.is(Blocks.DIAMOND_BLOCK)) {
                     //---- Listener gathering ----\\
-                    List<Listener> listeners = RadioManager.getInstance().listeners().get();
+                    List<Listener> listeners = ServerSimpleRadioApi.getInstance().listeners().get();
                     for (Listener listener : listeners) {
                         String name = parse(listener.getOwner(), listener.getPosition());
                         if (name != null) blockEntity.listeners.add(name);
                     }
                 } else {
                     //---- Frequency gathering ----\\
-                    List<Frequency> frequencies = RadioManager.getInstance().frequencies().get();
+                    List<Frequency> frequencies = ServerSimpleRadioApi.getInstance().frequencies().get();
                     for (Frequency frequency : frequencies) {
                         blockEntity.frequencies.add(frequency.getFrequency() + frequency.getModulation().shorthand);
                     }
@@ -137,8 +139,8 @@ public class FrequencerBlockEntity extends BlockEntity {
     public void loadTag(CompoundTag tag) {
         if (tag.contains("frequency")) {
             String frequencyName = tag.getString("frequency");
-            Frequency.Modulation modulation = RadioManager.getInstance().frequencies().modulationOf(tag.getString("modulation"));
-            this.frequency = RadioManager.getInstance().frequencies().getOrCreate(frequencyName, modulation);
+            Frequency.Modulation modulation = ServerSimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+            this.frequency = ServerSimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
         } else {
             this.frequency = null;
         }

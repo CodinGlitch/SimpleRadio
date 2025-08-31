@@ -72,8 +72,10 @@ import java.util.function.Predicate;
 public class ClientRadioManager extends ClientSimpleRadioApi {
     public static final ClientRadioManager INSTANCE = new ClientRadioManager();
 
-    private static final Map<Short, PendingRouter<?>> pendingRouters = new HashMap<>();
-    private static final Map<Short, ClientRouterWrapper> routers = new HashMap<>();
+    private static final FrequenciesImpl FREQUENCIES = new FrequenciesImpl();
+
+    private static final Map<Short, PendingRouter<?>> PENDING_ROUTERS = new HashMap<>();
+    private static final Map<Short, ClientRouterWrapper> ROUTERS = new HashMap<>();
 
     public static void load() {
     }
@@ -85,7 +87,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     public ClientRouterWrapper getWrapper(Predicate<ClientRouterWrapper> criteria) {
-        Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
+        Optional<Map.Entry<Short, ClientRouterWrapper>> result = ROUTERS.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getValue).orElse(null);
     }
     public ClientRouterWrapper getWrapper(UUID uuid) {
@@ -97,7 +99,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
     @Override
     public Frequencies frequencies() {
-        return RadioManager.INSTANCE.frequencies();
+        return FREQUENCIES;
     }
 
     @Override
@@ -140,19 +142,19 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
     @Override
     public List<Router> getRouters() {
-        return routers.values().stream().map(wrapper -> wrapper.router).toList();
+        return ROUTERS.values().stream().map(wrapper -> wrapper.router).toList();
     }
 
     @Override
     public Router getRouter(Predicate<Router> criteria) {
-        Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue().router)).findFirst();
+        Optional<Map.Entry<Short, ClientRouterWrapper>> result = ROUTERS.entrySet().stream().filter(entry -> criteria.test(entry.getValue().router)).findFirst();
 
         return result.map(Map.Entry::getValue).map(wrapper -> wrapper.router).orElse(null);
     }
 
     @Override
     public Router getRouter(short identifier) {
-        ClientRouterWrapper wrapper = routers.get(identifier);
+        ClientRouterWrapper wrapper = ROUTERS.get(identifier);
         return wrapper == null ? null : wrapper.router;
     }
     @Override
@@ -243,8 +245,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         short mapping = Short.MAX_VALUE;
         for (short index = Short.MIN_VALUE; index < Short.MAX_VALUE; index++) {
-            if (pendingRouters.containsKey(index)) continue;
-            pendingRouters.put(index, pendingRouter);
+            if (PENDING_ROUTERS.containsKey(index)) continue;
+            PENDING_ROUTERS.put(index, pendingRouter);
             mapping = index;
             break;
         }
@@ -254,7 +256,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
     public Router removeRouter(Predicate<Router> predicate) {
-        List<Map.Entry<Short, ClientRouterWrapper>> removal = routers.entrySet().stream()
+        List<Map.Entry<Short, ClientRouterWrapper>> removal = ROUTERS.entrySet().stream()
                 .filter(entry -> predicate.test(entry.getValue().router))
                 .toList();
 
@@ -262,7 +264,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         removal.forEach(entry -> {
             entry.getValue().close();
-            routers.remove(entry.getKey());
+            ROUTERS.remove(entry.getKey());
         });
 
         return removal.stream().findFirst().get().getValue().router;
@@ -302,22 +304,22 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     public static void finalizeRouter(short mapping, short identifier) {
         CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
 
-        PendingRouter<?> pending = pendingRouters.remove(mapping);
+        PendingRouter<?> pending = PENDING_ROUTERS.remove(mapping);
         if (pending == null) {
             CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
             return;
         }
 
         ((RadioRouter) pending.router).identifier = identifier;
-        routers.put(identifier, ClientRouterWrapper.of(pending.router));
+        ROUTERS.put(identifier, ClientRouterWrapper.of(pending.router));
     }
 
     public static void garbageCollect() {
         INSTANCE.removeRouter(router -> !router.validate());
         INSTANCE.removeRouter(router -> router.getOwner() == null && router.getPosition() == null);
 
-        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
-        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.getOwner() == null && entry.getValue().router.getPosition() == null));
+        PENDING_ROUTERS.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
+        PENDING_ROUTERS.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.getOwner() == null && entry.getValue().router.getPosition() == null));
     }
 
     public static void tick(long gameTime) {
@@ -325,7 +327,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
             garbageCollect();
 
             // After garbage collection, we shall also re-request still missing routers
-            Iterator<Map.Entry<Short, PendingRouter<?>>> iterator = pendingRouters.entrySet().iterator();
+            Iterator<Map.Entry<Short, PendingRouter<?>>> iterator = PENDING_ROUTERS.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<Short, PendingRouter<?>> entry = iterator.next();
 
@@ -340,7 +342,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
             }
         }
 
-        for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : routers.entrySet()) {
+        for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : ROUTERS.entrySet()) {
             ClientRouterWrapper wrapper = wrapperEntry.getValue();
             ((RadioRouter) wrapper.router).tick(0);
 
@@ -353,10 +355,10 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     public static void close() {
-        FrequenciesImpl.close();
+        FREQUENCIES.close();
 
-        pendingRouters.clear();
-        routers.clear();
+        PENDING_ROUTERS.clear();
+        ROUTERS.clear();
     }
 
     public static void speakSound(ClientboundSpeakSoundPacket packet) {
