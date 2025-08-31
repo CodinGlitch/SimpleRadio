@@ -55,7 +55,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     private static final Map<Consumer<? extends SimpleRadioEvent>, Class<? extends SimpleRadioEvent>> EVENT_LISTENERS = new HashMap<>();
 
-    private static final Frequencies FREQUENCIES = new FrequenciesImpl();
+    private static final FrequenciesImpl FREQUENCIES = new FrequenciesImpl();
     private static final Speakers SPEAKERS = new SpeakersImpl();
     private static final Listeners LISTENERS = new ListenersImpl();
 
@@ -86,8 +86,6 @@ public class RadioManager extends ServerSimpleRadioApi {
     public static RadioManager getInstance() {
         return INSTANCE;
     }
-
-    public RadioManager() {}
 
     @Override
     public <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener) {
@@ -299,7 +297,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     // -------- \\
 
     public static void close() {
-        FrequenciesImpl.close();
+        FREQUENCIES.close();
 
         SpeakersImpl.close();
         ListenersImpl.close();
@@ -313,7 +311,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     public static void garbageCollect() {
-        FrequenciesImpl.garbageCollect();
+        FREQUENCIES.garbageCollect();
 
         SpeakersImpl.garbageCollect();
         ListenersImpl.garbageCollect();
@@ -333,6 +331,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         // -- Receiver, Transmitter and Listener ticking -- \\
         List<Frequency> frequencies = FREQUENCIES.get();
+        CommonSimpleRadio.info(frequencies);
         for (Frequency frequency : frequencies) {
             ((FrequencyChannel) frequency).serverTick(tickCount);
         }

@@ -23,6 +23,9 @@ public abstract class SimpleRadioApi {
     public static SimpleRadioApi getInstance() {
         return INSTANCE;
     }
+    public static SimpleRadioApi getInstance(boolean isClient) {
+        return isClient ? ClientSimpleRadioApi.getInstance() : ServerSimpleRadioApi.getInstance();
+    }
 
     public abstract Frequencies frequencies();
 
