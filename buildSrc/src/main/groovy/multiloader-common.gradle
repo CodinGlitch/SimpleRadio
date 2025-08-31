@@ -58,6 +58,8 @@ repositories {
         url = 'https://maven.valkyrienskies.org'
     }
 
+    maven { url = "https://mvn.devos.one/releases" }
+    maven { url = "https://mvn.devos.one/snapshots" }
     maven { url = "https://maven.createmod.net" }
     maven { url = "https://maven.tterrag.com" }
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
@@ -69,13 +71,9 @@ repositories {
         }
     }
 
-    exclusiveContent {
-        forRepository {
-            maven {
-                url "https://cursemaven.com"
-            }
-        }
-        filter {
+    maven {
+        url "https://cursemaven.com"
+        content {
             includeGroup "curse.maven"
         }
     }
