@@ -12,6 +12,7 @@ import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
@@ -88,6 +89,19 @@ public class CompatCore {
         if (CompatCore.COMPUTER_CRAFT.isLoaded) {
             CommonCCCompat.acceptSource(router, source);
         }
+    }
+
+    public static String getSound(ItemStack stack) {
+        if (CompatCore.COMPUTER_CRAFT.isLoaded) {
+            String result = Services.COMPAT.getSound(stack);
+            if (result != null) return result;
+        }
+
+        if (stack.getItem() instanceof RecordItem recordItem) {
+            return recordItem.getSound().getLocation().toString();
+        }
+
+        return null;
     }
 
     public static RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {

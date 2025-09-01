@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.EtchedCompat;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
@@ -41,6 +42,17 @@ public class ForgeCompatPlatform implements CompatPlatform {
         }
 
         return rotation;
+    }
+
+    @Override
+    public String getSound(ItemStack stack) {
+        // ---- Etched ---- \\
+        if (CompatCore.ETCHED.enabled) {
+            String result = EtchedCompat.getSound(stack);
+            if (result != null) return result;
+        }
+
+        return null;
     }
 
     @Override

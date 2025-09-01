@@ -21,4 +21,6 @@ public interface CompatPlatform {
 
     RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
     RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria);
+
+    String getSound(ItemStack stack);
 }
