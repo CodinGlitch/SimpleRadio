@@ -48,6 +48,11 @@ public class FabricCompatPlatform implements CompatPlatform {
     }
 
     @Override
+    public String getSound(ItemStack stack) {
+        return null;
+    }
+
+    @Override
     public void postInitialize() {
         if (CompatCore.COMPUTER_CRAFT.isLoaded) {
             CCCompat.postInitialize();
