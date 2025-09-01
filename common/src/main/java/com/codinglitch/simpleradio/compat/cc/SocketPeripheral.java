@@ -36,7 +36,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         byte[] encodedData = source.getData();
         if (encodedData == null) {
             data = null;
-            sound = source.getSound().getLocation().toString();
+            sound = source.getSoundEvent().getLocation().toString();
         } else {
             sound = null;
 
