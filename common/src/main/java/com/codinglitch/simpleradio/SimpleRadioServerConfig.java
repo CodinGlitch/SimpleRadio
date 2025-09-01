@@ -261,6 +261,9 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "[EXPERIMENTAL] Pick up audio from the world, not just players. Defaults to false.")
         public Boolean soundListening = false;
+
+        @LexiconEntry(comment = "[EXPERIMENTAL] Pick up audio from speakers, can cause feedback loops. Defaults to false.")
+        public Boolean feedbackListening = false;
     }
 
     public static class Compatibilities extends LexiconPageData {
