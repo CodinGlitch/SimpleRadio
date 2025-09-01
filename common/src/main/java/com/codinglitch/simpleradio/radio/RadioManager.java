@@ -28,14 +28,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -497,6 +501,45 @@ public class RadioManager extends ServerSimpleRadioApi {
         sendAudio(WorldlyPosition.of(senderPosition, level), sender.getUUID(), event.getPacket().getOpusEncodedData());
     }
 
+    public void sendRecord(ItemStack stack, WorldlyPosition position, long identifier) {
+        Item item = stack.getItem();
+
+        if (item instanceof RecordItem recordItem) {
+            RadioManager.getInstance().sendSound(
+                    position,
+                    BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
+                    1, 1, identifier
+            );
+        }
+    }
+    public void stopRecord(ServerLevel level, long identifier) {
+
+        Map<Listener, Source> sources = new HashMap<>();
+        for (Listener listener : LISTENERS.get()) {
+            RadioSource newSource = new RadioSource(
+                    listener.getReference(),
+                    listener.getLocation(),
+                    SoundEvents.EMPTY, 1
+            );
+            newSource.seed = identifier;
+
+            sources.put(listener, newSource);
+        }
+
+        level.getServer().execute(() -> sources.forEach(Listener::listen));
+    }
+    public void updateRecord(ItemStack stack, WorldlyPosition position, float offset, long identifier) {
+        Item item = stack.getItem();
+
+        if (item instanceof RecordItem recordItem) {
+            RadioManager.getInstance().sendSound(
+                    position,
+                    BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
+                    1, 1,  offset, identifier
+            );
+        }
+    }
+
     public void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
         sendSound(location, soundHolder, volume, pitch, 0, seed);
     }
@@ -546,14 +589,6 @@ public class RadioManager extends ServerSimpleRadioApi {
             RadioListener listener = (RadioListener) entry.getValue();
 
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
-
-            Vector3f listenerPosition = null;
-            if (listener.position != null) {
-                listenerPosition = listener.position.position();
-            } else if (listener.owner != null) {
-                listenerPosition = listener.owner.position().toVector3f();
-            }
-            if (listenerPosition == null) continue;
 
             RadioSource newSource = new RadioSource(
                     sender,
