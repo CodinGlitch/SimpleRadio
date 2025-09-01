@@ -17,7 +17,6 @@ import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.Router;
-import com.codinglitch.simpleradio.routers.RouterContainer;
 import com.codinglitch.simpleradio.routers.Speaker;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
@@ -56,8 +55,8 @@ public class RadioManager extends ServerSimpleRadioApi {
     private static final Map<Consumer<? extends SimpleRadioEvent>, Class<? extends SimpleRadioEvent>> EVENT_LISTENERS = new HashMap<>();
 
     private static final FrequenciesImpl FREQUENCIES = new FrequenciesImpl();
-    private static final Speakers SPEAKERS = new SpeakersImpl();
-    private static final Listeners LISTENERS = new ListenersImpl();
+    private static final SpeakersImpl SPEAKERS = new SpeakersImpl();
+    private static final ListenersImpl LISTENERS = new ListenersImpl();
 
 
     // double queue for the win
@@ -172,34 +171,6 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public <R extends Router> void putRouter(@Nullable RouterContainer<R> container, R router) {
-        if (container != null) {
-            container.add(router);
-        } else {
-            pushRouter(router);
-        }
-    }
-
-    @Override
-    public <R extends Router> short pushRouter(R router) {
-        return pushRouter(routers, router);
-    }
-    @Override
-    public <R extends Router> short pushRouter(Map<Short, R> map, R router) {
-        RadioRouter radioRouter = (RadioRouter) router;
-        for (short identifier = Short.MIN_VALUE; identifier < Short.MAX_VALUE; identifier++) {
-            if (map.containsKey(identifier)) continue;
-
-            radioRouter.identifier = identifier;
-            map.put(identifier, (R) radioRouter);
-
-            return identifier;
-        }
-
-        return Short.MAX_VALUE;
-    }
-
-    @Override
     public short getIdentifier(Predicate<Router> filter) {
         Optional<Map.Entry<Short, Router>> result = routers.entrySet().stream().filter(entry -> filter.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getKey).orElse(Short.MAX_VALUE);
@@ -276,7 +247,15 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     @Override
     public void registerRouter(Router router) {
-        putRouter(null, router);
+        RadioRouter radioRouter = (RadioRouter) router;
+        for (short identifier = Short.MIN_VALUE; identifier < Short.MAX_VALUE; identifier++) {
+            if (routers.containsKey(identifier)) continue;
+
+            radioRouter.identifier = identifier;
+            routers.put(identifier, radioRouter);
+
+            return;
+        }
     }
 
     @Override
@@ -299,8 +278,8 @@ public class RadioManager extends ServerSimpleRadioApi {
     public static void close() {
         FREQUENCIES.close();
 
-        SpeakersImpl.close();
-        ListenersImpl.close();
+        SPEAKERS.close();
+        LISTENERS.close();
 
         routers.clear();
     }
@@ -313,8 +292,8 @@ public class RadioManager extends ServerSimpleRadioApi {
     public static void garbageCollect() {
         FREQUENCIES.garbageCollect();
 
-        SpeakersImpl.garbageCollect();
-        ListenersImpl.garbageCollect();
+        SPEAKERS.garbageCollect();
+        LISTENERS.garbageCollect();
 
         routers.entrySet().removeIf(entry -> !entry.getValue().validate());
         routers.entrySet().removeIf(entry -> entry.getValue().getOwner() == null && entry.getValue().getPosition() == null);
@@ -331,7 +310,6 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         // -- Receiver, Transmitter and Listener ticking -- \\
         List<Frequency> frequencies = FREQUENCIES.get();
-        CommonSimpleRadio.info(frequencies);
         for (Frequency frequency : frequencies) {
             ((FrequencyChannel) frequency).serverTick(tickCount);
         }

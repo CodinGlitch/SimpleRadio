@@ -25,6 +25,8 @@ public interface Router {
     @Nullable
     Frequency getFrequency();
 
+    Boolean isClientSide();
+
     WorldlyPosition getLocation();
 
     Router tryAddRouter(Router router);
@@ -36,6 +38,7 @@ public interface Router {
     @Nullable
     Entity getOwner();
     Router getRouter(UUID id);
+    List<Router> getRouters();
     Vec3 getConnectionPosition();
 
     List<Wiring> getWires();

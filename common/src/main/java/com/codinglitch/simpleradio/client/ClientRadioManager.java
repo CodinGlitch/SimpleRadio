@@ -255,6 +255,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
+
     public Router removeRouter(Predicate<Router> predicate) {
         List<Map.Entry<Short, ClientRouterWrapper>> removal = ROUTERS.entrySet().stream()
                 .filter(entry -> predicate.test(entry.getValue().router))
@@ -694,8 +695,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         LevelRenderer.renderLineBox(poseStack, consumer, boundingBox, r, g, b, 0.8f);
 
         // Drawing wire/router connections
-        for (RadioRouter otherRouter : new ArrayList<>(router.routers)) {
-            drawRouterConnection(router, otherRouter, null, poseStack, consumer, camera);
+        for (Router otherRouter : new ArrayList<>(router.routers)) {
+            drawRouterConnection(router, (RadioRouter) otherRouter, null, poseStack, consumer, camera);
         }
         for (Wiring wire : new ArrayList<>(router.wires)) {
             Router otherRouter = wire.transport(router);

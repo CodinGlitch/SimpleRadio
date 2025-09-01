@@ -25,7 +25,7 @@ public interface Wiring extends Medium {
 
     float getLength();
 
-    UUID getUUID();
+    UUID getReference();
 
     @Nullable
     Router getFromRouter();

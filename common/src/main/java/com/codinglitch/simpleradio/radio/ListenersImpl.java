@@ -14,12 +14,12 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class ListenersImpl implements Listeners {
-    private static final RouterContainer<Listener> LISTENERS = new RouterContainer<>();
+    private final RouterContainer<Listener> LISTENERS = new RouterContainer<>();
 
-    public static void garbageCollect() {
+    public void garbageCollect() {
         RadioManager.validate(LISTENERS);
     }
-    public static void close() {
+    public void close() {
         LISTENERS.clear();
     }
 
@@ -98,7 +98,7 @@ public class ListenersImpl implements Listeners {
             }
         }
 
-        RadioManager.getInstance().putRouter(LISTENERS, listener);
+        LISTENERS.add(listener);
         return (RadioListener) listener;
     }
 }

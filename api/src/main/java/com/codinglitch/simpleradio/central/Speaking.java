@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Router;
 import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.world.entity.Entity;

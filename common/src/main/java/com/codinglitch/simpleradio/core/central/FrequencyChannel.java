@@ -95,7 +95,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public void registerReceiver(Receiver receiver) {
-        RadioManager.getInstance().putRouter(receivers, (RadioReceiver) receiver);
+        receivers.add(receiver);
     }
 
     @Override
@@ -132,8 +132,8 @@ public class FrequencyChannel implements Frequency {
     public Receiver tryAddReceiver(UUID id, Entity entity) {
         boolean isClient = entity.level().isClientSide;
 
-        Receiver receiver = null;//isClient ? ClientRadioManager.getReceiver(entity) : getReceiver(entity);
-        if (receiver == null) receiver = isClient ? ClientRadioManager.getInstance().getReceiver(id) : getReceiver(id);
+        Receiver receiver = getReceiver(entity);
+        if (receiver == null) receiver = getReceiver(id);
 
         if (receiver == null)
             return addReceiver(id, entity);
@@ -191,7 +191,7 @@ public class FrequencyChannel implements Frequency {
 
     @Override
     public void registerTransmitter(Transmitter transmitter) {
-        RadioManager.getInstance().putRouter(transmitters, transmitter);
+        transmitters.add(transmitter);
     }
 
     @Override
@@ -228,8 +228,8 @@ public class FrequencyChannel implements Frequency {
     public Transmitter tryAddTransmitter(UUID id, Entity entity) {
         boolean isClient = entity.level().isClientSide;
 
-        Transmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(entity) : getTransmitter(entity);
-        if (transmitter == null) transmitter = isClient ? ClientRadioManager.getInstance().getTransmitter(id) : getTransmitter(id);
+        Transmitter transmitter = getTransmitter(entity);
+        if (transmitter == null) transmitter = getTransmitter(id);
 
         if (transmitter == null)
             return addTransmitter(id, entity);
