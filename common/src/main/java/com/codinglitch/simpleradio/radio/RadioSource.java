@@ -7,6 +7,8 @@ import com.codinglitch.simpleradio.core.registry.FrequencingRegistry;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.routers.Router;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
@@ -24,7 +26,7 @@ public class RadioSource implements Source {
     public short frequencingType = -1;
 
     public byte[] data;
-    public SoundEvent soundEvent;
+    public String sound;
 
     public float pitch = 1;
     public float volume;
@@ -56,7 +58,7 @@ public class RadioSource implements Source {
         this.origin = location;
         this.volume = volume;
 
-        this.soundEvent = soundEvent;
+        this.sound = soundEvent.getLocation().toString();
     }
 
     @Override
@@ -83,8 +85,8 @@ public class RadioSource implements Source {
     }
 
     @Override
-    public SoundEvent getSound() {
-        return soundEvent;
+    public SoundEvent getSoundEvent() {
+        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.tryParse(this.sound));
     }
 
     @Override
@@ -163,7 +165,7 @@ public class RadioSource implements Source {
         copy.frequencingType = this.frequencingType;
 
         copy.data = this.data;
-        copy.soundEvent = this.soundEvent;
+        copy.sound = this.sound;
 
         copy.volume = this.volume;
         copy.pitch = this.pitch;
