@@ -507,7 +507,7 @@ public class RadioManager extends ServerSimpleRadioApi {
         if (item instanceof RecordItem recordItem) {
             RadioManager.getInstance().sendSound(
                     position,
-                    BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
+                    recordItem.getSound(),
                     1, 1, identifier
             );
         }
@@ -534,23 +534,24 @@ public class RadioManager extends ServerSimpleRadioApi {
         if (item instanceof RecordItem recordItem) {
             RadioManager.getInstance().sendSound(
                     position,
-                    BuiltInRegistries.SOUND_EVENT.wrapAsHolder(recordItem.getSound()),
+                    recordItem.getSound(),
                     1, 1,  offset, identifier
             );
         }
     }
 
-    public void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
-        sendSound(location, soundHolder, volume, pitch, 0, seed);
+    public void sendSound(WorldlyPosition location, SoundEvent soundEvent, float volume, float pitch, long seed) {
+        sendSound(location, soundEvent, volume, pitch, 0, seed);
     }
-    public void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
+    public void sendSound(WorldlyPosition location, SoundEvent soundEvent, float volume, float pitch, float offset, long seed) {
+        sendSound(location, soundEvent.getLocation().toString(), volume, pitch, offset, seed);
+    }
+    public void sendSound(WorldlyPosition location, String sound, float volume, float pitch, float offset, long seed) {
         Level level = location.level;
 
         if (level.isClientSide) return;
         if (!SimpleRadioLibrary.SERVER_CONFIG.router.soundListening) return;
         if (!level.isLoaded(location.blockPos())) return;
-
-        SoundEvent sound = soundHolder.value();
 
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
 

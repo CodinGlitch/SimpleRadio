@@ -32,12 +32,12 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel {
 
     @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V")
     private void simpleradio$playSeededSound1_audioGathering(Player except, Entity entity, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
-        RadioManager.getInstance().sendSound(WorldlyPosition.of(entity.position().toVector3f(), this), sound, volume, pitch, seed);
+        RadioManager.getInstance().sendSound(WorldlyPosition.of(entity.position().toVector3f(), this), sound.value(), volume, pitch, seed);
     }
 
     @Inject(at = @At("TAIL"), method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V")
     private void simpleradio$playSeededSound2_audioGathering(Player except, double x, double y, double z, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch, long seed, CallbackInfo ci) {
-        RadioManager.getInstance().sendSound(new WorldlyPosition((float) x, (float) y, (float) z, this), sound, volume, pitch, seed);
+        RadioManager.getInstance().sendSound(new WorldlyPosition((float) x, (float) y, (float) z, this), sound.value(), volume, pitch, seed);
     }
 
     @Inject(at = @At("HEAD"), method = "tick")
