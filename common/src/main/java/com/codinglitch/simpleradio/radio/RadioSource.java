@@ -53,12 +53,16 @@ public class RadioSource implements Source {
         this.data = data;
     }
 
-    public RadioSource(UUID owner, WorldlyPosition location, SoundEvent soundEvent, float volume) {
+    public RadioSource(UUID owner, WorldlyPosition location, String sound, float volume) {
         this.owner = owner;
         this.origin = location;
         this.volume = volume;
 
-        this.sound = soundEvent.getLocation().toString();
+        this.sound = sound;
+    }
+
+    public RadioSource(UUID owner, WorldlyPosition location, SoundEvent soundEvent, float volume) {
+        this(owner, location, soundEvent.getLocation().toString(), volume);
     }
 
     @Override

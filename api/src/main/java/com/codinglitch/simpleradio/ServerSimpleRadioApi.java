@@ -57,8 +57,9 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
 
     // ---- Audio ---- \\
 
-    public abstract void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed);
-    public abstract void sendSound(WorldlyPosition location, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed);
+    public abstract void sendSound(WorldlyPosition location, SoundEvent soundEvent, float volume, float pitch, long seed);
+    public abstract void sendSound(WorldlyPosition location, SoundEvent soundEvent, float volume, float pitch, float offset, long seed);
+    public abstract void sendSound(WorldlyPosition location, String sound, float volume, float pitch, float offset, long seed);
 
     public abstract void sendAudio(WorldlyPosition location, UUID sender, byte[] data);
 
