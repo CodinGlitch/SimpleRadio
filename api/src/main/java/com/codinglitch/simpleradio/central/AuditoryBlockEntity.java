@@ -71,7 +71,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     }
 
     public void loadTag(CompoundTag tag) {
-        SimpleRadioApi api = this.hasLevel() ? SimpleRadioApi.getInstance(this.level.isClientSide) : ServerSimpleRadioApi.getInstance();
+        SimpleRadioApi api = SimpleRadioApi.getInstance();
 
         if (tag.contains("frequency")) {
             String frequencyName = tag.getString("frequency");

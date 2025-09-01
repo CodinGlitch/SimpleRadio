@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.entities;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.central.Wiring;
@@ -67,6 +68,11 @@ public class Wire extends Entity implements Wiring {
         this(SimpleRadioEntities.WIRE, level);
     }
 
+    @Override
+    public UUID getReference() {
+        return this.uuid;
+    }
+
     /**
      * Connect two given {@link Socket}s within a level.
      * @param from The first socket
@@ -123,12 +129,12 @@ public class Wire extends Entity implements Wiring {
         String fromType = this.getFromType();
         String toType = this.getToType();
         if (fromRef == null || toRef == null) {
-            CommonSimpleRadio.warn("Relaying cancelled; invalid wire [{}] to relay across.", this.getUUID());
+            CommonSimpleRadio.warn("Relaying cancelled; invalid wire [{}] to relay across.", this.getReference());
             return;
         }
 
-        RadioRouter from = (RadioRouter) RadioManager.getInstance().getRouter(fromRef, fromType);
-        RadioRouter to = (RadioRouter) RadioManager.getInstance().getRouter(toRef, toType);
+        RadioRouter from = (RadioRouter) SimpleRadioApi.getRouterSided(fromRef, fromType, this.level().isClientSide());
+        RadioRouter to = (RadioRouter) SimpleRadioApi.getRouterSided(toRef, toType, this.level().isClientSide());
         if (from == null || to == null) {
             CommonSimpleRadio.warn("Relaying cancelled; either end was unable to be found.");
             return;
@@ -182,7 +188,7 @@ public class Wire extends Entity implements Wiring {
 
         source.travel(from, to, this);
 
-        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime == -1) {
+        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime <= 0) {
             destination.accept(source);
         } else {
             RadioManager.getInstance().queueSource(source, destination, Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));

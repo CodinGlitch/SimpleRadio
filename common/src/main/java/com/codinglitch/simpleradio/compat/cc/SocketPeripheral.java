@@ -16,10 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeripheral {
     private final AttachedComputerSet computers = new AttachedComputerSet();
@@ -105,6 +102,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         } else if (length > 131072) {
             throw new LuaException("Audio data is too large");
         } else {
+            List<short[]> datas = new ArrayList<>();
             for (int x = 0; x < Math.floor(length/960d); x++) {
                 short[] data = new short[960];
                 for (int i = 1; i < 960; i++) {
@@ -115,8 +113,16 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
 
                     data[i] = (short) level;
                 }
-                router.send(data, volume.orElse(1d).floatValue());
+
+                datas.add(data);
             }
+
+            context.executeMainThreadTask(() -> {
+                for (short[] data : datas) {
+                    router.send(data, volume.orElse(1d).floatValue());
+                }
+                return new Object[0];
+            });
 
             return true;
         }

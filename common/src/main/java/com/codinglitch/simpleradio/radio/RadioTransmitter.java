@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.FrequencingType;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
@@ -35,6 +36,8 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     public RadioTransmitter(Frequency frequency, Entity owner, UUID uuid) {
         this(frequency, uuid);
         this.owner = owner;
+        CommonSimpleRadio.info(Thread.currentThread().getName());
+        CommonSimpleRadio.info(owner);
     }
     public RadioTransmitter(Frequency frequency, WorldlyPosition location) {
         this(frequency, location, UUID.randomUUID());
@@ -61,6 +64,8 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
 
     @Override
     public RadioTransmitter frequency(Frequency frequency) {
+        CommonSimpleRadio.info(frequency);
+
         if (this.frequency != null) {
             this.frequency.removeTransmitter(this);
         }

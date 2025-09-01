@@ -16,12 +16,12 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 public class SpeakersImpl implements Speakers {
-    private static final RouterContainer<Speaker> SPEAKERS = new RouterContainer<>();
+    private final RouterContainer<Speaker> SPEAKERS = new RouterContainer<>();
 
-    public static void garbageCollect() {
+    public void garbageCollect() {
         RadioManager.validate(SPEAKERS);
     }
-    public static void close() {
+    public void close() {
         SPEAKERS.clear();
     }
 
@@ -81,7 +81,7 @@ public class SpeakersImpl implements Speakers {
             }
         }
 
-        RadioManager.getInstance().putRouter(SPEAKERS, speaker);
+        SPEAKERS.add(speaker);
         return (RadioSpeaker) speaker;
     }
 }

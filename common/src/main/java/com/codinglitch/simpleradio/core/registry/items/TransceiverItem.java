@@ -1,8 +1,10 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.*;
+import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -47,10 +49,16 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
+
         Listener listener = startListening(entity, owner);
         Speaker speaker = startSpeaking(entity, owner);
-        Receiver receiver = startReceiving(entity, frequencyName, RadioManager.getInstance().frequencies().modulationOf(modulation), owner);
-        Transmitter transmitter = startTransmitting(entity, frequencyName, RadioManager.getInstance().frequencies().modulationOf(modulation), owner);
+        Receiver receiver = startReceiving(entity, frequencyName, frequencies.modulationOf(modulation), owner);
+        Transmitter transmitter = startTransmitting(entity, frequencyName, frequencies.modulationOf(modulation), owner);
+
+        if (speaker.getOwner().level() != level) {
+            CommonSimpleRadio.info(level);
+        }
 
         listener.setOwner(entity);
         speaker.setOwner(entity);
@@ -80,10 +88,12 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         });
     }
     private void inactivate(Level level, String frequencyName, String modulation, UUID owner) {
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
+
         stopListening(owner, level.isClientSide);
         stopSpeaking(owner, level.isClientSide);
-        stopReceiving(frequencyName, RadioManager.getInstance().frequencies().modulationOf(modulation), owner);
-        stopTransmitting(frequencyName, RadioManager.getInstance().frequencies().modulationOf(modulation), owner);
+        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner);
+        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner);
     }
 
     public int getCooldown() {
@@ -120,7 +130,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         tick(stack, level);
         if (frequency.isEmpty() || modulation.isEmpty()) return;
 
-        if (!RadioManager.getInstance().frequencies().check(frequency)) {
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
+        if (!frequencies.check(frequency)) {
             CommonSimpleRadio.info("Invalid frequency {}, replacing with default", frequency);
             frequency = this.getDefaultFrequency();
             tag.putString("frequency", frequency);
@@ -129,7 +140,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         // Mode-switch deactivation (i.e. item is dropped)
         Router activeRouter = null;
         if (tag.contains("reference")) {
-            activeRouter = RadioManager.getInstance().getRouterSided(tag.getUUID("reference"), level.isClientSide);
+            activeRouter = SimpleRadioApi.getRouterSided(tag.getUUID("reference"), level.isClientSide);
         }
 
         if (activeRouter != null) {

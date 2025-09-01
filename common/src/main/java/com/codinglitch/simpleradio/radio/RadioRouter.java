@@ -46,7 +46,7 @@ public class RadioRouter implements Socket, Router {
     private Map<UUID, OpusEncoder> encoders;
 
     public List<Wiring> wires = new ArrayList<>();
-    public List<RadioRouter> routers = new ArrayList<>();
+    public List<Router> routers = new ArrayList<>();
     public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
 
     public BiPredicate<Source, Router> routeCriteria;
@@ -167,6 +167,14 @@ public class RadioRouter implements Socket, Router {
         return null;
     }
 
+    @Nullable
+    @Override
+    public Boolean isClientSide() {
+        if (owner != null) return owner.level().isClientSide();
+        if (position != null) return position.isClientSide();
+        return null;
+    }
+
     @Override
     public WorldlyPosition getLocation() {
         if (this.position != null) {
@@ -190,8 +198,13 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public RadioRouter getRouter(UUID id) {
-        return routers.stream().filter(router -> router.reference.equals(id)).findFirst().orElse(null);
+    public Router getRouter(UUID id) {
+        return routers.stream().filter(router -> router.getReference().equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public List<Router> getRouters() {
+        return routers;
     }
 
     @Override
@@ -269,16 +282,16 @@ public class RadioRouter implements Socket, Router {
     public Router tryAddRouter(Router router) {
         return tryAddRouter((RadioRouter) router);
     }
-    public RadioRouter tryAddRouter(RadioRouter router) {
-        RadioRouter existingRouter = getRouter(router.reference);
+    public Router tryAddRouter(RadioRouter router) {
+        Router existingRouter = getRouter(router.reference);
         if (existingRouter != null) return existingRouter;
 
-        return (RadioRouter) addRouter(router);
+        return addRouter(router);
     }
 
     @Override
     public Router addRouter(Router router) {
-        routers.add((RadioRouter) router);
+        routers.add(router);
         return router;
     }
 
@@ -428,7 +441,7 @@ public class RadioRouter implements Socket, Router {
         }
 
         for (int i = 0; i < routers.size(); i++) {
-            RadioRouter router = routers.get(i);
+            RadioRouter router = (RadioRouter) routers.get(i);
 
             if (criteria != null) {
                 if (!criteria.test(router)) continue;

@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.routers;
 
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractList;
@@ -12,7 +13,11 @@ public class RouterContainer<R extends Router> extends AbstractList<R> {
     private final ArrayList<R> content = new ArrayList<>();
 
     public boolean add(R router) {
-        ServerSimpleRadioApi.getInstance().pushRouter(router);
+
+        // See if we can figure out the side from the router
+        Boolean isClient = router.isClientSide();
+        SimpleRadioApi api = isClient == null ? SimpleRadioApi.getInstance() : SimpleRadioApi.getInstance(isClient);
+        api.registerRouter(router);
 
         return content.add(router);
     }

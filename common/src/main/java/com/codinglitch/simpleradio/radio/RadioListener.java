@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.routers.Listener;
 import net.minecraft.world.entity.Entity;
@@ -38,7 +39,7 @@ public class RadioListener extends RadioRouter implements Listener {
         this.owner = owner;
 
         boolean isClient = owner.level().isClientSide();
-        RadioManager.registerRouterSided(this, isClient, null);
+        SimpleRadioApi.registerRouterSided(this, isClient, null);
     }
     public RadioListener(WorldlyPosition location) {
         this(location, UUID.randomUUID());
@@ -49,7 +50,7 @@ public class RadioListener extends RadioRouter implements Listener {
 
 
         boolean isClient = location.isClientSide();
-        RadioManager.registerRouterSided(this, isClient, null);
+        SimpleRadioApi.registerRouterSided(this, isClient, null);
     }
 
     @Override

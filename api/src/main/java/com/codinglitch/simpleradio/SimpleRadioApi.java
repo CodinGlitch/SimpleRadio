@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -21,7 +22,14 @@ public abstract class SimpleRadioApi {
     }
 
     public static SimpleRadioApi getInstance() {
-        return INSTANCE;
+        String threadName = Thread.currentThread().getName(); // ☹
+        if (threadName.contains("Render")) {
+            return getInstance(true);
+        } else if (threadName.contains("Server")) {
+            return getInstance(false);
+        } else {
+            return INSTANCE;
+        }
     }
     public static SimpleRadioApi getInstance(boolean isClient) {
         return isClient ? ClientSimpleRadioApi.getInstance() : ServerSimpleRadioApi.getInstance();
@@ -55,6 +63,9 @@ public abstract class SimpleRadioApi {
     public abstract <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener);
 
     public abstract BlockPos travelExtension(BlockPos pos, LevelAccessor level);
+
+    public abstract <R extends Router> void registerRouter(R router);
+    public abstract <R extends Router> void registerRouter(R router, @Nullable Frequency frequency);
 
     /**
      * Creates a blank Router with the specified reference.

@@ -49,9 +49,6 @@ public abstract class ClientSimpleRadioApi extends SimpleRadioApi {
     public abstract Transmitter getTransmitter(Entity owner);
     public abstract Transmitter getTransmitter(WorldlyPosition location);
 
-    public abstract <R extends Router> void registerRouter(R router);
-    public abstract <R extends Router> void registerRouter(R router, @Nullable Frequency frequency);
-
     public abstract Router removeRouter(Predicate<Router> predicate);
 
     public abstract Router removeRouter(Router router);

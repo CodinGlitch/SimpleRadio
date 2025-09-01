@@ -115,10 +115,10 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
+        this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
+        this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());
         if (!level.isClientSide) {
             //TODO: update players of radio state
-            this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
-            this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());
 
             level.playSound(
                     null, location.x, location.y, location.z,
@@ -126,12 +126,6 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
                     SoundSource.PLAYERS,
                     1f, 1f
             );
-        } else {
-            this.receiver = new RadioReceiver(frequency, location, id);
-            this.speaker = new RadioSpeaker(location, id);
-
-            ClientRadioManager.getInstance().registerRouter(receiver);
-            ClientRadioManager.getInstance().registerRouter(speaker);
         }
 
         receiver.addRouter(speaker);

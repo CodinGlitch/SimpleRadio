@@ -33,7 +33,7 @@ public interface Socket {
 
         for (int i = 0; i < wires.size(); i++) {
             Wiring wire = wires.get(i);
-            if (source.getWireMedium() != null && source.getWireMedium().getUUID().equals(wire.getUUID())) continue;
+            if (source.getWireMedium() != null && source.getWireMedium().getReference().equals(wire.getReference())) continue;
 
             Source oldSource = source;
             if (i < wires.size()-1) source = source.copy();
@@ -72,7 +72,7 @@ public interface Socket {
         this.getWires().removeIf(otherWire -> otherWire.equals(wire));
     }
     default void disconnect(UUID wire) {
-        this.getWires().removeIf(otherWire -> otherWire.getUUID().equals(wire));
+        this.getWires().removeIf(otherWire -> otherWire.getReference().equals(wire));
     }
 
     default UUID getReference() {
@@ -91,7 +91,9 @@ public interface Socket {
         for (Wiring wire : getWires()) {
             wire.burnOut();
         }
+
         this.getWires().clear();
+        this.getRouter().getRouters();
     }
 
     /**

@@ -35,10 +35,6 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
 
     // ---- Routers ---- \\
 
-    public abstract <R extends Router> void putRouter(@Nullable RouterContainer<R> container, R router);
-    public abstract <R extends Router> short pushRouter(R router);
-    public abstract <R extends Router> short pushRouter(Map<Short, R> map, R router);
-
     public abstract short getIdentifier(Predicate<Router> filter);
 
     public abstract List<Router> getRouters();
@@ -58,9 +54,6 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
     public abstract Router getRouter(UUID reference);
     public abstract Router getRouter(Entity owner);
     public abstract Router getRouter(WorldlyPosition location);
-
-    public abstract void registerRouter(Router router);
-    public abstract void registerRouter(Router router, @Nullable Frequency frequency);
 
     // ---- Audio ---- \\
 

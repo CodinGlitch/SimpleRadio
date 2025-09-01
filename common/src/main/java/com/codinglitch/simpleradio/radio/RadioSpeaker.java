@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
@@ -60,7 +61,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         this(uuid);
         this.owner = owner;
 
-        RadioManager.getInstance().registerRouterSided(this, owner.level().isClientSide(), null);
+        SimpleRadioApi.registerRouterSided(this, owner.level().isClientSide(), null);
     }
     public RadioSpeaker(WorldlyPosition location) {
         this(location, UUID.randomUUID());
@@ -69,7 +70,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         this(uuid);
         this.position = location;
 
-        RadioManager.getInstance().registerRouterSided(this, location.isClientSide(), null);
+        SimpleRadioApi.registerRouterSided(this, location.isClientSide(), null);
     }
 
     @Override
