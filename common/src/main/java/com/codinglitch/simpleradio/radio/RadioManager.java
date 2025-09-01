@@ -465,6 +465,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     // I mixin here instead of using the appropriate events to access the channel as well as prevent duplicates
     public void onLocationalPacket(Level level, LocationalAudioChannel channel, byte[] data) {
+        if (!SimpleRadioLibrary.SERVER_CONFIG.router.feedbackListening) return;
         Vector3f senderPosition = new Vector3f((float) channel.getLocation().getX(), (float) channel.getLocation().getY(), (float) channel.getLocation().getZ());
         sendAudio(WorldlyPosition.of(senderPosition, level), channel.getId(), data);
     }
