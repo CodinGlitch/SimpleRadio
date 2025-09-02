@@ -13,6 +13,7 @@ import java.util.UUID;
 public interface Source {
     byte[] getData();
     SoundEvent getSoundEvent();
+    String getSound();
 
     float getPitch();
     UUID getOwner();

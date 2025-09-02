@@ -89,6 +89,11 @@ public class RadioSource implements Source {
     }
 
     @Override
+    public String getSound() {
+        return this.sound;
+    }
+
+    @Override
     public SoundEvent getSoundEvent() {
         return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.tryParse(this.sound));
     }
