@@ -39,7 +39,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
     private void simpleradio$startPlaying_audioGathering(CallbackInfo ci) {
         Item item = this.getTheItem().getItem();
 
-        if (item instanceof RecordItem && level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel) {
             RadioManager.getInstance().sendRecord(
                     this.getFirstItem(),
                     WorldlyPosition.of(getBlockPos().getCenter().toVector3f(), serverLevel),
@@ -65,7 +65,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
     private void simpleradio$tick_audioGathering(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
         Item item = this.getTheItem().getItem();
 
-        if (item instanceof RecordItem && level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel) {
             float offset = (tickCount - recordStartedTick) / 20f;
 
             RadioManager.getInstance().updateRecord(

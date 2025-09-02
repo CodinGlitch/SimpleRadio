@@ -92,10 +92,8 @@ public class CompatCore {
     }
 
     public static String getSound(ItemStack stack) {
-        if (CompatCore.COMPUTER_CRAFT.isLoaded) {
-            String result = Services.COMPAT.getSound(stack);
-            if (result != null) return result;
-        }
+        String result = Services.COMPAT.getSound(stack);
+        if (result != null) return result;
 
         if (stack.getItem() instanceof RecordItem recordItem) {
             return recordItem.getSound().getLocation().toString();

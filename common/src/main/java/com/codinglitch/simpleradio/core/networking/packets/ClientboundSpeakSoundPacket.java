@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundEvent;
 
 import java.util.UUID;
 
-public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> sound, float volume, float pitch, float severity, float offset, long seed) implements CustomPacket {
+public record ClientboundSpeakSoundPacket(UUID routerID, String sound, float volume, float pitch, float severity, float offset, long seed) implements CustomPacket {
     public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "speak_sound_packet");
     @Override
     public ResourceLocation id() {
@@ -20,9 +20,7 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
 
     public void write(FriendlyByteBuf buffer) {
         buffer.writeUUID(routerID);
-        buffer.writeId(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), this.sound, (byteBuf, event) -> {
-            event.writeToNetwork(byteBuf);
-        });
+        buffer.writeUtf(this.sound);
         buffer.writeFloat(this.volume);
         buffer.writeFloat(this.pitch);
         buffer.writeFloat(this.severity);
@@ -32,7 +30,7 @@ public record ClientboundSpeakSoundPacket(UUID routerID, Holder<SoundEvent> soun
 
     public static ClientboundSpeakSoundPacket read(FriendlyByteBuf buffer) {
         return new ClientboundSpeakSoundPacket(
-                buffer.readUUID(), buffer.readById(BuiltInRegistries.SOUND_EVENT.asHolderIdMap(), SoundEvent::readFromNetwork),
+                buffer.readUUID(), buffer.readUtf(),
                 buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readLong()
         );
     }
