@@ -36,7 +36,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         byte[] encodedData = source.getData();
         if (encodedData == null) {
             data = null;
-            sound = source.getSoundEvent().getLocation().toString();
+            sound = source.getSound();
         } else {
             sound = null;
 
@@ -70,7 +70,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         Block block = this.socket.getBlockState().getBlock();
         ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(block);
 
-        return resource.getPath();
+        return resource.toString();
     }
 
     @LuaFunction
