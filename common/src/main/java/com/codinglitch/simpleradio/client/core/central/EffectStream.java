@@ -2,17 +2,23 @@ package com.codinglitch.simpleradio.client.core.central;
 
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.mojang.blaze3d.audio.OggAudioStream;
+import net.minecraft.client.sounds.AudioStream;
 
+import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
-public class EffectStream extends OggAudioStream {
+public class EffectStream implements AudioStream {
+    private final AudioStream substream;
     public AudioEffect effect;
 
     public EffectStream(InputStream inputStream) throws IOException {
-        super(inputStream);
+        this(new OggAudioStream(inputStream));
+    }
+    public EffectStream(AudioStream substream) {
+        this.substream = substream;
     }
 
     public void applyEffect(ByteBuffer buffer, int size) {
@@ -25,23 +31,36 @@ public class EffectStream extends OggAudioStream {
     }
 
     public ByteBuffer push(int size) throws IOException {
+        return this.substream.read(size);
+    }
 
-        return super.read(size);
+    @Override
+    public AudioFormat getFormat() {
+        return this.substream.getFormat();
     }
 
     @Override
     public ByteBuffer read(int size) throws IOException {
-        ByteBuffer buffer = super.read(size);
-        this.applyEffect(buffer, size);
+        ByteBuffer buffer = this.substream.read(size);
+        this.applyEffect(buffer, 1);
 
         return buffer;
     }
 
-    @Override
-    public ByteBuffer readAll() throws IOException {
-        ByteBuffer buffer = super.readAll();
-        this.applyEffect(buffer, buffer.limit());
 
+    public ByteBuffer readAll() throws IOException {
+        ByteBuffer buffer = null;
+        if (this.substream instanceof OggAudioStream oggStream) {
+            buffer = oggStream.readAll();
+        }
+        if (buffer == null) return null;
+
+        this.applyEffect(buffer, buffer.limit());
         return buffer;
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.substream.close();
     }
 }

@@ -502,15 +502,11 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     public void sendRecord(ItemStack stack, WorldlyPosition position, long identifier) {
-        Item item = stack.getItem();
-
-        if (item instanceof RecordItem recordItem) {
-            RadioManager.getInstance().sendSound(
-                    position,
-                    recordItem.getSound(),
-                    1, 1, identifier
-            );
-        }
+        RadioManager.getInstance().sendSound(
+                position,
+                CompatCore.getSound(stack),
+                1, 1, identifier
+        );
     }
     public void stopRecord(ServerLevel level, long identifier) {
 
@@ -519,7 +515,7 @@ public class RadioManager extends ServerSimpleRadioApi {
             RadioSource newSource = new RadioSource(
                     listener.getReference(),
                     listener.getLocation(),
-                    SoundEvents.EMPTY, 1
+                    "", 1
             );
             newSource.seed = identifier;
 
@@ -529,15 +525,11 @@ public class RadioManager extends ServerSimpleRadioApi {
         level.getServer().execute(() -> sources.forEach(Listener::listen));
     }
     public void updateRecord(ItemStack stack, WorldlyPosition position, float offset, long identifier) {
-        Item item = stack.getItem();
-
-        if (item instanceof RecordItem recordItem) {
-            RadioManager.getInstance().sendSound(
-                    position,
-                    recordItem.getSound(),
-                    1, 1,  offset, identifier
-            );
-        }
+        RadioManager.getInstance().sendSound(
+                position,
+                CompatCore.getSound(stack),
+                1, 1,  offset, identifier
+        );
     }
 
     public void sendSound(WorldlyPosition location, SoundEvent soundEvent, float volume, float pitch, long seed) {
@@ -545,6 +537,9 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
     public void sendSound(WorldlyPosition location, SoundEvent soundEvent, float volume, float pitch, float offset, long seed) {
         sendSound(location, soundEvent.getLocation().toString(), volume, pitch, offset, seed);
+    }
+    public void sendSound(WorldlyPosition location, String sound, float volume, float pitch, long seed) {
+        sendSound(location, sound, volume, pitch, 0, seed);
     }
     public void sendSound(WorldlyPosition location, String sound, float volume, float pitch, float offset, long seed) {
         Level level = location.level;
