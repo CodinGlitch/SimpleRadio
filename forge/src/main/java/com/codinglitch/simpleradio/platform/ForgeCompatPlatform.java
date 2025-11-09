@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.compat.EtchedCompat;
+import com.codinglitch.simpleradio.compat.etched.EtchedCompat;
 import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
