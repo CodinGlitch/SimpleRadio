@@ -6,8 +6,10 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinAbstractContraptionEntity",
+    "MixinAlbumJukeboxBlockEntity",
     "MixinContraption",
-    "MixinLocationalAudioChannelImpl"
+    "MixinLocationalAudioChannelImpl",
+    "MixinStreamingAudioSource"
   ],
   "client": [
   ],
