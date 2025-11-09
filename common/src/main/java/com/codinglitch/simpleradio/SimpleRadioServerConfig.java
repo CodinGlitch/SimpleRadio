@@ -339,6 +339,9 @@ public class SimpleRadioServerConfig extends LexiconData {
             @LexiconEntry(comment = "When false, removes compatibility for Etched. Defaults to true.")
             public Boolean enabled = true;
 
+            @LexiconEntry(comment = "When true, enabled the mixin patch fixing the 'dual-download' issue. Defaults to true.")
+            public Boolean streamPatch = true;
+
             @Override
             public boolean isEnabled() { return enabled; }
         }

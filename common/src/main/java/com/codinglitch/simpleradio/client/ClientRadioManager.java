@@ -33,10 +33,10 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.debug.DebugRenderer;
-import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
@@ -60,6 +60,7 @@ import org.joml.Math;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.openal.AL10;
 import oshi.util.tuples.Pair;
 
 import javax.sound.sampled.AudioFormat;
@@ -363,13 +364,13 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         ROUTERS.clear();
     }
 
-    public static void speakSound(ClientboundSpeakSoundPacket packet) {
+    public static void speakSound(UUID routerID, String soundString, float volume, float pitch, float severity, float offset, long seed) {
         Minecraft mc = Minecraft.getInstance();
 
         SoundManager soundManager = mc.getSoundManager();
         SoundEngine soundEngine = soundManager.soundEngine;
 
-        ClientRouterWrapper wrapper = INSTANCE.getWrapper(packet.routerID());
+        ClientRouterWrapper wrapper = INSTANCE.getWrapper(routerID);
         if (wrapper == null) return;
 
         Router router = wrapper.router;
@@ -378,48 +379,52 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         WorldlyPosition location = router.getLocation();
         Vec3 position = new Vec3(location.position());
 
-        String soundString = packet.sound();
 
-        ChannelHandleWrapper existingChannelHandle = wrapper.getChannel(packet.seed());
+        ChannelHandleWrapper existingChannelHandle = wrapper.getChannel(seed);
         if (existingChannelHandle != null) {
             if (existingChannelHandle.channelHandle.isStopped()) {
-                wrapper.removeChannel(packet.seed());
+                wrapper.removeChannel(seed);
             } else {
-                if (soundString.isEmpty() && packet.volume() == 0) {
+                if (soundString.isEmpty() && volume == 0) {
                     existingChannelHandle.execute(Channel::stop);
-                } else {
-                    //if (true) return;
-
-                    existingChannelHandle.effect.severity = packet.severity();
-                    existingChannelHandle.effect.volume = packet.volume();
+                    if (existingChannelHandle.instance instanceof TickableSoundInstance tickable) {
+                        soundEngine.tickingSounds.remove(tickable);
+                    }
+                    return;
+                } else if (existingChannelHandle.currentSound.equals(soundString)) {
+                    existingChannelHandle.effect.severity = severity;
+                    existingChannelHandle.effect.volume = volume;
 
                     existingChannelHandle.execute(channel -> {
                         channel.setSelfPosition(position);
                     });
-                }
 
-                return;
+                    return;
+                } else {
+                    existingChannelHandle.execute(Channel::stop);
+                }
             }
         }
-        if (soundString.isEmpty() && packet.volume() == 0) return;
+
+        if (soundString.isEmpty() && volume == 0) return;
 
 
         Optional<ResourceLocation> soundLocation = ResourceLocation.read(soundString).result();
-        AbstractSoundInstance instance;
+        SoundInstance instance;
 
         SoundEvent soundEvent = null;
         if (soundLocation.isPresent()) soundEvent = BuiltInRegistries.SOUND_EVENT.get(soundLocation.get());
 
         if (soundEvent == null) {
-            instance = ClientServices.COMPAT.makeSound(router, soundString, packet.seed());
+            instance = ClientServices.COMPAT.makeSound(router, soundString, volume, pitch, severity, offset, seed);
             if (instance == null) return;
 
             //soundManager.play(instance);
             //return;
         } else {
             instance = new SimpleSoundInstance(soundEvent, SoundSource.BLOCKS,
-                    packet.volume(), packet.pitch(),
-                    RandomSource.create(packet.seed()), location.blockPos()
+                    volume, pitch,
+                    RandomSource.create(seed), location.blockPos()
             );
             instance.resolve(soundManager);
         }
@@ -430,10 +435,10 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         CompletableFuture<ChannelAccess.ChannelHandle> completableFuture = soundEngine.channelAccess.createHandle(sound.shouldStream() ? Library.Pool.STREAMING : Library.Pool.STATIC);
         ChannelAccess.ChannelHandle channelHandle = completableFuture.join();
 
-        float attenuatedVolume = Math.max(packet.volume(), 1.0F) * (float) (sound.getAttenuationDistance());
+        float attenuatedVolume = Math.max(volume, 1.0F) * (float) (sound.getAttenuationDistance());
         channelHandle.execute(channel -> {
-            channel.setPitch(packet.pitch());
-            channel.setVolume(packet.volume());
+            channel.setPitch(pitch);
+            channel.setVolume(volume);
 
             if (instance.getAttenuation() == SoundInstance.Attenuation.LINEAR) {
                 channel.linearAttenuation(attenuatedVolume);
@@ -445,28 +450,45 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
             channel.setRelative(instance.isRelative());
         });
 
+        soundEngine.soundDeleteTime.put(instance, soundEngine.tickCount + 20);
+        soundEngine.instanceToChannel.put(instance, channelHandle);
+        soundEngine.instanceBySource.put(instance.getSource(), instance);
+        if (instance instanceof TickableSoundInstance tickable) {
+            soundEngine.tickingSounds.add(tickable);
+        }
+
         // --- Audio Streaming --- \\
         CompletableFuture<AudioStream> future = ClientServices.COMPAT.makeSubstream(instance);
 
         AudioEffect effect = new BaseAudioEffect();
         effect.volume = 1;
-        effect.severity = packet.severity();
-
+        effect.severity = severity;
 
         if (sound.shouldStream()) {
             ChannelHandleWrapper channelWrapper = ChannelHandleWrapper.of(channelHandle);
             channelWrapper.effect = effect;
+            channelWrapper.currentSound = soundString;
+            channelWrapper.instance = instance;
 
-            wrapper.addChannel(packet.seed(), channelWrapper);
+            wrapper.addChannel(seed, channelWrapper);
 
             future.thenAccept(audioStream -> channelHandle.execute(channel -> {
+                //channel.updateStream();
+
+                int $$0 = AL10.alGetSourcei(channel.source, 4118);
+                if ($$0 > 0) {
+                    int[] $$1 = new int[$$0];
+                    AL10.alSourceUnqueueBuffers(channel.source, $$1);
+                    AL10.alDeleteBuffers($$1);
+                }
+
                 EffectStream stream = new EffectStream(audioStream);
                 stream.effect = effect;
 
                 AudioFormat format = audioStream.getFormat();
 
-                if (packet.offset() != 0) {
-                    int sampleOffset = (int)((packet.offset() * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());
+                if (offset != 0) {
+                    int sampleOffset = (int)((offset * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());
                     try {
                         stream.push(sampleOffset);
                     } catch (IOException e) {
@@ -497,6 +519,10 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
                 channel.play();
             }));
         }
+    }
+
+    public static void speakSound(ClientboundSpeakSoundPacket packet) {
+        speakSound(packet.routerID(), packet.sound(), packet.volume(), packet.pitch(), packet.severity(), packet.offset(), packet.seed());
     }
 
     public static void handleListenParticle(BlockState state, MicrophoneBlockEntity blockEntity) {

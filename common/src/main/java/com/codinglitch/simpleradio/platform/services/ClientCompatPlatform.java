@@ -4,9 +4,8 @@ import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.audio.OggAudioStream;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.AudioStream;
-import net.minecraft.client.sounds.LoopingAudioStream;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
 
@@ -16,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public interface ClientCompatPlatform {
-    default CompletableFuture<AudioStream> makeSubstream(AbstractSoundInstance sound) {
+    default CompletableFuture<AudioStream> makeSubstream(SoundInstance sound) {
         Minecraft mc = Minecraft.getInstance();
         SoundManager soundManager = mc.getSoundManager();
         SoundEngine soundEngine = soundManager.soundEngine;
@@ -31,5 +30,5 @@ public interface ClientCompatPlatform {
         }, Util.backgroundExecutor());
     }
 
-    AbstractSoundInstance makeSound(Router router, String soundString, long seed);
+    SoundInstance makeSound(Router router, String soundString, float volume, float pitch, float severity, float offset, long seed);
 }
