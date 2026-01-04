@@ -525,7 +525,6 @@ public class RadioManager extends ServerSimpleRadioApi {
         level.getServer().execute(() -> sources.forEach(Listener::listen));
     }
     public void updateRecord(ItemStack stack, WorldlyPosition position, float offset, long identifier) {
-        if (true) return;
         RadioManager.getInstance().sendSound(
                 position,
                 CompatCore.getSound(stack),
