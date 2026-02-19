@@ -5,7 +5,6 @@ import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.lua.*;
-import dan200.computercraft.api.peripheral.AttachedComputerSet;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -17,9 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeripheral {
-    private final AttachedComputerSet computers = new AttachedComputerSet();
+    private final CopyOnWriteArraySet<IComputerAccess> computers = new CopyOnWriteArraySet<>();
     private final T socket;
 
     public SocketPeripheral(BlockEntity socket) {
