@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.routers.Router;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -31,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public class InsulatorBlock extends BaseEntityBlock implements Routing {
+    public static final MapCodec<InsulatorBlock> CODEC = simpleCodec(InsulatorBlock::new);
+
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty EMPTY = BooleanProperty.create("empty");
     public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
@@ -56,6 +59,11 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
     public InsulatorBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(ROTATED, false).setValue(EMPTY, true));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.routers.Transmitter;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class TransmitterBlock extends BaseEntityBlock implements Routing, Transmitting {
+    public static final MapCodec<TransmitterBlock> CODEC = simpleCodec(TransmitterBlock::new);
+
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(Block.box(2.0, 0.0, 4.0, 14.0, 9.0, 16.0), Block.box(1.0, 9.0, 3.0, 15.0, 12.0, 16.0));
@@ -43,6 +46,11 @@ public class TransmitterBlock extends BaseEntityBlock implements Routing, Transm
     public TransmitterBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override

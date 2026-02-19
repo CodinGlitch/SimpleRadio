@@ -28,9 +28,6 @@ public class CompatCore {
             "Vibrative Voice", "vibrativevoice", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.vibrative_voice,
             List.of(VC_INTERACTION)
     );
-    public static CompatibilityInstance VALKYRIEN_SKIES = new CompatibilityInstance(
-            "Valkyrien Skies", "valkyrienskies", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.valkyrien_skies
-    );
     public static CompatibilityInstance CREATE = new CompatibilityInstance(
             "Create", "create", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create, "[6.0,)"
     );
@@ -52,7 +49,6 @@ public class CompatCore {
         VC_INTERACTION.spout();
         VIBRATIVE_VOICE.spout();
 
-        VALKYRIEN_SKIES.spout();
         CREATE.spout();
         COMPUTER_CRAFT.spout();
 
