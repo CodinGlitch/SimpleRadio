@@ -4,7 +4,6 @@ import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.InteractionCompat;
-import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSource;
@@ -30,7 +29,6 @@ public class FabricCompatPlatform implements CompatPlatform {
 
         // ---- Valkyrien Skies ---- \\
         if (CompatCore.VALKYRIEN_SKIES.enabled) {
-            return ValkyrienCompat.modifyPosition(position);
         }
 
         return position;
@@ -41,7 +39,6 @@ public class FabricCompatPlatform implements CompatPlatform {
 
         // ---- Valkyrien Skies ---- \\
         if (CompatCore.VALKYRIEN_SKIES.enabled) {
-            return ValkyrienCompat.modifyRotation(position, rotation);
         }
 
         return rotation;

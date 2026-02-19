@@ -41,7 +41,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
 
         if (level instanceof ServerLevel serverLevel) {
             RadioManager.getInstance().sendRecord(
-                    this.getFirstItem(),
+                    this.getTheItem(),
                     WorldlyPosition.of(getBlockPos().getCenter().toVector3f(), serverLevel),
                     this.getBlockPos().asLong()
             );
@@ -69,7 +69,7 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
             float offset = (tickCount - recordStartedTick) / 20f;
 
             RadioManager.getInstance().updateRecord(
-                    this.getFirstItem(),
+                    this.getTheItem(),
                     WorldlyPosition.of(getBlockPos().getCenter().toVector3f(), serverLevel),
                     offset,
                     this.getBlockPos().asLong()
