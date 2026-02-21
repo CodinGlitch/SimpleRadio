@@ -11,23 +11,13 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.UUID;
 
 public class VibrativeCompat {
-    public static void onData(RadioSpeaker channel, RadioSource source, short[] decodedData) {
-        UUID sourceOwner = source.getRealOwner();
-        VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(sourceOwner);
-
+    public static void onData(RadioSpeaker speaker, RadioSource source, short[] decodedData) {
         VibrativeVoiceApi.VibrationType type = VibrativeVoiceApi.INSTANCE.getQualifyingType(decodedData);
-
         if (type == null) return;
 
-        if (connection == null) {
-            if (channel.position == null) return;
+        WorldlyPosition location = speaker.getLocation();
+        if (location == null) return;
 
-            WorldlyPosition location = channel.position;
-            //VibrativeVoiceApi.INSTANCE.trySendVibration(channel.owner, location.blockPos(), location.level, type);
-        } else {
-            if (connection.getPlayer().getPlayer() instanceof ServerPlayer player) {
-                VibrativeVoiceApi.INSTANCE.trySendVibration(player, player.level(), type);
-            }
-        }
+        VibrativeVoiceApi.INSTANCE.trySendVibration(speaker.reference, location.blockPos(), location.level, type);
     }
 }
