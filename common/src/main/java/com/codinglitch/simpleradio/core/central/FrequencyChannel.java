@@ -114,8 +114,9 @@ public class FrequencyChannel implements Frequency {
     public Receiver tryAddReceiver(UUID id, WorldlyPosition location) {
         boolean isClient = location.isClientSide();
 
-        Receiver receiver = null;//isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
-        if (receiver == null) receiver = getReceiver(id);
+        //Receiver receiver = null;isClient ? ClientRadioManager.getReceiver(location) : getReceiver(location);
+        //if (receiver == null)
+        Receiver receiver = getReceiver(id);
 
         if (receiver == null)
             return addReceiver(id, location);
@@ -132,8 +133,9 @@ public class FrequencyChannel implements Frequency {
     public Receiver tryAddReceiver(UUID id, Entity entity) {
         boolean isClient = entity.level().isClientSide;
 
-        Receiver receiver = getReceiver(entity);
-        if (receiver == null) receiver = getReceiver(id);
+        //Receiver receiver = getReceiver(entity);
+        //if (receiver == null)
+        Receiver receiver = getReceiver(id);
 
         if (receiver == null)
             return addReceiver(id, entity);
@@ -210,8 +212,9 @@ public class FrequencyChannel implements Frequency {
     public Transmitter tryAddTransmitter(UUID id, WorldlyPosition location) {
         boolean isClient = location.isClientSide();
 
-        Transmitter transmitter = null;//isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
-        if (transmitter == null) transmitter = getTransmitter(id);
+        //Transmitter transmitter = isClient ? ClientRadioManager.getTransmitter(location) : getTransmitter(location);
+        //if (transmitter == null)
+        Transmitter transmitter = getTransmitter(id);
 
         if (transmitter == null)
             return addTransmitter(id, location);
@@ -228,8 +231,9 @@ public class FrequencyChannel implements Frequency {
     public Transmitter tryAddTransmitter(UUID id, Entity entity) {
         boolean isClient = entity.level().isClientSide;
 
-        Transmitter transmitter = getTransmitter(entity);
-        if (transmitter == null) transmitter = getTransmitter(id);
+        //Transmitter transmitter = getTransmitter(entity);
+        //if (transmitter == null)
+        Transmitter transmitter = getTransmitter(id);
 
         if (transmitter == null)
             return addTransmitter(id, entity);
