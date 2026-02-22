@@ -1,75 +1,40 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'net.minecraftforge.gradle' version '[7.0.2,8.0)'
+    id 'net.minecraftforge.jarjar' version '0.2.3'
     id "com.modrinth.minotaur" version "2.+"
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
-mixin {
+/*mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
     config("${mod_id}.mixins.json")
     config("${mod_id}.forge.mixins.json")
-}
+}*/
 
-artifacts {
-    apiElements tasks.named("jarJar")
-}
-
-tasks.withType(GenerateModuleMetadata) {
-    enabled = false
-}
-components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
-    skip()
-}
+jarJar.register()
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
 
-    copyIdeResources = true //Calls processResources when in dev
+    //copyIdeResources = true //Calls processResources when in dev
 
-    // Automatically enable forge AccessTransformers if the file exists
-    // This location is hardcoded in Forge and can not be changed.
-    // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
-    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformer = at
-    }
+    accessTransformers = files('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
-        client {
-            workingDirectory file('runs/client')
-            ideaModule "${rootProject.name}.${project.name}.development"
-            taskName 'Client'
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                }
-            }
+        configureEach {
+            workingDir.convention layout.projectDirectory.dir('run')
+
+            args "--mixin.config=${mod_id}.mixins.json"
+            args "--mixin.config=${mod_id}.forge.mixins.json"
         }
 
-        server {
-            workingDirectory file('runs/server')
-            ideaModule "${rootProject.name}.${project.name}.development"
-            taskName 'Server'
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                }
-            }
+        register('client') {
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
         }
-
-        data {
-            workingDirectory file('runs/data')
-            ideaModule "${rootProject.name}.${project.name}.datagen"
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            taskName 'Data'
-            mods {
-                modDataRun {
-                    source sourceSets.datagen
-                }
-            }
+        register('server') {
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
         }
     }
 }
@@ -77,65 +42,54 @@ minecraft {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    implementation project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
-    // --- Dependencies --- \\
+    implementation "com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}"
 
-    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    developmentRuntimeOnly fg.deobf("com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}:slim")
+    implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    implementation "maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}"
 
-    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    compileOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
-    developmentRuntimeOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}"))
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}")) {
-        jarJar.ranged(it, "[${mixin_extras_version},)")
-    }
-
-    // --- Compatibilities --- \\
-
-    // Audio Player
-    implementation fg.deobf("curse.maven:etched-491890:5999495")
-
-    // ComputerCraft
-    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${cc_version}")
-    compileOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${cc_version}"))
-    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}"))
+    // -- Compatibilities -- \\
 
     // Vibrative Voice
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
 
     // Valkyrien Skies
     if (valkyrien_skies_env_versions.contains(minecraft_version)) {
-        compileOnly fg.deobf("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}")
-        compileOnly "org.valkyrienskies.core:api:${valkyrien_skies_api_version}" // forge wont inherit the api from common for some reason
+        compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.', '')}-forge:${valkyrien_skies_version}"
+        runtimeOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.', '')}-forge:${valkyrien_skies_version}"
+        implementation("org.valkyrienskies.core:api:${valkyrien_skies_api_version}")
+        // forge wont inherit the api from common for some reason
     }
 
     // Create
     if (create_env_versions.contains(minecraft_version)) {
-        compileOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        compileOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-        compileOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
-
-        developmentRuntimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        developmentRuntimeOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-        developmentRuntimeOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        developmentRuntimeOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+        implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim")
+        implementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+        compileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+        runtimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+        implementation("com.tterrag.registrate:Registrate:${registrate_version}")
     }
 
     // JEI / REI
     if (recipe_viewer == "jei") {
-        developmentRuntimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
+        // compile against the JEI API but do not include it at runtime
+        compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+        compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+        // at runtime, use the full JEI jar for Forge
+        runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
     } else if (recipe_viewer == "rei") {
         // TODO: add rei to devenv
     }
 
     // Config mods
     if (config_mod == "configured") {
-        developmentRuntimeOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
+        runtimeOnly "com.mrcrayfish:configured-forge:${configured_version}"
     } else if (config_mod == "cloth_config") {
 
     } else if (config_mod == "owo") {
@@ -145,23 +99,47 @@ dependencies {
     }
 }
 
-
+tasks.withType(JavaCompile).configureEach {
+    source(project(":common").sourceSets.main.allSource)
+}
+tasks.withType(Javadoc).configureEach {
+    source(project(":common").sourceSets.main.allJava)
+}
+tasks.named("sourcesJar", Jar) {
+    from(project(":common").sourceSets.main.allSource)
+}
 tasks.named('jarJar') {
     archiveClassifier = ''
-    //finalizedBy reobfJarJar
 }
-jar.archiveClassifier = "slim"
+tasks.('jar') {
+    archiveClassifier = "slim"
+    manifest {
+        attributes 'ContainedDeps': "mixinextras-forge-${mixin_extras_version}.jar"
+    }
+}
 jar.finalizedBy('reobfJar')
 
-sourceSets.each {
-    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-    it.output.resourcesDir = dir
-    it.java.destinationDirectory = dir
+processResources {
+    from project(":common").sourceSets.main.resources
+    from project(":forge").sourceSets.main.resources
 }
 
-substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
-datagenClasses.finalizedBy substituteResources
 
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId base.archivesName.get()
+            from components.jarJar
+        }
+    }
+    repositories {
+        maven {
+            url "file://" + System.getenv("local_maven")
+        }
+    }
+}

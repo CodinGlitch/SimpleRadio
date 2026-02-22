@@ -35,6 +35,11 @@ repositories {
         }
     }
 
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+
     maven { url 'https://maven.maxhenkel.de/repository/public' }
     maven { url 'https://maven.nucleoid.xyz' }
     maven { url 'https://maven.codinglitch.com/repository/releases' }
