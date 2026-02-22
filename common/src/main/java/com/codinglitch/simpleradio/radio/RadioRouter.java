@@ -398,6 +398,10 @@ public class RadioRouter implements Socket, Router {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
 
+        // Validate the connected routers
+        // routers.removeIf(router -> !router.isValid());
+        // ^ might cause problems if it's linked to the frequency router list; will continue later
+
         // Update router activity
         if (!this.active) {
             this.activity = 0;
