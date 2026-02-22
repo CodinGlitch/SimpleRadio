@@ -138,6 +138,10 @@ public class RadioRouter implements Socket, Router {
         return active;
     }
     @Override
+    public boolean isValid() {
+        return valid;
+    }
+    @Override
     public Vec3 getConnectionOffset() {
         return connectionOffset;
     }
@@ -378,6 +382,7 @@ public class RadioRouter implements Socket, Router {
     }
 
     public void tick(int tickCount) {
+        // Calculate velocity and/or modify position/rotation for things like VS integration
         if (position != null) {
             this.updateRotation(Services.COMPAT.modifyRotation(position, rotation));
             this.updateLocation(Services.COMPAT.modifyPosition(position));
@@ -393,6 +398,7 @@ public class RadioRouter implements Socket, Router {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
 
+        // Update router activity
         if (!this.active) {
             this.activity = 0;
             this.activityTime = -1;

@@ -44,6 +44,7 @@ public interface Router {
     List<Wiring> getWires();
 
     boolean isActive();
+    boolean isValid();
     Vec3 getConnectionOffset();
     Class<?> getLink();
     Vector3f getVelocity();
