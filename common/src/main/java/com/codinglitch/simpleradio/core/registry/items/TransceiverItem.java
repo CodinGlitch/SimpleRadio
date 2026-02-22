@@ -117,8 +117,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
     }
 
-
-
     public void entityTick(ItemStack stack, Entity entity) {
         if (entity.isRemoved()) return;
 

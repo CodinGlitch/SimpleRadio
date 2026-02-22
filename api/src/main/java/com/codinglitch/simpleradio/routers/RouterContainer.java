@@ -7,10 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class RouterContainer<R extends Router> extends AbstractList<R> {
-    private final ArrayList<R> content = new ArrayList<>();
+    private final List<R> content = new ArrayList<>();
 
     public boolean add(R router) {
 
@@ -44,7 +45,7 @@ public class RouterContainer<R extends Router> extends AbstractList<R> {
         });
     }
 
-    public ArrayList<R> getContent() {
+    public List<R> getContent() {
         return content;
     }
 
