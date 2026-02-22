@@ -472,7 +472,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         String category = channel.getCategory();
         if (category != null) {
-            if (category.equals("speakers")) {
+            if (category.equals("speakers") || category.equals("transceivers") || category.equals("radios") || category.equals("walkies")) {
                 if (!SimpleRadioLibrary.SERVER_CONFIG.router.feedbackListening) return;
             } else {
                 if (category.equals("music_discs") || category.equals("note_blocks") || category.equals("goat_horns"))
