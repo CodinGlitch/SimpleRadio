@@ -36,5 +36,6 @@
   ],
   "result": {
     "item": "simpleradio:radio"
-  }
+  },
+  "show_notification": true
 }

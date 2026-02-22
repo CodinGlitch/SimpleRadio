@@ -30,5 +30,6 @@
   ],
   "result": {
     "item": "simpleradio:radiosmither"
-  }
+  },
+  "show_notification": true
 }

@@ -40,14 +40,15 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_copper_wire",
-      "has_wool"
+      "has_wool",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:listener_module"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

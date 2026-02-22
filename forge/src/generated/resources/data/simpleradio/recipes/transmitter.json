@@ -1,37 +1,42 @@
 {
   "type": "forge:conditional",
-  "forge:condition": {
-    "type": "simpleradio:items_enabled",
-    "item": "transmitter"
-  },
   "recipes": [
     {
-      "type": "minecraft:crafting_shaped",
-      "category": "building",
-      "key": {
-        "A": {
-          "item": "simpleradio:antenna"
-        },
-        "B": {
-          "item": "minecraft:iron_block"
-        },
-        "C": {
-          "item": "simpleradio:copper_wire"
-        },
-        "Q": {
-          "item": "minecraft:quartz"
-        },
-        "T": {
-          "item": "simpleradio:transmitting_module"
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "transmitter"
         }
-      },
-      "pattern": [
-        " A ",
-        "QBT",
-        " C "
       ],
-      "result": {
-        "item": "simpleradio:transmitter"
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "building",
+        "key": {
+          "A": {
+            "item": "simpleradio:antenna"
+          },
+          "B": {
+            "item": "minecraft:iron_block"
+          },
+          "C": {
+            "item": "simpleradio:copper_wire"
+          },
+          "Q": {
+            "item": "minecraft:quartz"
+          },
+          "T": {
+            "item": "simpleradio:transmitting_module"
+          }
+        },
+        "pattern": [
+          " A ",
+          "QBT",
+          " C "
+        ],
+        "result": {
+          "item": "simpleradio:transmitter"
+        },
+        "show_notification": true
       }
     }
   ]

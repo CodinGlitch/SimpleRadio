@@ -27,5 +27,6 @@
   ],
   "result": {
     "item": "simpleradio:spuddie_talkie"
-  }
+  },
+  "show_notification": true
 }

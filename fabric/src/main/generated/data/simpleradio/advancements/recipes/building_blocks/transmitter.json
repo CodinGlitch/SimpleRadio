@@ -42,14 +42,15 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_transmitting_module",
-      "has_antenna"
+      "has_antenna",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:transmitter"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

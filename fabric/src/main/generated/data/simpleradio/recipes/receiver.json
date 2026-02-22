@@ -33,5 +33,6 @@
   ],
   "result": {
     "item": "simpleradio:receiver"
-  }
+  },
+  "show_notification": true
 }

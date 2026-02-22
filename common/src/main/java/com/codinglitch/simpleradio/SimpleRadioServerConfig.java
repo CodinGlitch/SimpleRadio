@@ -6,7 +6,8 @@ import com.codinglitch.lexiconfig.annotations.LexiconEntry;
 import com.codinglitch.lexiconfig.annotations.LexiconPage;
 import com.codinglitch.lexiconfig.classes.LexiconData;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
-import com.codinglitch.simpleradio.api.compat.CompatibilityInstance;
+import com.codinglitch.simpleradio.central.ConfigHolder;
+import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 
 @Lexicon(name = CommonSimpleRadio.ID+"-server", location = LexiconfigApi.Location.SERVER)
 public class SimpleRadioServerConfig extends LexiconData {
@@ -46,7 +47,7 @@ public class SimpleRadioServerConfig extends LexiconData {
     @LexiconPage(comment = "These are the general configurations for compatibilities.")
     public Compatibilities compatibilities = new Compatibilities();
 
-    public static class Transceiver extends LexiconPageData {
+    public static class Transceiver extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is how effective the transceiver is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 200.")
         public Integer receptionPower = 200;
 
@@ -80,7 +81,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class WalkieTalkie extends LexiconPageData {
+    public static class WalkieTalkie extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is how effective the walkie is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 100.")
         public Integer receptionPower = 100;
 
@@ -117,7 +118,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Wire extends LexiconPageData {
+    public static class Wire extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is the method of diminishment to use. ADDITIVE subtracts a flat amount, while MULTIPLICATIVE subtracts a percentage from the initial transmission power. Defaults to ADDITIVE.")
         public String diminishmentMethod = "MULTIPLICATIVE";
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.01.")
@@ -138,7 +139,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer effectInterval = 5;
     }
 
-    public static class Transmitter extends LexiconPageData {
+    public static class Transmitter extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is the capability of this item to make use of antennas. Essentially acts as a multiplier for the antenna score. Defaults to 10.")
         public Integer antennaAptitude = 10;
 
@@ -164,7 +165,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Receiver extends LexiconPageData {
+    public static class Receiver extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is the capability of this item to make use of antennas. Essentially acts as a multiplier for the antenna score. Defaults to 10.")
         public Integer antennaAptitude = 10;
 
@@ -178,7 +179,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Radio extends LexiconPageData {
+    public static class Radio extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is how effective the radio is at receiving signals, and is essentially a flat bonus to transmission power. Defaults to 100.")
         public Integer receptionPower = 100;
 
@@ -192,7 +193,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Microphone extends LexiconPageData {
+    public static class Microphone extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is the range for the microphone that it can hear from. Defaults to 8.")
         public Integer listeningRange = 8;
 
@@ -203,7 +204,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Speaker extends LexiconPageData {
+    public static class Speaker extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is the range for the radio in which the audio transmitted from it can be heard. Defaults to 32.")
         public Integer speakingRange = 32;
 
@@ -214,7 +215,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Antenna extends LexiconPageData {
+    public static class Antenna extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is the maximum distance an antenna can travel without support before falling. CAUTION: SETTING THIS TOO HIGH MAY CAUSE LAG WITH LARGE ANTENNAS. Defaults to 8.")
         public Integer maxDistance = 8;
 
@@ -222,7 +223,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean enabled = true;
     }
 
-    public static class Frequency extends LexiconPageData {
+    public static class Frequency extends LexiconPageData implements ConfigHolder {
         @LexiconEntry(comment = "This is how many whole places (digits before the period) can exist in a frequency. Defaults to 3.")
         public Integer wholePlaces = 3;
 
@@ -246,7 +247,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Integer packetBuffer = 2;
     }
 
-    public static class Router extends LexiconPageData {
+    public static class Router extends LexiconPageData implements ConfigHolder {
 
         @LexiconEntry(comment = "How many sources should be compiled for reading audio levels? Affects the rate of updates for activity levels. Changing this value greatly may cause unexpected results. Defaults to 10.")
         public Integer compileAmount = 10;
@@ -260,6 +261,9 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "[EXPERIMENTAL] Pick up audio from the world, not just players. Defaults to false.")
         public Boolean soundListening = false;
+
+        @LexiconEntry(comment = "[EXPERIMENTAL] Pick up audio from speakers, can cause feedback loops. Defaults to false.")
+        public Boolean feedbackListening = false;
     }
 
     public static class Compatibilities extends LexiconPageData {
@@ -307,6 +311,48 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         public static class Create extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
             @LexiconEntry(comment = "When false, removes compatibility for Create. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency CC: Tweaked.")
+        public CCTweaked cc_tweaked = new CCTweaked();
+
+        public static class CCTweaked extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for CC: Tweaked. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency Etched.")
+        public Etched etched = new Etched();
+
+        public static class Etched extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for Etched. Defaults to true.")
+            public Boolean enabled = true;
+
+            @LexiconEntry(comment = "When true, enabled the mixin patch fixing the 'dual-download' issue. Defaults to true.")
+            public Boolean streamPatch = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency AudioPlayer.")
+        public AudioPlayer audioplayer = new AudioPlayer();
+
+        public static class AudioPlayer extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for AudioPlayer. Defaults to true.")
             public Boolean enabled = true;
 
             @Override

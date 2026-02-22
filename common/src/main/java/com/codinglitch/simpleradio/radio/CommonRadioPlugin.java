@@ -1,11 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.VolumeCategory;
-import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent;
@@ -50,6 +48,10 @@ public class CommonRadioPlugin {
             thread.setDaemon(true);
             return thread;
         });
+    }
+
+    public static boolean isAudioValid(short[] data) {
+        return analyzeActivity(data) > 10f;
     }
 
     public static float analyzeActivity(short[] data) {

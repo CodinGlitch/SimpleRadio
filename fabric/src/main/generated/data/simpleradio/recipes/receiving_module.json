@@ -30,5 +30,6 @@
   ],
   "result": {
     "item": "simpleradio:receiving_module"
-  }
+  },
+  "show_notification": true
 }

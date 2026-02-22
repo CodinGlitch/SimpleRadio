@@ -1,8 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.api.central.Receiving;
-import com.codinglitch.simpleradio.api.central.Speaking;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.SimpleRadioApi;
+import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.core.central.AnimationInstance;
 import com.codinglitch.simpleradio.core.central.Animatable;
@@ -10,7 +9,6 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
@@ -21,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking, Animatable {
@@ -54,7 +53,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, speaker.location.x, speaker.location.y, speaker.location.z,
+                    null, speaker.getPosition().x, speaker.getPosition().y, speaker.getPosition().z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -105,8 +104,8 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
 
     public void inactivate() {
         if (this.frequency != null) {
-            RadioManager.removeRouterSided(this.id, this.level.isClientSide);
-            if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
+            SimpleRadioApi.removeRouterSided(this.id, this.level.isClientSide);
+            if (!this.level.isClientSide) stopReceiving(frequency.getFrequency(), frequency.getModulation(), this.id);
             if (!this.level.isClientSide) stopSpeaking();
         }
 
@@ -116,10 +115,10 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
+        this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
+        this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());
         if (!level.isClientSide) {
             //TODO: update players of radio state
-            this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
-            this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());
 
             level.playSound(
                     null, location.x, location.y, location.z,
@@ -127,15 +126,9 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
                     SoundSource.PLAYERS,
                     1f, 1f
             );
-        } else {
-            this.receiver = new RadioReceiver(frequency, location, id);
-            this.speaker = new RadioSpeaker(location, id);
-
-            ClientRadioManager.registerRouter(receiver);
-            ClientRadioManager.registerRouter(speaker);
         }
 
-        receiver.routers.add(speaker);
+        receiver.addRouter(speaker);
 
         this.isActive = true;
     }
@@ -143,5 +136,10 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     @Override
     public int getAntennaPower() {
         return antennaPower;
+    }
+
+    @Override
+    public List<Wiring> getWires() {
+        return getRouter().getWires();
     }
 }

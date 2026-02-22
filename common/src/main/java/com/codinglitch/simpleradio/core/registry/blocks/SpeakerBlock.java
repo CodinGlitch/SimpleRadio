@@ -1,13 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.central.Routing;
-import com.codinglitch.simpleradio.api.central.Speaking;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.Routing;
+import com.codinglitch.simpleradio.central.Speaking;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import com.mojang.serialization.MapCodec;
+import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,13 +26,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
-    public static final MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     private static final Map<Direction, Vec3> CONNECTION_OFFSETS = Map.of(
@@ -52,17 +49,12 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     }
 
     @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
+    public Speaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
+        Speaker speaker = startSpeaking(location, id);
+        speaker.setRange(SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange);
+        speaker.setCategory(CommonRadioPlugin.SPEAKERS_CATEGORY);
 
-    @Override
-    public RadioSpeaker getOrCreateSpeaker(WorldlyPosition location, UUID id, BlockState state) {
-        RadioSpeaker speaker = startSpeaking(location, id);
-        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange;
-        speaker.category = CommonRadioPlugin.SPEAKERS_CATEGORY;
-
-        speaker.connectionOffset = CONNECTION_OFFSETS.get(state.getValue(FACING));
+        speaker.setConnectionOffset(CONNECTION_OFFSETS.get(state.getValue(FACING)));
 
         return speaker;
     }

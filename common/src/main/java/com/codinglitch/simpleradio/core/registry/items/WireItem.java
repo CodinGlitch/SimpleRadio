@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.Socket;
+import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
@@ -12,7 +12,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;

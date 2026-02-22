@@ -1,17 +1,20 @@
 package com.codinglitch.simpleradio.core.registry.entities;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.central.Wiring;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.api.central.Medium;
-import com.codinglitch.simpleradio.api.central.Socket;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -34,7 +37,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Wire extends Entity implements Medium {
+public class Wire extends Entity implements Wiring {
     private static final EntityDataAccessor<Optional<UUID>> FROM = SynchedEntityData.defineId(Wire.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<String> FROM_TYPE = SynchedEntityData.defineId(Wire.class, EntityDataSerializers.STRING);
 
@@ -65,6 +68,11 @@ public class Wire extends Entity implements Medium {
         this(SimpleRadioEntities.WIRE, level);
     }
 
+    @Override
+    public UUID getReference() {
+        return this.uuid;
+    }
+
     /**
      * Connect two given {@link Socket}s within a level.
      * @param from The first socket
@@ -75,10 +83,10 @@ public class Wire extends Entity implements Medium {
     public static Wire connect(Socket from, Socket to, Level level) {
         if (from.equals(to)) return null;
 
-        RadioRouter fromRouter = from.getRouter();
+        Router fromRouter = from.getRouter();
         if (fromRouter == null) return null;
 
-        RadioRouter toRouter = to.getRouter();
+        Router toRouter = to.getRouter();
         if (toRouter == null) return null;
 
         UUID fromRef = fromRouter.getReference();
@@ -88,7 +96,7 @@ public class Wire extends Entity implements Medium {
         if (to.hasWire(fromRef, toRef)) return null;
 
         Wire wire = new Wire(level);
-        wire.moveTo(new Vec3(fromRouter.location));
+        wire.moveTo(new Vec3(fromRouter.getLocation()));
         wire.setFrom(fromRouter);
         wire.setTo(toRouter);
 
@@ -100,11 +108,8 @@ public class Wire extends Entity implements Medium {
         return wire;
     }
 
-    /**
-     * Get the router opposite to the one provided.
-     * @param source The originating router
-     */
-    public RadioRouter transport(RadioRouter source) {
+    @Override
+    public RadioRouter transport(Router source) {
         RadioRouter from = this.getFromRouter();
         RadioRouter to = this.getToRouter();
 
@@ -114,13 +119,9 @@ public class Wire extends Entity implements Medium {
         return null;
     }
 
-    /**
-     * Relay a {@link RadioSource} along this wire.
-     * @param source The {@link RadioSource} to relay
-     * @param originSocket The {@link Socket} the source came from
-     */
-    public void relay(RadioSource source, Socket originSocket) {
-        if (!this.isAlive()) return;
+    @Override
+    public void relay(Source source, Socket originSocket) {
+        if (!this.isValid()) return;
 
         UUID fromRef = this.getFrom().orElse(null);
         UUID toRef = this.getTo().orElse(null);
@@ -128,12 +129,12 @@ public class Wire extends Entity implements Medium {
         String fromType = this.getFromType();
         String toType = this.getToType();
         if (fromRef == null || toRef == null) {
-            CommonSimpleRadio.warn("Relaying cancelled; invalid wire [{}] to relay across.", this.getUUID());
+            CommonSimpleRadio.warn("Relaying cancelled; invalid wire [{}] to relay across.", this.getReference());
             return;
         }
 
-        RadioRouter from = RadioManager.getRouter(fromRef, fromType);
-        RadioRouter to = RadioManager.getRouter(toRef, toType);
+        RadioRouter from = (RadioRouter) SimpleRadioApi.getRouterSided(fromRef, fromType, this.level().isClientSide());
+        RadioRouter to = (RadioRouter) SimpleRadioApi.getRouterSided(toRef, toType, this.level().isClientSide());
         if (from == null || to == null) {
             CommonSimpleRadio.warn("Relaying cancelled; either end was unable to be found.");
             return;
@@ -154,8 +155,8 @@ public class Wire extends Entity implements Medium {
         if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime != -1) {
             AtomicInteger timeUntilDemise = new AtomicInteger();
             AtomicReference<Float> placeOfDemise = new AtomicReference<>((float) 0);
-            if (RadioManager.readQueue(queued -> {
-                if (queued.source.wireMedium.equals(this) && queued.router.equals(origin)) {
+            if (RadioManager.getInstance().readQueue(queued -> {
+                if (queued.source.getWireMedium().equals(this) && queued.router.equals(origin)) {
                     int maxProgress = Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength());
                     float progress = (float) queued.time / maxProgress;
 
@@ -173,24 +174,24 @@ public class Wire extends Entity implements Medium {
             }
         }
 
-        if (!level.isClientSide() && !effectCooldowns.containsKey(source.owner) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
+        if (!level.isClientSide() && !effectCooldowns.containsKey(source.getOwner()) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
             for (Player player : level.players()) {
                 if (player.distanceTo(this) <= 100) {
                     Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundWireEffectPacket(this.getId(), isReversed));
                 }
             }
 
-            this.effectCooldowns.put(source.owner, SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
+            this.effectCooldowns.put(source.getOwner(), SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
         }
 
         //CommonSimpleRadio.info("Relaying from {} to {}", origin, destination);
 
         source.travel(from, to, this);
 
-        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime == -1) {
+        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime <= 0) {
             destination.accept(source);
         } else {
-            RadioManager.queueSource(source, destination, Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));
+            RadioManager.getInstance().queueSource(source, destination, Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));
         }
     }
 
@@ -209,7 +210,7 @@ public class Wire extends Entity implements Medium {
         UUID reference = this.getFrom().orElse(null);
         if (reference == null) return null;
 
-        return RadioManager.getRouterSided(reference, this.getFromType(), this.level().isClientSide);
+        return (RadioRouter) RadioManager.getRouterSided(reference, this.getFromType(), this.level().isClientSide);
     }
     public Optional<UUID> getFrom() {
         return this.getEntityData().get(FROM);
@@ -220,40 +221,52 @@ public class Wire extends Entity implements Medium {
         String type = this.getEntityData().get(FROM_TYPE);
         return type.isEmpty() ? null : type;
     }
-    public void setFrom(RadioRouter from) {
+    @Override
+    public void setFrom(Router from) {
         this.getEntityData().set(FROM, Optional.of(from.getReference()));
         if (from.getClass() != RadioRouter.class)
             this.getEntityData().set(FROM_TYPE, from.getClass().getSimpleName());
     }
 
+    @Override
     @Nullable
     public RadioRouter getToRouter() {
         UUID reference = this.getTo().orElse(null);
         if (reference == null) return null;
 
-        return RadioManager.getRouterSided(reference, this.getToType(), this.level().isClientSide);
+        return (RadioRouter) RadioManager.getRouterSided(reference, this.getToType(), this.level().isClientSide);
     }
+    @Override
     public Optional<UUID> getTo() {
         return this.getEntityData().get(TO);
     }
+    @Override
     @Nullable
     public String getToType() {
         String type = this.getEntityData().get(TO_TYPE);
         return type.isEmpty() ? null : type;
     }
-    public void setTo(RadioRouter to) {
+    @Override
+    public void setTo(Router to) {
         this.getEntityData().set(TO, Optional.of(to.getReference()));
         if (to.getClass() != RadioRouter.class)
             this.getEntityData().set(TO_TYPE, to.getClass().getSimpleName());
     }
 
+    @Override
+    public boolean isValid() {
+        return this.isAlive();
+    }
+
+    @Override
     public void burnOut() {
-        RadioManager.dequeueSource(queuedSource -> queuedSource.source.wireMedium == this);
+        RadioManager.getInstance().dequeueSource(queuedSource -> queuedSource.source.getWireMedium() == this);
         this.kill();
     }
 
+    @Override
     public void shortCircuit(Vector3f at) {
-        if (level() instanceof ServerLevel level) Socket.shortAt(level, at);
+        if (level() instanceof ServerLevel level) RadioManager.getInstance().shortAt(WorldlyPosition.of(at, level));
         this.burnOut();
     }
     public void shortCircuit() {
@@ -305,12 +318,13 @@ public class Wire extends Entity implements Medium {
                 effect.progress += effect.direction;
             }
 
-            RadioRouter from = ClientRadioManager.getRouter(fromRef);
-            RadioRouter to = ClientRadioManager.getRouter(toRef);
+            if (fromRef != null && toRef != null) {
+                RadioRouter from = (RadioRouter) ClientRadioManager.getInstance().getRouter(fromRef);
+                RadioRouter to = (RadioRouter) ClientRadioManager.getInstance().getRouter(toRef);
 
-            if (from != null && !from.hasWire(this)) from.connect(this);
-            if (to != null && !to.hasWire(this)) to.connect(this);
-
+                if (from != null && !from.hasWire(this)) from.connect(this);
+                if (to != null && !to.hasWire(this)) to.connect(this);
+            }
         } else {
             String fromType = this.getFromType();
             String toType = this.getToType();
@@ -321,8 +335,8 @@ public class Wire extends Entity implements Medium {
                     return;
                 }
 
-                RadioRouter from = RadioManager.getRouter(fromRef, fromType);
-                RadioRouter to = RadioManager.getRouter(toRef, toType);
+                RadioRouter from = (RadioRouter) RadioManager.getInstance().getRouter(fromRef, fromType);
+                RadioRouter to = (RadioRouter) RadioManager.getInstance().getRouter(toRef, toType);
 
                 if (from == null) {
                     if (to != null) this.moveTo(new Vec3(to.getLocation().position()));

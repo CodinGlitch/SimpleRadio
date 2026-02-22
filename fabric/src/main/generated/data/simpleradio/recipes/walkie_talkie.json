@@ -27,5 +27,6 @@
   ],
   "result": {
     "item": "simpleradio:walkie_talkie"
-  }
+  },
+  "show_notification": true
 }

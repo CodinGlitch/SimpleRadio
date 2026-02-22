@@ -27,5 +27,6 @@
   ],
   "result": {
     "item": "simpleradio:speaker_module"
-  }
+  },
+  "show_notification": true
 }

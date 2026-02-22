@@ -1,10 +1,10 @@
 package com.codinglitch.simpleradio.compat;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import de.maxhenkel.vcinteraction.AudioUtils;
 import de.maxhenkel.vcinteraction.VoicechatInteraction;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
@@ -28,9 +28,9 @@ public class InteractionCompat {
         }
 
         if (connection == null) {
-            if (channel.location == null) return;
+            if (channel.position == null) return;
 
-            WorldlyPosition location = channel.location;
+            WorldlyPosition location = channel.position;
             location.level.getServer().execute(() -> {
                 if (setCooldown(channel.reference, location.level)) {
                     BlockState state = location.level.getBlockState(location.blockPos());

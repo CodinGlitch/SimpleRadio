@@ -1,15 +1,17 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.central.*;
+import com.codinglitch.simpleradio.central.*;
+import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -32,37 +34,43 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         super(settings);
     }
 
-    protected void setupRouters(RadioListener listener, RadioSpeaker speaker, RadioReceiver receiver, RadioTransmitter transmitter) {
-        speaker.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange;
-        listener.range = SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange;
-        speaker.category = CommonRadioPlugin.TRANSCEIVERS_CATEGORY;
+    protected void setupRouters(Listener listener, Speaker speaker, Receiver receiver, Transmitter transmitter) {
+        speaker.setRange(SimpleRadioLibrary.SERVER_CONFIG.transceiver.speakingRange);
+        listener.setRange(SimpleRadioLibrary.SERVER_CONFIG.transceiver.listeningRange);
+        speaker.setCategory(CommonRadioPlugin.TRANSCEIVERS_CATEGORY);
 
         transmitter.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
         receiver.frequencingType(SimpleRadioFrequencing.TRANSCEIVER);
 
-        listener.link = this.getClass();
-        speaker.link = this.getClass();
-        receiver.link = this.getClass();
-        transmitter.link = this.getClass();
+        listener.setLink(this.getClass());
+        speaker.setLink(this.getClass());
+        receiver.setLink(this.getClass());
+        transmitter.setLink(this.getClass());
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
-        RadioListener listener = startListening(entity, owner);
-        RadioSpeaker speaker = startSpeaking(entity, owner);
-        RadioReceiver receiver = startReceiving(entity, frequencyName, Frequency.modulationOf(modulation), owner);
-        RadioTransmitter transmitter = startTransmitting(entity, frequencyName, Frequency.modulationOf(modulation), owner);
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
 
-        listener.owner = entity;
-        speaker.owner = entity;
-        receiver.owner = entity;
-        transmitter.owner = entity;
+        Listener listener = startListening(entity, owner);
+        Speaker speaker = startSpeaking(entity, owner);
+        Receiver receiver = startReceiving(entity, frequencyName, frequencies.modulationOf(modulation), owner);
+        Transmitter transmitter = startTransmitting(entity, frequencyName, frequencies.modulationOf(modulation), owner);
+
+        if (speaker.getOwner().level() != level) {
+            CommonSimpleRadio.info(level);
+        }
+
+        listener.setOwner(entity);
+        speaker.setOwner(entity);
+        receiver.setOwner(entity);
+        transmitter.setOwner(entity);
 
         listener.tryAddRouter(transmitter);
         receiver.tryAddRouter(speaker);
 
         this.setupRouters(listener, speaker, receiver, transmitter);
 
-        transmitter.transmitCriteria((source, router) -> {
+        transmitter.setRoutingCriteria((source, router) -> {
             if (entity instanceof Player player) {
                 ItemStack using = player.getUseItem();
                 if (!(using.getItem() instanceof TransceiverItem)) return false;
@@ -80,10 +88,12 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         });
     }
     private void inactivate(Level level, String frequencyName, String modulation, UUID owner) {
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
+
         stopListening(owner, level.isClientSide);
         stopSpeaking(owner, level.isClientSide);
-        stopReceiving(frequencyName, Frequency.modulationOf(modulation), owner);
-        stopTransmitting(frequencyName, Frequency.modulationOf(modulation), owner);
+        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner);
+        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner);
     }
 
     public int getCooldown() {
@@ -102,8 +112,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     public void onDestroyed(ItemEntity itemEntity) {
         super.onDestroyed(itemEntity);
         CompoundTag tag = itemEntity.getItem().getOrCreateTag();
-        if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("user")) {
-            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("user"));
+        if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("reference")) {
+            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("reference"));
         }
     }
 
@@ -118,42 +128,74 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         tick(stack, level);
         if (frequency.isEmpty() || modulation.isEmpty()) return;
 
-        if (!Frequency.check(frequency)) {
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
+        if (!frequencies.check(frequency)) {
             CommonSimpleRadio.info("Invalid frequency {}, replacing with default", frequency);
             frequency = this.getDefaultFrequency();
             tag.putString("frequency", frequency);
         }
 
         // Mode-switch deactivation (i.e. item is dropped)
-        RadioRouter activeRouter = null;
-        if (tag.contains("user")) {
-            activeRouter = RadioManager.getRouterSided(tag.getUUID("user"), level.isClientSide);
+        Router activeRouter = null;
+        if (tag.contains("reference")) {
+            activeRouter = SimpleRadioApi.getRouterSided(tag.getUUID("reference"), level.isClientSide);
         }
 
-        if (activeRouter != null && (activeRouter.owner == null || !activeRouter.owner.getUUID().equals(entity.getUUID()))) {
-            activeRouter = null;
+        if (activeRouter != null) {
+            if (activeRouter.getOwner() == null) { // Invalid router, not ours
+                activeRouter = null;
+            } else if (!activeRouter.getOwner().getUUID().equals(entity.getUUID())) { // Found router does not match ours, discard
+                activeRouter = null;
+                //if (tag.contains("reference")) tag.remove("reference");
+            } else if (tag.contains("reference")) { // Check for a duplicate UUID from a different ItemStack
+                Iterable<ItemStack> items = List.of();
+                if (entity instanceof Player player) {
+                    items = player.getInventory().items;
+                } else if (entity instanceof LivingEntity livingEntity) {
+                    items = livingEntity.getAllSlots();
+                }
+
+                for (ItemStack slotStack : items) {
+                    if (slotStack.isEmpty()) continue;
+                    if (!slotStack.hasTag()) continue;
+
+                    CompoundTag slotTag = slotStack.getTag();
+                    if (slotTag == null) continue;
+                    if (!slotTag.contains("reference")) continue;
+                    if (!slotTag.getUUID("reference").equals(tag.getUUID("reference"))) continue;
+
+                    if (!slotStack.equals(stack)) {
+                        tag.remove("reference");
+                        break;
+                    }
+                }
+
+                if (!tag.contains("reference")) activeRouter = null;
+            }
         }
 
         // Transceiver activation
         UUID activationUUID = null;
         if (entity.level().isClientSide) {
 
-            if (tag.contains("user") && activeRouter == null) {
-                activationUUID = tag.getUUID("user");
+            if (tag.contains("reference") && activeRouter == null) {
+                activationUUID = tag.getUUID("reference");
             }
 
         } else {
             if (activeRouter != null) return;
 
-            if (!tag.contains("user")) {
+            if (!tag.contains("reference")) {
                 activationUUID = UUID.randomUUID();
-                tag.putUUID("user", activationUUID);
+                tag.putUUID("reference", activationUUID);
             } else {
-                activationUUID = tag.getUUID("user");
+                activationUUID = tag.getUUID("reference");
             }
         }
 
         if (activationUUID == null) return;
+
+
 
         CommonSimpleRadio.debug("Activated transceiver using UUID {}!", activationUUID);
 

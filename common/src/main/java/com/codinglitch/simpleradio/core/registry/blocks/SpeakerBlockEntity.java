@@ -1,8 +1,9 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.central.Speaking;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
+import com.codinglitch.simpleradio.central.Speaking;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
@@ -13,7 +14,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking {
@@ -27,7 +27,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.speaker != null) {
             level.playSound(
-                    null, speaker.location.x, speaker.location.y, speaker.location.z,
+                    null, speaker.getPosition().x, speaker.getPosition().y, speaker.getPosition().z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -63,12 +63,12 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
 
         if (blockEntity.level == null) return;
-        if (blockEntity.speaker != null && blockEntity.speaker.activityTime >= 0) {
-            if (blockEntity.speaker.activityTime % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
+        if (blockEntity.speaker != null && blockEntity.speaker.getActivityTime() >= 0) {
+            if (blockEntity.speaker.getActivityTime() % SimpleRadioLibrary.SERVER_CONFIG.speaker.redstonePolling == 0) {
                 level.updateNeighborsAt(pos, SimpleRadioBlocks.SPEAKER);
             }
             if (SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval != 0) {
-                if (blockEntity.level.isClientSide && blockEntity.speaker.activityTime % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
+                if (blockEntity.level.isClientSide && blockEntity.speaker.getActivityTime() % SimpleRadioLibrary.CLIENT_CONFIG.speaker.particleInterval == 0) {
                     ClientRadioManager.handleSpeakParticle(state, blockEntity);
                 }
             }

@@ -1,12 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.api.central.Socket;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.SimpleRadioApi;
+import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -62,7 +62,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
     @Override
     public void setRemoved() {
         if (router != null) {
-            RadioManager.removeRouterSided(router, this.level.isClientSide);
+            SimpleRadioApi.removeRouterSided(router, this.level.isClientSide);
         }
 
         super.setRemoved();
@@ -70,7 +70,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
 
     @Override
     public RadioRouter getRouter() {
-        return router != null ? router : (this.hasLevel() ? RadioManager.getRouterSided(this.id, this.level.isClientSide) : null);
+        return router != null ? router : (this.hasLevel() ? (RadioRouter) SimpleRadioApi.getRouterSided(this.id, this.level.isClientSide) : null);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
         if (blockEntity.router == null && blockEntity.id != null) {
             WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(pos, level, pos));
 
-            blockEntity.router = SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, blockEntity.id, state);
+            blockEntity.router = (RadioRouter) SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, blockEntity.id, state);
         }
     }
 }

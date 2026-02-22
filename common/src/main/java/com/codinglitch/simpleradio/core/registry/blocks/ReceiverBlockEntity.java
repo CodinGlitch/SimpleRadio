@@ -1,15 +1,14 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
-import com.codinglitch.simpleradio.api.central.Receiving;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.SimpleRadioApi;
+import com.codinglitch.simpleradio.central.Receiving;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -36,7 +35,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     public void setRemoved() {
         if (level != null && !level.isClientSide && this.receiver != null) {
             level.playSound(
-                    null, receiver.location.x, receiver.location.y, receiver.location.z,
+                    null, receiver.getPosition().x, receiver.getPosition().y, receiver.getPosition().z,
                     SimpleRadioSounds.RADIO_CLOSE,
                     SoundSource.PLAYERS,
                     1f, 1f
@@ -94,13 +93,13 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
 
-        if (blockEntity.receiver != null) blockEntity.receiver.active = blockEntity.catalyst != null;
+        if (blockEntity.receiver != null) blockEntity.receiver.setActive(blockEntity.catalyst != null);
 
         if (!blockEntity.catalyzed) return;
 
         if (blockEntity.isDirty && level.getGameTime() % 200 == 0 && !level.isClientSide) {
             blockEntity.antennaPower = blockEntity.calculateAntennaPower(blockEntity.getAdaptorLocation(), level);
-            RadioRouter router = blockEntity.getRouter();
+            Router router = blockEntity.getRouter();
             if (router instanceof RadioReceiver receiver) receiver.antennaPower = blockEntity.antennaPower;
 
             level.sendBlockUpdated(pos, blockState, blockState, Block.UPDATE_CLIENTS);
@@ -111,8 +110,8 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
     public void inactivate() {
         if (this.frequency != null) {
-            RadioManager.removeRouterSided(this.id, this.getLevel().isClientSide);
-            if (!this.level.isClientSide) stopReceiving(frequency.frequency, frequency.modulation, this.id);
+            SimpleRadioApi.removeRouterSided(this.id, this.getLevel().isClientSide);
+            stopReceiving(frequency.getFrequency(), frequency.getModulation(), this.id);
         }
 
         this.isActive = false;
@@ -121,18 +120,14 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     public void activate() {
         WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
+        this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());
         if (!level.isClientSide) {
-            this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());
-
             level.playSound(
                     null, location.x, location.y, location.z,
                     SimpleRadioSounds.RADIO_OPEN,
                     SoundSource.PLAYERS,
                     1f, 1f
             );
-        } else {
-            this.receiver = new RadioReceiver(frequency, location, id);
-            ClientRadioManager.registerRouter(receiver);
         }
 
         this.isActive = true;

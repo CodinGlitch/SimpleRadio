@@ -1,30 +1,32 @@
 {
   "item_group.simpleradio": "Simple Radio",
 
-  "item.simpleradio.transmitting_module": "Модуль передачи радиосигнала",
-  "item.simpleradio.receiving_module": "Модуль приёма радиосигнала",
+  "item.simpleradio.transmitting_module": "Модуль передатчика",
+  "item.simpleradio.receiving_module": "Модуль приёмника",
   "item.simpleradio.speaker_module": "Модуль динамика",
   "item.simpleradio.listener_module": "Модуль микрофона",
 
-  "item.simpleradio.iron_upgrade_module": "Модуль Железного Улучшения",
-  "item.simpleradio.gold_upgrade_module": "Модуль Золотого Улучшения",
-  "item.simpleradio.diamond_upgrade_module": "Модуль Алмазного Улучшения",
-  "item.simpleradio.netherite_upgrade_module": "Модуль Незеритового Улучшения",
+  "item.simpleradio.iron_module": "Железный модуль: %1$s",
+  "item.simpleradio.gold_module": "Золотой модуль: %1$s",
+  "item.simpleradio.diamond_module": "Алмазный модуль: %1$s",
+  "item.simpleradio.netherite_module": "Незеритовый модуль: %1$s",
 
-  "upgrade.simpleradio.clarity": "Улучшение чистоты сигнала",
-  "upgrade.simpleradio.clarity.effects": "Обеспечивает более четкий звук",
+  "module.simpleradio.empty": "Пусто",
 
-  "upgrade.simpleradio.range": "Улучшение дальности",
+  "upgrade.simpleradio.clarity": "Чистота сигнала",
+  "upgrade.simpleradio.clarity.effects": "Обеспечивает более чёткий звук",
+
+  "upgrade.simpleradio.range": "Дальность",
   "upgrade.simpleradio.range.transmitting.effects": "Увеличивает дальность передачи сигнала",
   "upgrade.simpleradio.range.receiving.effects": "Увеличивает дальность получения сигнала",
 
-  "upgrade.simpleradio.latch": "Улучшение переключателя",
+  "upgrade.simpleradio.latch": "Переключатель",
   "upgrade.simpleradio.latch.effects": "Позволяет переключать состояние прослушивания",
 
-  "upgrade.simpleradio.battery": "Улучшение батарейки",
+  "upgrade.simpleradio.battery": "Батарея",
   "upgrade.simpleradio.battery.effects": "Хранит больше энергии в аккумуляторе",
 
-  "upgrade.simpleradio.solar": "Улучшение солнечной панели",
+  "upgrade.simpleradio.solar": "Солнечная панель",
   "upgrade.simpleradio.solar.effects": "Заряжает аккумулятор при солнечном свете",
 
   "item.modifiers.transmitting": "Во время передачи:",
@@ -36,29 +38,39 @@
   "item.simpleradio.transceiver": "Рация",
   "item.simpleradio.walkie_talkie": "Портативная рация",
   "item.simpleradio.spuddie_talkie": "Портативная картофельная рация",
+  "item.simpleradio.copper_wire": "Медный провод",
   "block.simpleradio.radio": "Радио",
   "block.simpleradio.antenna": "Антенна",
   "block.simpleradio.speaker": "Динамик",
   "block.simpleradio.microphone": "Микрофон",
   "block.simpleradio.radiosmither": "Радиотехнический стол",
   "block.simpleradio.frequencer": "Преобразователь частоты",
+  "block.simpleradio.receiver": "Приёмник",
+  "block.simpleradio.transmitter": "Передатчик",
+  "block.simpleradio.insulator": "Опора провода",
+
+  "screen.simpleradio.frequencing.catalyst": "ФИЛЬТР СИГНАЛА",
+  "screen.simpleradio.frequencing.efficiency": "ЭФФЕКТИВНОСТЬ: %s%%",
+  "screen.simpleradio.frequencing.antenna_strength": "МОЩНОСТЬ АНТЕННЫ:",
 
   "screen.simpleradio.radiosmither": "Радиотехнический стол",
   "screen.simpleradio.radiosmither.am": "AM",
   "screen.simpleradio.radiosmither.fm": "FM",
-  "screen.simpleradio.radiosmither.am_description": "Больший радиус передачи сигнала, при более плохом качестве звучания.",
-  "screen.simpleradio.radiosmither.fm_description": "Меньший радиус передачи сигнала, но с более лучшим качеством звучания.",
+  "screen.simpleradio.radiosmither.am_description": "Больший радиус передачи сигнала, но хуже качество звука.",
+  "screen.simpleradio.radiosmither.fm_description": "Меньший радиус передачи сигнала, но лучше качество звука.",
 
   "subtitles.simpleradio.radio_open": "Радио начинает вещание",
   "subtitles.simpleradio.radio_close": "Радио прекращает вещание",
 
+  "subtitles.simpleradio.short_circuit": "Провод коротит",
+
+  "subtitles.simpleradio.tilt_microphone": "Щелчок микрофона",
+  "subtitles.simpleradio.press_microphone": "Микрофон переключается",
+
+  "subtitles.simpleradio.spin_insulator": "Опора провода вращается",
+
   "tooltip.simpleradio.transceiver_frequency": "Частота: %s",
-  "tooltip.simpleradio.receiver_user": "Пользователь: %s",
-
-  "lexiconfig.simpleradio.title": "Конфигурация Simple Radio",
-
-  "lexiconfig.simpleradio.maxRadioDistance": "Максимальная дистанция радиосигнала",
-  "lexiconfig.simpleradio.maxRadioDistance_description": "Максимальное расстояние, на которое может вещать радио."
+  "tooltip.simpleradio.receiver_user": "Пользователь: %s"
 }
 
 

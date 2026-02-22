@@ -19,7 +19,7 @@ public class SimpleRadioClientNetworking {
         short identifier = packet.identifier();
 
         Minecraft.getInstance().execute(() -> {
-            RadioRouter router = ClientRadioManager.getRouter(identifier);
+            RadioRouter router = (RadioRouter) ClientRadioManager.getInstance().getRouter(identifier);
             if (router == null) return;
 
             router.activity = activity;

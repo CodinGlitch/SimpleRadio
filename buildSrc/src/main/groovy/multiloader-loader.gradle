@@ -45,7 +45,6 @@ dependencies {
 
     // --- Common --- \\
 
-    implementation(project(':api'))
     apiJava project(path: ':api', configuration: 'apiJava')
 }
 
@@ -88,11 +87,11 @@ tasks.register("substituteResources", Copy) {
 }
 
 tasks.register('publishModrinth') {
-    dependsOn("fabric:modrinth", "forge:modrinth", "neoforge:modrinth")
+    dependsOn(":${project.name}:modrinth")
 }
 
 tasks.register('publishCurseForge') {
-    dependsOn("fabric:curseforge", "forge:curseforge", "neoforge:curseforge")
+    dependsOn(":${project.name}:curseforge")
 }
 
 tasks.register('publishSites') {

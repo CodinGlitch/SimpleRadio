@@ -1,26 +1,31 @@
 {
   "type": "forge:conditional",
-  "forge:condition": {
-    "type": "simpleradio:items_enabled",
-    "item": "insulator"
-  },
   "recipes": [
     {
-      "type": "minecraft:crafting_shaped",
-      "category": "building",
-      "key": {
-        "I": {
-          "item": "minecraft:iron_ingot"
-        },
-        "P": {
-          "tag": "minecraft:planks"
+      "conditions": [
+        {
+          "type": "simpleradio:items_enabled",
+          "item": "insulator"
         }
-      },
-      "pattern": [
-        "PIP"
       ],
-      "result": {
-        "item": "simpleradio:insulator"
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "building",
+        "key": {
+          "I": {
+            "item": "minecraft:iron_ingot"
+          },
+          "P": {
+            "tag": "minecraft:planks"
+          }
+        },
+        "pattern": [
+          "PIP"
+        ],
+        "result": {
+          "item": "simpleradio:insulator"
+        },
+        "show_notification": true
       }
     }
   ]

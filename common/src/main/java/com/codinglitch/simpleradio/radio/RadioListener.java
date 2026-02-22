@@ -1,11 +1,12 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
-import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.routers.Listener;
 import net.minecraft.world.entity.Entity;
 
-import java.util.*;
+import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 /**
@@ -15,20 +16,16 @@ import java.util.function.UnaryOperator;
  * <br>
  * <b>Does route further.</b>
  */
-public class RadioListener extends RadioRouter {
+public class RadioListener extends RadioRouter implements Listener {
 
-    private UnaryOperator<RadioSource> dataTransformer;
-    private final Map<UUID, OpusDecoder> decoders;
+    private UnaryOperator<Source> dataTransformer;
 
     public float range = 8;
-    public long lastHeader = 0;
 
     public byte[] compiledData = new byte[] {};
 
     protected RadioListener(UUID reference) {
         super(reference);
-
-        decoders = new HashMap<>();
     }
     protected RadioListener() {
         this(UUID.randomUUID());
@@ -42,49 +39,41 @@ public class RadioListener extends RadioRouter {
         this.owner = owner;
 
         boolean isClient = owner.level().isClientSide();
-        RadioManager.registerRouterSided(this, isClient, null);
+        SimpleRadioApi.registerRouterSided(this, isClient, null);
     }
     public RadioListener(WorldlyPosition location) {
         this(location, UUID.randomUUID());
     }
     public RadioListener(WorldlyPosition location, UUID uuid) {
         this(uuid);
-        this.location = location;
+        this.position = location;
 
 
         boolean isClient = location.isClientSide();
-        RadioManager.registerRouterSided(this, isClient, null);
+        SimpleRadioApi.registerRouterSided(this, isClient, null);
     }
 
+    @Override
+    public float getRange() {
+        return range;
+    }
+
+    @Override
     public void setRange(float range) {
         this.range = range;
     }
 
-    public void tryRouteHeader() {
-        if (this.location == null) return;
-
-        long currentTime = this.location.level.getGameTime();
-        if (currentTime - lastHeader < SimpleRadioLibrary.SERVER_CONFIG.wire.headerInterval) return;
-
-        //RadioHeader header = new RadioHeader(this.location);
-        //this.route(header);
-
-        this.lastHeader = currentTime;
-    }
-
-    public void transformer(UnaryOperator<RadioSource> transformer) {
+    @Override
+    public void transformer(UnaryOperator<Source> transformer) {
         this.dataTransformer = transformer;
-    }
-
-    public OpusDecoder getDecoder(UUID sender) {
-        return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
     }
 
     public void onData(byte[] data) {
         //TODO: compile like RadioSources into a larger sample
     }
 
-    public void onSource(RadioSource source) {
+    @Override
+    public void listen(Source source) {
         if (dataTransformer != null) {
             source = dataTransformer.apply(source);
         }
@@ -93,7 +82,7 @@ public class RadioListener extends RadioRouter {
 
         source.delegate(this.reference);
 
-        this.tryRouteHeader();
+        CompatCore.acceptSource(this, source);
         this.route(source);
     }
 

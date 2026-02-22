@@ -1,7 +1,9 @@
 package com.codinglitch.simpleradio.client.core.registry.renderers;
 
+import com.codinglitch.simpleradio.core.registry.CatalystRegistry;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.api.central.Frequencing;
+import com.codinglitch.simpleradio.central.Catalyst;
+import com.codinglitch.simpleradio.central.Frequencing;
 import com.codinglitch.simpleradio.core.registry.blocks.CatalyzingBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.ReceiverBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -16,13 +18,16 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Math;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.joml.Vector3f;
+
+import java.util.List;
 
 public class FrequencingRenderer {
     public static final int FRAME_RATE = 12;
@@ -63,18 +68,29 @@ public class FrequencingRenderer {
         if (level == null) return;
 
         if (blockEntity.catalyst == null) {
-            poseStack.scale(0.5f, 0.5f, 0.5f);
-            poseStack.translate(0, 20f, 0f);
+            List<Catalyst> catalysts = CatalystRegistry.getCatalysts();
+            float catalystSize = 8f;
+            float offset = catalystSize/2f - (catalysts.size() / 2f) * catalystSize;
+            for (int i = 0; i < catalysts.size(); i++) {
+                Catalyst catalyst = catalysts.get(i);
+
+                poseStack.pushPose();
+                poseStack.translate(offset + i*catalystSize, 10f, 0f);
+                poseStack.scale(catalystSize, catalystSize, 0.01f);
+                //poseStack.mulPose(Axis.YP.rotationDegrees(time*60));
+
+                minecraft.getItemRenderer().renderStatic(
+                        new ItemStack(catalyst.associate), ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT, overlay,
+                        poseStack, bufferSource, blockEntity.getLevel(), 0
+                );
+                poseStack.popPose();
+            }
 
             String text = I18n.get("screen.simpleradio.frequencing.catalyst");
-            float width = (float) (-font.width(text) / 2);
-            font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
+            poseStack.scale(1f, 1f, 1f);
+            poseStack.translate(0.5f, -5f, 0);
 
-            text = "✖";
-            poseStack.scale(4f, 4f, 4f);
-            poseStack.translate(0, -9f, 0);
-
-            width = (float) (-font.width(text) / 2);
+            float width = -font.width(text) /**// 2f;
             font.drawInBatch(text, width, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
 
             return;
@@ -90,7 +106,7 @@ public class FrequencingRenderer {
         poseStack.mulPose(Axis.YP.rotationDegrees(time*60));
 
         minecraft.getItemRenderer().renderStatic(
-                new ItemStack(blockEntity.catalyst.associate), ItemDisplayContext.GUI, light,
+                new ItemStack(blockEntity.catalyst.associate), ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT,
                 OverlayTexture.pack((int) Math.floor((Math.sin(time * 5f) + 1) * 5), 15), poseStack, bufferSource, blockEntity.getLevel(), 0
         );
         poseStack.popPose();

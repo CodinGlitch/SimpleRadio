@@ -54,15 +54,16 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_iron_ingot",
       "has_polished_deepslate",
-      "has_amethyst_shard"
+      "has_amethyst_shard",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:radiosmither"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

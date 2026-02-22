@@ -22,5 +22,6 @@
   ],
   "result": {
     "item": "simpleradio:insulator"
-  }
+  },
+  "show_notification": true
 }

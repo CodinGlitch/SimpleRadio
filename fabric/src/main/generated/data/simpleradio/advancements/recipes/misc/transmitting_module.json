@@ -21,12 +21,12 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_lapis_lazuli": {
+    "has_ender_pearl": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:lapis_lazuli"
+              "minecraft:ender_pearl"
             ]
           }
         ]
@@ -42,14 +42,15 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_copper_wire",
-      "has_lapis_lazuli"
+      "has_ender_pearl",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:transmitting_module"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

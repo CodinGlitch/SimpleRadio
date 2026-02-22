@@ -1,20 +1,18 @@
-<div align="center" style="text-align:center;"><img src="https://github.com/CodinGlitch/SimpleRadio/assets/22829873/30156ede-b1dd-4842-9b26-0f0dfadf9360"></div>
+<div align="center" style="text-align:center;"><img style="width:50%;" src="https://github.com/user-attachments/assets/074c208f-b8d8-472a-97d7-bf026d5638f9"></div>
+<br><br>
 
 <div align="center" style="text-align:center;">
-<a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://img.shields.io/badge/CodinGlitch-red?style=flat-square&logo=patreon"></a>
-<a href="https://ko-fi.com/codinglitch"><img alt="Ko-fi Badge" src="https://img.shields.io/badge/CodinGlitch-white?style=flat-square&logo=kofi"></a>
-<a href="https://discord.gg/8zDE5ZTqCj"><img alt="Discord" src="https://img.shields.io/discord/1192568922185146559?style=flat-square&logo=discord&label=Discord&labelColor=222222&color=5865f2"></a>
+<a href="https://www.patreon.com/codinglitch"><img alt="Patreon Badge" src="https://github.com/user-attachments/assets/03a71fc7-a02a-4425-b0bf-5a16a252cfcc"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://ko-fi.com/codinglitch"><img alt="Ko-fi Badge" src="https://github.com/user-attachments/assets/9776503f-d44b-4237-a2d7-d0d8670cb5fa"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://discord.gg/8zDE5ZTqCj"><img alt="Discord Badge" src="https://github.com/user-attachments/assets/f7e24fc0-101f-41f1-b489-42873aa45e42"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Badge" src="https://github.com/user-attachments/assets/e7eccf85-61dd-4787-8e0e-ad928bd20bf4"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://modrinth.com/mod/simple-radio"><img alt="Modrinth Badge" src="https://github.com/user-attachments/assets/f1208ac6-f6d7-472f-a0bc-1482c6a27190"></a>
 </div>
-
+<br>
 <div align="center" style="text-align:center;">
-<a href="https://github.com/CodinGlitch/SimpleRadio"><img alt="Github Badge" src="https://img.shields.io/badge/SimpleRadio-222222?style=flat-square&logo=github"></a>
-<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Game Versions" src="https://img.shields.io/modrinth/game-versions/simple-voice-radio?style=flat-square&label=Available%20for&labelColor=222222&color=white"></a>
 <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img alt="Static Badge" src="https://img.shields.io/badge/License-GPLv3-darkred?style=flat-square&labelColor=222222"></a>
-</div>
-
-<div align="center" style="text-align:center;">
-<a href="https://www.curseforge.com/minecraft/mc-mods/simple-voice-radio"><img alt="CurseForge Downloads" src="https://img.shields.io/curseforge/dt/820070?style=flat-square&logo=curseforge&label=CurseForge&labelColor=222222&color=red"></a>
-<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/simple-voice-radio?style=flat-square&logo=modrinth&label=Modrinth&labelColor=222222&color=1bd96a"></a>
+<a href="https://github.com/CodinGlitch/SimpleRadio"><img alt="Github Badge" src="https://img.shields.io/badge/SimpleRadio-222222?style=flat-square&logo=github"></a>
+<a href="https://modrinth.com/mod/simple-voice-radio"><img alt="Modrinth Game Versions" src="https://img.shields.io/modrinth/game-versions/simple-radio?style=flat-square&label=Available%20for&labelColor=222222&color=white"></a>
 </div>
 
 ---
@@ -32,7 +30,7 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 |--------|--------------------------------------------------------------------------------------------------------|
 | ✅      | Radio item that transmits voice packets                                                                |
 | ✅      | Compile audio from nearby players as well                                                              |
-| ❌      | Additive transceiving                                                                                  |
+| ✅      | Additive transceiving                                                                                  |
 | ✅      | Radio block that can listen to frequencies and output audio from it                                    |
 | ✅      | Microphone block that transmits audio of every player nearby                                           |
 | ✅      | Packet transmission over frequencies instead of groups                                                 |
@@ -42,15 +40,14 @@ This mod is a plugin of Simple Voice Chat which adds radio communication over fr
 | ❓      | Fully customizable config compatible with cloth config, etc.                                           |
 | ❌      | Rechargable battery for transceivers                                                                   |
 | ❓      | Radio upgrades that can increase range, improve audio quality, etc.                                    |
-| ❌      | Transmitter block that transmits audio in conjunction with an antenna                                  |
-| ❌      | Receiver block that can receive audio transmitted by transmitters, requires a speaker                  |
-| ❓      | Speaker block that can receive and play audio in conjunction with an receiver                          |
-| ❓      | Antennae that can increase transmitting/receiving range of a block                                     |
+| ✅      | Transmitter block that transmits audio in conjunction with an antenna                                  |
+| ✅      | Receiver block that can receive audio transmitted by transmitters, requires a speaker                  |
+| ✅      | Speaker block that can receive and play audio in conjunction with an receiver                          |
+| ✅      | Antennae that can increase transmitting/receiving range of a block                                     |
 | ❌      | Weather and environmental interference                                                                 |
 | ❌      | Altitude influences interference amount                                                                |
 | ❌      | Relay towers                                                                                           |
 | ❌      | Transmission mapping                                                                                   |
-| ❌      | VR compatibility                                                                                   |
 
 <br>
 
@@ -63,24 +60,20 @@ Check the [wiki](https://github.com/CodinGlitch/SimpleRadio/wiki) for more infor
 ✅ - Supported
 ❓ - Untested
 
-| Loader       | 1.18.X | 1.19.X | 1.20.X |
-|--------------|--------|--------|--------|
-| **Fabric**   | ❌      | ❌      | ✅      |
-| **Quilt**    | ❓      | ❓      | ❓      |
-| **Forge**    | ❌      | ❌      | ✅      |
-| **NeoForge** | ❌      | ❌      | ✅      |
+| Loader       | 1.18.X | 1.19.X | 1.20.1 | 1.20.4 | 1.21.1 |
+|--------------|--------|--------|--------|--------|--------|
+| **Fabric**   | ❌      | ✅      | ✅      | ✅       | ❌       |
+| **Quilt**    | ❓      | ❓      | ❓      | ❓       | ❓       |
+| **Forge**    | ❌      | ✅      | ✅      | ✅       | ❌       |
+| **NeoForge** | ❌      | ✅      | ✅      | ✅       | ❌       |
 
 
 <br>
 
 # Related Projects
-
-## [Simple Create Radios](https://modrinth.com/resourcepack/simple-create-radios)
-![Simple Create Radios](https://github.com/CodinGlitch/SimpleRadio/assets/22829873/a602e295-2de6-42e5-b182-71404b7625de)
-
-This amazing resource pack aims to make the blocks and items fit aesthetically with the Create mod!
-
-## [Simple Radio Redone](https://modrinth.com/resourcepack/simple-radio-redone)
-![Simple Radio Redone](https://cdn.modrinth.com/data/cached_images/7c816071a7f11f8a20e17724f8b0b72f3d1ff63d.png)
-
-Another resource pack which remakes the textures of the mod to give it a fresh look while maintaining the original style!
+| Project                                                                                                                                                              | Description                                                                                                                                                                                                          |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![Simple Create Radios](https://raw.githubusercontent.com/CodinGlitch/SimpleRadio/7e77ba5c8be7256d7e168b9937e9d4df77bb5793/.related/simple_create_radios/icon.png)   | [**Simple Create Radios**](https://modrinth.com/resourcepack/simple-create-radios) [2.0-3.0]<br/>This amazing resource pack aims to make the blocks and items fit aesthetically with the Create mod!                 |
+| ![Simple Radio Redone](https://raw.githubusercontent.com/CodinGlitch/SimpleRadio/7e77ba5c8be7256d7e168b9937e9d4df77bb5793/.related/simple_radio_redone/icon.png)     | [**Simple Radio Redone**](https://modrinth.com/resourcepack/simple-radio-redone) [2.0]<br/>Another resource pack which remakes the textures of the mod to give it a fresh look while maintaining the original style! |
+| ![Simple Radio Reworked](https://raw.githubusercontent.com/CodinGlitch/SimpleRadio/7e77ba5c8be7256d7e168b9937e9d4df77bb5793/.related/simple_radio_reworked/icon.png) | [**Simple Radio Reworked**](https://modrinth.com/resourcepack/simple-radio-reworked) [2.0]<br/>This resource pack gives a fresh view on the blocks and items to make them look more vanilla-friendly!                |
+| ![Simple Frequency](https://raw.githubusercontent.com/CodinGlitch/SimpleRadio/7e77ba5c8be7256d7e168b9937e9d4df77bb5793/.related/simple_frequency/icon.png)           | [**Simple Frequency**](https://modrinth.com/datapack/simple-frequency) [2.0-3.0]<br/>This datapack adds the ability to change the frequency and modulation of various Simple Radio items by using a simple command!  |

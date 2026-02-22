@@ -10,17 +10,16 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.NetworkProtocol;
-import net.minecraftforge.network.SimpleChannel;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -28,14 +27,18 @@ import org.apache.logging.log4j.util.TriConsumer;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Mod.EventBusSubscriber(modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeLoader {
-    public static final SimpleChannel CHANNEL = ChannelBuilder.named(CommonSimpleRadio.id("channel"))
-            .optional()
-            .networkProtocolVersion(0)
-            .simpleChannel();
+    private static final String PROTOCOL_VERSION = "0";
+    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
+            CommonSimpleRadio.id("channel"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
+    );
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
@@ -50,7 +53,7 @@ public class ForgeLoader {
                 event.includeServer(),
                 new LootTableProvider(generator.getPackOutput(), Set.of(), List.of(
                         new LootTableProvider.SubProviderEntry(SimpleRadioBlockLootTableProvider::new, LootContextParamSets.BLOCK)
-                ), event.getLookupProvider())
+                ))
         );
     }
 
@@ -67,8 +70,8 @@ public class ForgeLoader {
 
         event.register(ForgeRegistries.Keys.PARTICLE_TYPES, helper -> SimpleRadioParticles.PARTICLES.forEach(helper::register));
 
-        event.register(ForgeRegistries.Keys.CONDITION_SERIALIZERS, helper -> {
-            helper.register(CommonSimpleRadio.id("items_enabled"), ItemsEnabledCondition.CODEC);
+        event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> {
+            CraftingHelper.register(ItemsEnabledCondition.Serializer.INSTANCE);
         });
 
         CommonSimpleRadio.load();
@@ -79,24 +82,24 @@ public class ForgeLoader {
 
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
-            public <P extends CustomPacket, B extends FriendlyByteBuf> void register(CustomPacketPayload.Type<P> type, Class<P> packetClass, StreamCodec<B, P> codec, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
-                CHANNEL.<P, B>messageBuilder(packetClass, index.getAndIncrement(), (NetworkProtocol<B>) null)
-                        .codec(codec)
+            public <P extends CustomPacket> void register(ResourceLocation id, Class<P> packetClass, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+                CHANNEL.messageBuilder(packetClass, index.getAndIncrement())
+                        .decoder(reader).encoder(writer)
                         .consumerMainThread((packet, context) -> {
-                            handler.accept(packet, context.getSender().getServer(), context.getSender());
-                            context.setPacketHandled(true);
+                            handler.accept(packet, context.get().getSender().getServer(), context.get().getSender());
+                            context.get().setPacketHandled(true);
                         }).add();
             }
         });
 
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
-            public <P extends CustomPacket, B extends FriendlyByteBuf> void register(CustomPacketPayload.Type<P> type, Class<P> packetClass, StreamCodec<B, P> codec, Consumer<P> handler) {
-                CHANNEL.<P, B>messageBuilder(packetClass, index.getAndIncrement(), (NetworkProtocol<B>) null)
-                        .codec(codec)
+            public <P extends CustomPacket> void register(ResourceLocation id, Class<P> packetClass, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
+                CHANNEL.messageBuilder(packetClass, index.getAndIncrement())
+                        .decoder(reader).encoder(writer)
                         .consumerMainThread((packet, context) -> {
                             handler.accept(packet);
-                            context.setPacketHandled(true);
+                            context.get().setPacketHandled(true);
                         }).add();
             }
         });

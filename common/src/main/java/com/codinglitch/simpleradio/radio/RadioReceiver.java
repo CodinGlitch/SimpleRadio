@@ -1,20 +1,20 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.api.central.FrequencingType;
-import com.codinglitch.simpleradio.api.central.Frequency;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.FrequencingType;
+import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * A type of {@link RadioRouter} that accepts {@link RadioSource}s from its connected {@link Frequency}.
  * <br>
  * <b>Does route further.</b>
  */
-public class RadioReceiver extends RadioRouter {
+public class RadioReceiver extends RadioRouter implements Receiver {
     public int antennaPower = 0;
     public Frequency frequency;
 
@@ -22,7 +22,7 @@ public class RadioReceiver extends RadioRouter {
 
     protected RadioReceiver(Frequency frequency, UUID id) {
         super(id);
-        this.setFrequency(frequency);
+        this.frequency(frequency);
     }
     protected RadioReceiver(Frequency frequency) {
         this(frequency, UUID.randomUUID());
@@ -40,29 +40,36 @@ public class RadioReceiver extends RadioRouter {
     }
     public RadioReceiver(Frequency frequency, WorldlyPosition location, UUID uuid) {
         this(frequency, uuid);
-        this.location = location;
+        this.position = location;
     }
 
-    public void setFrequency(Frequency frequency) {
+    @Override
+    public int getAntennaPower() {
+        return antennaPower;
+    }
+    @Override
+    public float getPower() {
+        return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
+    }
+    @Override
+    public FrequencingType getFrequencingType() {
+        return frequencingType;
+    }
+
+    @Override
+    public RadioReceiver frequency(Frequency frequency) {
         if (this.frequency != null) {
             this.frequency.removeReceiver(this);
         }
 
         this.frequency = frequency;
-    }
-
-    public RadioReceiver receiveCriteria(Predicate<RadioSource> criteria) {
-        this.acceptCriteria = criteria;
         return this;
     }
 
+    @Override
     public RadioReceiver frequencingType(FrequencingType type) {
         this.frequencingType = type;
         return this;
-    }
-
-    public double getPower() {
-        return frequencingType.receptionPower + (antennaPower * frequencingType.antennaAptitude);
     }
 
     @Override
@@ -77,12 +84,12 @@ public class RadioReceiver extends RadioRouter {
     }
 
     @Override
-    public void accept(RadioSource source) {
+    public void take(Source source) {
         //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        if (source.transmissionPower <= 0) return;
+        if (source.getPower() <= 0) return;
 
         this.compileActivity(source);
 

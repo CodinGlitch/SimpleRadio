@@ -30,5 +30,6 @@
   ],
   "result": {
     "item": "simpleradio:speaker"
-  }
+  },
+  "show_notification": true
 }

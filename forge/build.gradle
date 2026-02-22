@@ -6,15 +6,22 @@ plugins {
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
-
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
     config("${mod_id}.mixins.json")
     config("${mod_id}.forge.mixins.json")
+}
+
+artifacts {
+    apiElements tasks.named("jarJar")
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
+    skip()
 }
 
 minecraft {
@@ -76,9 +83,10 @@ dependencies {
     // --- Dependencies --- \\
 
     compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    runtimeOnly fg.deobf("com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}")
+    developmentRuntimeOnly fg.deobf("com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}:slim")
 
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    compileOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
     developmentRuntimeOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
@@ -87,6 +95,14 @@ dependencies {
     }
 
     // --- Compatibilities --- \\
+
+    // Audio Player
+    implementation fg.deobf("curse.maven:etched-491890:5999495")
+
+    // ComputerCraft
+    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${cc_version}")
+    compileOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${cc_version}"))
+    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}"))
 
     // Vibrative Voice
     implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
@@ -129,8 +145,10 @@ dependencies {
     }
 }
 
+
 tasks.named('jarJar') {
     archiveClassifier = ''
+    //finalizedBy reobfJarJar
 }
 jar.archiveClassifier = "slim"
 jar.finalizedBy('reobfJar')
@@ -141,7 +159,9 @@ sourceSets.each {
     it.java.destinationDirectory = dir
 }
 
-substituteResources.dependsOn compileDatagenJava, processDatagenResources
+substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
 datagenClasses.finalizedBy substituteResources
 
-
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'

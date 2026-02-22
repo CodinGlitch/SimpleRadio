@@ -3,11 +3,10 @@ package com.codinglitch.simpleradio.client.core.registry.renderers;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.registry.blocks.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
@@ -26,13 +25,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
-import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -136,13 +133,13 @@ public class WireRenderer extends EntityRenderer<Wire> {
         Optional<UUID> toRef = wire.getTo();
 
         if (fromRef.isPresent()) {
-            RadioRouter from = ClientRadioManager.getRouter(fromRef.get());
+            Router from = ClientRadioManager.getInstance().getRouter(fromRef.get());
             if (from == null) return;
 
             //wire.setPos(new Vec3(from.getLocation().position()));
 
             if (toRef.isPresent()) {
-                RadioRouter to = ClientRadioManager.getRouter(toRef.get());
+                Router to = ClientRadioManager.getInstance().getRouter(toRef.get());
                 if (to == null) return;
 
                 Vec3 fromPosition = from.getConnectionPosition();
@@ -163,11 +160,11 @@ public class WireRenderer extends EntityRenderer<Wire> {
     }
 
     public static void renderPlayer(AbstractClientPlayer player, MultiBufferSource source, PoseStack poseStack, float partialTick, @Nullable Camera camera) {
-        ItemStack wire = RadioManager.isEntityHolding(player, stack -> stack.is(SimpleRadioItems.COPPER_WIRE));
+        ItemStack wire = RadioManager.getInstance().isEntityHolding(player, stack -> stack.is(SimpleRadioItems.COPPER_WIRE));
         if (wire != null) {
             CompoundTag tag = wire.getOrCreateTag();
             if (tag.contains("connectTo")) {
-                RadioRouter router = ClientRadioManager.getRouter(tag.getUUID("connectTo"));
+                Router router = ClientRadioManager.getInstance().getRouter(tag.getUUID("connectTo"));
                 if (router == null) return;
 
                 ClientLevel level = player.clientLevel;

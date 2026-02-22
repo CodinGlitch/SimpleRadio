@@ -4,11 +4,13 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_id}-${project.name}-${minecraft_version}"
+    archivesName = "${mod_id}-${project.name}"
+    version = "${minecraft_version}-${version}"
 }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+
     withSourcesJar()
     withJavadocJar()
 }
@@ -56,17 +58,22 @@ repositories {
         url = 'https://maven.valkyrienskies.org'
     }
 
+    maven { url = "https://mvn.devos.one/releases" }
+    maven { url = "https://mvn.devos.one/snapshots" }
     maven { url = "https://maven.createmod.net" }
     maven { url = "https://maven.tterrag.com" }
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
 
-    exclusiveContent {
-        forRepository {
-            maven {
-                url "https://cursemaven.com"
-            }
+    maven {
+        url "https://maven.squiddev.cc"
+        content {
+            includeGroup("cc.tweaked")
         }
-        filter {
+    }
+
+    maven {
+        url "https://cursemaven.com"
+        content {
             includeGroup "curse.maven"
         }
     }
@@ -87,8 +94,19 @@ repositories {
     }
 }
 
+configurations {
+    apiJava {
+        canBeResolved = true
+    }
+}
+
 dependencies {
     implementation 'org.jetbrains:annotations:24.1.0'
+
+    // --- Common --- \\
+
+    implementation(project(':api'))
+    apiJava project(path: ':api', configuration: 'apiJava')
 }
 
 sourcesJar {
@@ -157,5 +175,3 @@ tasks.withType(ProcessResources).configureEach {
     inputs.properties(expandProps)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-
-publishing {}

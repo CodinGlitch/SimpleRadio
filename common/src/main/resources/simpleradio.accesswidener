@@ -21,6 +21,13 @@ accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite <init
 # SoundEngine field
 accessible field net/minecraft/client/sounds/SoundManager soundEngine Lnet/minecraft/client/sounds/SoundEngine;
 
+# tickingSounds field
+accessible field net/minecraft/client/sounds/SoundEngine tickingSounds Ljava/util/List;
+accessible field net/minecraft/client/sounds/SoundEngine instanceBySource Lcom/google/common/collect/Multimap;
+accessible field net/minecraft/client/sounds/SoundEngine instanceToChannel Ljava/util/Map;
+accessible field net/minecraft/client/sounds/SoundEngine soundDeleteTime Ljava/util/Map;
+accessible field net/minecraft/client/sounds/SoundEngine tickCount I
+
 # SoundBufferLibrary field
 accessible field net/minecraft/client/sounds/SoundEngine soundBuffers Lnet/minecraft/client/sounds/SoundBufferLibrary;
 

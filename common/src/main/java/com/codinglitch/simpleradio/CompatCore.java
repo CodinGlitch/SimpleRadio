@@ -1,13 +1,19 @@
 package com.codinglitch.simpleradio;
 
-import com.codinglitch.simpleradio.api.compat.CompatibilityInstance;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.CompatibilityInstance;
+import com.codinglitch.simpleradio.compat.VibrativeCompat;
+import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.RadioSpeaker;
+import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -28,6 +34,15 @@ public class CompatCore {
     public static CompatibilityInstance CREATE = new CompatibilityInstance(
             "Create", "create", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.create, "[6.0,)"
     );
+    public static CompatibilityInstance COMPUTER_CRAFT = new CompatibilityInstance(
+            "CC:Tweaked", "computercraft", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.cc_tweaked
+    );
+    public static CompatibilityInstance ETCHED = new CompatibilityInstance(
+            "Etched", "etched", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.etched
+    );
+    public static CompatibilityInstance AUDIO_PLAYER = new CompatibilityInstance(
+            "AudioPlayer", "audioplayer", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.audioplayer
+    );
 
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
@@ -39,6 +54,10 @@ public class CompatCore {
 
         VALKYRIEN_SKIES.spout();
         CREATE.spout();
+        COMPUTER_CRAFT.spout();
+
+        ETCHED.spout();
+        AUDIO_PLAYER.spout();
 
         if (!initialized) {
             initialized = true;
@@ -56,7 +75,31 @@ public class CompatCore {
     public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE.enabled) {
+            VibrativeCompat.onData(channel, source, decoded);
         }
+    }
+
+    public static void removeBlockEntity(BlockEntity blockEntity) {
+        if (CompatCore.COMPUTER_CRAFT.isLoaded) {
+            CommonCCCompat.removePeripheral(blockEntity);
+        }
+    }
+
+    public static void acceptSource(Router router, Source source) {
+        if (CompatCore.COMPUTER_CRAFT.isLoaded) {
+            CommonCCCompat.acceptSource(router, source);
+        }
+    }
+
+    public static String getSound(ItemStack stack) {
+        String result = Services.COMPAT.getSound(stack);
+        if (result != null) return result;
+
+        if (stack.getItem() instanceof RecordItem recordItem) {
+            return recordItem.getSound().getLocation().toString();
+        }
+
+        return null;
     }
 
     public static RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {

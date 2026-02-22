@@ -20,7 +20,7 @@
       "item": "minecraft:iron_ingot"
     },
     "Q": {
-      "item": "minecraft:quartz"
+      "item": "minecraft:amethyst_shard"
     },
     "W": {
       "item": "simpleradio:listener_module"
@@ -42,5 +42,6 @@
   ],
   "result": {
     "item": "simpleradio:transceiver"
-  }
+  },
+  "show_notification": true
 }

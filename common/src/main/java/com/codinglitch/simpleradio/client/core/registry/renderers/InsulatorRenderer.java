@@ -4,7 +4,7 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
-import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -52,7 +52,7 @@ public class InsulatorRenderer implements BlockEntityRenderer<InsulatorBlockEnti
             model.wire.visible = !blockEntity.getWires().isEmpty() || blockEntity.connector != null;
             model.spool.xRot = blockEntity.rotation;
 
-            RadioRouter router = ClientRadioManager.getRouter(blockEntity.id);
+            Router router = ClientRadioManager.getInstance().getRouter(blockEntity.id);
             if (router != null) {
                 /*float rotation = Math.toRadians(SimpleRadioBlocks.MICROPHONE.getYRotationDegrees(state) - 90);
                 float tilt = blockEntity.currentTilt - 0.5f;

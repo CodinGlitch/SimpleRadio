@@ -42,14 +42,15 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_copper_wire",
-      "has_note_block"
+      "has_note_block",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:speaker_module"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

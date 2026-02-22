@@ -52,15 +52,16 @@
   },
   "requirements": [
     [
-      "has_the_recipe",
       "has_iron_ingot",
       "has_planks",
-      "has_copper_wire"
+      "has_copper_wire",
+      "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
       "simpleradio:insulator"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

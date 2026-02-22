@@ -1,0 +1,1 @@
+This resourcepack redesigns blocks and items in the style of the Create mod!

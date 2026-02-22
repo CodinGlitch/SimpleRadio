@@ -1,10 +1,16 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Wiring;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
+import com.codinglitch.simpleradio.core.Frequencies;
+import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
@@ -16,10 +22,12 @@ import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
+import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,145 +36,219 @@ import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
+import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Math;
-import org.joml.Vector3f;
-
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.openal.AL10;
+import oshi.util.tuples.Pair;
+
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class ClientRadioManager {
-    // do NOT FORGET THIS
-    // pending routers are added when initially registered
-    // packet will lookup a pending router by reference
-    // it will then assign the given identifier before registering it
-    // but what about identical reference?
-    // i dont know bruh
-    private static final Map<Short, PendingRouter<?>> pendingRouters = new HashMap<>();
-    private static final Map<Short, ClientRouterWrapper> routers = new HashMap<>();
+public class ClientRadioManager extends ClientSimpleRadioApi {
+    public static final ClientRadioManager INSTANCE = new ClientRadioManager();
 
-    public static List<RadioRouter> getRouters() {
-        return routers.values().stream().map(wrapper -> wrapper.router).toList();
-    }
+    private static final FrequenciesImpl FREQUENCIES = new FrequenciesImpl();
 
-    public static RadioRouter getRouter(Predicate<RadioRouter> criteria) {
-        Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue().router)).findFirst();
+    private static final Map<Short, PendingRouter<?>> PENDING_ROUTERS = new HashMap<>();
+    private static final Map<Short, ClientRouterWrapper> ROUTERS = new HashMap<>();
 
-        return result.map(Map.Entry::getValue).map(wrapper -> wrapper.router).orElse(null);
+    public static void load() {
     }
 
     // im, losing it
 
-    public static ClientRouterWrapper getWrapper(Predicate<ClientRouterWrapper> criteria) {
-        Optional<Map.Entry<Short, ClientRouterWrapper>> result = routers.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
+    private boolean routerMatches(Router router, @Nullable String type) {
+        return (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type));
+    }
+
+    public ClientRouterWrapper getWrapper(Predicate<ClientRouterWrapper> criteria) {
+        Optional<Map.Entry<Short, ClientRouterWrapper>> result = ROUTERS.entrySet().stream().filter(entry -> criteria.test(entry.getValue())).findFirst();
         return result.map(Map.Entry::getValue).orElse(null);
     }
-    public static ClientRouterWrapper getWrapper(UUID uuid) {
-        return getWrapper(wrapper -> uuid.equals(wrapper.router.reference));
+    public ClientRouterWrapper getWrapper(UUID uuid) {
+        return getWrapper(wrapper -> uuid.equals(wrapper.router.getReference()));
     }
-    public static ClientRouterWrapper getWrapper(RadioRouter router) {
+    public ClientRouterWrapper getWrapper(RadioRouter router) {
         return getWrapper(wrapper -> router.equals(wrapper.router));
     }
 
-    public static RadioRouter getRouter(short identifier) {
-        ClientRouterWrapper wrapper = routers.get(identifier);
+    @Override
+    public Frequencies frequencies() {
+        return FREQUENCIES;
+    }
+
+    @Override
+    public <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener) {
+        RadioManager.getInstance().listen(event, listener);
+    }
+
+    @Override
+    public <T> Optional<T> getConfig(String path) {
+        return CommonSimpleRadio.getConfigFrom(SimpleRadioLibrary.CLIENT_CONFIG, path);
+    }
+
+    @Override
+    public <T> void setConfig(String path, T value) {
+        CommonSimpleRadio.setConfigFrom(SimpleRadioLibrary.CLIENT_CONFIG, path, value);
+    }
+
+    @Override
+    public Router newRouter(UUID reference) {
+        return new RadioRouter(reference);
+    }
+    @Override
+    public Router newRouter(WorldlyPosition position) {
+        return new RadioRouter(position);
+    }
+    @Override
+    public Router newRouter(UUID reference, WorldlyPosition position) {
+        return new RadioRouter(position, reference);
+    }
+
+    @Override
+    public Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+        return new RadioSource(owner, location, data, volume);
+    }
+
+    @Override
+    public BlockPos travelExtension(BlockPos pos, LevelAccessor level) {
+        return RadioManager.getInstance().travelExtension(pos, level);
+    }
+
+    @Override
+    public List<Router> getRouters() {
+        return ROUTERS.values().stream().map(wrapper -> wrapper.router).toList();
+    }
+
+    @Override
+    public Router getRouter(Predicate<Router> criteria) {
+        Optional<Map.Entry<Short, ClientRouterWrapper>> result = ROUTERS.entrySet().stream().filter(entry -> criteria.test(entry.getValue().router)).findFirst();
+
+        return result.map(Map.Entry::getValue).map(wrapper -> wrapper.router).orElse(null);
+    }
+
+    @Override
+    public Router getRouter(short identifier) {
+        ClientRouterWrapper wrapper = ROUTERS.get(identifier);
         return wrapper == null ? null : wrapper.router;
     }
-    public static RadioRouter getRouter(UUID reference, @Nullable String type) {
+    @Override
+    public Router getRouter(UUID reference, @Nullable String type) {
         return getRouter(router ->
-                router.reference.equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
+                router.getReference().equals(reference) && (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type))
         );
     }
-    public static RadioRouter getRouter(UUID reference) {
-        return ClientRadioManager.getRouter(router -> reference.equals(router.reference));
+    @Override
+    public Router getRouter(UUID reference) {
+        return getRouter(router -> reference.equals(router.getReference()));
     }
-    public static RadioRouter getRouter(Entity owner) {
-        return ClientRadioManager.getRouter(router -> owner.equals(router.owner));
+    @Override
+    public Router getRouter(Entity owner) {
+        return getRouter(router -> owner.equals(router.getOwner()));
     }
-    public static RadioRouter getRouter(WorldlyPosition location) {
-        return ClientRadioManager.getRouter(router -> location.equals(router.location));
-    }
-
-    public static RadioListener getListener(UUID uuid) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioListener);
-    }
-    public static RadioListener getListener(Entity owner) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioListener);
-    }
-    public static RadioListener getListener(WorldlyPosition location) {
-        return (RadioListener) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioListener);
+    @Override
+    public Router getRouter(WorldlyPosition location) {
+        return getRouter(router -> location.equals(router.getPosition()));
     }
 
-    public static RadioSpeaker getSpeaker(UUID uuid) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioSpeaker);
+    @Override
+    public RadioListener getListener(UUID uuid) {
+        return (RadioListener) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioListener);
     }
-    public static RadioSpeaker getSpeaker(Entity owner) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioSpeaker);
+    @Override
+    public RadioListener getListener(Entity owner) {
+        return (RadioListener) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioListener);
     }
-    public static RadioSpeaker getSpeaker(WorldlyPosition location) {
-        return (RadioSpeaker) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioSpeaker);
-    }
-
-    public static RadioReceiver getReceiver(UUID uuid) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioReceiver);
-    }
-    public static RadioReceiver getReceiver(Entity owner) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioReceiver);
-    }
-    public static RadioReceiver getReceiver(WorldlyPosition location) {
-        return (RadioReceiver) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioReceiver);
+    @Override
+    public RadioListener getListener(WorldlyPosition location) {
+        return (RadioListener) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioListener);
     }
 
-    public static RadioTransmitter getTransmitter(UUID uuid) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> uuid.equals(router.reference) && router instanceof RadioTransmitter);
+    @Override
+    public RadioSpeaker getSpeaker(UUID uuid) {
+        return (RadioSpeaker) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioSpeaker);
     }
-    public static RadioTransmitter getTransmitter(Entity owner) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> owner.equals(router.owner) && router instanceof RadioTransmitter);
+    @Override
+    public RadioSpeaker getSpeaker(Entity owner) {
+        return (RadioSpeaker) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioSpeaker);
     }
-    public static RadioTransmitter getTransmitter(WorldlyPosition location) {
-        return (RadioTransmitter) ClientRadioManager.getRouter(router -> location.equals(router.location) && router instanceof RadioTransmitter);
+    @Override
+    public RadioSpeaker getSpeaker(WorldlyPosition location) {
+        return (RadioSpeaker) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioSpeaker);
     }
 
-    public static void finalizeRouter(short mapping, short identifier) {
-        CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
+    @Override
+    public RadioReceiver getReceiver(UUID uuid) {
+        return (RadioReceiver) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioReceiver);
+    }
+    @Override
+    public RadioReceiver getReceiver(Entity owner) {
+        return (RadioReceiver) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioReceiver);
+    }
+    @Override
+    public RadioReceiver getReceiver(WorldlyPosition location) {
+        return (RadioReceiver) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioReceiver);
+    }
 
-        PendingRouter<?> pending = pendingRouters.remove(mapping);
-        if (pending == null) {
-            CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
-            return;
+    @Override
+    public RadioTransmitter getTransmitter(UUID uuid) {
+        return (RadioTransmitter) getRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioTransmitter);
+    }
+    @Override
+    public RadioTransmitter getTransmitter(Entity owner) {
+        return (RadioTransmitter) getRouter(router -> owner.equals(router.getOwner()) && router instanceof RadioTransmitter);
+    }
+    @Override
+    public RadioTransmitter getTransmitter(WorldlyPosition location) {
+        return (RadioTransmitter) getRouter(router -> location.equals(router.getPosition()) && router instanceof RadioTransmitter);
+    }
+
+    @Override
+    public <R extends Router> void registerRouter(R router, @Nullable Frequency frequency) {
+        this.registerRouter(router);
+
+        if (router instanceof RadioReceiver receiver) {
+            if (frequency != null) frequency.registerReceiver(receiver);
+        } else if (router instanceof RadioTransmitter transmitter) {
+            if (frequency != null) frequency.registerTransmitter(transmitter);
         }
-
-        pending.router.identifier = identifier;
-        routers.put(identifier, ClientRouterWrapper.of(pending.router));
     }
 
-    public static <R extends RadioRouter> void registerRouter(R router) {
+    @Override
+    public <R extends Router> void registerRouter(R router) {
         PendingRouter<R> pendingRouter = PendingRouter.of(router);
 
         short mapping = Short.MAX_VALUE;
         for (short index = Short.MIN_VALUE; index < Short.MAX_VALUE; index++) {
-            if (pendingRouters.containsKey(index)) continue;
-            pendingRouters.put(index, pendingRouter);
+            if (PENDING_ROUTERS.containsKey(index)) continue;
+            PENDING_ROUTERS.put(index, pendingRouter);
             mapping = index;
             break;
         }
@@ -175,35 +257,74 @@ public class ClientRadioManager {
 
         CommonSimpleRadio.debug("Requested identifier for {} with mapping {} and reference {}", router.getClass().getSimpleName(), mapping, router.getReference());
     }
-    public static void removeRouter(Predicate<ClientRouterWrapper> predicate) {
-        routers.entrySet().removeIf(entry -> {
-            if (predicate.test(entry.getValue())) {
-                entry.getValue().close();
-                return true;
-            }
 
-            return false;
+    public Router removeRouter(Predicate<Router> predicate) {
+        List<Map.Entry<Short, ClientRouterWrapper>> removal = ROUTERS.entrySet().stream()
+                .filter(entry -> predicate.test(entry.getValue().router))
+                .toList();
+
+        if (removal.isEmpty()) return null;
+
+        removal.forEach(entry -> {
+            entry.getValue().close();
+            ROUTERS.remove(entry.getKey());
         });
+
+        return removal.stream().findFirst().get().getValue().router;
     }
-    public static void removeRouter(RadioRouter router) {
-        removeRouter(wrapper -> wrapper.router == router);
+    @Override
+    public Router removeRouter(Router router) {
+        return removeRouter(otherRouter -> otherRouter == router);
     }
-    public static void removeRouter(UUID uuid) {
-        removeRouter(wrapper -> uuid.equals(wrapper.router.reference));
+
+    @Override
+    public Router removeRouter(UUID reference) {
+        return removeRouter(router -> reference.equals(router.getReference()));
     }
-    public static void removeRouter(Entity owner) {
-        removeRouter(wrapper -> owner.equals(wrapper.router.owner));
+    @Override
+    public Router removeRouter(UUID reference, @Nullable String type) {
+        return removeRouter(router -> reference.equals(router.getReference()) && routerMatches(router, type));
     }
-    public static void removeRouter(WorldlyPosition location) {
-        removeRouter(wrapper -> wrapper.router.location != null && location.equals(wrapper.router.location));
+
+    @Override
+    public Router removeRouter(Entity owner) {
+        return removeRouter(router -> owner.equals(router.getOwner()));
+    }
+    @Override
+    public Router removeRouter(Entity owner, @Nullable String type) {
+        return removeRouter(router -> owner.equals(router.getOwner()) && routerMatches(router, type));
+    }
+
+    @Override
+    public Router removeRouter(WorldlyPosition location) {
+        return removeRouter(router -> location.equals(router.getPosition()));
+    }
+    @Override
+    public Router removeRouter(WorldlyPosition location, @Nullable String type) {
+        return removeRouter(router -> location.equals(router.getPosition()) && routerMatches(router, type));
+    }
+
+    public static void finalizeRouter(short mapping, short identifier) {
+        CommonSimpleRadio.debug("Received identifier {} for mapping {}", identifier, mapping);
+
+        PendingRouter<?> pending = PENDING_ROUTERS.remove(mapping);
+        if (pending == null) {
+            CommonSimpleRadio.warn("This should not happen! We could not find the router with mapping {} the server attempted to finalize with identifier {}!", mapping, identifier);
+            return;
+        }
+
+        ((RadioRouter) pending.router).identifier = identifier;
+        ROUTERS.put(identifier, ClientRouterWrapper.of(pending.router));
     }
 
     public static void garbageCollect() {
-        removeRouter(wrapper -> !wrapper.router.validate());
-        removeRouter(wrapper -> wrapper.router.owner == null && wrapper.router.location == null);
+        INSTANCE.removeRouter(router -> !router.validate());
+        INSTANCE.removeRouter(router -> router.getOwner() == null && router.getPosition() == null);
 
-        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
-        pendingRouters.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.owner == null && entry.getValue().router.location == null));
+        PENDING_ROUTERS.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
+        PENDING_ROUTERS.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.getOwner() == null && entry.getValue().router.getPosition() == null));
+
+        FREQUENCIES.garbageCollect();
     }
 
     public static void tick(long gameTime) {
@@ -211,7 +332,7 @@ public class ClientRadioManager {
             garbageCollect();
 
             // After garbage collection, we shall also re-request still missing routers
-            Iterator<Map.Entry<Short, PendingRouter<?>>> iterator = pendingRouters.entrySet().iterator();
+            Iterator<Map.Entry<Short, PendingRouter<?>>> iterator = PENDING_ROUTERS.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<Short, PendingRouter<?>> entry = iterator.next();
 
@@ -226,9 +347,9 @@ public class ClientRadioManager {
             }
         }
 
-        for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : routers.entrySet()) {
+        for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : ROUTERS.entrySet()) {
             ClientRouterWrapper wrapper = wrapperEntry.getValue();
-            wrapper.router.tick(0);
+            ((RadioRouter) wrapper.router).tick(0);
 
             for (Map.Entry<Long, ChannelHandleWrapper> entry : wrapper.audioChannels.entrySet()) {
                 entry.getValue().execute(channel -> {
@@ -239,65 +360,87 @@ public class ClientRadioManager {
     }
 
     public static void close() {
-        pendingRouters.clear();
-        routers.clear();
+        FREQUENCIES.close();
+
+        PENDING_ROUTERS.clear();
+        ROUTERS.clear();
     }
 
-    public static void speakSound(ClientboundSpeakSoundPacket packet) {
+    public static void speakSound(UUID routerID, String soundString, float volume, float pitch, float severity, float offset, long seed) {
         Minecraft mc = Minecraft.getInstance();
 
         SoundManager soundManager = mc.getSoundManager();
         SoundEngine soundEngine = soundManager.soundEngine;
 
-        ClientRouterWrapper wrapper = ClientRadioManager.getWrapper(packet.routerID());
+        ClientRouterWrapper wrapper = INSTANCE.getWrapper(routerID);
         if (wrapper == null) return;
 
-        RadioRouter router = wrapper.router;
+        Router router = wrapper.router;
         if (router == null) return;
 
         WorldlyPosition location = router.getLocation();
         Vec3 position = new Vec3(location.position());
 
-        ChannelHandleWrapper existingChannelHandle = wrapper.getChannel(packet.seed());
+
+        ChannelHandleWrapper existingChannelHandle = wrapper.getChannel(seed);
         if (existingChannelHandle != null) {
             if (existingChannelHandle.channelHandle.isStopped()) {
-                wrapper.removeChannel(packet.seed());
+                wrapper.removeChannel(seed);
             } else {
-                if (packet.sound().value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume() == 0) {
+                if (soundString.isEmpty() && volume == 0) {
                     existingChannelHandle.execute(Channel::stop);
-                } else {
-                    //if (true) return;
-
-                    existingChannelHandle.effect.severity = packet.severity();
-                    existingChannelHandle.effect.volume = packet.volume();
+                    if (existingChannelHandle.instance instanceof TickableSoundInstance tickable) {
+                        soundEngine.tickingSounds.remove(tickable);
+                    }
+                    return;
+                } else if (existingChannelHandle.currentSound.equals(soundString)) {
+                    existingChannelHandle.effect.severity = severity;
+                    existingChannelHandle.effect.volume = volume;
 
                     existingChannelHandle.execute(channel -> {
                         channel.setSelfPosition(position);
                     });
-                }
 
-                return;
+                    return;
+                } else {
+                    existingChannelHandle.execute(Channel::stop);
+                }
             }
         }
 
-        if (packet.sound().value().getLocation().equals(SoundEvents.EMPTY.getLocation()) && packet.volume() == 0) return;
+        if (soundString.isEmpty() && volume == 0) return;
 
-        SimpleSoundInstance instance = new SimpleSoundInstance(packet.sound().value(), SoundSource.BLOCKS,
-                packet.volume(), packet.pitch(),
-                RandomSource.create(packet.seed()), location.blockPos());
-        instance.resolve(soundManager);
+
+        Optional<ResourceLocation> soundLocation = ResourceLocation.read(soundString).result();
+        SoundInstance instance;
+
+        SoundEvent soundEvent = null;
+        if (soundLocation.isPresent()) soundEvent = BuiltInRegistries.SOUND_EVENT.get(soundLocation.get());
+
+        if (soundEvent == null) {
+            instance = ClientServices.COMPAT.makeSound(router, soundString, volume, pitch, severity, offset, seed);
+            if (instance == null) return;
+
+            //soundManager.play(instance);
+            //return;
+        } else {
+            instance = new SimpleSoundInstance(soundEvent, SoundSource.BLOCKS,
+                    volume, pitch,
+                    RandomSource.create(seed), location.blockPos()
+            );
+            instance.resolve(soundManager);
+        }
 
         Sound sound = instance.getSound();
-        ResourceLocation path = sound.getPath();
 
         // --- Playback Setup --- \\
         CompletableFuture<ChannelAccess.ChannelHandle> completableFuture = soundEngine.channelAccess.createHandle(sound.shouldStream() ? Library.Pool.STREAMING : Library.Pool.STATIC);
         ChannelAccess.ChannelHandle channelHandle = completableFuture.join();
 
-        float attenuatedVolume = Math.max(packet.volume(), 1.0F) * (float) (sound.getAttenuationDistance());
+        float attenuatedVolume = Math.max(volume, 1.0F) * (float) (sound.getAttenuationDistance());
         channelHandle.execute(channel -> {
-            channel.setPitch(packet.pitch());
-            channel.setVolume(packet.volume());
+            channel.setPitch(pitch);
+            channel.setVolume(volume);
 
             if (instance.getAttenuation() == SoundInstance.Attenuation.LINEAR) {
                 channel.linearAttenuation(attenuatedVolume);
@@ -309,33 +452,45 @@ public class ClientRadioManager {
             channel.setRelative(instance.isRelative());
         });
 
-        // --- Audio Streaming --- \\
-        EffectStream stream;
-        try {
-            InputStream inputStream = soundEngine.soundBuffers.resourceManager.open(path);
-            stream = new EffectStream(inputStream);
-        } catch (IOException e) {
-            throw new CompletionException(e);
+        soundEngine.soundDeleteTime.put(instance, soundEngine.tickCount + 20);
+        soundEngine.instanceToChannel.put(instance, channelHandle);
+        soundEngine.instanceBySource.put(instance.getSource(), instance);
+        if (instance instanceof TickableSoundInstance tickable) {
+            soundEngine.tickingSounds.add(tickable);
         }
-        AudioFormat format = stream.getFormat();
+
+        // --- Audio Streaming --- \\
+        CompletableFuture<AudioStream> future = ClientServices.COMPAT.makeSubstream(instance);
 
         AudioEffect effect = new BaseAudioEffect();
         effect.volume = 1;
-        effect.severity = packet.severity();
-
-        stream.effect = effect;
-
+        effect.severity = severity;
 
         if (sound.shouldStream()) {
             ChannelHandleWrapper channelWrapper = ChannelHandleWrapper.of(channelHandle);
             channelWrapper.effect = effect;
+            channelWrapper.currentSound = soundString;
+            channelWrapper.instance = instance;
 
-            wrapper.addChannel(packet.seed(), channelWrapper);
+            wrapper.addChannel(seed, channelWrapper);
 
-            channelHandle.execute(channel -> {
+            future.thenAccept(audioStream -> channelHandle.execute(channel -> {
+                //channel.updateStream();
 
-                if (packet.offset() != 0) {
-                    int sampleOffset = (int)((packet.offset() * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());
+                int $$0 = AL10.alGetSourcei(channel.source, 4118);
+                if ($$0 > 0) {
+                    int[] $$1 = new int[$$0];
+                    AL10.alSourceUnqueueBuffers(channel.source, $$1);
+                    AL10.alDeleteBuffers($$1);
+                }
+
+                EffectStream stream = new EffectStream(audioStream);
+                stream.effect = effect;
+
+                AudioFormat format = audioStream.getFormat();
+
+                if (offset != 0) {
+                    int sampleOffset = (int)((offset * format.getSampleSizeInBits()) / 8.0F * (float)format.getChannels() * format.getSampleRate());
                     try {
                         stream.push(sampleOffset);
                     } catch (IOException e) {
@@ -344,44 +499,36 @@ public class ClientRadioManager {
                 }
 
                 channel.attachBufferStream(stream);
-
-                //AL10.alSourcei(channel.source, EXTOffset.AL_SAMPLE_OFFSET, 160000);
-
                 channel.play();
-            });
+            }));
+
         } else {
-            ByteBuffer byteBuffer;
-            try {
-                byteBuffer = stream.readAll();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            future.thenAccept(audioStream -> channelHandle.execute(channel -> {
+                EffectStream stream = new EffectStream(audioStream);
+                stream.effect = effect;
 
-            SoundBuffer soundBuffer = new SoundBuffer(byteBuffer, format);
-            channelHandle.execute(channel -> {
-                channel.attachStaticBuffer(soundBuffer);
-                channel.play();
-            });
-        }
+                AudioFormat format = audioStream.getFormat();
 
-            /* failure attempt
-            Services.COMPAT.handleSound(data, position, packet.severity);
-
-            OpusEncoder encoder = CommonRadioPlugin.commonApi.createEncoder();
-            for (int i = 0; i < data.length; i += 960) {
-                short[] frame = new short[960];
-                for (int j = 0; j < frame.length && (j+i) < data.length; j++) {
-                    short piece = data[j+i];
-                    frame[j] = piece;
+                ByteBuffer byteBuffer;
+                try {
+                    byteBuffer = stream.readAll();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
 
-                byte[] encodedData = encoder.encode(frame);
+                SoundBuffer soundBuffer = new SoundBuffer(byteBuffer, format);
+                channel.attachStaticBuffer(soundBuffer);
+                channel.play();
+            }));
+        }
+    }
 
-            }*/
+    public static void speakSound(ClientboundSpeakSoundPacket packet) {
+        speakSound(packet.routerID(), packet.sound(), packet.volume(), packet.pitch(), packet.severity(), packet.offset(), packet.seed());
     }
 
     public static void handleListenParticle(BlockState state, MicrophoneBlockEntity blockEntity) {
-        RadioRouter mainRouter = blockEntity.getRouter();
+        RadioRouter mainRouter = (RadioRouter) blockEntity.getRouter();
         if (mainRouter == null) return;
 
         float rotation = RotationSegment.convertToDegrees(state.getValue(MicrophoneBlock.ROTATION));
@@ -402,7 +549,7 @@ public class ClientRadioManager {
     }
 
     public static void handleSpeakParticle(BlockState state, SpeakerBlockEntity blockEntity) {
-        RadioRouter mainRouter = blockEntity.getRouter();
+        RadioRouter mainRouter = (RadioRouter) blockEntity.getRouter();
         if (mainRouter == null) return;
 
         Direction direction = state.getValue(SpeakerBlock.FACING);
@@ -431,19 +578,16 @@ public class ClientRadioManager {
     }
 
     //
+    private static final List<Pair<UUID, UUID>> connections = new ArrayList<>();
 
-    public static void renderRouter(RadioRouter router, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
-        poseStack.pushPose();
-
-        Vector3f location = null;
-        if (router.location != null) {
-            location = new Vector3f(router.location.x, router.location.y, router.location.z);
-        } else if (router.owner != null) {
-            location = router.owner.position().toVector3f();
+    public static void renderDebug(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
+        connections.clear();
+        for (Router router : ClientRadioManager.getInstance().getRouters()) {
+            ClientRadioManager.renderRouter((RadioRouter) router, poseStack, bufferSource, camera);
         }
+    }
 
-        if (location == null) return;
-
+    public static float[] getRouterColor(RadioRouter router) {
         float r = 0.1f;
         float g = 0.1f;
         float b = 0.1f;
@@ -462,7 +606,94 @@ public class ClientRadioManager {
             g = 1f;
         }
 
-        location = location.sub(camera);
+        return new float[] {r,g,b};
+    }
+
+    public static void drawRouterConnection(RadioRouter from, RadioRouter to, @Nullable Wiring wiring, PoseStack poseStack, VertexConsumer consumer, Vector3f camera) {
+        if (from == null || to == null) return;
+
+        if (from.reference.equals(to.reference)) return;
+        if (!from.active) return;
+        if (wiring != null && !from.distributes) return;
+
+        float[] color = getRouterColor(from);
+        float r = color[0];
+        float g = color[1];
+        float b = color[2];
+
+        Vector3f location = from.getLocation().position();
+
+        WorldlyPosition worldly = to.getLocation();
+        if (worldly != null) {
+
+            boolean hasOppositeConnection = false;
+            connections.add(new Pair<>(from.reference, to.reference));
+            for (Pair<UUID, UUID> connection : connections) {
+                if (connection.getA().equals(to.reference) && connection.getB().equals(from.reference)) {
+                    hasOppositeConnection = true;
+                    break;
+                }
+            }
+
+            Matrix4f lastPose = poseStack.last().pose();
+            Matrix3f normalMatrix = poseStack.last().normal();
+
+            Vector3f pos = worldly.position().sub(location, new Vector3f());
+            Vector3f dir = pos.normalize(new Vector3f());
+
+            Vector3f cameraDirection = camera.sub(location, new Vector3f()).normalize();
+            Vector3f side = cameraDirection.cross(dir).normalize();
+
+            if (hasOppositeConnection) {
+                poseStack.translate(side.x*0.1f, side.y*0.1f, side.z*0.1f);
+            }
+
+            // Main line
+            consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, dir.x, dir.y, dir.z).endVertex();
+            consumer.vertex(lastPose, pos.x, pos.y, pos.z).color(r, g, b, 1f).normal(normalMatrix, dir.x, dir.y, dir.z).endVertex();
+
+            // Arrow
+            int arrowCount = (int) Math.floor(pos.length());
+            for (int i = 0; i < arrowCount; i++) {
+                float factor = (0.5f+i) / arrowCount;
+
+                Vector3f center = pos.mul(factor, new Vector3f());
+
+                poseStack.translate(center.x, center.y, center.z);
+
+                Vector3f arrowLine1 = dir.negate(new Vector3f()).add(side).normalize();
+                consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, arrowLine1.x, arrowLine1.y, arrowLine1.z).endVertex();
+                consumer.vertex(lastPose, arrowLine1.x*0.1f, arrowLine1.y*0.1f, arrowLine1.z*0.1f).color(r, g, b, 1f).normal(normalMatrix, arrowLine1.x, arrowLine1.y, arrowLine1.z).endVertex();
+
+                Vector3f arrowLine2 = dir.negate(new Vector3f()).sub(side).normalize();
+                consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, arrowLine2.x, arrowLine2.y, arrowLine2.z).endVertex();
+                consumer.vertex(lastPose, arrowLine2.x*0.1f, arrowLine2.y*0.1f, arrowLine2.z*0.1f).color(r, g, b, 1f).normal(normalMatrix, arrowLine2.x, arrowLine2.y, arrowLine2.z).endVertex();
+
+                poseStack.translate(-center.x, -center.y, -center.z);
+            }
+
+
+        }
+    }
+
+    public static void renderRouter(RadioRouter router, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
+        poseStack.pushPose();
+        poseStack.translate(-camera.x, -camera.y, -camera.z);
+
+        Vector3f location = null;
+        if (router.position != null) {
+            location = new Vector3f(router.position.x, router.position.y, router.position.z);
+        } else if (router.owner != null) {
+            location = router.owner.position().toVector3f();
+        }
+
+        if (location == null) return;
+
+        float[] color = getRouterColor(router);
+        float r = color[0];
+        float g = color[1];
+        float b = color[2];
+
         poseStack.translate(location.x, location.y, location.z);
 
         if (router.rotation != null) {
@@ -483,16 +714,28 @@ public class ClientRadioManager {
         ).move(newOffset.x, newOffset.y, newOffset.z);
         DebugRenderer.renderFilledBox(poseStack, bufferSource, pointBox, r, g, b, 0.8f);
 
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.lines());
+
         AABB boundingBox = new AABB(
                 -0.5f, -0.5f, -0.5f,
                 0.5f, 0.5f, 0.5f
         );
-        LevelRenderer.renderLineBox(poseStack, bufferSource.getBuffer(RenderType.lines()), boundingBox, r, g, b, 0.8f);
+        LevelRenderer.renderLineBox(poseStack, consumer, boundingBox, r, g, b, 0.8f);
+
+        // Drawing wire/router connections
+        for (Router otherRouter : new ArrayList<>(router.routers)) {
+            drawRouterConnection(router, (RadioRouter) otherRouter, null, poseStack, consumer, camera);
+        }
+        for (Wiring wire : new ArrayList<>(router.wires)) {
+            Router otherRouter = wire.transport(router);
+            if (otherRouter == null) continue;
+            drawRouterConnection(router, (RadioRouter) otherRouter, wire, poseStack, consumer, camera);
+        }
 
         poseStack.popPose();
     }
 
-    public static class PendingRouter<R extends RadioRouter> {
+    public static class PendingRouter<R extends Router> {
         public final R router;
         public int attempts = 0;
 
@@ -502,7 +745,7 @@ public class ClientRadioManager {
 
         public boolean request(short mapping) {
             if (attempts > 5) {
-                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.location);
+                CommonSimpleRadio.warn("Attempted to request identifier for {} with mapping {} and reference {} at {} with no response after 5 tries. This could be indicative of a greater issue.", router.getClass().getSimpleName(), mapping, router.getReference(), router.getPosition());
                 return false;
             }
 
@@ -511,7 +754,7 @@ public class ClientRadioManager {
             return true;
         }
 
-        public static <R extends RadioRouter> PendingRouter<R> of(R router) {
+        public static <R extends Router> PendingRouter<R> of(R router) {
             return new PendingRouter<>(router);
         }
     }

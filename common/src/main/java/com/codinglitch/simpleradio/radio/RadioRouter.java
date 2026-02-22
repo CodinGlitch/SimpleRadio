@@ -1,12 +1,20 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
-import com.codinglitch.simpleradio.api.central.*;
+import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
-import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.routers.Receiver;
+import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.Transmitter;
+import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import de.maxhenkel.voicechat.api.opus.OpusEncoder;
+import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -16,6 +24,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -23,7 +32,7 @@ import java.util.function.Predicate;
 /**
  * Routes RadioSources to other routers.
  */
-public class RadioRouter implements Socket {
+public class RadioRouter implements Socket, Router {
     public static class Compiled<E> extends LinkedList<E> {
         @Override
         public boolean add(E value) {
@@ -33,13 +42,15 @@ public class RadioRouter implements Socket {
         }
     }
 
-    public ArrayList<Wire> wires = new ArrayList<>();
+    private Map<UUID, OpusDecoder> decoders;
+    private Map<UUID, OpusEncoder> encoders;
 
-    public List<RadioRouter> routers = new ArrayList<>();
+    public List<Wiring> wires = new ArrayList<>();
+    public List<Router> routers = new ArrayList<>();
     public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
 
-    public BiPredicate<RadioSource, RadioRouter> routeCriteria;
-    public Predicate<RadioSource> acceptCriteria;
+    public BiPredicate<Source, Router> routeCriteria;
+    public Predicate<Source> acceptCriteria;
 
     public boolean active = true;
     public boolean distributes = false;
@@ -47,9 +58,11 @@ public class RadioRouter implements Socket {
 
     public short identifier;
     public UUID reference;
+
     public Entity owner;
-    public WorldlyPosition location;
+    public WorldlyPosition position;
     public Vector3f oldPosition = new Vector3f();
+
     public Vector3f velocity = new Vector3f();
 
     public float activity = 0;
@@ -75,25 +88,34 @@ public class RadioRouter implements Socket {
     }
     public RadioRouter(WorldlyPosition location, UUID reference) {
         this(reference);
-        this.location = location;
+        this.position = location;
     }
 
     @Nullable
-    public static RadioReceiver getRouterFromReceivers(UUID reference) {
-        for (Frequency frequency : Frequency.getFrequencies()) {
-            RadioReceiver receiver = frequency.getReceiver(reference);
+    public static Receiver getRouterFromReceivers(UUID reference) {
+        for (Frequency frequency : RadioManager.getInstance().frequencies().get()) {
+            Receiver receiver = frequency.getReceiver(reference);
             if (receiver != null) return receiver;
         }
         return null;
     }
 
     @Nullable
-    public static RadioTransmitter getRouterFromTransmitters(UUID reference) {
-        for (Frequency frequency : Frequency.getFrequencies()) {
-            RadioTransmitter transmitter = frequency.getTransmitter(reference);
+    public static Transmitter getRouterFromTransmitters(UUID reference) {
+        for (Frequency frequency : RadioManager.getInstance().frequencies().get()) {
+            Transmitter transmitter = frequency.getTransmitter(reference);
             if (transmitter != null) return transmitter;
         }
         return null;
+    }
+
+    @Override
+    public void setRoutingCriteria(BiPredicate<Source, Router> criteria) {
+        this.routeCriteria = criteria;
+    }
+    @Override
+    public void setAcceptingCriteria(Predicate<Source> criteria) {
+        this.acceptCriteria = criteria;
     }
 
     @Override
@@ -106,52 +128,249 @@ public class RadioRouter implements Socket {
         return this.reference;
     }
 
+    @Override
     public short getIdentifier() {
         return this.identifier;
     }
 
     @Override
-    public ArrayList<Wire> getWires() {
+    public boolean isActive() {
+        return active;
+    }
+    @Override
+    public boolean isValid() {
+        return valid;
+    }
+    @Override
+    public Vec3 getConnectionOffset() {
+        return connectionOffset;
+    }
+    @Override
+    public Class<?> getLink() {
+        return link;
+    }
+
+    @Override
+    public List<Wiring> getWires() {
         return this.wires;
     }
 
-    public void allowDistribution() {
-        this.distributes = true;
+    public OpusDecoder getDecoder(UUID sender) {
+        if (decoders == null) decoders = new ConcurrentHashMap<>();
+        return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
+    }
+
+    public OpusEncoder getEncoder(UUID sender) {
+        if (encoders == null) encoders = new ConcurrentHashMap<>();
+        return encoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createEncoder());
     }
 
     @Nullable
+    @Override
     public Frequency getFrequency() {
         return null;
     }
 
-    public double distanceTo(RadioRouter other) {
-        return this.getLocation().distance(other.getLocation());
+    @Nullable
+    @Override
+    public Boolean isClientSide() {
+        if (owner != null) return owner.level().isClientSide();
+        if (position != null) return position.isClientSide();
+        return null;
     }
 
-    public Vec3 getConnectionPosition() {
-        Vector3f translatedOffset = rotation == null ? connectionOffset.toVector3f() : rotation.transform(connectionOffset.toVector3f());
-
-        return new Vec3(getLocation().position()).add(translatedOffset.x, translatedOffset.y, translatedOffset.z);
-    }
-
+    @Override
     public WorldlyPosition getLocation() {
-        if (this.location != null) {
-            return this.location;
+        if (this.position != null) {
+            return this.position;
         } else if (this.owner != null) {
             return new WorldlyPosition((float) owner.getX(), (float) owner.getY(), (float) owner.getZ(), owner.level());
         }
         return null;
     }
 
-    public RadioRouter tryAddRouter(RadioRouter router) {
-        RadioRouter existingRouter = getRouter(router.reference);
+    @Nullable
+    @Override
+    public WorldlyPosition getPosition() {
+        return this.position;
+    }
+
+    @Nullable
+    @Override
+    public Entity getOwner() {
+        return this.owner;
+    }
+
+    @Override
+    public Router getRouter(UUID id) {
+        return routers.stream().filter(router -> router.getReference().equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public List<Router> getRouters() {
+        return routers;
+    }
+
+    @Override
+    public Vec3 getConnectionPosition() {
+        Vector3f translatedOffset = rotation == null ? connectionOffset.toVector3f() : rotation.transform(connectionOffset.toVector3f());
+
+        return new Vec3(getLocation().position()).add(translatedOffset.x, translatedOffset.y, translatedOffset.z);
+    }
+
+    @Override
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+
+    @Override
+    public float getActivity() {
+        return activity;
+    }
+
+    @Override
+    public int getActivityTime() {
+        return activityTime;
+    }
+
+    @Override
+    public int getRedstoneMappedActivity() {
+        return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
+    }
+
+    @Override
+    public Quaternionf getRotation() {
+        return rotation;
+    }
+
+    @Override
+    public void allowDistribution() {
+        this.distributes = true;
+    }
+
+    @Override
+    public void setOwner(Entity owner) {
+        this.owner = owner;
+    }
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    @Override
+    public void setLink(Class<?> link) {
+        this.link = link;
+    }
+    @Override
+    public void setConnectionOffset(Vec3 connectionOffset) {
+        this.connectionOffset = connectionOffset;
+    }
+    @Override
+    public void setPosition(WorldlyPosition position) {
+        this.position = position;
+    }
+    @Override
+    public void setRotation(Quaternionf rotation) {
+        this.rotation = rotation;
+    }
+
+
+    @Override
+    public double distanceTo(Router other) {
+        return distanceTo((RadioRouter) other);
+    }
+    public double distanceTo(RadioRouter other) {
+        return this.getLocation().distance(other.getLocation());
+    }
+
+    @Override
+    public Router tryAddRouter(Router router) {
+        return tryAddRouter((RadioRouter) router);
+    }
+    public Router tryAddRouter(RadioRouter router) {
+        Router existingRouter = getRouter(router.reference);
         if (existingRouter != null) return existingRouter;
 
+        return addRouter(router);
+    }
+
+    @Override
+    public Router addRouter(Router router) {
         routers.add(router);
         return router;
     }
-    public RadioRouter getRouter(UUID id) {
-        return routers.stream().filter(router -> router.reference.equals(id)).findFirst().orElse(null);
+
+    @Override
+    public void accept(Source source) {
+        CompatCore.acceptSource(this, source);
+        this.take(source);
+    }
+
+    public void take(Source source) {
+        if (!this.active) return;
+        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
+        this.route(source);
+    }
+
+    @Override
+    public void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed) {
+        this.send(at, sender, soundHolder, volume, pitch, 0, seed);
+    }
+
+    @Override
+    public void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
+        RadioSource newSource = new RadioSource(sender, at, soundHolder.value(), volume);
+        newSource.pitch = pitch;
+        newSource.offset = offset;
+        newSource.seed = seed;
+        newSource.activity = (float) (Math.clamp(0, 15, volume*15) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
+
+        this.accept(newSource);
+    }
+
+    @Override
+    public Source send(WorldlyPosition at, UUID sender, short[] data, float volume) {
+        OpusEncoder encoder = this.getEncoder(sender);
+
+        RadioSource newSource = new RadioSource(sender, at, encoder.encode(data), volume);
+        newSource.activity = CommonRadioPlugin.analyzeActivity(data);
+
+        this.accept(newSource);
+        return newSource;
+    }
+    @Override
+    public Source send(WorldlyPosition at, short[] data, float volume) {
+        return this.send(at, this.reference, data, volume);
+    }
+    @Override
+    public Source send(UUID sender, short[] data, float volume) {
+        return this.send(this.getLocation(), sender, data, volume);
+    }
+    @Override
+    public Source send(short[] data, float volume) {
+        return this.send(this.getLocation(), this.reference, data, volume);
+    }
+
+    @Override
+    public Source send(WorldlyPosition at, UUID sender, byte[] data, float volume) {
+        OpusDecoder decoder = this.getDecoder(sender);
+
+        RadioSource newSource = new RadioSource(sender, at, data, volume);
+        newSource.activity = CommonRadioPlugin.analyzeActivity(decoder.decode(data));
+
+        this.accept(newSource);
+        return newSource;
+    }
+    @Override
+    public Source send(WorldlyPosition at, byte[] data, float volume) {
+        return this.send(at, this.reference, data, volume);
+    }
+    @Override
+    public Source send(UUID sender, byte[] data, float volume) {
+        return this.send(this.getLocation(), sender, data, volume);
+    }
+    @Override
+    public Source send(byte[] data, float volume) {
+        return this.send(this.getLocation(), this.reference, data, volume);
     }
 
     //this method is so dumb bro
@@ -163,11 +382,12 @@ public class RadioRouter implements Socket {
     }
 
     public void tick(int tickCount) {
-        if (location != null) {
-            this.updateRotation(Services.COMPAT.modifyRotation(location, rotation));
-            this.updateLocation(Services.COMPAT.modifyPosition(location));
+        // Calculate velocity and/or modify position/rotation for things like VS integration
+        if (position != null) {
+            this.updateRotation(Services.COMPAT.modifyRotation(position, rotation));
+            this.updateLocation(Services.COMPAT.modifyPosition(position));
 
-            Vector3f currentPosition = location.position();
+            Vector3f currentPosition = position.position();
             if (currentPosition != oldPosition) {
                 currentPosition.sub(oldPosition, velocity);
             } else {
@@ -178,6 +398,11 @@ public class RadioRouter implements Socket {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
 
+        // Validate the connected routers
+        // routers.removeIf(router -> !router.isValid());
+        // ^ might cause problems if it's linked to the frequency router list; will continue later
+
+        // Update router activity
         if (!this.active) {
             this.activity = 0;
             this.activityTime = -1;
@@ -196,12 +421,6 @@ public class RadioRouter implements Socket {
         }
     }
 
-    public void accept(RadioSource source) {
-        if (!this.active) return;
-        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        this.route(source);
-    }
-
     public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
         if (this.getLocation().equals(destination.getLocation())) return source;
 
@@ -213,63 +432,61 @@ public class RadioRouter implements Socket {
         return true;
     }
 
-    public void route(RadioSource source, @Nullable Predicate<RadioRouter> criteria) {
+    public void route(Source source, @Nullable Predicate<RadioRouter> criteria) {
         if (!this.active) return;
+        RadioSource radioSource = (RadioSource) source;
 
-        if (!source.isValid()) {
+        if (!radioSource.isValid()) {
             CommonSimpleRadio.warn("Invalid source; discarded");
             return;
         }
 
         if (routerAcceptor != null) {
-            if (routerAcceptor.apply(source))
-                source = source.copy();
+            if (routerAcceptor.apply(radioSource))
+                radioSource = radioSource.copy();
         }
 
         if (distributes) {
-            if (this.distribute(source)) source = source.copy();
+            if (this.distribute(radioSource)) radioSource = radioSource.copy();
         }
 
         for (int i = 0; i < routers.size(); i++) {
-            RadioRouter router = routers.get(i);
+            RadioRouter router = (RadioRouter) routers.get(i);
 
             if (criteria != null) {
                 if (!criteria.test(router)) continue;
             }
-            if (!shouldRouteTo(source, router)) continue;
+            if (!shouldRouteTo(radioSource, router)) continue;
 
-            if (routeCriteria != null && !routeCriteria.test(source, router)) continue;
+            if (routeCriteria != null && !routeCriteria.test(radioSource, router)) continue;
 
-            if (source.willShort(router)) {
+            if (radioSource.willShort(router)) {
                 router.shortCircuit();
                 continue;
             }
 
-            source = this.prepareSource(source, router);
+            radioSource = this.prepareSource(radioSource, router);
 
-            RadioSource oldSource = source;
-            if (i < routers.size()-1) source = source.copy();
+            RadioSource oldSource = radioSource;
+            if (i < routers.size()-1) radioSource = radioSource.copy();
             router.accept(oldSource);
         }
     }
 
-    public void route(RadioSource source) {
+    @Override
+    public void route(Source source) {
         this.route(source, null);
     }
 
-    public int getRedstoneMappedActivity() {
-        return (int) Math.clamp(0, 15, Math.round(this.activity / SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor));
-    }
-
-    public void compileActivity(RadioSource source) {
+    public void compileActivity(Source source) {
         if (!this.active) return;
 
-        if (source.data == null) {
-            this.activity = source.activity;
+        if (source.getData() == null) {
+            this.activity = source.getActivity();
             compiledActivity = 0;
             compiledSamples = 0;
         } else {
-            compiledActivity += source.activity;
+            compiledActivity += source.getActivity();
             if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
                 this.activity = Math.sqrt(compiledActivity);
                 compiledActivity = 0;
@@ -294,6 +511,7 @@ public class RadioRouter implements Socket {
         }
     }
 
+    @Override
     public void invalidate() {
         this.valid = false;
     }
@@ -302,22 +520,22 @@ public class RadioRouter implements Socket {
         if (!valid) return false;
 
         if (owner == null) {
-            if (location == null) {
+            if (position == null) {
                 invalidate();
                 return false;
             }
 
             boolean flag = true;
             if (this instanceof RadioSpeaker) {
-                flag = Auricular.validate(location, this.link != null ? this.link : Speaking.class);
+                flag = Auricular.validateLocation(position, this.link != null ? this.link : Speaking.class, this.reference);
             } else if (this instanceof RadioListener) {
-                flag = Auricular.validate(location, this.link != null ? this.link : Listening.class);
+                flag = Auricular.validateLocation(position, this.link != null ? this.link : Listening.class, this.reference);
             } else if (this instanceof RadioReceiver) {
-                flag = Frequencing.validate(location, this.link != null ? this.link : Receiving.class, null);
+                flag = Frequencing.validateLocation(position, this.link != null ? this.link : Receiving.class, this.reference, null);
             } else if (this instanceof RadioTransmitter) {
-                flag = Frequencing.validate(location, this.link != null ? this.link : Transmitting.class, null);
+                flag = Frequencing.validateLocation(position, this.link != null ? this.link : Transmitting.class, this.reference, null);
             } else {
-                flag = this.link != null && RadioManager.verifyLocationCollection(location, this.link);
+                flag = this.link != null && RadioManager.getInstance().verifyLocationCollection(position, this.link);
             }
 
             if (!flag) {
@@ -325,20 +543,18 @@ public class RadioRouter implements Socket {
                 return false;
             }
         } else {
-            boolean flag = true;
-            if (this instanceof RadioSpeaker) {
-                flag = Auricular.validate(owner, this.link != null ? this.link : Speaking.class);
-            } else if (this instanceof RadioListener) {
-                flag = Auricular.validate(owner, this.link != null ? this.link : Listening.class);
-            } else if (this instanceof RadioReceiver) {
-                flag = Frequencing.validate(owner, this.link != null ? this.link : Receiving.class, null);
-            } else if (this instanceof RadioTransmitter) {
-                flag = Frequencing.validate(owner, this.link != null ? this.link : Transmitting.class, null);
-            } else {
-                flag = this.link != null && RadioManager.verifyEntityCollection(owner, stack -> this.link.isAssignableFrom(stack.getItem().getClass()));
-            }
+            boolean isValid = RadioManager.getInstance().verifyEntityCollection(owner, stack -> {
+                if (stack.isEmpty()) return false;
+                if (!stack.hasTag()) return false;
 
-            if (!flag) {
+                CompoundTag tag = stack.getTag();
+                if (!tag.contains("reference")) return false;
+                if (!tag.getUUID("reference").equals(reference)) return false;
+
+                return true;
+            });
+
+            if (!isValid) {
                 invalidate();
                 return false;
             }
