@@ -35,4 +35,9 @@ public class ClientRouterWrapper {
             entry.getValue().execute(Channel::destroy);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Wrapper: " + router.getClass().getSimpleName() + "[" + router.getIdentifier() + "]" + router.getLocation().toString();
+    }
 }
