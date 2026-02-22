@@ -323,6 +323,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         PENDING_ROUTERS.entrySet().removeIf(entry -> entry.getValue().router == null || !entry.getValue().router.validate());
         PENDING_ROUTERS.entrySet().removeIf(entry -> entry.getValue().router == null || (entry.getValue().router.getOwner() == null && entry.getValue().router.getPosition() == null));
+
+        FREQUENCIES.garbageCollect();
     }
 
     public static void tick(long gameTime) {
