@@ -67,7 +67,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     }
 
     public void loadFromItem(ItemStack stack) {
-        loadTag(stack.getOrCreateTag());
+        loadTag(stack.compon());
     }
 
     public void loadTag(CompoundTag tag) {
