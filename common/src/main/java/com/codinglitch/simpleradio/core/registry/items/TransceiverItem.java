@@ -155,16 +155,20 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                     items = livingEntity.getAllSlots();
                 }
 
-                items.forEach(slotStack -> {
-                    if (slotStack.isEmpty()) return;
-                    if (!slotStack.hasTag()) return;
+                for (ItemStack slotStack : items) {
+                    if (slotStack.isEmpty()) continue;
+                    if (!slotStack.hasTag()) continue;
 
                     CompoundTag slotTag = slotStack.getTag();
-                    if (!slotTag.contains("reference")) return;
-                    if (!slotTag.getUUID("reference").equals(tag.getUUID("reference"))) return;
+                    if (slotTag == null) continue;
+                    if (!slotTag.contains("reference")) continue;
+                    if (!slotTag.getUUID("reference").equals(tag.getUUID("reference"))) continue;
 
-                    if (!slotStack.equals(stack)) tag.remove("reference");
-                });
+                    if (!slotStack.equals(stack)) {
+                        tag.remove("reference");
+                        break;
+                    }
+                }
 
                 if (!tag.contains("reference")) activeRouter = null;
             }
