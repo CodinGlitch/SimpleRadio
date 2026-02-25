@@ -18,8 +18,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.MODULE;
-import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.REFERENCE;
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.MODULE;
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.REFERENCE;
 
 public class ModuleItem extends TieredItem {
 

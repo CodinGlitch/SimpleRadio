@@ -10,6 +10,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -47,21 +48,21 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
         loadTag(tag);
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         saveTag(tag);
-        super.saveAdditional(tag);
+        super.saveAdditional(tag, provider);
     }
 
     @Override
-    public void saveToItem(ItemStack stack) {
-        saveTag(stack.getOrCreateTag());
-        super.saveToItem(stack);
+    public void saveToItem(ItemStack stack, HolderLookup.Provider provider) {
+        super.saveTag(stack);
+        super.saveToItem(stack, provider);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, MicrophoneBlockEntity blockEntity) {

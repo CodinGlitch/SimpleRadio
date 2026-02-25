@@ -5,7 +5,6 @@ import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioComponents;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.mojang.serialization.Codec;
@@ -48,7 +47,7 @@ public class FabricLoader {
     }
 
     public static void loadComponents() {
-        SimpleRadioComponents.COMPONENT_TYPES.forEach(((location, componentType) -> Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, location, componentType)));
+        SimpleRadioComponents.COMPONENT_TYPES.forEach(((location, componentType) -> Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, CommonSimpleRadio.id(location), componentType)));
     }
 
     public static void loadPackets() {

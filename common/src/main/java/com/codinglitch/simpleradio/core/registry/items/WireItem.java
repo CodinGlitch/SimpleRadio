@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.WIRE_POSITION;
-import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.WIRE_TARGET;
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.WIRE_POSITION;
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.WIRE_TARGET;
 
 public class WireItem extends Item implements WorldTicking {
 

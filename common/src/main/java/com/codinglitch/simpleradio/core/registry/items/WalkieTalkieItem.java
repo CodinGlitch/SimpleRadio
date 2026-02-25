@@ -3,7 +3,6 @@ package com.codinglitch.simpleradio.core.registry.items;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioComponents;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.routers.Listener;
@@ -23,8 +22,8 @@ import net.minecraft.world.level.gameevent.EntityPositionSource;
 
 import java.util.Random;
 
-import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.FREQUENCY;
-import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.MODULATION;
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.FREQUENCY;
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.MODULATION;
 
 public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     public WalkieTalkieItem(Properties settings) {
@@ -57,11 +56,11 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
             if (entity instanceof Player player) {
                 ItemStack using = player.getUseItem();
 
-                if (!using.has(FREQUENCY) || !using.has(SimpleRadioComponents.MODULATION)) return true;
+                if (!using.has(FREQUENCY) || !using.has(MODULATION)) return true;
 
                 if (!(using.getItem() instanceof TransceiverItem)) return true;
                 if (!frequency.getFrequency().equals(using.get(FREQUENCY))) return true;
-                return !frequency.getModulation().shorthand.equals(using.get(SimpleRadioComponents.MODULATION));
+                return !frequency.getModulation().shorthand.equals(using.get(MODULATION));
             }
 
             return true;

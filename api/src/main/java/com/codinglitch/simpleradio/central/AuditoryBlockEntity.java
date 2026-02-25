@@ -1,10 +1,10 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.ClientSimpleRadioApi;
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioApi;
+import com.codinglitch.simpleradio.core.SimpleRadioComponents;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -66,6 +66,10 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
         return this.getBlockPos().getCenter();
     }
 
+    public static CompoundTag tagFromStack(ItemStack stack, CompoundTag tag) {
+        tag.put("frequency", stack.get(SimpleRadioComponents.FREQUENCY));
+    }
+
     public void loadFromItem(ItemStack stack) {
         loadTag(stack.compon());
     }
@@ -96,15 +100,15 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         saveTag(tag);
-        super.saveAdditional(tag);
+        super.saveAdditional(tag, provider);
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
-        this.saveAdditional(tag);
+        this.saveAdditional(tag, provider);
         return tag;
     }
 
