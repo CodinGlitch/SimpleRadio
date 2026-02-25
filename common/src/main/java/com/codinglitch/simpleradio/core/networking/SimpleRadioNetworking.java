@@ -6,7 +6,7 @@ import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
@@ -19,16 +19,16 @@ import java.util.function.Consumer;
 
 public class SimpleRadioNetworking {
     public interface ServerboundRegistry {
-        <P extends CustomPacket, B extends FriendlyByteBuf> void register(
+        <P extends CustomPacket> void register(
                 CustomPacketPayload.Type<P> type, Class<P> packetClass,
-                StreamCodec<B, P> codec,
+                StreamCodec<RegistryFriendlyByteBuf, P> codec,
                 TriConsumer<P, MinecraftServer, ServerPlayer> handler
         );
     }
     public interface ClientboundRegistry {
-        <P extends CustomPacket, B extends FriendlyByteBuf> void register(
+        <P extends CustomPacket> void register(
                 CustomPacketPayload.Type<P> type, Class<P> packetClass,
-                StreamCodec<B, P> codec,
+                StreamCodec<RegistryFriendlyByteBuf, P> codec,
                 Consumer<P> handler
         );
     }
