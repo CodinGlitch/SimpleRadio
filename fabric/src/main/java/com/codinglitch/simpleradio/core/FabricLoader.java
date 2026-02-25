@@ -4,18 +4,24 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
-import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioComponents;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -50,8 +56,9 @@ public class FabricLoader {
     public static void loadPackets() {
         SimpleRadioNetworking.loadServerbound(new SimpleRadioNetworking.ServerboundRegistry() {
             @Override
-            public <P extends CustomPacket> void register(ResourceLocation id, Class<P> packetClass, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
-                ServerPlayNetworking.registerGlobalReceiver(id, serverbound(reader, handler));
+            public <P extends CustomPacket> void register(CustomPacketPayload.Type<P> type, Class<P> packetClass, StreamCodec<RegistryFriendlyByteBuf, P> codec, TriConsumer<P, MinecraftServer, ServerPlayer> handler) {
+                PayloadTypeRegistry.playC2S().register(type, codec);
+                ServerPlayNetworking.registerGlobalReceiver(type, serverbound(handler));
             }
         });
     }
@@ -59,17 +66,18 @@ public class FabricLoader {
     public static void loadClientPackets() {
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
-            public <P extends CustomPacket> void register(ResourceLocation id, Class<P> packetClass, FriendlyByteBuf.Reader<P> reader, BiConsumer<P, FriendlyByteBuf> writer, Consumer<P> handler) {
-                ClientPlayNetworking.registerGlobalReceiver(id, clientbound(reader, handler));
+            public <P extends CustomPacket> void register(CustomPacketPayload.Type<P> type, Class<P> packetClass, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
+                PayloadTypeRegistry.playS2C().register(type, codec);
+                ClientPlayNetworking.registerGlobalReceiver(type, clientbound(handler));
             }
         });
     }
 
-    public static <P> ServerPlayNetworking.PlayChannelHandler serverbound(Function<FriendlyByteBuf, P> decoder, TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
-        return (server, player, handler, buf, response) -> consumer.accept(decoder.apply(buf), server, player);
+    public static <P extends CustomPacketPayload> ServerPlayNetworking.PlayPayloadHandler<P> serverbound(TriConsumer<P, MinecraftServer, ServerPlayer> consumer) {
+        return (payload, context) -> consumer.accept(payload, context.server(), context.player());
     }
-    public static <P> ClientPlayNetworking.PlayChannelHandler clientbound(Function<FriendlyByteBuf, P> decoder, Consumer<P> consumer) {
-        return (client, listener, buffer, sender) -> consumer.accept(decoder.apply(buffer));
+    public static <P extends CustomPacketPayload> ClientPlayNetworking.PlayPayloadHandler<P> clientbound(Consumer<P> consumer) {
+        return (payload, context) -> consumer.accept(payload);
     }
 
     private static final ResourceLocation ITEMS_ENABLED = CommonSimpleRadio.id("items_enabled");
