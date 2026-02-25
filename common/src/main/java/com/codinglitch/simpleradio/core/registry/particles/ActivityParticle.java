@@ -86,7 +86,7 @@ public class ActivityParticle extends TextureSheetParticle {
     }
 
     protected void makeCornerVertex(VertexConsumer consumer, Vector3f pos, float u, float v, int light) {
-        consumer.vertex(pos.x(), pos.y(), pos.z()).uv(u, v).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(light).endVertex();
+        consumer.addVertex(pos.x(), pos.y(), pos.z()).setUv(u, v).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(light);
     }
 
     public int getLightColor(float t) {

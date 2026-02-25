@@ -4,7 +4,6 @@ import com.codinglitch.simpleradio.central.Frequencing;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioMenus;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlockEntity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,6 +11,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.REFERENCE;
 
 public class RadiosmitherMenu extends AbstractContainerMenu {
     private final Container container;
@@ -55,9 +56,8 @@ public class RadiosmitherMenu extends AbstractContainerMenu {
         if (!tinkering.isEmpty() && tinkering.getItem() instanceof Frequencing frequencing) {
             frequencing.setFrequency(tinkering, frequency, modulation);
 
-            CompoundTag tag = tinkering.getOrCreateTag();
-            if (tag.contains("user")) {
-                tag.remove("user");
+            if (tinkering.has(REFERENCE)) {
+                tinkering.remove(REFERENCE);
             }
         }
     }
