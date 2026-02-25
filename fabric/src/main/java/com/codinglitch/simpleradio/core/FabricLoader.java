@@ -8,31 +8,29 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioComponents;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditionType;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class FabricLoader {
     public static void loadItems() {
@@ -80,41 +78,35 @@ public class FabricLoader {
         return (payload, context) -> consumer.accept(payload);
     }
 
-    private static final ResourceLocation ITEMS_ENABLED = CommonSimpleRadio.id("items_enabled");
+    // -------- Resource Conditions -------- \\
 
-    public static ConditionJsonProvider itemsEnabled(String... items) {
-        return new ConditionJsonProvider() {
-            @Override
-            public void writeParameters(JsonObject object) {
-                JsonArray array = new JsonArray();
-                for (var item : items) {
-                    array.add(item);
-                }
-                object.add("values", array);
-            }
+    public static final ResourceConditionType<ItemsEnabledCondition> ITEMS_ENABLED =
+            ResourceConditionType.create(CommonSimpleRadio.id("items_enabled"), ItemsEnabledCondition.CODEC);
 
-            @Override
-            public ResourceLocation getConditionId() {
-                return ITEMS_ENABLED;
-            }
-        };
-    }
+    public record ItemsEnabledCondition(List<String> items) implements ResourceCondition {
+        public static final MapCodec<ItemsEnabledCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.listOf().fieldOf("values").forGetter(ItemsEnabledCondition::items)
+        ).apply(instance, ItemsEnabledCondition::new));
 
-    static {
-        ResourceConditions.register(ITEMS_ENABLED, object -> {
-            JsonArray array = GsonHelper.getAsJsonArray(object, "values");
+        @Override
+        public ResourceConditionType<?> getType() {
+            return ITEMS_ENABLED;
+        }
 
-            for (JsonElement element : array) {
-                if (element.isJsonPrimitive()) {
-                    ItemHolder<Item> holder = SimpleRadioItems.getByName(element.getAsString());
-                    if (holder != null) return holder.enabled;
-                } else {
-                    throw new JsonParseException("Invalid item entry: " + element);
-                }
+        @Override
+        public boolean test(@Nullable HolderLookup.Provider registryLookup) {
+
+            for (String itemName : items) {
+                ItemHolder<Item> holder = SimpleRadioItems.getByName(itemName);
+                if (holder != null) return holder.enabled;
             }
 
             return true;
-        });
+        }
+    }
+
+    public static ResourceCondition itemsEnabled(String... items) {
+        return new ItemsEnabledCondition(List.of(items));
     }
 
     public static void load() {
@@ -125,5 +117,7 @@ public class FabricLoader {
         loadComponents();
 
         CommonSimpleRadio.load();
+
+        ResourceConditions.register(ITEMS_ENABLED);
     }
 }
