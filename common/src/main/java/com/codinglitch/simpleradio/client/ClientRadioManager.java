@@ -57,7 +57,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.openal.AL10;
@@ -635,8 +634,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
                 }
             }
 
-            Matrix4f lastPose = poseStack.last().pose();
-            Matrix3f normalMatrix = poseStack.last().normal();
+            PoseStack.Pose last = poseStack.last();
+            Matrix4f lastPose = last.pose();
 
             Vector3f pos = worldly.position().sub(location, new Vector3f());
             Vector3f dir = pos.normalize(new Vector3f());
@@ -649,8 +648,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
             }
 
             // Main line
-            consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, dir.x, dir.y, dir.z).endVertex();
-            consumer.vertex(lastPose, pos.x, pos.y, pos.z).color(r, g, b, 1f).normal(normalMatrix, dir.x, dir.y, dir.z).endVertex();
+            consumer.addVertex(lastPose, 0, 0, 0).setColor(r, g, b, 1f).setNormal(last, dir.x, dir.y, dir.z);
+            consumer.addVertex(lastPose, pos.x, pos.y, pos.z).setColor(r, g, b, 1f).setNormal(last, dir.x, dir.y, dir.z);
 
             // Arrow
             int arrowCount = (int) Math.floor(pos.length());
@@ -662,12 +661,12 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
                 poseStack.translate(center.x, center.y, center.z);
 
                 Vector3f arrowLine1 = dir.negate(new Vector3f()).add(side).normalize();
-                consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, arrowLine1.x, arrowLine1.y, arrowLine1.z).endVertex();
-                consumer.vertex(lastPose, arrowLine1.x*0.1f, arrowLine1.y*0.1f, arrowLine1.z*0.1f).color(r, g, b, 1f).normal(normalMatrix, arrowLine1.x, arrowLine1.y, arrowLine1.z).endVertex();
+                consumer.addVertex(lastPose, 0, 0, 0).setColor(r, g, b, 1f).setNormal(last, arrowLine1.x, arrowLine1.y, arrowLine1.z);
+                consumer.addVertex(lastPose, arrowLine1.x*0.1f, arrowLine1.y*0.1f, arrowLine1.z*0.1f).setColor(r, g, b, 1f).setNormal(last, arrowLine1.x, arrowLine1.y, arrowLine1.z);
 
                 Vector3f arrowLine2 = dir.negate(new Vector3f()).sub(side).normalize();
-                consumer.vertex(lastPose, 0, 0, 0).color(r, g, b, 1f).normal(normalMatrix, arrowLine2.x, arrowLine2.y, arrowLine2.z).endVertex();
-                consumer.vertex(lastPose, arrowLine2.x*0.1f, arrowLine2.y*0.1f, arrowLine2.z*0.1f).color(r, g, b, 1f).normal(normalMatrix, arrowLine2.x, arrowLine2.y, arrowLine2.z).endVertex();
+                consumer.addVertex(lastPose, 0, 0, 0).setColor(r, g, b, 1f).setNormal(last, arrowLine2.x, arrowLine2.y, arrowLine2.z);
+                consumer.addVertex(lastPose, arrowLine2.x*0.1f, arrowLine2.y*0.1f, arrowLine2.z*0.1f).setColor(r, g, b, 1f).setNormal(last, arrowLine2.x, arrowLine2.y, arrowLine2.z);
 
                 poseStack.translate(-center.x, -center.y, -center.z);
             }

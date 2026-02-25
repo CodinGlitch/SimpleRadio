@@ -38,7 +38,7 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
             poseStack.mulPose(Axis.YP.rotationDegrees(microphoneBlock.getYRotationDegrees(state)));
 
             float targetTilt = blockEntity.tilt - 1.5f;
-            blockEntity.currentTilt = Math.lerp(blockEntity.currentTilt, targetTilt, Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.3f, 1));
+            blockEntity.currentTilt = Math.lerp(blockEntity.currentTilt, targetTilt, Math.min(Minecraft.getInstance().getFrameTimeNs() * 0.3f, 1));
 
             model.plug.visible = !blockEntity.getWires().isEmpty();
 

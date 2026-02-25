@@ -96,7 +96,7 @@ public class FrequencingRenderer {
             return;
         }
 
-        float time = (level.getGameTime() + Minecraft.getInstance().getFrameTime())/20; // in SECONDS bro
+        float time = (level.getGameTime() + Minecraft.getInstance().getFrameTimeNs())/20; // in SECONDS bro
         time = Math.floor(time*FRAME_RATE)/FRAME_RATE;
 
         //--- Catalyst Display ---\\
@@ -157,14 +157,14 @@ public class FrequencingRenderer {
         Vector3f four = poseStack.last().pose().transformPosition(new Vector3f(-40 + (progress*80), -5, 0));
 
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutout(CommonSimpleRadio.id("textures/gui/bars.png")));
-        consumer.vertex(one.x, one.y, one.z).color(1f, 1f, 1f, 1f).uv(0f, 0f)
-                .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
-        consumer.vertex(two.x, two.y, two.z).color(1f, 1f, 1f, 1f).uv(0f, 1f)
-                .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
-        consumer.vertex(three.x, three.y, three.z).color(1f, 1f, 1f, 1f).uv(progress, 1f)
-                .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
-        consumer.vertex(four.x, four.y, four.z).color(1f, 1f, 1f, 1f).uv(progress, 0f)
-                .overlayCoords(overlay).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
+        consumer.addVertex(one.x, one.y, one.z).setColor(1f, 1f, 1f, 1f).setUv(0f, 0f)
+                .setOverlay(overlay).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+        consumer.addVertex(two.x, two.y, two.z).setColor(1f, 1f, 1f, 1f).setUv(0f, 1f)
+                .setOverlay(overlay).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+        consumer.addVertex(three.x, three.y, three.z).setColor(1f, 1f, 1f, 1f).setUv(progress, 1f)
+                .setOverlay(overlay).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+        consumer.addVertex(four.x, four.y, four.z).setColor(1f, 1f, 1f, 1f).setUv(progress, 0f)
+                .setOverlay(overlay).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
 
         poseStack.popPose();
 
