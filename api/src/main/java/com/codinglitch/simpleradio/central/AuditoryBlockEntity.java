@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.SimpleRadioApi;
-import com.codinglitch.simpleradio.core.SimpleRadioComponents;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -20,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
+
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.*;
 
 /**
  * A block entity which interacts with audio in some way;
@@ -66,12 +67,27 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
         return this.getBlockPos().getCenter();
     }
 
-    public static CompoundTag tagFromStack(ItemStack stack, CompoundTag tag) {
-        tag.put("frequency", stack.get(SimpleRadioComponents.FREQUENCY));
+    public static CompoundTag tagFromComponents(ItemStack stack, CompoundTag tag) {
+        if (stack.has(FREQUENCY))  tag.putString("frequency",  stack.get(FREQUENCY));
+        if (stack.has(MODULATION)) tag.putString("modulation", stack.get(MODULATION));
+        if (stack.has(REFERENCE))  tag.putUUID("reference",    stack.get(REFERENCE));
+        return tag;
+    }
+
+    @Override
+    public void saveToItem(ItemStack stack, HolderLookup.Provider provider) {
+        if (this.frequency != null) {
+            stack.set(FREQUENCY, this.frequency.getFrequency());
+            stack.set(MODULATION, this.frequency.getModulation().shorthand);
+        }
+
+        if (this.id != null) {
+            stack.set(REFERENCE, this.id);
+        }
     }
 
     public void loadFromItem(ItemStack stack) {
-        loadTag(stack.compon());
+        loadTag(tagFromComponents(stack, new CompoundTag()));
     }
 
     public void loadTag(CompoundTag tag) {
@@ -83,8 +99,8 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
             this.frequency = api.frequencies().getOrCreate(frequencyName, modulation);
         }
 
-        if (tag.contains("uuid")) {
-            this.id = tag.getUUID("uuid");
+        if (tag.contains("reference")) {
+            this.id = tag.getUUID("reference");
         }
     }
 
@@ -95,7 +111,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
         }
 
         if (this.id != null) {
-            tag.putUUID("uuid", this.id);
+            tag.putUUID("reference", this.id);
         }
     }
 

@@ -16,7 +16,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -57,12 +56,6 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         saveTag(tag);
         super.saveAdditional(tag, provider);
-    }
-
-    @Override
-    public void saveToItem(ItemStack stack, HolderLookup.Provider provider) {
-        super.saveTag(stack);
-        super.saveToItem(stack, provider);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, MicrophoneBlockEntity blockEntity) {

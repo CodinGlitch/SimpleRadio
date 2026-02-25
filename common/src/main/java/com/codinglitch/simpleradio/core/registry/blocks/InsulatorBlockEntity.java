@@ -9,6 +9,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -74,27 +75,27 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        if (tag.contains("uuid")) {
-            this.id = tag.getUUID("uuid");
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        if (tag.contains("reference")) {
+            this.id = tag.getUUID("reference");
         }
 
-        super.load(tag);
+        super.loadAdditional(tag, provider);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         if (this.id != null) {
-            tag.putUUID("uuid", this.id);
+            tag.putUUID("reference", this.id);
         }
 
-        super.saveAdditional(tag);
+        super.saveAdditional(tag, provider);
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag);
+        saveAdditional(tag, provider);
         return tag;
     }
 

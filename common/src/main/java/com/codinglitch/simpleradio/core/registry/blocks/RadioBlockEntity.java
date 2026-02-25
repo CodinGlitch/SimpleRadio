@@ -2,19 +2,16 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.*;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.client.core.central.AnimationInstance;
 import com.codinglitch.simpleradio.core.central.Animatable;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioReceiver;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -71,21 +68,15 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
         loadTag(tag);
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         saveTag(tag);
-        super.saveAdditional(tag);
-    }
-
-    @Override
-    public void saveToItem(ItemStack stack) {
-        saveTag(stack.getOrCreateTag());
-        super.saveToItem(stack);
+        super.saveAdditional(tag, provider);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, RadioBlockEntity blockEntity) {

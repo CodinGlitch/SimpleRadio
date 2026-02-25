@@ -10,9 +10,9 @@ import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -61,8 +61,8 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
         loadTag(tag);
 
         if (tag.contains("antennaPower")) {
@@ -71,15 +71,9 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         saveTag(tag);
-        super.saveAdditional(tag);
-    }
-
-    @Override
-    public void saveToItem(ItemStack stack) {
-        saveTag(stack.getOrCreateTag());
-        super.saveToItem(stack);
+        super.saveAdditional(tag, provider);
     }
 
     @Override
