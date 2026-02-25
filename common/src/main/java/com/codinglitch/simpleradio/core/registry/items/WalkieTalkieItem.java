@@ -3,15 +3,15 @@ package com.codinglitch.simpleradio.core.registry.items;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioComponents;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
-import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.Speaker;
 import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.VibrationParticleOption;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +22,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
 
 import java.util.Random;
+
+import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.FREQUENCY;
+import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.MODULATION;
 
 public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     public WalkieTalkieItem(Properties settings) {
@@ -54,12 +57,11 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
             if (entity instanceof Player player) {
                 ItemStack using = player.getUseItem();
 
-                CompoundTag usingTag = using.getOrCreateTag();
-                if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return true;
+                if (!using.has(FREQUENCY) || !using.has(SimpleRadioComponents.MODULATION)) return true;
 
                 if (!(using.getItem() instanceof TransceiverItem)) return true;
-                if (!usingTag.getString("frequency").equals(frequency.getFrequency())) return true;
-                return !usingTag.getString("modulation").equals(frequency.getModulation().shorthand);
+                if (!frequency.getFrequency().equals(using.get(FREQUENCY))) return true;
+                return !frequency.getModulation().shorthand.equals(using.get(SimpleRadioComponents.MODULATION));
             }
 
             return true;
@@ -87,21 +89,18 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
         this.tick(myStack, level);
 
         if (item.tickCount > 60 && item.tickCount % 10 == 0) {
-            CompoundTag myTag = myStack.getOrCreateTag();
-
             for (Entity entity : level.getEntities(item, item.getBoundingBox().inflate(1.0d))) {
                 if (entity instanceof ItemEntity otherItem) {
                     if (!(otherItem.getItem().getItem() instanceof WalkieTalkieItem)) continue;
 
                     ItemStack theirStack = otherItem.getItem();
-                    CompoundTag theirTag = theirStack.getOrCreateTag();
-                    if (!theirTag.contains("frequency")) continue;
-                    if (!theirTag.contains("modulation")) continue;
-                    if (theirTag.getString("frequency").equals(myTag.getString("frequency")) &&
-                            theirTag.getString("modulation").equals(myTag.getString("modulation"))) continue;
+                    if (!theirStack.has(FREQUENCY)) continue;
+                    if (!theirStack.has(MODULATION)) continue;
+                    if (theirStack.get(FREQUENCY).equals(myStack.get(FREQUENCY)) &&
+                            theirStack.get(MODULATION).equals(myStack.get(MODULATION))) continue;
 
-                    myTag.putString("frequency", theirTag.getString("frequency"));
-                    myTag.putString("modulation", theirTag.getString("modulation"));
+                    myStack.set(FREQUENCY,  theirStack.get(FREQUENCY));
+                    myStack.set(MODULATION, theirStack.get(MODULATION));
 
                     level.playSound(null, item, SoundEvents.ALLAY_ITEM_TAKEN, SoundSource.MASTER, 1, 1);
 

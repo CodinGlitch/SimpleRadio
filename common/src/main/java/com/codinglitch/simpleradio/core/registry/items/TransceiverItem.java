@@ -28,6 +28,9 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.UUID;
 
+import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.FREQUENCY;
+import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.MODULATION;
+
 public class TransceiverItem extends Item implements Listening, Speaking, Receiving, Transmitting, WorldTicking {
     public TransceiverItem(Properties settings) {
         super(settings);
@@ -74,8 +77,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                 ItemStack using = player.getUseItem();
                 if (!(using.getItem() instanceof TransceiverItem)) return false;
 
-                if (!using.has(SimpleRadioComponents.FREQUENCY) || !using.has(SimpleRadioComponents.MODULATION)) return false;
-                if (!using.get(SimpleRadioComponents.FREQUENCY).equals(frequencyName) || !using.get(SimpleRadioComponents.MODULATION).equals(modulation)) return false;
+                if (!using.has(FREQUENCY) || !using.has(MODULATION)) return false;
+                if (!using.get(FREQUENCY).equals(frequencyName) || !using.get(MODULATION).equals(modulation)) return false;
             }
 
             Frequency frequency = getFrequency(stack);
@@ -110,10 +113,10 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         super.onDestroyed(itemEntity);
 
         ItemStack stack = itemEntity.getItem();
-        if (stack.has(SimpleRadioComponents.FREQUENCY) && stack.has(SimpleRadioComponents.MODULATION) && stack.has(SimpleRadioComponents.MODULATION)) {
+        if (stack.has(FREQUENCY) && stack.has(MODULATION) && stack.has(MODULATION)) {
             inactivate(itemEntity.level(),
-                    stack.get(SimpleRadioComponents.FREQUENCY),
-                    stack.get(SimpleRadioComponents.MODULATION),
+                    stack.get(FREQUENCY),
+                    stack.get(MODULATION),
                     UUID.fromString(stack.get(SimpleRadioComponents.REFERENCE))
             );
         }
@@ -124,8 +127,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         Level level = entity.level();
 
-        String frequency = stack.get(SimpleRadioComponents.FREQUENCY);
-        String modulation = stack.get(SimpleRadioComponents.MODULATION);
+        String frequency = stack.get(FREQUENCY);
+        String modulation = stack.get(MODULATION);
         tick(stack, level);
         if (frequency == null || modulation == null) return;
 
@@ -133,7 +136,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         if (!frequencies.check(frequency)) {
             CommonSimpleRadio.info("Invalid frequency {}, replacing with default", frequency);
             frequency = this.getDefaultFrequency();
-            stack.set(SimpleRadioComponents.FREQUENCY, frequency);
+            stack.set(FREQUENCY, frequency);
         }
 
         // Mode-switch deactivation (i.e. item is dropped)
@@ -196,8 +199,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         CommonSimpleRadio.debug("Activated transceiver using UUID {}!", activationUUID);
 
-        frequency = stack.get(SimpleRadioComponents.FREQUENCY);
-        modulation = stack.get(SimpleRadioComponents.MODULATION);
+        frequency = stack.get(FREQUENCY);
+        modulation = stack.get(MODULATION);
         activate(level, stack, frequency, modulation, entity, activationUUID);
     }
 
