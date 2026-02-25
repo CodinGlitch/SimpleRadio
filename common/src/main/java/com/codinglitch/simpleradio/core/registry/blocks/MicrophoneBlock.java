@@ -7,9 +7,9 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.routers.Listener;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -43,6 +43,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listening {
+    public static final MapCodec<MicrophoneBlock> CODEC = simpleCodec(MicrophoneBlock::new);
+
+    @Override
+    public MapCodec<MicrophoneBlock> codec() {
+        return CODEC;
+    }
+
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
@@ -121,13 +128,13 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof RadioBlockEntity radioBlockEntity)
-            radioBlockEntity.saveToItem(stack);
+            radioBlockEntity.saveToItem(stack, builder.getLevel().registryAccess());
 
         return List.of(stack);
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult result) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof MicrophoneBlockEntity mic) {
             if (player.isCrouching()) {
@@ -150,7 +157,7 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
             }
         }
 
-        return super.use(state, level, pos, player, hand, result);
+        return super.useWithoutItem(state, level, pos, player, result);
     }
 
     @Override

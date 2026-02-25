@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.routers.Speaker;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,6 +32,13 @@ import java.util.Map;
 import java.util.UUID;
 
 public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
+    public static final MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);
+
+    @Override
+    public MapCodec<SpeakerBlock> codec() {
+        return CODEC;
+    }
+
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     private static final Map<Direction, Vec3> CONNECTION_OFFSETS = Map.of(
@@ -108,7 +116,7 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SpeakerBlockEntity speakerBlockEntity)
-            speakerBlockEntity.saveToItem(stack);
+            speakerBlockEntity.saveToItem(stack, builder.getLevel().registryAccess());
 
         return List.of(stack);
     }

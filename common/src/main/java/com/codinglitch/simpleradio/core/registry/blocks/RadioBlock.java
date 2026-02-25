@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.Speaker;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -35,6 +36,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Receiving {
+    public static final MapCodec<RadioBlock> CODEC = simpleCodec(RadioBlock::new);
+
+    @Override
+    public MapCodec<RadioBlock> codec() {
+        return CODEC;
+    }
+
     public static final int MAX_ROTATION_INDEX = RotationSegment.getMaxSegmentIndex();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
@@ -110,7 +118,7 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof RadioBlockEntity radioBlockEntity)
-            radioBlockEntity.saveToItem(stack);
+            radioBlockEntity.saveToItem(stack, builder.getLevel().registryAccess());
 
         return List.of(stack);
     }

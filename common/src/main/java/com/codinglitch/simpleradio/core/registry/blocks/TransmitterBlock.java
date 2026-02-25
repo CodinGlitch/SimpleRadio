@@ -4,10 +4,11 @@ import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.routers.Transmitter;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -33,6 +34,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class TransmitterBlock extends BaseEntityBlock implements Routing, Transmitting {
+    public static final MapCodec<TransmitterBlock> CODEC = simpleCodec(TransmitterBlock::new);
+
+    @Override
+    public MapCodec<TransmitterBlock> codec() {
+        return CODEC;
+    }
+
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(Block.box(2.0, 0.0, 4.0, 14.0, 9.0, 16.0), Block.box(1.0, 9.0, 3.0, 15.0, 12.0, 16.0));
@@ -101,7 +109,7 @@ public class TransmitterBlock extends BaseEntityBlock implements Routing, Transm
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof AuditoryBlockEntity auditoryBlockEntity)
-            auditoryBlockEntity.saveToItem(stack);
+            auditoryBlockEntity.saveToItem(stack, builder.getLevel().registryAccess());
 
         return List.of(stack);
     }
@@ -117,16 +125,16 @@ public class TransmitterBlock extends BaseEntityBlock implements Routing, Transm
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity == null) return super.use(state, level, pos, player, hand, result);
+        if (blockEntity == null) return super.useItemOn(stack, state, level, pos, player, hand, result);
 
         if (blockEntity instanceof CatalyzingBlockEntity catalyzingBlock)  {
-            InteractionResult interactionResult = catalyzingBlock.trySwapCatalyst(state, level, pos, player, hand, result);
+            ItemInteractionResult interactionResult = catalyzingBlock.trySwapCatalyst(state, level, pos, player, hand, result);
             if (interactionResult != null) return interactionResult;
         }
 
-        return super.use(state, level, pos, player, hand, result);
+        return super.useItemOn(stack, state, level, pos, player, hand, result);
     }
 
     @Nullable
