@@ -6,11 +6,11 @@ import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +19,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.WIRE_POSITION;
+import static com.codinglitch.simpleradio.core.registry.SimpleRadioComponents.WIRE_TARGET;
 
 public class WireItem extends Item implements WorldTicking {
 
@@ -38,9 +41,8 @@ public class WireItem extends Item implements WorldTicking {
 
             if (!interactingSocket.canConnect()) return super.useOn(context);
 
-            CompoundTag tag = stack.getOrCreateTag();
-            if (tag.contains("connectTo")) {
-                BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
+            if (stack.has(WIRE_TARGET)) {
+                BlockPos connectTo = BlockPos.of(stack.get(WIRE_POSITION));
 
                 BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
                 if (connectToBlockEntity instanceof Socket socket) {
@@ -56,14 +58,14 @@ public class WireItem extends Item implements WorldTicking {
                         insulatorBlockEntity.removeConnector();;
                     }
 
-                    tag.remove("connectTo");
-                    tag.remove("connectToPos");
+                    stack.remove(WIRE_TARGET);
+                    stack.remove(WIRE_POSITION);
 
                     return InteractionResult.SUCCESS;
                 }
             } else {
-                tag.putUUID("connectTo", interactingSocket.getReference());
-                tag.putLong("connectToPos", blockEntity.getBlockPos().asLong());
+                stack.set(WIRE_TARGET,   interactingSocket.getReference());
+                stack.set(WIRE_POSITION, blockEntity.getBlockPos().asLong());
 
                 if (blockEntity instanceof InsulatorBlockEntity socket) {
                     socket.setConnector(context.getPlayer());
@@ -81,33 +83,34 @@ public class WireItem extends Item implements WorldTicking {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean b) {
         super.inventoryTick(stack, level, entity, slot, b);
 
+        if (!(entity instanceof LivingEntity livingEntity)) return;
+
         AtomicBoolean isHolding = new AtomicBoolean(false);
-        entity.getHandSlots().forEach(handStack -> {
+        livingEntity.getHandSlots().forEach(handStack -> {
             if (handStack.equals(stack)) {
                 isHolding.set(true);
             }
         });
 
         if (!isHolding.get()) {
-            CompoundTag tag = stack.getOrCreateTag();
-            if (tag.contains("connectTo")) {
-                BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));
+            if (stack.has(WIRE_TARGET)) {
+                BlockPos connectTo = BlockPos.of(stack.get(WIRE_POSITION));
 
                 BlockEntity connectToBlockEntity = level.getBlockEntity(connectTo);
                 if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
                     insulatorBlockEntity.removeConnector();
                 }
 
-                tag.remove("connectTo");
+                stack.remove(WIRE_TARGET);
             }
         }
     }
 
     @Override
     public void worldTick(ItemEntity item, Level level) {
-        CompoundTag tag = item.getItem().getOrCreateTag();
-        if (tag.contains("connectTo")) {
-            tag.remove("connectTo");
+        ItemStack stack = item.getItem();
+        if (stack.has(WIRE_TARGET)) {
+            stack.remove(WIRE_POSITION);
         }
     }
 }

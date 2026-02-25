@@ -64,9 +64,9 @@ public class SimpleRadioComponents {
             DataComponentType.<UUID>builder().persistent(UUID).build()
     );
 
-    public static final DataComponentType<String> WIRE_POSITION = register(
+    public static final DataComponentType<Long> WIRE_POSITION = register(
             CommonSimpleRadio.id("wire_position"),
-            DataComponentType.<String>builder().persistent(Codec.STRING).build()
+            DataComponentType.<Long>builder().persistent(Codec.LONG).build()
     );
 
     private static <T> DataComponentType<T> register(ResourceLocation location, DataComponentType<T> componentType) {
