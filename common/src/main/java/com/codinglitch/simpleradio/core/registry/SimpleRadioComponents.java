@@ -37,6 +37,12 @@ public class SimpleRadioComponents {
             DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
     );
 
+    public static final DataComponentType<String> MODULE = Registry.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE,
+            CommonSimpleRadio.id("module"),
+            DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
     private static <T> DataComponentType<T> register(ResourceLocation location, DataComponentType<T> componentType) {
         COMPONENT_TYPES.put(location, componentType);
         return componentType;
