@@ -23,9 +23,9 @@ public class TransmitterItem extends BlockItem implements Frequencing, Alterable
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag tooltip) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag tooltip) {
         appendTooltip(stack, components);
-        super.appendHoverText(stack, level, components, tooltip);
+        super.appendHoverText(stack, context, components, tooltip);
     }
 
     @Override
