@@ -422,12 +422,12 @@ public class Wire extends Entity implements Wiring {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.getEntityData().define(FROM, Optional.empty());
-        this.getEntityData().define(FROM_TYPE, "");
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(FROM, Optional.empty());
+        builder.define(FROM_TYPE, "");
 
-        this.getEntityData().define(TO, Optional.empty());
-        this.getEntityData().define(TO_TYPE, "");
+        builder.define(TO, Optional.empty());
+        builder.define(TO_TYPE, "");
     }
 
     @Override
