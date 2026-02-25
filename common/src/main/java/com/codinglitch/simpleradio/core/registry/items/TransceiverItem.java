@@ -117,7 +117,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             inactivate(itemEntity.level(),
                     stack.get(FREQUENCY),
                     stack.get(MODULATION),
-                    UUID.fromString(stack.get(SimpleRadioComponents.REFERENCE))
+                    stack.get(SimpleRadioComponents.REFERENCE)
             );
         }
     }
@@ -143,7 +143,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         Router activeRouter = null;
         if (stack.has(SimpleRadioComponents.REFERENCE)) {
             activeRouter = SimpleRadioApi.getRouterSided(
-                    UUID.fromString(stack.get(SimpleRadioComponents.REFERENCE)), level.isClientSide
+                    stack.get(SimpleRadioComponents.REFERENCE), level.isClientSide
             );
         }
 
@@ -181,7 +181,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         if (entity.level().isClientSide) {
 
             if (stack.has(SimpleRadioComponents.REFERENCE) && activeRouter == null) {
-                activationUUID = UUID.fromString(stack.get(SimpleRadioComponents.REFERENCE));
+                activationUUID = stack.get(SimpleRadioComponents.REFERENCE);
             }
 
         } else {
@@ -189,9 +189,9 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
             if (!stack.has(SimpleRadioComponents.REFERENCE)) {
                 activationUUID = UUID.randomUUID();
-                stack.set(SimpleRadioComponents.REFERENCE, activationUUID.toString());
+                stack.set(SimpleRadioComponents.REFERENCE, activationUUID);
             } else {
-                activationUUID = UUID.fromString(stack.get(SimpleRadioComponents.REFERENCE));
+                activationUUID = stack.get(SimpleRadioComponents.REFERENCE);
             }
         }
 

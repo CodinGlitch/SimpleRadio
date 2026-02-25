@@ -2,14 +2,37 @@ package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.PrimitiveCodec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class SimpleRadioComponents {
     public static final Map<ResourceLocation, DataComponentType<?>> COMPONENT_TYPES = new LinkedHashMap<>();
+
+    static PrimitiveCodec<UUID> UUID = new PrimitiveCodec<>() {
+        @Override
+        public <T> DataResult<UUID> read(final DynamicOps<T> ops, final T input) {
+            return ops
+                    .getStringValue(input)
+                    .map(java.util.UUID::fromString);
+        }
+
+        @Override
+        public <T> T write(final DynamicOps<T> ops, final UUID value) {
+            return ops.createString(value.toString());
+        }
+
+        @Override
+        public String toString() {
+            return "UUID";
+        }
+    };
 
     public static final DataComponentType<String> FREQUENCY = register(
             CommonSimpleRadio.id("frequency"),
@@ -21,9 +44,9 @@ public class SimpleRadioComponents {
             DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
-    public static final DataComponentType<String> REFERENCE = register(
+    public static final DataComponentType<UUID> REFERENCE = register(
             CommonSimpleRadio.id("reference"),
-            DataComponentType.<String>builder().persistent(Codec.STRING).build()
+            DataComponentType.<UUID>builder().persistent(UUID).build()
     );
 
     public static final DataComponentType<Boolean> ACTIVATED = register(
@@ -33,6 +56,16 @@ public class SimpleRadioComponents {
 
     public static final DataComponentType<String> MODULE = register(
             CommonSimpleRadio.id("module"),
+            DataComponentType.<String>builder().persistent(Codec.STRING).build()
+    );
+
+    public static final DataComponentType<UUID> WIRE_TARGET = register(
+            CommonSimpleRadio.id("wire_target"),
+            DataComponentType.<UUID>builder().persistent(UUID).build()
+    );
+
+    public static final DataComponentType<String> WIRE_POSITION = register(
+            CommonSimpleRadio.id("wire_position"),
             DataComponentType.<String>builder().persistent(Codec.STRING).build()
     );
 
