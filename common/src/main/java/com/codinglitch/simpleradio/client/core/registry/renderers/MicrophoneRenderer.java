@@ -19,6 +19,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
 import org.joml.Vector3f;
 
+import java.awt.*;
+
 public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEntity> {
     private MicrophoneModel model;
 
@@ -38,7 +40,7 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
             poseStack.mulPose(Axis.YP.rotationDegrees(microphoneBlock.getYRotationDegrees(state)));
 
             float targetTilt = blockEntity.tilt - 1.5f;
-            blockEntity.currentTilt = Math.lerp(blockEntity.currentTilt, targetTilt, Math.min(Minecraft.getInstance().getFrameTimeNs() * 0.3f, 1));
+            blockEntity.currentTilt = Math.lerp(blockEntity.currentTilt, targetTilt, Math.min(Minecraft.getInstance().getTimer().getRealtimeDeltaTicks() * 0.3f, 1));
 
             model.plug.visible = !blockEntity.getWires().isEmpty();
 
@@ -58,7 +60,7 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
             }
 
             VertexConsumer vertexConsumer = bufferSource.getBuffer(model.renderType(blockEntity.isListening() ? MicrophoneModel.ACTIVE_LOCATION : MicrophoneModel.TEXTURE_LOCATION));
-            model.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1, 1, 1, 1);
+            model.renderToBuffer(poseStack, vertexConsumer, light, overlay, Color.white.getRGB());
 
             poseStack.popPose();
         }

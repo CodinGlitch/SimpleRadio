@@ -12,7 +12,6 @@ import com.codinglitch.simpleradio.routers.Transmitter;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -28,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.REFERENCE;
 
 /**
  * Routes RadioSources to other routers.
@@ -545,11 +546,8 @@ public class RadioRouter implements Socket, Router {
         } else {
             boolean isValid = RadioManager.getInstance().verifyEntityCollection(owner, stack -> {
                 if (stack.isEmpty()) return false;
-                if (!stack.hasTag()) return false;
 
-                CompoundTag tag = stack.getTag();
-                if (!tag.contains("reference")) return false;
-                if (!tag.getUUID("reference").equals(reference)) return false;
+                if (!reference.equals(stack.get(REFERENCE))) return false;
 
                 return true;
             });

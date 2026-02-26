@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.CompatibilityInstance;
-import com.codinglitch.simpleradio.compat.VibrativeCompat;
 import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
@@ -10,12 +9,15 @@ import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class CompatCore {
@@ -75,7 +77,6 @@ public class CompatCore {
     public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE.enabled) {
-            VibrativeCompat.onData(channel, source, decoded);
         }
     }
 
@@ -91,15 +92,12 @@ public class CompatCore {
         }
     }
 
-    public static String getSound(ItemStack stack) {
+    public static String getSound(HolderLookup.Provider provider, ItemStack stack) {
         String result = Services.COMPAT.getSound(stack);
         if (result != null) return result;
 
-        if (stack.getItem() instanceof RecordItem recordItem) {
-            return recordItem.getSound().getLocation().toString();
-        }
-
-        return null;
+        Optional<Holder<JukeboxSong>> song = JukeboxSong.fromStack(provider, stack);
+        return song.map(s -> s.value().soundEvent().value().getLocation().toString()).orElse(null);
     }
 
     public static RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {

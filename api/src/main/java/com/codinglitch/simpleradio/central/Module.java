@@ -11,10 +11,10 @@ public class Module {
     public List<Type> types;
 
     public Module(ResourceLocation identifier) {
-        this(identifier, new ResourceLocation(identifier.getNamespace(), "module/"+identifier.getPath()));
+        this(identifier, ResourceLocation.fromNamespaceAndPath(identifier.getNamespace(), "module/"+identifier.getPath()));
     }
     public Module(ResourceLocation identifier, Type... types) {
-        this(identifier, new ResourceLocation(identifier.getNamespace(), "module/"+identifier.getPath()), types);
+        this(identifier, ResourceLocation.fromNamespaceAndPath(identifier.getNamespace(), "module/"+identifier.getPath()), types);
     }
     public Module(ResourceLocation identifier, ResourceLocation texture) {
         this(identifier, texture, Type.TRANSMITTING);

@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client.core;
 
+import com.codinglitch.simpleradio.client.core.central.AnimatableModel;
 import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.Keyframe;

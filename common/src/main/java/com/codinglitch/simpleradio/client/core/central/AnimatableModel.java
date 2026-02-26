@@ -57,5 +57,5 @@ public abstract class AnimatableModel extends Model {
     }
 
     @Override
-    public abstract void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, float v, float v1, float v2, float v3);
+    public abstract void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color);
 }

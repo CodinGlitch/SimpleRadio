@@ -8,7 +8,7 @@
     "MixinBlockEntity",
     "MixinEntity",
     "MixinExplosion",
-    "MixinJukeboxBlockEntity",
+    "MixinJukeboxSongPlayer",
     "MixinLevel",
     "MixinMinecraftServer",
     "MixinPlayerList",

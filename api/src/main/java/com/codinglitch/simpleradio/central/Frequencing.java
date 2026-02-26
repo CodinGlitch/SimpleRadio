@@ -6,7 +6,6 @@ import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -16,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.*;
 
 public interface Frequencing {
     static boolean validateLocation(WorldlyPosition position, Class<?> clazz, UUID reference, @Nullable Frequency frequency) {
@@ -72,15 +73,10 @@ public interface Frequencing {
      * @param stack the ItemStack to change the frequency of
      * @param frequencyName the frequency to set it to
      * @param modulation the modulation type of the frequency
-     * @return The updated tag.
      */
-    default CompoundTag setFrequency(ItemStack stack, String frequencyName, Frequency.Modulation modulation) {
-        CompoundTag tag = stack.getOrCreateTag();
-
-        tag.putString("frequency", frequencyName);
-        tag.putString("modulation", modulation.shorthand);
-
-        return tag;
+    default void setFrequency(ItemStack stack, String frequencyName, Frequency.Modulation modulation) {
+        stack.set(FREQUENCY, frequencyName);
+        stack.set(MODULATION, modulation.shorthand);
     }
     /**
      * Sets the frequency for a BlockEntity.
@@ -107,12 +103,10 @@ public interface Frequencing {
      * @return The frequency, or null if it doesn't have one.
      */
     default Frequency getFrequency(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        if (!stack.has(FREQUENCY) || !stack.has(MODULATION)) return null;
 
-        if (!tag.contains("frequency") || !tag.contains("modulation")) return null;
-
-        String frequencyName = tag.getString("frequency");
-        Frequency.Modulation modulation = SimpleRadioApi.getInstance().frequencies().modulationOf(tag.getString("modulation"));
+        String frequencyName = stack.get(FREQUENCY);
+        Frequency.Modulation modulation = SimpleRadioApi.getInstance().frequencies().modulationOf(stack.get(MODULATION));
         return SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
     }
     /**
@@ -152,24 +146,21 @@ public interface Frequencing {
     }
 
     default void tick(ItemStack stack, Level level) {
-        CompoundTag tag = stack.getOrCreateTag();
-        if (!tag.contains("frequency") || tag.getString("frequency").isEmpty())
+        if (!stack.has(FREQUENCY) || stack.get(FREQUENCY).isEmpty())
             setFrequency(stack, this.getDefaultFrequency(), this.getDefaultModulation());
     }
 
     default void appendTooltip(ItemStack stack, List<Component> components) {
-        CompoundTag tag = stack.getOrCreateTag();
-
-        if (tag.contains("frequency")) {
+        if (stack.has(FREQUENCY)) {
             components.add(Component.literal(
-                    tag.getString("frequency") + tag.getString("modulation")
+                    stack.get(FREQUENCY) + stack.get(MODULATION)
             ).withStyle(ChatFormatting.DARK_GRAY));
         }
 
-        if (Screen.hasShiftDown() && tag.contains("user")) {
+        if (Screen.hasShiftDown() && stack.has(REFERENCE)) {
             components.add(Component.translatable(
                     "tooltip.simpleradio.receiver_user",
-                    tag.getUUID("user")
+                    stack.get(REFERENCE)
             ).withStyle(ChatFormatting.DARK_GRAY));
         }
     }

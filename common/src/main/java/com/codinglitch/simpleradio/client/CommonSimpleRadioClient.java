@@ -1,10 +1,10 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.core.registry.SimpleRadioModels;
 import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
 import com.codinglitch.simpleradio.client.core.registry.models.MicrophoneModel;
 import com.codinglitch.simpleradio.client.core.registry.models.RadioModel;
-import com.codinglitch.simpleradio.client.core.registry.models.InsulatorModel;
 import com.codinglitch.simpleradio.client.core.registry.renderers.*;
 import com.codinglitch.simpleradio.client.core.registry.screens.RadiosmitherScreen;
 import com.codinglitch.simpleradio.core.registry.*;
@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -38,29 +37,29 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.REFERENCE;
+
 public class CommonSimpleRadioClient {
     // -- Model Properties -- \\
     public static final Map<UUID, Boolean> isTransmitting = new HashMap<>();
     public static void loadProperties(TriConsumer<Item, ResourceLocation, ClampedItemPropertyFunction> registry) {
-        registry.accept(SimpleRadioItems.TRANSCEIVER, new ResourceLocation("using"),
+        registry.accept(SimpleRadioItems.TRANSCEIVER, CommonSimpleRadio.id("using"),
                 (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
 
-        registry.accept(SimpleRadioItems.TRANSCEIVER, new ResourceLocation("speaking"),
+        registry.accept(SimpleRadioItems.TRANSCEIVER, CommonSimpleRadio.id("speaking"),
             (stack, level, entity, i) -> {
-                CompoundTag tag = stack.getOrCreateTag();
-                if (!tag.contains("user")) return 0;
+                if (!stack.has(REFERENCE)) return 0;
 
-                UUID uuid = tag.getUUID("user");
-                Receiver receiver = ClientRadioManager.getInstance().getReceiver(uuid);
+                Receiver receiver = ClientRadioManager.getInstance().getReceiver(stack.get(REFERENCE));
                 if (receiver == null) return 0;
 
                 return receiver.getActivityTime() > 0 ? 1 : 0;
             }
         );
 
-        registry.accept(SimpleRadioItems.WALKIE_TALKIE, new ResourceLocation("using"),
+        registry.accept(SimpleRadioItems.WALKIE_TALKIE, CommonSimpleRadio.id("using"),
                 (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
-        registry.accept(SimpleRadioItems.SPUDDIE_TALKIE, new ResourceLocation("using"),
+        registry.accept(SimpleRadioItems.SPUDDIE_TALKIE, CommonSimpleRadio.id("using"),
                 (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1 : 0);
     }
 

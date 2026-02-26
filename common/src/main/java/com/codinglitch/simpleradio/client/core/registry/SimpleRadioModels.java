@@ -28,14 +28,14 @@ public class SimpleRadioModels {
     public static final List<ModelOverride> OVERRIDES = new ArrayList<>();
 
     public static ModelSubstitution<ModuleModel> MODULE = register(new ModelSubstitution<>(ModuleModel::new,
-            new ModelResourceLocation(CommonSimpleRadio.ID, "iron_module", "inventory"),
-            new ModelResourceLocation(CommonSimpleRadio.ID, "gold_module", "inventory"),
-            new ModelResourceLocation(CommonSimpleRadio.ID, "diamond_module", "inventory"),
-            new ModelResourceLocation(CommonSimpleRadio.ID, "netherite_module", "inventory")
+            new ModelResourceLocation(CommonSimpleRadio.id("iron_module"), "inventory"),
+            new ModelResourceLocation(CommonSimpleRadio.id("gold_module"), "inventory"),
+            new ModelResourceLocation(CommonSimpleRadio.id("diamond_module"), "inventory"),
+            new ModelResourceLocation(CommonSimpleRadio.id( "netherite_module"), "inventory")
     ));
 
-    public static ModelResourceLocation TRANSCEIVER = register(new ModelResourceLocation(CommonSimpleRadio.ID, "transceiver_item", "inventory"));
-    public static ModelResourceLocation TRANSCEIVER_IN_HAND = register(new ModelResourceLocation(CommonSimpleRadio.ID, "transceiver", "inventory"));
+    public static ModelResourceLocation TRANSCEIVER = register(new ModelResourceLocation(CommonSimpleRadio.id("item/transceiver_item"), "inventory"));
+    public static ModelResourceLocation TRANSCEIVER_IN_HAND = register(new ModelResourceLocation(CommonSimpleRadio.id("item/transceiver"), "inventory"));
 
     // ----
 
@@ -73,7 +73,7 @@ public class SimpleRadioModels {
                     if (newModel instanceof LocationHolder locationHolder)
                         locationHolder.location = location;
 
-                    bakedRegistry.put(location, newModel);
+                    bakedRegistry.put(location.id(), newModel);
                 }
             }
         }

@@ -38,7 +38,7 @@ public class LayeredModuleModel implements BakedModel {
 
         for (BlockElement element : blockElements) {
             element.faces.forEach((side, face) -> {
-                quads.add(BlockModel.bakeFace(element, face, sprite, side, BlockModelRotation.X0_Y0, baseModel.location));
+                quads.add(BlockModel.bakeFace(element, face, sprite, side, BlockModelRotation.X0_Y0));
             });
         }
         //TODO: optimize quads; culling and removal of overlapping quads

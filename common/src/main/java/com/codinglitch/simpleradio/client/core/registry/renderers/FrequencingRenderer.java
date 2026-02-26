@@ -96,7 +96,7 @@ public class FrequencingRenderer {
             return;
         }
 
-        float time = (level.getGameTime() + Minecraft.getInstance().getFrameTimeNs())/20; // in SECONDS bro
+        float time = (level.getGameTime() + Minecraft.getInstance().getTimer().getRealtimeDeltaTicks())/20; // in SECONDS bro
         time = Math.floor(time*FRAME_RATE)/FRAME_RATE;
 
         //--- Catalyst Display ---\\

@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class RadiosmitherBlockEntity extends BaseContainerBlockEntity {
     public static final int CONTAINER_SIZE = 1;
 
-    private final NonNullList<ItemStack> items = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY);
+    private NonNullList<ItemStack> items = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY);
 
     public RadiosmitherBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.RADIOSMITHER, pos, state);
@@ -78,6 +79,16 @@ public class RadiosmitherBlockEntity extends BaseContainerBlockEntity {
         return null;
     }
 
+    @Override
+    protected NonNullList<ItemStack> getItems() {
+        return items;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
+    }
+
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
@@ -98,15 +109,15 @@ public class RadiosmitherBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        ContainerHelper.loadAllItems(tag, items);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
+        ContainerHelper.loadAllItems(tag, items, provider);
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        ContainerHelper.saveAllItems(tag, items);
-        super.saveAdditional(tag);
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        ContainerHelper.saveAllItems(tag, items, provider);
+        super.saveAdditional(tag, provider);
     }
 
     @Override

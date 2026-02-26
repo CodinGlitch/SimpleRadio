@@ -26,20 +26,16 @@ import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -447,18 +443,20 @@ public class RadioManager extends ServerSimpleRadioApi {
             return player.getInventory().hasAnyMatching(itemCriteria);
         } else if (entity instanceof ItemEntity itemEntity) {
             return itemCriteria.test(itemEntity.getItem());
-        } else {
-            for (ItemStack stack : entity.getHandSlots()) {
+        } else if (entity instanceof LivingEntity livingEntity) {
+            for (ItemStack stack : livingEntity.getHandSlots()) {
                 if (itemCriteria.test(stack)) return true;
             }
-            return false;
         }
+        return false;
     }
 
     @Nullable
     public ItemStack isEntityHolding(Entity entity, Predicate<ItemStack> handCriteria) {
-        for (ItemStack stack : entity.getHandSlots()) {
-            if (handCriteria.test(stack)) return stack;
+        if (entity instanceof LivingEntity livingEntity) {
+            for (ItemStack stack : livingEntity.getHandSlots()) {
+                if (handCriteria.test(stack)) return stack;
+            }
         }
         return null;
     }
@@ -504,7 +502,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     public void sendRecord(ItemStack stack, WorldlyPosition position, long identifier) {
         RadioManager.getInstance().sendSound(
                 position,
-                CompatCore.getSound(stack),
+                CompatCore.getSound(position.level.registryAccess(), stack),
                 1, 1, identifier
         );
     }
@@ -527,7 +525,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     public void updateRecord(ItemStack stack, WorldlyPosition position, float offset, long identifier) {
         RadioManager.getInstance().sendSound(
                 position,
-                CompatCore.getSound(stack),
+                CompatCore.getSound(position.level.registryAccess(), stack),
                 1, 1,  offset, identifier
         );
     }

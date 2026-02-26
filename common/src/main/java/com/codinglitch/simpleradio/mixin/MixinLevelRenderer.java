@@ -1,8 +1,10 @@
 package com.codinglitch.simpleradio.mixin;
 
 import com.codinglitch.simpleradio.client.core.registry.renderers.WireRenderer;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -23,8 +25,8 @@ public abstract class MixinLevelRenderer {
 
     @Shadow @Final private Minecraft minecraft;
 
-    @Inject(at = @At("HEAD"), method = "renderLevel")
-    private void simpleradio$renderLevel_renderWire(PoseStack poseStack, float partialTick, long $$2, boolean $$3, Camera camera, GameRenderer $$5, LightTexture $$6, Matrix4f $$7, CallbackInfo ci) {
-        WireRenderer.renderPlayer(minecraft.player, this.renderBuffers.bufferSource(), poseStack, partialTick, camera);
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/debug/DebugRenderer;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;DDD)V"), method = "renderLevel")
+    private void simpleradio$renderLevel_renderWire(DeltaTracker deltaTracker, boolean $$1, Camera camera, GameRenderer renderer, LightTexture lightTexture, Matrix4f matrix4f, Matrix4f matrix4f1, CallbackInfo ci, @Local PoseStack poseStack) {
+        WireRenderer.renderPlayer(minecraft.player, this.renderBuffers.bufferSource(), poseStack, deltaTracker.getGameTimeDeltaTicks(), camera);
     }
 }

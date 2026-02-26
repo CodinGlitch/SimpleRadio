@@ -12,6 +12,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.awt.*;
+
 public class RadioRenderer implements BlockEntityRenderer<RadioBlockEntity> {
     private RadioModel model;
 
@@ -35,7 +37,7 @@ public class RadioRenderer implements BlockEntityRenderer<RadioBlockEntity> {
             poseStack.mulPose(Axis.YP.rotationDegrees(radioBlock.getYRotationDegrees(state)));
 
             VertexConsumer vertexConsumer = bufferSource.getBuffer(model.renderType(RadioModel.TEXTURE_LOCATION));
-            model.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1, 1, 1, 1);
+            model.renderToBuffer(poseStack, vertexConsumer, light, overlay, Color.white.getRGB());
 
             poseStack.popPose();
         }

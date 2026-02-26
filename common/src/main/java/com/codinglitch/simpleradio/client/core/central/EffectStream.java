@@ -1,8 +1,8 @@
 package com.codinglitch.simpleradio.client.core.central;
 
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
-import com.mojang.blaze3d.audio.OggAudioStream;
 import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.JOrbisAudioStream;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
@@ -15,7 +15,7 @@ public class EffectStream implements AudioStream {
     public AudioEffect effect;
 
     public EffectStream(InputStream inputStream) throws IOException {
-        this(new OggAudioStream(inputStream));
+        this(new JOrbisAudioStream(inputStream));
     }
     public EffectStream(AudioStream substream) {
         this.substream = substream;
@@ -50,7 +50,7 @@ public class EffectStream implements AudioStream {
 
     public ByteBuffer readAll() throws IOException {
         ByteBuffer buffer = null;
-        if (this.substream instanceof OggAudioStream oggStream) {
+        if (this.substream instanceof JOrbisAudioStream oggStream) {
             buffer = oggStream.readAll();
         }
         if (buffer == null) return null;
