@@ -13,7 +13,9 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}"){
+        exclude module: "fabric-resource-loader-v0" // 🤷‍♂️
+    }
 
     // --- Dependencies --- \\
 
@@ -95,14 +97,12 @@ loom {
         client {
             client()
             setConfigName("Fabric Client")
-            ideConfigGenerated(true)
             runDir("runs/client")
             source sourceSets.development
         }
         server {
             server()
             setConfigName("Fabric Server")
-            ideConfigGenerated(true)
             runDir("runs/server")
             source sourceSets.development
         }
