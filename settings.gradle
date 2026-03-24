@@ -16,19 +16,6 @@ pluginManagement {
             }
         }
         exclusiveContent {
-            forRepositories(
-                maven {
-                    name = 'ParchmentMC'
-                    url = 'https://maven.parchmentmc.org/'
-                },
-                maven {
-                    name = "NeoForge"
-                    url = 'https://maven.neoforged.net/releases'
-                }
-            )
-            filter { includeGroup('org.parchmentmc.data') }
-        }
-        exclusiveContent {
             forRepository {
                 maven {
                     name = 'Forge'
@@ -54,6 +41,7 @@ pluginManagement {
 }
 
 plugins {
+    // gradle 9 requires foojay >= 1.0.0
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
 

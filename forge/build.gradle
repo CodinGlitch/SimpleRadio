@@ -1,9 +1,8 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle' version '[7.0.2,8.0)'
-    id 'net.minecraftforge.jarjar' version '0.2.3'
+    id 'net.minecraftforge.gradle'
+    id 'net.minecraftforge.jarjar'
     id "com.modrinth.minotaur" version "2.+"
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 /*mixin {
@@ -13,18 +12,35 @@ plugins {
     config("${mod_id}.forge.mixins.json")
 }*/
 
-jarJar.register()
+repositories {
+    maven minecraft.mavenizer
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+
+    maven { url "https://repo.spongepowered.org/maven" }
+
+    mavenCentral()
+    mavenLocal()
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
 
-    //copyIdeResources = true //Calls processResources when in dev
-
-    accessTransformers = files('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers = files([ at ])
+    }
 
     runs {
         configureEach {
             workingDir.convention layout.projectDirectory.dir('run')
+
+            //systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+            systemProperty 'forge.logging.console.level', 'debug'
+            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
 
             args "--mixin.config=${mod_id}.mixins.json"
             args "--mixin.config=${mod_id}.forge.mixins.json"
@@ -33,8 +49,19 @@ minecraft {
         register('client') {
             systemProperty 'forge.enabledGameTestNamespaces', mod_id
         }
+
         register('server') {
             systemProperty 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        register('gameTestServer') {
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        register('data') {
+            workingDir = layout.projectDirectory.dir('run-data')
+
+            args '--mod', mod_id, '--all', '--output', layout.projectDirectory.dir('src/generated/resources'), '--existing', layout.projectDirectory.dir('src/main/resources')
         }
     }
 }
@@ -43,46 +70,52 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
     implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
-    implementation project(":common")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0-beta.10'
+
+    implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 
     implementation "com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}"
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     implementation "maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}"
 
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}"))
+    //implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
+    //implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}"))
 
     // -- Compatibilities -- \\
 
+    // Audio Player
+    //implementation "curse.maven:etched-491890:7088631"
+
     // Vibrative Voice
-    implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
+    //implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
+
+    // ComputerCraft
+    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${cc_version}")
+    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${cc_version}")
+    runtimeOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}")
 
     // Valkyrien Skies
-    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
-        compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.', '')}-forge:${valkyrien_skies_version}"
-        runtimeOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.', '')}-forge:${valkyrien_skies_version}"
-        implementation("org.valkyrienskies.core:api:${valkyrien_skies_api_version}")
-        // forge wont inherit the api from common for some reason
-    }
+    //compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.', '')}-forge:${valkyrien_skies_version}"
+    //runtimeOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.', '')}-forge:${valkyrien_skies_version}"
+    //implementation("org.valkyrienskies.core:api:${valkyrien_skies_api_version}")
+    // forge wont inherit the api from common for some reason
 
     // Create
-    if (create_env_versions.contains(minecraft_version)) {
-        implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim")
-        implementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-        compileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
-        runtimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
-        implementation("com.tterrag.registrate:Registrate:${registrate_version}")
-    }
+    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim")
+    implementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    compileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+    runtimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    implementation("com.tterrag.registrate:Registrate:${registrate_version}")
 
     // JEI / REI
     if (recipe_viewer == "jei") {
         // compile against the JEI API but do not include it at runtime
-        compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-        compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+        //compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+        //compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
         // at runtime, use the full JEI jar for Forge
-        runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+        //runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
     } else if (recipe_viewer == "rei") {
         // TODO: add rei to devenv
     }
@@ -99,42 +132,40 @@ dependencies {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-tasks.withType(Javadoc).configureEach {
-    source(project(":common").sourceSets.main.allJava)
-}
-tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
-}
-tasks.named('jarJar') {
-    archiveClassifier = ''
-}
-tasks.('jar') {
-    archiveClassifier = "slim"
-    manifest {
-        attributes 'ContainedDeps': "mixinextras-forge-${mixin_extras_version}.jar"
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'forge')
+        }
     }
 }
-jar.finalizedBy('reobfJar')
-
-processResources {
-    from project(":common").sourceSets.main.resources
-    from project(":forge").sourceSets.main.resources
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'forge')
+            }
+        }
+    }
 }
 
+jar {
+    finalizedBy('reobfJar')
 
-java {
-    withSourcesJar()
-    withJavadocJar()
+    archiveClassifier.set("slim")
+    manifest.attributes([
+        "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+    ])
 }
 
-publishing {
+/*publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId base.archivesName.get()
-            from components.jarJar
+            artifact jarJar
         }
     }
     repositories {
@@ -142,4 +173,4 @@ publishing {
             url "file://" + System.getenv("local_maven")
         }
     }
-}
+}*/

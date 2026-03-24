@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'net.neoforged.moddev'
     id 'maven-publish'
 }
 
@@ -10,8 +10,13 @@ base {
 
 apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
 
-minecraft {
-    version(minecraft_version)
+neoForge {
+    neoFormVersion = neo_form_version
+
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
 }
 
 dependencies {
