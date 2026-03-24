@@ -1,6 +1,4 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}" apply false
-    id 'net.neoforged.moddev' version "${mdg_version}" apply false
-    id 'net.minecraftforge.gradle' version "${forgegradle_version}" apply false
-    id 'net.minecraftforge.jarjar' version '0.2.3' apply false
+    alias(libs.plugins.loom) apply false
+    alias(libs.plugins.moddevgradle) apply false
 }

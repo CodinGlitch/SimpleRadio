@@ -1,7 +1,0 @@
-package com.codinglitch.simpleradio.platform;
-
-import com.codinglitch.simpleradio.platform.services.ClientRenderingHelper;
-
-public class ForgeClientRenderingHelper implements ClientRenderingHelper {
-
-}

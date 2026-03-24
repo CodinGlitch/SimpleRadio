@@ -3,9 +3,14 @@ plugins {
     id 'maven-publish'
 }
 
+def catalogs = project.extensions.getByType(VersionCatalogsExtension)
+def libs = catalogs.named("libs")
+
+def minecraft = libs.findVersion("minecraft").get()
+
 base {
     archivesName = "${mod_id}-${project.name}"
-    version = "${minecraft_version}-${version}"
+    version = "${minecraft}-${version}"
 }
 
 java {
@@ -39,6 +44,7 @@ repositories {
         )
         filter { includeGroup('org.parchmentmc.data') }
     }
+
     maven {
         name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
         url = 'https://maven.blamejared.com'
@@ -107,7 +113,7 @@ repositories {
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
     configurations."$variant".outgoing {
         capability("$group:${base.archivesName.get()}:$version")
-        capability("$group:$mod_id-${project.name}-${minecraft_version}:$version")
+        capability("$group:$mod_id-${project.name}-${minecraft}:$version")
         capability("$group:$mod_id-${project.name}:$version")
         capability("$group:$mod_id:$version")
     }
@@ -126,7 +132,7 @@ dependencies {
     // --- Common --- \\
 
     implementation(project(':api'))
-    apiJava project(path: ':api', configuration: 'apiJava')
+    apiJava(project(path: ':api', configuration: 'apiJava'))
 }
 
 sourcesJar {
@@ -148,7 +154,7 @@ jar {
                 'Implementation-Title'  : project.name,
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_author,
-                'Built-On-Minecraft'    : minecraft_version
+                'Built-On-Minecraft'    : minecraft
         ])
     }
 }
@@ -157,38 +163,25 @@ processResources {
     def expandProps = [
             "version"                       : version,
             "group"                         : project.group, //Else we target the task's group.
-            "minecraft_version"             : minecraft_version,
-            "forge_version"                 : forge_version,
-            "forge_version_range"           : forge_version_range,
-            "minecraft_version_range"       : minecraft_version_range,
-            "fabric_version"                : fabric_version,
-            "fabric_loader_version"         : fabric_loader_version,
-            "fabric_minecraft_version_range": fabric_minecraft_version_range,
             "mod_name"                      : mod_name,
             "mod_author"                    : mod_author,
             "mod_id"                        : mod_id,
             "license"                       : license,
             "description"                   : project.description,
-            "neoforge_version"              : neoforge_version,
-            "neoforge_version_range"        : neoforge_version_range,
-            "voicechat_api_version"         : voicechat_api_version,
-            "voicechat_version"             : voicechat_version,
-            "voicechat_interaction_version" : voicechat_interaction_version,
-            "polymer_version"               : polymer_version,
-            "night_config_version"          : night_config_version,
-            "lexiconfig_version"            : lexiconfig_version,
-            "vibrative_voice_version"       : vibrative_voice_version,
-            "create_version"                : create_version,
-            "name_template"                 : name_template,
-            "modrinth_id"                   : modrinth_id,
-            "curseforge_id"                 : curseforge_id,
-            "supported_versions"            : supported_versions,
-            "requiredDependencies"          : requiredDependencies,
-            "optionalDependencies"          : optionalDependencies,
-            "parchment_minecraft"           : parchment_minecraft,
-            "parchment_version"             : parchment_version,
-            "release_type"                  : release_type,
-            "credits"                       : credits
+            "credits"                       : credits,
+
+            "minecraft_version"             : minecraft,
+            "minecraft_version_range"       : libs.findVersion("minecraft_range").get(),
+            "fabric_version"                : libs.findVersion("fabric_api").get(),
+            "fabric_loader_version"         : libs.findVersion("fabric_loader").get(),
+            "fabric_minecraft_version_range": libs.findVersion("fabric_mc_range").get(),
+            "neoforge_version"              : libs.findVersion("neoforge").get(),
+            "neoforge_version_range"        : libs.findVersion("neoforge_range").get(),
+
+            "lexiconfig_version"            : libs.findVersion("lexiconfig").get(),
+
+            "voicechat_api_version"         : libs.findVersion("voicechat_api").get(),
+            "voicechat_version"             : libs.findVersion("voicechat").get(),
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

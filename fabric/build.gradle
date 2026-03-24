@@ -1,7 +1,9 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
-    id "com.modrinth.minotaur" version "2.+"
+
+    alias(libs.plugins.loom)
+//    alias(libs.plugins.minotaur)
+//    alias(libs.plugins.cursegradle)
 }
 
 //apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
@@ -9,77 +11,23 @@ plugins {
 //apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
+    minecraft(libs.fabric.minecraft)
+
     mappings loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+        parchment("org.parchmentmc.data:parchment-${libs.versions.parchment.minecraft.get()}:${libs.versions.parchment.mappings.get()}@zip")
     }
 
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
+    modImplementation libs.bundles.fabric.modImpl
 
-    // --- Dependencies --- \\
+    compileOnlyApi(libs.lexiconfig.api)
+    compileOnlyApi(libs.voicechat.api) { artifact { classifier = "fabric-stub" } }
+    modCompileOnly(libs.fabric.computercraft.api)
+    compileOnly(libs.vibrativevoice.api)
 
-    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    modRuntimeOnly "com.codinglitch.lexiconfig:lexiconfig-fabric:${lexiconfig_version}"
+    modCompileOnly(libs.fabric.voicechat)
 
-    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}:fabric-stub"
-    modCompileOnly "maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}"
-    modLocalRuntime("maven.modrinth:simple-voice-chat:fabric-${minecraft_version}-${voicechat_version}")
-
-    //include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
-
-    // --- Compatibilities --- \\
-
-    // Audio Player
-    modLocalRuntime "maven.modrinth:audioplayer:fabric-${minecraft_version}-${audioplayer_version}"
-    modLocalRuntime "maven.modrinth:admiral:0.4.5+1.21+fabric"
-
-    // ComputerCraft
-    modCompileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-fabric-api:${cc_version}")
-    modRuntimeOnly("cc.tweaked:cc-tweaked-${minecraft_version}-fabric:${cc_version}")
-
-    // Voice Chat Interaction
-    modCompileOnly "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
-    modCompileOnly "eu.pb4:polymer-reg-sync-manipulator:${polymer_version}"
-    //modLocalRuntime "maven.modrinth:voice-chat-interaction:fabric-${minecraft_version}-${voicechat_interaction_version}"
-    //modLocalRuntime "eu.pb4:polymer-reg-sync-manipulator:${polymer_version}"
-
-    // Vibrative Voice
-    implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
-    //modCompileOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
-    //modRuntimeOnly "maven.modrinth:vibrative-voice:${vibrative_voice_version}"
-
-    // Valkyrien Skies
-    modCompileOnly("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}")
-    modLocalRuntime("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-fabric:${valkyrien_skies_version}") {
-        exclude group: "com.simibubi.create" // create 5 💔💔
-    }
-
-    // Create
-    //modLocalRuntime("com.simibubi.create:create-fabric:6.0.8.1+build.1744-mc1.20.1")
-
-    // JEI / REI
-    if (recipe_viewer == "jei") {
-        // compile against the JEI API but do not include it at runtime
-        modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-        modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-        // at runtime, use the full JEI jar for Fabric
-        modLocalRuntime("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
-    } else if (recipe_viewer == "rei") {
-        // TODO: add rei to devenv
-    }
-
-    // Config mods
-    if (config_mod == "configured") {
-        modLocalRuntime "com.mrcrayfish:configured-fabric:${configured_version}"
-    } else if (config_mod == "cloth_config") {
-
-    } else if (config_mod == "owo") {
-
-    } else if (config_mod == "config_screens") {
-
-    }
+    modLocalRuntime libs.bundles.fabric.environment
 }
 
 loom {

@@ -11,12 +11,10 @@ base {
 apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
 
 neoForge {
-    neoFormVersion = neo_form_version
+    neoFormVersion = libs.versions.neoform.get()
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
+    parchment.minecraftVersion.set(libs.versions.parchment.minecraft.get())
+    parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
 }
 
 dependencies {

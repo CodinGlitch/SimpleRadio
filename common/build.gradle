@@ -4,15 +4,17 @@ plugins {
 }
 
 neoForge {
-    neoFormVersion = neo_form_version
+    neoFormVersion = libs.versions.neoform.get()
+
+    accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg'))
+
+    parchment.minecraftVersion.set(libs.versions.parchment.minecraft.get())
+    parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
+
     // Automatically enable AccessTransformers if the file exists
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
-    }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
     }
 }
 
@@ -25,37 +27,21 @@ repositories {
     }
 }
 
-/*minecraft {
-    version(minecraft_version)
-    def aw = file("src/main/resources/${mod_id}.accesswidener")
-    if(aw.exists()){
-        accessWideners(aw)
-    }
-}*/
-
 dependencies {
-    compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
+    compileOnly(libs.mixin)
 
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
-    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    compileOnly(libs.mixinextras.common)
 
     // --- Dependencies --- \\
+    implementation libs.voicechat.api
+    compileOnly libs.lexiconfig.api
 
-    implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
+    // --- Integrations --- \\
+    compileOnly libs.computercraft
+    implementation libs.vibrativevoice.api
+    compileOnly libs.valkyrienskies
 
-    // --- Compatibilities --- \\
-
-    // ComputerCraft
-    compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-common-api:$cc_version")
-
-    // Vibrative Voice
-    implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
-
-    // Valkyrien Skies
-    if (valkyrien_skies_env_versions.contains(minecraft_version))
-        compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}")
 }
 
 configurations {

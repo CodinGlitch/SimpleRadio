@@ -1,95 +1,58 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.gradle.userdev' version '7.0.107'
-    id "com.modrinth.minotaur" version "2.+"
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
+
+    alias(libs.plugins.moddevgradle)
 }
 
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
+//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
+//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
+//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
 
-// Automatically enable neoforge AccessTransformers if the file exists
-// This location is hardcoded in FML and can not be changed.
-// https://github.com/neoforged/FancyModLoader/blob/a952595eaaddd571fbc53f43847680b00894e0c1/loader/src/main/java/net/neoforged/fml/loading/moddiscovery/ModFile.java#L118
-def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-if (at.exists()) {
-    minecraft.accessTransformers.file at
-}
-runs {
-    client {
-        modSource project.sourceSets.main
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        idea {
-            primarySourceSet = sourceSets.development
+neoForge {
+    neoFormVersion = libs.versions.neoform.get()
+
+    accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg'))
+
+    parchment.minecraftVersion.set(libs.versions.parchment.minecraft.get())
+    parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
+
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
+        client {
+            client()
+        }
+        data {
+            data()
+
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+
+        }
+        server {
+            server()
         }
     }
-    server {
-        modSource project.sourceSets.main
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        idea {
-            primarySourceSet = sourceSets.development
-        }
-    }
-
-    gameTestServer {
-        modSource project.sourceSets.main
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-    }
-
-    data {
-        modSources project.sourceSets.main, project.sourceSets.datagen
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        idea {
-            primarySourceSet = sourceSets.datagen
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
         }
     }
 }
 
-sourceSets.main.resources.srcDir 'src/generated/resources'
+sourceSets.main.resources.srcDir "src/generated/resources"
 
 dependencies {
-    implementation "net.neoforged:neoforge:${neoforge_version}"
+    compileOnlyApi(libs.lexiconfig.api)
+    compileOnlyApi(libs.voicechat.api)
+    compileOnly(libs.neoforge.computercraft.api)
+    compileOnly(libs.vibrativevoice.api)
+    compileOnly(libs.neoforge.voicechat)
 
-    // --- Dependencies --- \\
-
-    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    runtimeOnly "com.codinglitch.lexiconfig:lexiconfig-neoforge:${lexiconfig_version}"
-
-    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    developmentRuntimeOnly "maven.modrinth:simple-voice-chat:neoforge-${minecraft_version}-${voicechat_version}"
-
-    // --- Compatibilities --- \\
-
-    // Vibrative Voice
-    implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
-
-    // Valkyrien Skies
-    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
-        compileOnly "org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-neoforge:${valkyrien_skies_version}"
-        compileOnly("org.valkyrienskies.core:api:${valkyrien_skies_api_version}") // forge wont inherit the api from common for some reason
-    }
-
-    if (recipe_viewer == "jei") {
-        // compile against the JEI API but do not include it at runtime
-        //compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-        //compileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-        // at runtime, use the full JEI jar for NeoForge
-        //runtimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
-    } else if (recipe_viewer == "rei") {
-        // TODO: add rei to devenv
-    }
-
-    // Config mods
-    if (config_mod == "configured") {
-        developmentRuntimeOnly "com.mrcrayfish:configured-neoforge:${configured_version}"
-    } else if (config_mod == "cloth_config") {
-
-    } else if (config_mod == "owo") {
-
-    } else if (config_mod == "config_screens") {
-
-    }
+    runtimeOnly libs.bundles.neoforge.environment
 }
 
 substituteResources.dependsOn compileDatagenJava, processDatagenResources
