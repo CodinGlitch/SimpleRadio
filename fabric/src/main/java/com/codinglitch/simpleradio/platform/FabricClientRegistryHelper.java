@@ -24,8 +24,4 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class FabricClientRegistryHelper implements ClientRegistryHelper {
-    @Override
-    public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerScreen(MenuType<? extends M> menuType, ScreenConstructor<M, U> screenConstructor) {
-        MenuScreens.register(menuType, screenConstructor::create);
-    }
 }

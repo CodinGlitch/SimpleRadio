@@ -47,7 +47,7 @@ public class FabricLoader {
     }
 
     public static void loadComponents() {
-        SimpleRadioComponents.COMPONENT_TYPES.forEach(((location, componentType) -> Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, CommonSimpleRadio.id(location), componentType)));
+        SimpleRadioComponents.COMPONENT_TYPES.forEach(((location, componentType) -> Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, location, componentType)));
     }
 
     public static void loadPackets() {
@@ -58,13 +58,19 @@ public class FabricLoader {
                 ServerPlayNetworking.registerGlobalReceiver(type, serverbound(handler));
             }
         });
+
+        SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
+            @Override
+            public <P extends CustomPacket> void register(CustomPacketPayload.Type<P> type, Class<P> packetClass, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
+                PayloadTypeRegistry.playS2C().register(type, codec);
+            }
+        });
     }
 
     public static void loadClientPackets() {
         SimpleRadioNetworking.loadClientbound(new SimpleRadioNetworking.ClientboundRegistry() {
             @Override
             public <P extends CustomPacket> void register(CustomPacketPayload.Type<P> type, Class<P> packetClass, StreamCodec<RegistryFriendlyByteBuf, P> codec, Consumer<P> handler) {
-                PayloadTypeRegistry.playS2C().register(type, codec);
                 ClientPlayNetworking.registerGlobalReceiver(type, clientbound(handler));
             }
         });

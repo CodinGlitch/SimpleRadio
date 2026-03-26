@@ -5,13 +5,14 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class SimpleRadioComponents {
-    public static final Map<String, DataComponentType<?>> COMPONENT_TYPES = new LinkedHashMap<>();
+    public static final Map<ResourceLocation, DataComponentType<?>> COMPONENT_TYPES = new LinkedHashMap<>();
 
     static PrimitiveCodec<UUID> UUID = new PrimitiveCodec<>() {
         @Override
@@ -61,7 +62,7 @@ public class SimpleRadioComponents {
     );
 
     private static <T> DataComponentType<T> register(String location, DataComponentType<T> componentType) {
-        COMPONENT_TYPES.put(location, componentType);
+        COMPONENT_TYPES.put(ResourceLocation.fromNamespaceAndPath("simpleradio", location), componentType);
         return componentType;
     }
 }
