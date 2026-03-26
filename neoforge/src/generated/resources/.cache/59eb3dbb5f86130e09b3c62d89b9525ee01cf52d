@@ -1,0 +1,10 @@
+// 1.21.1	2026-03-26T01:54:44.5717497	Loot Tables
+b89fe1935e18d27be75e2029cde64a7da0e1ef66 data/simpleradio/loot_table/blocks/antenna.json
+44102d7d898139e02e7024a0efe0f95c2ce14e17 data/simpleradio/loot_table/blocks/frequencer.json
+5c2d08f4efe7382321118ce85e8e092d1541de9c data/simpleradio/loot_table/blocks/insulator.json
+c7fd5ad593c3ef5de5b7cfd3812eebefa934c1ea data/simpleradio/loot_table/blocks/microphone.json
+bf4d769ab926db685afe025533905e835c4db552 data/simpleradio/loot_table/blocks/radio.json
+3ffd7fb7cfadbffa7a225074548018c811093d47 data/simpleradio/loot_table/blocks/radiosmither.json
+01ad984f6618568d97a5bf2630e2d2f6e08963a3 data/simpleradio/loot_table/blocks/receiver.json
+33e1514c2840e5dcc6dfcbaac354f26a47598c38 data/simpleradio/loot_table/blocks/speaker.json
+d612dab3a4d98f34b6eea0524d14ac782f1e2c20 data/simpleradio/loot_table/blocks/transmitter.json

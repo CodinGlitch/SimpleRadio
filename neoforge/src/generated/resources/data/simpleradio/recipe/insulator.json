@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "simpleradio:items_enabled",
+      "item": "insulator"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "pattern": [
+    "PIP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:insulator"
+  }
+}

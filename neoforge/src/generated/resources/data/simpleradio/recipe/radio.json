@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "simpleradio:items_enabled",
+      "item": "radio"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": {
+      "item": "simpleradio:antenna"
+    },
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "Y": {
+      "item": "simpleradio:speaker_module"
+    },
+    "Z": {
+      "item": "simpleradio:receiving_module"
+    }
+  },
+  "pattern": [
+    " ZA",
+    "RIC",
+    " Y "
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:radio"
+  }
+}

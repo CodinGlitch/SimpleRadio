@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "simpleradio:items_enabled",
+      "item": "spuddie_talkie"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "minecraft:potato"
+    }
+  },
+  "pattern": [
+    " I ",
+    " P ",
+    " C "
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:spuddie_talkie"
+  }
+}

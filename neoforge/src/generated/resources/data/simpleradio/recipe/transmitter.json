@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "simpleradio:items_enabled",
+      "item": "transmitter"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": {
+      "item": "simpleradio:antenna"
+    },
+    "B": {
+      "item": "minecraft:iron_block"
+    },
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "T": {
+      "item": "simpleradio:transmitting_module"
+    }
+  },
+  "pattern": [
+    " A ",
+    "QBT",
+    " C "
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:transmitter"
+  }
+}

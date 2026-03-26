@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "simpleradio:items_enabled",
+      "item": "radiosmither"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
+    "D": {
+      "item": "minecraft:polished_deepslate"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    " C ",
+    "IAI",
+    "DDD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:radiosmither"
+  }
+}
