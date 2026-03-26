@@ -15,6 +15,9 @@
     "icon": "assets/${mod_id}/${mod_id}.png",
     "environment": "*",
     "entrypoints": {
+        "fabric-gametest": [
+          "com.codinglitch.simpleradio.test.SystemTest"
+        ],
         "fabric-datagen": [
             "com.codinglitch.simpleradio.datagen.SimpleRadioDataGenerator"
         ],
