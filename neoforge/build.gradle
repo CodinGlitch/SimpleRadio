@@ -9,7 +9,7 @@ plugins {
 //apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
 
 neoForge {
-    neoFormVersion = libs.versions.neoform.get()
+    version = libs.versions.neoforge.asProvider().get()
 
     accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg'))
 
@@ -39,6 +39,7 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet sourceSets.main
+            sourceSet sourceSets.development
         }
     }
 }
@@ -52,6 +53,7 @@ dependencies {
     compileOnly(libs.vibrativevoice.api)
     compileOnly(libs.neoforge.voicechat)
 
+    runtimeOnly libs.neoforge.lexiconfig
     runtimeOnly libs.bundles.neoforge.environment
 }
 

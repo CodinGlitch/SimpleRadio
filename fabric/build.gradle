@@ -26,8 +26,15 @@ dependencies {
     compileOnly(libs.vibrativevoice.api)
 
     modCompileOnly(libs.fabric.voicechat)
+    modCompileOnly(libs.fabric.voicechatinteraction)
 
     modLocalRuntime libs.bundles.fabric.environment
+}
+
+fabricApi {
+    configureDataGeneration() {
+        setOutputDirectory(project(":fabric").file("src/main/generated"))
+    }
 }
 
 loom {
@@ -51,14 +58,18 @@ loom {
             ideConfigGenerated(true)
             source sourceSets.development
         }
+        gameTest {
+            server()
+            setConfigName("Fabric Game Test")
+            vmArg "-Dfabric-api.gametest=1"
+            runDir("runs/gametest")
+            ideConfigGenerated(true)
+            source sourceSets.development
+        }
     }
 }
 
-fabricApi {
-    configureDataGeneration() {
-        setOutputDirectory(project(":fabric").file("src/main/generated"))
-    }
-}
+
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
