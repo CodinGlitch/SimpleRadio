@@ -1,0 +1,45 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_version_range}"
+license = "${license}"
+issueTrackerURL="https://github.com/CodinGlitch/SimpleRadio/issues"
+
+[[mods]]
+    modId = "${mod_id}"
+    version = "${version}"
+    displayName = "${mod_name}"
+    displayURL="https://simpleradio.codinglitch.com"
+    logoFile="${mod_id}.png"
+    credits="${credits}"
+    authors = "${mod_author}"
+    description = '''${description}'''
+
+[[mixins]]
+    config = "${mod_id}.mixins.json"
+
+[[mixins]]
+    config = "${mod_id}.neoforge.mixins.json"
+
+[[dependencies.${mod_id}]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "${neoforge_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+[[dependencies.${mod_id}]]
+    modId = "minecraft"
+    type = "required"
+    versionRange = "${minecraft_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+[[dependencies.${mod_id}]]
+    modId="voicechat"
+    type = "required"
+    versionRange="[${minecraft_version}-${voicechat_version},)"
+    ordering="AFTER"
+    side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="lexiconfig"
+    type = "required"
+    versionRange="[${lexiconfig_version},)"
+    ordering="AFTER"
+    side="BOTH"

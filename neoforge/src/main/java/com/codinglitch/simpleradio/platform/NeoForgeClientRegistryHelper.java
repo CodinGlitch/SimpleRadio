@@ -15,8 +15,4 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NeoForgeClientRegistryHelper implements ClientRegistryHelper {
-    @Override
-    public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerScreen(MenuType<? extends M> menuType, ScreenConstructor<M, U> screenConstructor) {
-        MenuScreens.register(menuType, screenConstructor::create);
-    }
 }

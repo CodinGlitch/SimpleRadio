@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.api.central.WorldlyPosition;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSource;
@@ -49,6 +49,11 @@ public class NeoForgeCompatPlatform implements CompatPlatform {
         }
 
         return RadioManager.CollectionResult.PASS;
+    }
+
+    @Override
+    public String getSound(ItemStack stack) {
+        return "";
     }
 
     @Override

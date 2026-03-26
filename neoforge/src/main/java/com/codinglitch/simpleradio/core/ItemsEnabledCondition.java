@@ -2,11 +2,12 @@ package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.neoforged.neoforge.common.conditions.ICondition;
 
 public record ItemsEnabledCondition(String item) implements ICondition {
-    public static final Codec<ItemsEnabledCondition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+    public static final MapCodec<ItemsEnabledCondition> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
             Codec.STRING.fieldOf("item").forGetter(ItemsEnabledCondition::item)
     ).apply(builder, ItemsEnabledCondition::new));
 
@@ -21,7 +22,7 @@ public record ItemsEnabledCondition(String item) implements ICondition {
     }
 
     @Override
-    public Codec<? extends ICondition> codec() {
+    public MapCodec<? extends ICondition> codec() {
         return CODEC;
     }
 }
