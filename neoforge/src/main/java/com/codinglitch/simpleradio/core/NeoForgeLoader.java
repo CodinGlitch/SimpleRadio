@@ -6,6 +6,8 @@ import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
+import com.codinglitch.simpleradio.test.SystemTest;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
@@ -22,6 +24,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -98,6 +101,11 @@ public class NeoForgeLoader {
                 registrar.playToClient(type, codec, (packet, context) -> handler.accept(packet));
             }
         });
+    }
+
+    @SubscribeEvent
+    public static void loadTests(RegisterGameTestsEvent event) {
+        event.register(NeoSystemTest.class);
     }
 
     public static void load() {
