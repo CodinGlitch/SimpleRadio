@@ -1,10 +1,12 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
-    id "com.modrinth.minotaur" version "2.+"
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
+
+    alias(libs.plugins.legacyforge)
 }
+
+//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
+//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
+//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
 
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
@@ -24,52 +26,32 @@ components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
     skip()
 }
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
+legacyForge {
+    version = libs.versions.forge.asProvider().get()
 
-    copyIdeResources = true //Calls processResources when in dev
+    //validateAccessTransformers = true
 
-    // Automatically enable forge AccessTransformers if the file exists
-    // This location is hardcoded in Forge and can not be changed.
-    // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
-    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformer = at
-    }
+    accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg'))
+
+    parchment.minecraftVersion.set(libs.versions.parchment.minecraft.get())
+    parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
 
     runs {
         client {
-            workingDirectory file('runs/client')
-            ideaModule "${rootProject.name}.${project.name}.development"
-            taskName 'Client'
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                }
-            }
+            client()
         }
-
-        server {
-            workingDirectory file('runs/server')
-            ideaModule "${rootProject.name}.${project.name}.development"
-            taskName 'Server'
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                }
-            }
-        }
-
         data {
-            workingDirectory file('runs/data')
-            ideaModule "${rootProject.name}.${project.name}.datagen"
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            taskName 'Data'
-            mods {
-                modDataRun {
-                    source sourceSets.datagen
-                }
-            }
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        server {
+            server()
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.development
         }
     }
 }
@@ -77,81 +59,36 @@ minecraft {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
-    // --- Dependencies --- \\
+    implementation(libs.forge.etched)
 
-    compileOnly "com.codinglitch.lexiconfig:lexiconfig-api:${lexiconfig_version}"
-    developmentRuntimeOnly fg.deobf("com.codinglitch.lexiconfig:lexiconfig-forge:${lexiconfig_version}:slim")
+    compileOnly(libs.forge.computercraft.api)
+    compileOnly(libs.forge.voicechat)
+    runtimeOnly(libs.forge.lexiconfig)
 
-    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
-    compileOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
-    developmentRuntimeOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${minecraft_version}-${voicechat_version}")
+    compileOnly(libs.forge.create) { artifact { classifier = "slim" } }
+    compileOnly(libs.forge.ponder)
 
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}")) {
-        jarJar.ranged(it, "[${mixin_extras_version},)")
-    }
+    modCompileOnly(libs.forge.valkyrienskies) { transitive = false }
 
-    // --- Compatibilities --- \\
+    compileOnly(libs.mixinextras.common)
+    implementation(jarJar(libs.forge.mixinextras.get()))
 
-    // Audio Player
-    implementation fg.deobf("curse.maven:etched-491890:5999495")
-
-    // ComputerCraft
-    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${cc_version}")
-    compileOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${cc_version}"))
-    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}"))
-
-    // Vibrative Voice
-    implementation "com.codinglitch.vibrativevoice:vibrativevoice-api:${vibrative_voice_version}"
-
-    // Valkyrien Skies
-    if (valkyrien_skies_env_versions.contains(minecraft_version)) {
-        compileOnly fg.deobf("org.valkyrienskies:valkyrienskies-${minecraft_version.replace('.','')}-forge:${valkyrien_skies_version}")
-        compileOnly "org.valkyrienskies.core:api:${valkyrien_skies_api_version}" // forge wont inherit the api from common for some reason
-    }
-
-    // Create
-    if (create_env_versions.contains(minecraft_version)) {
-        compileOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        compileOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-        compileOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
-
-        developmentRuntimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-        developmentRuntimeOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-        developmentRuntimeOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-        developmentRuntimeOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
-    }
-
-    // JEI / REI
-    if (recipe_viewer == "jei") {
-        developmentRuntimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
-    } else if (recipe_viewer == "rei") {
-        // TODO: add rei to devenv
-    }
-
-    // Config mods
-    if (config_mod == "configured") {
-        developmentRuntimeOnly fg.deobf("com.mrcrayfish:configured-forge:${configured_version}")
-    } else if (config_mod == "cloth_config") {
-
-    } else if (config_mod == "owo") {
-
-    } else if (config_mod == "config_screens") {
-
-    }
+    modRuntimeOnly libs.bundles.forge.environment
 }
-
 
 tasks.named('jarJar') {
     archiveClassifier = ''
     //finalizedBy reobfJarJar
 }
-jar.archiveClassifier = "slim"
-jar.finalizedBy('reobfJar')
+jar {
+    archiveClassifier = "slim"
+    finalizedBy('reobfJar')
+    manifest.attributes([
+            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+    ])
+}
 
 sourceSets.each {
     def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
@@ -161,7 +98,3 @@ sourceSets.each {
 
 substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
 datagenClasses.finalizedBy substituteResources
-
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
-apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'

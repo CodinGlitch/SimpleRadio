@@ -1,0 +1,173 @@
+[versions]
+#---- Common ----#
+minecraft           = "1.20.1"
+minecraft_range     = "[1.20,1.20.1]"
+
+parchment_minecraft = "1.20.1"
+parchment_mappings  = "2023.09.03"
+
+#---- Fabric ----#
+fabric_api          = "0.92.5+1.20.1"
+fabric_loader       = "0.16.13"
+fabric_mc_range     = ">=1.20 <=1.20.1"
+
+#---- Forge ----#
+forge               = "1.20.1-47.4.0"
+forge_range         = "[47,)"
+
+#---- Plugins ----#
+loom                = "1.10-SNAPSHOT"
+legacy_forge        = "2.0.77"
+idea_ext            = "1.2"
+
+minotaur            = "2.+"
+curse_gradle        = "1.4.0"
+
+#---- Dependencies ----#
+mixin               = "0.8.5"
+mixin_extras        = "0.4.1"
+voicechat_api       = "2.4.11"
+voicechat           = "2.4.32"
+lexiconfig          = "1.4.18"
+
+#---- Environment ----#
+fabric_voicechat    = "fabric-1.20.1-2.4.32"
+forge_voicechat     = "forge-1.20.1-2.4.32"
+
+audioplayer         = "fabric-1.20.1-1.13.2"
+admiral             = "0.4.5+1.20.1+fabric"
+
+vc_interaction      = "fabric-1.20.1-1.0.5"
+polymer             = "0.5.19+1.20.1"
+
+jei                 = "15.20.0.106"
+configured          = "1.20.1-2.2.3"
+
+#---- Integrations ----#
+computercraft       = "1.116.1"
+
+vibrative_voice     = "1.0.0"
+
+etched              = "5999495"
+
+valkyrien_skies_api = "1.1.0+e26d9059c0"
+valkyrien_skies     = "2.4.8.1"
+
+create_fabric       = "6.0.8.1+build.1744-mc1.20.1"
+create              = "6.0.3-71"
+ponder              = "1.0.51"
+flywheel            = "1.0.1"
+registrate          = "MC1.20-1.3.3"
+
+
+[libraries]
+#---- Common ----#
+mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
+mixinextras-common = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin_extras" }
+
+voicechat_api = { group="de.maxhenkel.voicechat", name="voicechat-api", version.ref="voicechat_api" }
+lexiconfig_api = { group="com.codinglitch.lexiconfig", name="lexiconfig-api", version.ref="lexiconfig" }
+
+computercraft_common = { group="cc.tweaked", name="cc-tweaked-1.20.1-common-api", version.ref="computercraft" }
+computercraft_core = { group="cc.tweaked", name="cc-tweaked-1.20.1-core-api", version.ref="computercraft" }
+vibrativevoice_api = { group="com.codinglitch.vibrativevoice", name="vibrativevoice-api", version.ref="vibrative_voice" }
+valkyrienskies_api = { group="org.valkyrienskies.core", name="api", version.ref="valkyrien_skies_api"}
+valkyrienskies_common = { group="org.valkyrienskies", name="valkyrienskies-120-common", version.ref="valkyrien_skies"}
+
+jei = { group="mezz.jei", name="jei-1.20.1-common-api", version.ref="jei" }
+
+#---- Fabric ----#
+fabric = { group="net.fabricmc", name="fabric-loader", version.ref="fabric_loader" }
+fabric_api = { group="net.fabricmc.fabric-api", name="fabric-api", version.ref="fabric_api" }
+
+fabric_minecraft = { group="com.mojang", name="minecraft", version.ref="minecraft" }
+
+fabric_lexiconfig = { group="com.codinglitch.lexiconfig", name="lexiconfig-fabric", version.ref="lexiconfig" }
+fabric_voicechat = { group="maven.modrinth", name="simple-voice-chat", version.ref="fabric_voicechat" }
+
+fabric_audioplayer = { group="maven.modrinth", name="audioplayer", version.ref="audioplayer" }
+fabric_admiral = { group="maven.modrinth", name="admiral", version.ref="admiral" }
+
+fabric_voicechatinteraction = { group="maven.modrinth", name="voice-chat-interaction", version.ref="vc_interaction" }
+fabric_polymer = { group="eu.pb4", name="polymer-reg-sync-manipulator", version.ref="polymer" }
+
+fabric_computercraft_api = { group="cc.tweaked", name="cc-tweaked-1.20.1-fabric-api", version.ref="computercraft" }
+fabric_computercraft = { group="cc.tweaked", name="cc-tweaked-1.20.1-fabric", version.ref="computercraft" }
+
+fabric_valkyrienskies = { group="org.valkyrienskies", name="valkyrienskies-120-fabric", version.ref="valkyrien_skies" }
+
+fabric_create = { group="com.simibubi.create", name="create-fabric", version.ref="create_fabric"}
+
+fabric_jei = { group="mezz.jei", name="jei-1.20.1-fabric", version.ref="jei"}
+
+fabric_configured = { group="com.mrcrayfish", name="configured-fabric", version.ref="configured"}
+
+#---- Forge ----#
+forge_lexiconfig = { group="com.codinglitch.lexiconfig", name="lexiconfig-forge", version.ref="lexiconfig" }
+forge_voicechat = { group="maven.modrinth", name="simple-voice-chat", version.ref="forge_voicechat" }
+
+forge_minecraft = { group="net.minecraftforge", name="forge", version.ref="forge" }
+forge_mixinextras = { group="io.github.llamalad7", name="mixinextras-forge", version.ref="mixin_extras" }
+
+forge_computercraft_api = { group="cc.tweaked", name="cc-tweaked-1.20.1-forge-api", version.ref="computercraft" }
+forge_computercraft = { group="cc.tweaked", name="cc-tweaked-1.20.1-forge", version.ref="computercraft" }
+
+forge_etched = { group="curse.maven", name="etched-491890", version.ref="etched" }
+
+forge_valkyrienskies = { group="org.valkyrienskies", name="valkyrienskies-120-forge", version.ref="valkyrien_skies" }
+
+forge_create = { group="com.simibubi.create", name="create-1.20.1", version.ref="create"}
+forge_ponder = { group="net.createmod.ponder", name="Ponder-Forge-1.20.1", version.ref="ponder"}
+
+forge_jei = { group="mezz.jei", name="jei-1.20.1-forge", version.ref="jei"}
+
+forge_configured = { group="com.mrcrayfish", name="configured-forge", version.ref="configured"}
+
+[plugins]
+#---- Publishing ----#
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+cursegradle = { id = "net.darkhax.curseforgegradle", version.ref = "curse_gradle" }
+
+#---- Loaders ----#
+legacyforge = { id = "net.neoforged.moddev.legacyforge", version.ref = "legacy_forge" }
+ideaext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "idea_ext" }
+loom = { id = "fabric-loom", version.ref = "loom" }
+
+[bundles]
+#---- Fabric ----#
+fabric_modImpl = [ "fabric", "fabric_api" ]
+
+# All mods that should be enabled in the Fabric development environment.
+fabric_environment = [
+    "fabric_lexiconfig",
+    "fabric_voicechat",
+    "fabric_audioplayer",
+    "fabric_admiral",
+    "fabric_computercraft",
+    "fabric_voicechatinteraction",
+    "fabric_polymer",
+#    "vibrativevoice",
+#    "fabric_valkyrienskies",
+#    "fabric_create",
+
+    "fabric_jei",
+
+#    "fabric_configured" currently having issues including later fapi transitively (which breaks in dev for some reason??)
+]
+
+#---- Forge ----#
+
+# All mods that should be enabled in the Forge development environment.
+forge_environment = [
+    "forge_lexiconfig",
+    "forge_voicechat",
+    "forge_etched",
+    "forge_computercraft",
+    #    "vibrativevoice",
+    #    "forge_valkyrienskies",
+    #    "forge_create",
+
+    "forge_jei",
+
+    "forge_configured"
+]

@@ -1,7 +1,8 @@
 plugins {
     id 'java-library'
-    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
     id 'maven-publish'
+
+    alias(libs.plugins.legacyforge)
 }
 
 base {
@@ -10,8 +11,11 @@ base {
 
 apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
 
-minecraft {
-    version(minecraft_version)
+legacyForge {
+    mcpVersion = libs.versions.minecraft.asProvider().get()
+
+    parchment.minecraftVersion.set(libs.versions.parchment.minecraft.get())
+    parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
 }
 
 dependencies {

@@ -5,7 +5,7 @@ plugins {
 
 base {
     archivesName = "${mod_id}-${project.name}"
-    version = "${minecraft_version}-${version}"
+    version = "${libs.versions.minecraft.asProvider().get()}-${version}"
 }
 
 java {
@@ -17,10 +17,7 @@ java {
 
 repositories {
     mavenCentral()
-    maven {
-        name = 'Sponge / Mixin'
-        url = 'https://repo.spongepowered.org/repository/maven-public/'
-    }
+
     maven {
         name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
         url = 'https://maven.blamejared.com'
@@ -35,9 +32,23 @@ repositories {
         }
     }
 
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+
     maven { url 'https://maven.maxhenkel.de/repository/public' }
     maven { url 'https://maven.nucleoid.xyz' }
-    maven { url 'https://maven.codinglitch.com/repository/releases' }
+
+    exclusiveContent {
+        forRepositories(
+                maven { url 'https://maven.codinglitch.com/repository/releases' }
+        )
+        filter {
+            includeGroup('com.codinglitch.lexiconfig')
+            includeGroup('com.codinglitch.vibrativevoice')
+        }
+    }
 
     maven {
         // location of a maven mirror for JEI files, as a fallback
@@ -53,9 +64,17 @@ repositories {
         }
     }
 
-    maven {
-        name = "Valkyrien Skies Internal"
-        url = 'https://maven.valkyrienskies.org'
+    exclusiveContent {
+        forRepositories(
+                maven {
+                    name = "Valkyrien Skies"
+                    url = 'https://maven.valkyrienskies.org'
+                }
+        )
+        filter {
+            includeGroup('org.valkyrienskies')
+            includeGroup('org.valkyrienskies.core')
+        }
     }
 
     maven { url = "https://mvn.devos.one/releases" }
@@ -77,15 +96,37 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Sponge'
+                url = 'https://repo.spongepowered.org/repository/maven-public'
+            }
+        }
+        filter { includeGroupAndSubgroups('org.spongepowered') }
+    }
+    exclusiveContent {
+        forRepositories(
+                maven {
+                    name = 'ParchmentMC'
+                    url = 'https://maven.parchmentmc.org/'
+                },
+                maven {
+                    name = "NeoForge"
+                    url = 'https://maven.neoforged.net/releases'
+                }
+        )
+        filter { includeGroup('org.parchmentmc.data') }
+    }
 }
 
 // Declare capabilities on the outgoing configurations.
 // Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
     configurations."$variant".outgoing {
-        capability("$group:${project.name}:$version")
         capability("$group:${base.archivesName.get()}:$version")
-        capability("$group:$mod_id-${project.name}-${minecraft_version}:$version")
+        capability("$group:$mod_id-${project.name}-${libs.versions.minecraft.asProvider().get()}:$version")
         capability("$group:$mod_id-${project.name}:$version")
         capability("$group:$mod_id:$version")
     }
@@ -101,12 +142,17 @@ configurations {
 }
 
 dependencies {
-    implementation 'org.jetbrains:annotations:24.1.0'
-
     // --- Common --- \\
 
     implementation(project(':api'))
-    apiJava project(path: ':api', configuration: 'apiJava')
+    apiJava(project(path: ':api', configuration: 'apiJava'))
+
+    api(libs.voicechat.api)
+    api(libs.lexiconfig.api)
+
+    compileOnly(libs.vibrativevoice.api)
+    compileOnly(libs.computercraft.core)
+    compileOnly(libs.valkyrienskies.api)
 }
 
 sourcesJar {
@@ -128,50 +174,40 @@ jar {
                 'Implementation-Title'  : project.name,
                 'Implementation-Version': project.jar.archiveVersion,
                 'Implementation-Vendor' : mod_author,
-                'Built-On-Minecraft'    : minecraft_version
+                'Built-On-Minecraft'    : libs.versions.minecraft.asProvider().get()
         ])
     }
 }
 
-tasks.withType(ProcessResources).configureEach {
+processResources {
     def expandProps = [
             "version"                       : version,
             "group"                         : project.group, //Else we target the task's group.
-            "minecraft_version"             : minecraft_version,
-            "forge_version"                 : forge_version,
-            "forge_version_range"           : forge_version_range,
-            "minecraft_version_range"       : minecraft_version_range,
-            "fabric_version"                : fabric_version,
-            "fabric_loader_version"         : fabric_loader_version,
-            "fabric_minecraft_version_range": fabric_minecraft_version_range,
             "mod_name"                      : mod_name,
             "mod_author"                    : mod_author,
             "mod_id"                        : mod_id,
             "license"                       : license,
             "description"                   : project.description,
-            "neoforge_version"              : neoforge_version,
-            "neoforge_version_range"        : neoforge_version_range,
-            "voicechat_api_version"         : voicechat_api_version,
-            "voicechat_version"             : voicechat_version,
-            "voicechat_interaction_version" : voicechat_interaction_version,
-            "polymer_version"               : polymer_version,
-            "night_config_version"          : night_config_version,
-            "lexiconfig_version"            : lexiconfig_version,
-            "vibrative_voice_version"       : vibrative_voice_version,
-            "create_version"                : create_version,
-            "name_template"                 : name_template,
-            "modrinth_id"                   : modrinth_id,
-            "curseforge_id"                 : curseforge_id,
-            "supported_versions"            : supported_versions,
-            "requiredDependencies"          : requiredDependencies,
-            "optionalDependencies"          : optionalDependencies,
-            "release_type"                  : release_type,
-            "credits"                       : credits
+            "credits"                       : credits,
+
+            "minecraft_version"             : libs.versions.minecraft.asProvider().get(),
+            "minecraft_version_range"       : libs.versions.minecraft.range.get(),
+            "fabric_version"                : libs.versions.fabric.api.get(),
+            "fabric_loader_version"         : libs.versions.fabric.loader.get(),
+            "fabric_minecraft_version_range": libs.versions.fabric.mc.range.get(),
+            "forge_version"                 : libs.versions.forge.asProvider().get(),
+            "forge_version_range"           : libs.versions.forge.range.get(),
+
+            "lexiconfig_version"            : libs.versions.lexiconfig.get(),
+
+            "voicechat_api_version"         : libs.versions.voicechat.api.get(),
+            "voicechat_version"             : libs.versions.voicechat.asProvider().get(),
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
         expand expandProps
     }
     inputs.properties(expandProps)
+
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

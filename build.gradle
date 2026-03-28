@@ -1,4 +1,7 @@
 plugins {
-    // Required for NeoGradle
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
+    alias(libs.plugins.loom) apply false
+    alias(libs.plugins.legacyforge) apply false
+
+    // load-bearing version 💔
+    alias(libs.plugins.ideaext)
 }
