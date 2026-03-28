@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.compat.create;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
@@ -70,7 +71,7 @@ public class CreateCompat {
     private static void resetRouter(Router router, BlockPos pos, Level level) {
         if (router == null) return;
         router.setOwner(null);
-        router.setPosition(Services.COMPAT.modifyPosition(WorldlyPosition.of(pos, level, pos)));
+        router.setPosition(CompatCore.modifyPosition(WorldlyPosition.of(pos, level, pos)));
     }
 
     public static void contraptionRemoveBlock(Contraption contraption, Level level, BlockPos pos, BlockState state, CompoundTag tag) {

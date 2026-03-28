@@ -3,7 +3,6 @@ package com.codinglitch.simpleradio.platform;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.etched.EtchedCompat;
-import com.codinglitch.simpleradio.compat.ValkyrienCompat;
 import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
@@ -20,28 +19,6 @@ public class ForgeCompatPlatform implements CompatPlatform {
     @Override
     public void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
 
-    }
-
-    @Override
-    public WorldlyPosition modifyPosition(WorldlyPosition position) {
-
-        // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES.enabled) {
-            return ValkyrienCompat.modifyPosition(position);
-        }
-
-        return position;
-    }
-
-    @Override
-    public Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
-
-        // ---- Valkyrien Skies ---- \\
-        if (CompatCore.VALKYRIEN_SKIES.enabled) {
-            return ValkyrienCompat.modifyRotation(position, rotation);
-        }
-
-        return rotation;
     }
 
     @Override
