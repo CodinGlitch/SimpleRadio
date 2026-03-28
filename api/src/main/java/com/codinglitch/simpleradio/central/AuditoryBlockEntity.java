@@ -101,6 +101,8 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
 
         if (tag.contains("reference")) {
             this.id = tag.getUUID("reference");
+        } else {
+            this.id = UUID.randomUUID();
         }
     }
 

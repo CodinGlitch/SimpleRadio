@@ -105,8 +105,6 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         return 0;
     }
 
-
-
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
