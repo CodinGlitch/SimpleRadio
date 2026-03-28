@@ -47,10 +47,7 @@ neoForge {
 sourceSets.main.resources.srcDir "src/generated/resources"
 
 dependencies {
-    compileOnlyApi(libs.lexiconfig.api)
-    compileOnlyApi(libs.voicechat.api)
     compileOnly(libs.neoforge.computercraft.api)
-    compileOnly(libs.vibrativevoice.api)
     compileOnly(libs.neoforge.voicechat)
 
     runtimeOnly libs.neoforge.lexiconfig

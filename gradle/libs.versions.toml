@@ -1,7 +1,7 @@
 [versions]
 #---- Common ----#
 minecraft           = "1.21.1"
-minecraft_range     = "[1.21.1,1.21.1]"
+minecraft_range     = "[1.21,1.21.4]"
 
 parchment_minecraft = "1.21.1"
 parchment_mappings  = "2024.11.17"
@@ -12,7 +12,7 @@ fabric_loader       = "0.18.4"
 fabric_mc_range     = ">=1.21.1 <=1.21.1"
 
 #---- NeoForge ----#
-neoforge            = "21.1.162"
+neoforge            = "21.1.211"
 neoforge_range      = "[1,)"
 
 #---- Plugins ----#
@@ -28,7 +28,7 @@ mixin               = "0.8.5"
 mixin_extras        = "0.4.1"
 voicechat_api       = "2.6.0"
 voicechat           = "2.6.12"
-lexiconfig          = "1.4.18"
+lexiconfig          = "1.4.19"
 
 #---- Environment ----#
 fabric_voicechat    = "fabric-1.21.1-2.6.12"
@@ -59,6 +59,7 @@ ponder              = "1.0.81"
 flywheel            = "1.0.6"
 registrate          = "MC1.21-1.3.0+67"
 
+
 [libraries]
 #---- Common ----#
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
@@ -67,7 +68,8 @@ mixinextras-common = { group = "io.github.llamalad7", name = "mixinextras-common
 voicechat_api = { group="de.maxhenkel.voicechat", name="voicechat-api", version.ref="voicechat_api" }
 lexiconfig_api = { group="com.codinglitch.lexiconfig", name="lexiconfig-api", version.ref="lexiconfig" }
 
-computercraft = { group="cc.tweaked", name="cc-tweaked-1.21.1-common-api", version.ref="computercraft" }
+computercraft_common = { group="cc.tweaked", name="cc-tweaked-1.21.1-common-api", version.ref="computercraft" }
+computercraft_core = { group="cc.tweaked", name="cc-tweaked-1.21.1-core-api", version.ref="computercraft" }
 vibrativevoice_api = { group="com.codinglitch.vibrativevoice", name="vibrativevoice-api", version.ref="vibrative_voice" }
 valkyrienskies = { group="org.valkyrienskies.core", name="api", version.ref="valkyrien_skies_api"}
 
@@ -116,8 +118,6 @@ neoforge_jei = { group="mezz.jei", name="jei-1.21.1-neoforge", version.ref="jei"
 
 neoforge_configured = { group="com.mrcrayfish", name="configured-neoforge", version.ref="configured"}
 
-#---- NeoForge ----#
-
 
 [plugins]
 #---- Publishing ----#
@@ -127,6 +127,7 @@ cursegradle = { id = "net.darkhax.curseforgegradle", version.ref = "curse_gradle
 #---- Loaders ----#
 moddevgradle = { id = "net.neoforged.moddev", version.ref = "mod_dev_gradle" }
 loom = { id = "fabric-loom", version.ref = "loom" }
+
 
 [bundles]
 #---- Fabric ----#
@@ -147,7 +148,7 @@ fabric_environment = [
 
     "fabric_jei",
 
-    "fabric_configured"
+#    "fabric_configured" currently having issues including later fapi transitively (which breaks in dev for some reason??)
 ]
 
 #---- NeoForge ----#

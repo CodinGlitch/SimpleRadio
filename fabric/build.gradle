@@ -20,10 +20,7 @@ dependencies {
 
     modImplementation libs.bundles.fabric.modImpl
 
-    compileOnlyApi(libs.lexiconfig.api)
-    compileOnlyApi(libs.voicechat.api) { artifact { classifier = "fabric-stub" } }
     modCompileOnly(libs.fabric.computercraft.api)
-    compileOnly(libs.vibrativevoice.api)
 
     modCompileOnly(libs.fabric.voicechat)
     modCompileOnly(libs.fabric.voicechatinteraction)

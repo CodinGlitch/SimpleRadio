@@ -34,15 +34,10 @@ dependencies {
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly(libs.mixinextras.common)
 
-    // --- Dependencies --- \\
-    implementation libs.voicechat.api
-    compileOnly libs.lexiconfig.api
-
     // --- Integrations --- \\
-    compileOnly libs.computercraft
-    implementation libs.vibrativevoice.api
-    compileOnly libs.valkyrienskies
+    compileOnly(libs.computercraft.common)
 
+//    compileOnly(libs.forge.valkyrienskies)
 }
 
 configurations {
