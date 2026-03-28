@@ -16,9 +16,6 @@ public interface CompatPlatform {
 
     void onData(RadioSpeaker channel, RadioSource source, short[] decoded);
 
-    WorldlyPosition modifyPosition(WorldlyPosition position);
-    Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation);
-
     RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
     RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria);
 

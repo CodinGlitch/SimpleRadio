@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.CommonValkyrienCompat;
 import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
 import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.joml.Quaternionf;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -90,6 +92,23 @@ public class CompatCore {
             CommonCCCompat.acceptSource(router, source);
         }
     }
+
+    public static WorldlyPosition modifyPosition(WorldlyPosition position) {
+        if (CompatCore.VALKYRIEN_SKIES.isLoaded) {
+            CommonValkyrienCompat.modifyPosition(position);
+        }
+
+        return position;
+    }
+
+    public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+        if (CompatCore.VALKYRIEN_SKIES.isLoaded) {
+            CommonValkyrienCompat.modifyRotation(position, rotation);
+        }
+
+        return rotation;
+    }
+
 
     public static String getSound(ItemStack stack) {
         String result = Services.COMPAT.getSound(stack);

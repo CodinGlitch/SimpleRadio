@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
@@ -113,7 +114,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     }
 
     public void activate() {
-        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+        WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
         this.receiver = SimpleRadioBlocks.RADIO.getOrCreateReceiver(location, this.frequency, id, this.getBlockState());

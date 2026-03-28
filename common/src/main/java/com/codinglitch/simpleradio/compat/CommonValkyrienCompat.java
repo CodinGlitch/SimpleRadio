@@ -6,9 +6,11 @@ import org.joml.Matrix4dc;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class CommonValkyrienCompat {
-    public static WorldlyPosition modifyPosition(Ship ship, WorldlyPosition position) {
+    public static WorldlyPosition modifyPosition(WorldlyPosition position) {
+        Ship ship = VSGameUtilsKt.getLoadedShipManagingPos(position.level, position.realLocation());
         if (ship != null) {
             BlockPos realLocation = position.realLocation();
 
@@ -21,10 +23,12 @@ public class CommonValkyrienCompat {
             position.z = (float) blockOnShip.z;
         }
 
+
         return position;
     }
 
-    public static Quaternionf modifyRotation(Ship ship, Quaternionf rotation) {
+    public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+        Ship ship = VSGameUtilsKt.getLoadedShipManagingPos(position.level, position.realLocation());
         if (ship != null) {
             Matrix4dc shipToWorld = ship.getTransform().getShipToWorld();
             rotation = new Quaternionf(shipToWorld.getNormalizedRotation(new Quaternionf()));
