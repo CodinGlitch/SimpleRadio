@@ -15,8 +15,54 @@ java {
     withJavadocJar()
 }
 
+void exclusiveGroup(MavenArtifactRepository repo, String... groups) {
+    repositories.exclusiveContent {
+        forRepository { repo }
+        filter {
+            for (final def g in groups) includeGroup g
+        }
+    }
+}
+void exclusiveGroup(String uri, String... groups) {
+    exclusiveGroup(repositories.maven { url = uri }, groups)
+}
+
+void exclusiveRegex(String uri, String... regexes) {
+    repositories.exclusiveContent {
+        forRepository { repositories.maven { url = uri } }
+        filter {
+            for (final def regex in regexes) includeGroupByRegex regex
+        }
+    }
+}
+
 repositories {
     mavenCentral()
+
+    maven { url "https://modmaven.dev" }
+
+    exclusiveGroup(maven {
+        url "https://maven.pkg.github.com/MrCrayfish/Maven"
+        credentials {
+            username = "CodinGlitch"
+            password = project.property("github_token")
+        }
+    }, "com.mrcrayfish")
+
+    exclusiveRegex("https://maven.codinglitch.com/repository/releases", "com\\.codinglitch.*") // Lexiconfig, Vibrative Voice
+
+    exclusiveGroup("https://maven.nucleoid.xyz", "eu.pb4") // Polymer
+    //exclusiveGroup("https://maven.terraformersmc.com/", "") // ModMenu
+    exclusiveGroup("https://maven.maxhenkel.de/repository/public", "de.maxhenkel.voicechat") // SVC
+    exclusiveGroup("https://maven.blamejared.com", "mezz.jei") // JEI
+    exclusiveGroup("https://maven.squiddev.cc", "cc.tweaked") // CC: Tweaked
+    exclusiveGroup("https://maven.createmod.net", "net.createmod.ponder", "com.simibubi.create") // Create
+    exclusiveGroup("https://maven.tterrag.com", "com.tterrag.registrate") // Registrate
+    exclusiveRegex("https://maven.valkyrienskies.org", "org\\.valkyrienskies.*") // Valkyrien Skies
+
+    maven { url "https://api.modrinth.com/maven" }
+    maven { url "https://cursemaven.com" }
+
     exclusiveContent {
         forRepository {
             maven {
@@ -38,68 +84,6 @@ repositories {
                 }
         )
         filter { includeGroup('org.parchmentmc.data') }
-    }
-
-    maven {
-        name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
-        url = 'https://maven.blamejared.com'
-    }
-
-    maven {
-        name = "MrCrayfish (GitHub)"
-        url = "https://maven.pkg.github.com/MrCrayfish/Maven"
-        credentials {
-            username = "CodinGlitch"
-            password = project.property("github_token")
-        }
-    }
-
-    maven {
-        name = "Terraformers"
-        url = "https://maven.terraformersmc.com/"
-    }
-
-    maven { url 'https://maven.maxhenkel.de/repository/public' }
-    maven { url 'https://maven.nucleoid.xyz' }
-    maven { url 'https://maven.codinglitch.com/repository/releases' }
-
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-
-    maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-        content {
-            includeGroup "maven.modrinth"
-        }
-    }
-
-    maven {
-        name = "Valkyrien Skies Internal"
-        url = 'https://maven.valkyrienskies.org'
-    }
-
-    maven { url = "https://mvn.devos.one/releases" }
-    maven { url = "https://mvn.devos.one/snapshots" }
-    maven { url = "https://maven.createmod.net" }
-    maven { url = "https://maven.tterrag.com" }
-    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
-
-    maven {
-        url "https://maven.squiddev.cc"
-        content {
-            includeGroup("cc.tweaked")
-        }
-    }
-
-    maven {
-        url "https://cursemaven.com"
-        content {
-            includeGroup "curse.maven"
-        }
     }
 }
 
@@ -135,7 +119,6 @@ dependencies {
     compileOnly(libs.computercraft.core)
 //    compileOnly(libs.valkyrienskies.api)
 }
-
 
 sourcesJar {
     from(rootProject.file("LICENSE")) {
