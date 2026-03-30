@@ -47,36 +47,24 @@ loom {
             client()
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("runs/client")
+            source sourceSets.development
         }
         server {
             server()
             setConfigName("Fabric Server")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("runs/server")
+            source sourceSets.development
         }
-
-//        client {
-//            client()
-//            setConfigName("Fabric Client")
-//            ideConfigGenerated(true)
-//            runDir("runs/client")
-//            source sourceSets.development
-//        }
-//        server {
-//            server()
-//            setConfigName("Fabric Server")
-//            ideConfigGenerated(true)
-//            runDir("runs/server")
-//            source sourceSets.development
-//        }
-//        gameTest {
-//            server()
-//            setConfigName("Fabric Game Test")
-//            vmArg "-Dfabric-api.gametest=1"
-//            runDir("runs/gametest")
-//            ideConfigGenerated(true)
-//            source sourceSets.development
-//        }
+        gameTest {
+            server()
+            setConfigName("Fabric Game Test")
+            vmArg "-Dfabric-api.gametest=1"
+            vmArg "-Dfabric.log.level=debug"
+            runDir("runs/gametest")
+            ideConfigGenerated(true)
+            source sourceSets.development
+        }
     }
 }
