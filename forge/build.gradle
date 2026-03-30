@@ -52,8 +52,8 @@ legacyForge {
             server()
         }
         gameTestServer {
-            server()
-            systemProperty('forge.enabledGameTestNamespaces', "${mod_id}")
+            type = "gameTestServer"
+            gameDirectory = project.file("run/gametest")
         }
     }
     mods {

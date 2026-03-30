@@ -17,7 +17,7 @@ forge_range         = "[47,)"
 
 #---- Plugins ----#
 loom                = "1.10-SNAPSHOT"
-legacy_forge        = "2.0.77"
+legacy_forge        = "2.0.141"
 idea_ext            = "1.2"
 
 minotaur            = "2.+"
