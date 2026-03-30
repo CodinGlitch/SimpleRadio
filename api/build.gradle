@@ -20,6 +20,7 @@ legacyForge {
 
 dependencies {
     compileOnly(libs.mixin)
+    compileOnly(libs.mixinextras.common)
     //compileOnly project(":common")
 }
 
