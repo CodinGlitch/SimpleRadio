@@ -19,6 +19,7 @@ neoForge {
 }
 
 dependencies {
+    compileOnly(libs.mixin)
     //compileOnly project(":common")
 }
 
@@ -27,8 +28,13 @@ configurations {
         canBeResolved = false
         canBeConsumed = true
     }
+    apiResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
 }
 
 artifacts {
     apiJava sourceSets.main.java.sourceDirectories.singleFile
+    apiResources sourceSets.main.resources.sourceDirectories.singleFile
 }
