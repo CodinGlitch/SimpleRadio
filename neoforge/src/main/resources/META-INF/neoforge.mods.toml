@@ -17,6 +17,9 @@ issueTrackerURL="https://github.com/CodinGlitch/SimpleRadio/issues"
     config = "${mod_id}.mixins.json"
 
 [[mixins]]
+    config = "${mod_id}.api.mixins.json"
+
+[[mixins]]
     config = "${mod_id}.neoforge.mixins.json"
 
 [[dependencies.${mod_id}]]

@@ -10,17 +10,18 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class SimpleRadioTestFunction extends TestFunction {
+public class SimpleRadioTestFunction {
     public static final Map<String, SimpleRadioTestFunction> FUNCTIONS = new HashMap<>();
 
     public final String id;
     public final String name;
+    public final TestFunction func;
 
     protected SimpleRadioTestFunction(
             String id, String name, String batch, String template, Rotation rot, int maxTicks, long setupTicks,
             boolean required, int requiredSuccesses, int maxAttempts, Consumer<GameTestHelper> consumer
     ) {
-        super(batch, template, template, rot, maxTicks, setupTicks, required, requiredSuccesses, maxAttempts, consumer);
+        this.func = new TestFunction(batch, name, template, rot, maxTicks, setupTicks, required, false, maxAttempts, requiredSuccesses, true, consumer);
         this.id = id;
         this.name = name;
 
@@ -35,7 +36,7 @@ public class SimpleRadioTestFunction extends TestFunction {
             SimpleRadioTestFunction func = SimpleRadioTestFunction.from(clazz, method);
             if (func == null) continue;
 
-            functions.add(func);
+            functions.add(func.func);
         }
 
         return functions;
@@ -79,10 +80,5 @@ public class SimpleRadioTestFunction extends TestFunction {
                 gameTest.required(), gameTest.requiredSuccesses(), gameTest.attempts(),
                 consumer
         );
-    }
-
-    @Override
-    public @NotNull String getTestName() {
-        return name;
     }
 }

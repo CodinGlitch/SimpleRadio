@@ -16,7 +16,7 @@
     "environment": "*",
     "entrypoints": {
         "fabric-gametest": [
-          "com.codinglitch.simpleradio.test.SystemTest"
+            "com.codinglitch.simpleradio.gametest.SimpleRadioTests"
         ],
         "fabric-datagen": [
             "com.codinglitch.simpleradio.datagen.SimpleRadioDataGenerator"
@@ -36,6 +36,7 @@
     },
     "mixins": [
         "${mod_id}.mixins.json",
+        "${mod_id}.api.mixins.json",
         "${mod_id}.fabric.mixins.json"
     ],
     "depends": {

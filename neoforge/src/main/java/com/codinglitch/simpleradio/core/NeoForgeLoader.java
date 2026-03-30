@@ -6,23 +6,19 @@ import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
-import com.codinglitch.simpleradio.test.SystemTest;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.codinglitch.simpleradio.gametest.SimpleRadioTests;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -33,7 +29,6 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @EventBusSubscriber(modid = CommonSimpleRadio.ID)
@@ -105,7 +100,7 @@ public class NeoForgeLoader {
 
     @SubscribeEvent
     public static void loadTests(RegisterGameTestsEvent event) {
-        event.register(NeoSystemTest.class);
+        event.register(SimpleRadioTests.class);
     }
 
     public static void load() {
