@@ -12,6 +12,7 @@ mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
     config("${mod_id}.mixins.json")
+    config("${mod_id}.api.mixins.json")
     config("${mod_id}.forge.mixins.json")
 }
 
@@ -37,6 +38,9 @@ legacyForge {
     parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
 
     runs {
+        configureEach {
+            ideName = "Forge ${it.name.capitalize()} (${project.path})"
+        }
         client {
             client()
         }
@@ -46,6 +50,10 @@ legacyForge {
         }
         server {
             server()
+        }
+        gameTestServer {
+            server()
+            systemProperty('forge.enabledGameTestNamespaces', "${mod_id}")
         }
     }
     mods {
