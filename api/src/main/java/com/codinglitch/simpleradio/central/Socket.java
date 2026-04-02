@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.central;
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
+import net.minecraft.world.entity.Entity;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +89,7 @@ public interface Socket {
 
         if (!location.isClientSide()) ServerSimpleRadioApi.getInstance().shortAt(location);
 
-        for (Wiring wire : getWires()) {
+        for (Wiring wire : getWires().stream().toList()) {
             wire.burnOut();
         }
 

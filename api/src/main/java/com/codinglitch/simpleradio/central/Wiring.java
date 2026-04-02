@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -45,6 +46,7 @@ public interface Wiring extends Medium {
 
     boolean isValid();
 
+    void burnOut(Entity.RemovalReason reason);
     void burnOut();
 
     void shortCircuit(Vector3f at);

@@ -259,9 +259,14 @@ public class Wire extends Entity implements Wiring {
     }
 
     @Override
-    public void burnOut() {
+    public void burnOut(RemovalReason reason) {
         RadioManager.getInstance().dequeueSource(queuedSource -> queuedSource.source.getWireMedium() == this);
-        this.kill();
+        this.remove(reason);
+    }
+
+    @Override
+    public void burnOut() {
+        this.burnOut(RemovalReason.KILLED);
     }
 
     @Override
@@ -386,6 +391,11 @@ public class Wire extends Entity implements Wiring {
 
     @Override
     public void remove(RemovalReason reason) {
+        if (!reason.shouldDestroy()) {
+            super.remove(reason);
+            return;
+        }
+
         ItemEntity drop = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), new ItemStack(SimpleRadioItems.COPPER_WIRE, 1));
         this.level().addFreshEntity(drop);
         cleanUp();
