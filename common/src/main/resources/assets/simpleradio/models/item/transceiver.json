@@ -3,18 +3,18 @@
   "overrides": [
     {
       "predicate": {
-        "using": 1
+        "simpleradio:using": 1
       },
       "model": "simpleradio:item/transceiver/using_transceiver_in_hand"
     }, {
       "predicate": {
-        "speaking": 1
+        "simpleradio:speaking": 1
       },
       "model": "simpleradio:item/transceiver/glowing_transceiver_in_hand"
     }, {
       "predicate": {
-        "using": 1,
-        "speaking": 1
+        "simpleradio:using": 1,
+        "simpleradio:speaking": 1
       },
       "model": "simpleradio:item/transceiver/using_glowing_transceiver_in_hand"
     }
