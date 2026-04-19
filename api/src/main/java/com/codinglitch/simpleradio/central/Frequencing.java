@@ -160,7 +160,7 @@ public interface Frequencing {
         if (Screen.hasShiftDown() && stack.has(REFERENCE)) {
             components.add(Component.translatable(
                     "tooltip.simpleradio.receiver_user",
-                    stack.get(REFERENCE)
+                    stack.get(REFERENCE).toString()
             ).withStyle(ChatFormatting.DARK_GRAY));
         }
     }
