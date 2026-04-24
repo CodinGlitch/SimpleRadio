@@ -56,6 +56,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         Receiver receiver = startReceiving(entity, frequencyName, frequencies.modulationOf(modulation), owner);
         Transmitter transmitter = startTransmitting(entity, frequencyName, frequencies.modulationOf(modulation), owner);
 
+        // what the hell was this for
         if (speaker.getOwner().level() != level) {
             CommonSimpleRadio.info(level);
         }
