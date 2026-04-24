@@ -1,7 +1,5 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.ClientSimpleRadioApi;
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.core.BlockPos;
@@ -79,8 +77,10 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
             this.frequency = api.frequencies().getOrCreate(frequencyName, modulation);
         }
 
-        if (tag.contains("uuid")) {
-            this.id = tag.getUUID("uuid");
+        if (tag.contains("reference")) {
+            this.id = tag.getUUID("reference");
+        } else if (hasLevel() && !level.isClientSide) {
+            this.id = UUID.randomUUID();
         }
     }
 
@@ -91,7 +91,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
         }
 
         if (this.id != null) {
-            tag.putUUID("uuid", this.id);
+            tag.putUUID("reference", this.id);
         }
     }
 
