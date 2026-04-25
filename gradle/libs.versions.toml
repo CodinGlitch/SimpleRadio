@@ -12,11 +12,11 @@ fabric_loader       = "0.18.4"
 fabric_mc_range     = ">=1.21.1 <=1.21.1"
 
 #---- NeoForge ----#
-neoforge            = "21.1.211"
+neoforge            = "21.1.219"
 neoforge_range      = "[1,)"
 
 #---- Plugins ----#
-loom                = "1.14-SNAPSHOT"
+loom                = "1.15-SNAPSHOT"
 neoform             = "1.21.1-20240808.144430"
 mod_dev_gradle      = "2.0.123"
 
@@ -43,6 +43,9 @@ polymer             = "0.9.9+1.21"
 jei                 = "19.21.0.247"
 configured          = "1.21.1-2.6.2"
 
+fabric_sable        = "9iwrgmBq"
+neoforge_sable      = "g8CObHcP"
+
 #---- Integrations ----#
 computercraft       = "1.117.0"
 
@@ -52,6 +55,8 @@ etched              = "7088631"
 
 valkyrien_skies_api = "1.1.0+e26d9059c0"
 valkyrien_skies     = "2.3.0-beta.5+2e2d63a807"
+
+sable_companion     = "1.6.0"
 
 create_fabric       = "6.0.8.1+build.1744-mc1.20.1"
 create              = "create-1.21.1-6.0.9-215"
@@ -72,6 +77,8 @@ computercraft_common = { group="cc.tweaked", name="cc-tweaked-1.21.1-common-api"
 computercraft_core = { group="cc.tweaked", name="cc-tweaked-1.21.1-core-api", version.ref="computercraft" }
 vibrativevoice_api = { group="com.codinglitch.vibrativevoice", name="vibrativevoice-api", version.ref="vibrative_voice" }
 valkyrienskies = { group="org.valkyrienskies.core", name="api", version.ref="valkyrien_skies_api"}
+
+sablecompanion = { group="dev.ryanhcode.sable-companion", name="sable-companion-common-1.21.1", version.ref="sable_companion"}
 
 jei = { group="mezz.jei", name="jei-1.21.1-common-api", version.ref="jei" }
 
@@ -95,6 +102,9 @@ fabric_computercraft = { group="cc.tweaked", name="cc-tweaked-1.21.1-fabric", ve
 
 fabric_valkyrienskies = { group="org.valkyrienskies", name="valkyrienskies-1211-fabric", version.ref="valkyrien_skies" }
 
+fabric_sablecompanion = { group="dev.ryanhcode.sable-companion", name="sable-companion-fabric-1.21.1", version.ref="sable_companion"}
+fabric_sable = { group="maven.modrinth", name="sable", version.ref="fabric_sable" }
+
 fabric_create = { group="com.simibubi.create", name="create-fabric", version.ref="create_fabric"}
 
 fabric_jei = { group="mezz.jei", name="jei-1.21.1-fabric", version.ref="jei"}
@@ -111,6 +121,8 @@ neoforge_computercraft = { group="cc.tweaked", name="cc-tweaked-1.21.1-forge", v
 neoforge_etched = { group="curse.maven", name="etched-491890", version.ref="etched" }
 
 neoforge_valkyrienskies = { group="org.valkyrienskies", name="valkyrienskies-1211-neoforge", version.ref="valkyrien_skies" }
+
+neoforge_sable = { group="maven.modrinth", name="sable", version.ref="neoforge_sable" }
 
 neoforge_create = { group="com.simibubi.create", name="create-neoforge", version.ref="create"}
 
@@ -142,6 +154,7 @@ fabric_environment = [
     "fabric_computercraft",
     "fabric_voicechatinteraction",
     "fabric_polymer",
+    "fabric_sable",
 #    "vibrativevoice",
 #    "fabric_valkyrienskies",
 #    "fabric_create",
@@ -159,6 +172,7 @@ neoforge_environment = [
     "neoforge_voicechat",
     "neoforge_etched",
     "neoforge_computercraft",
+    "neoforge_sable",
     #    "vibrativevoice",
     #    "neoforge_valkyrienskies",
     #    "neoforge_create",

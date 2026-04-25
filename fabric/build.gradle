@@ -21,6 +21,7 @@ dependencies {
     modImplementation libs.bundles.fabric.modImpl
 
     modCompileOnly(libs.fabric.computercraft.api)
+    modCompileOnly(libs.fabric.sablecompanion)
 
     modCompileOnly(libs.fabric.voicechat)
     modCompileOnly(libs.fabric.voicechatinteraction)

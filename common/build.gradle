@@ -30,6 +30,7 @@ dependencies {
 
     // --- Integrations --- \\
     compileOnly(libs.computercraft.common)
+    compileOnly(libs.sablecompanion)
 
 //    compileOnly(libs.forge.valkyrienskies)
 }

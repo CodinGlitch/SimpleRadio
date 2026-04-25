@@ -54,6 +54,8 @@ dependencies {
     compileOnly(libs.neoforge.computercraft.api)
     compileOnly(libs.neoforge.voicechat)
 
+    compileOnly(libs.sablecompanion)
+
     runtimeOnly libs.neoforge.lexiconfig
     runtimeOnly libs.bundles.neoforge.environment
 }

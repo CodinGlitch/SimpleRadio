@@ -59,6 +59,7 @@ repositories {
     exclusiveGroup("https://maven.createmod.net", "net.createmod.ponder", "com.simibubi.create") // Create
     exclusiveGroup("https://maven.tterrag.com", "com.tterrag.registrate") // Registrate
     exclusiveRegex("https://maven.valkyrienskies.org", "org\\.valkyrienskies.*") // Valkyrien Skies
+    exclusiveRegex("https://maven.ryanhcode.dev/releases", "dev\\.ryanhcode.*") // Sable
 
     maven { url "https://api.modrinth.com/maven" }
     maven { url "https://cursemaven.com" }
