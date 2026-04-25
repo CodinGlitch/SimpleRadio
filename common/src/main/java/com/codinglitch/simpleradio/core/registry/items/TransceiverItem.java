@@ -49,6 +49,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
+        CommonSimpleRadio.info("Activating transceiver with reference {}", owner);
         Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
 
         Listener listener = startListening(entity, owner);
