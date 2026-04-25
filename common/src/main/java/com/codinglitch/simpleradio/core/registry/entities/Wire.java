@@ -339,28 +339,25 @@ public class Wire extends Entity implements Wiring {
                     this.kill();
                     return;
                 }
-                List<Router> r = RadioManager.getInstance().getRouters();
-
                 RadioRouter from = (RadioRouter) RadioManager.getInstance().getRouter(fromRef, fromType);
                 RadioRouter to = (RadioRouter) RadioManager.getInstance().getRouter(toRef, toType);
 
-
                 if (from == null) {
-                    CommonSimpleRadio.info("Ticking death via missing FROM");
+                    CommonSimpleRadio.debug("Ticking wire death via missing FROM");
                     if (to != null) this.moveTo(new Vec3(to.getLocation().position()));
                     this.tickDeath();
                     return;
                 }
 
                 if (to == null) {
-                    CommonSimpleRadio.info("Ticking death via missing TO");
+                    CommonSimpleRadio.debug("Ticking wire death via missing TO");
                     this.moveTo(new Vec3(from.getLocation().position()));
                     this.tickDeath();
                     return;
                 }
 
                 if (from.getLocation().position().distance(to.getLocation().position()) > SimpleRadioLibrary.SERVER_CONFIG.wire.range) {
-                    CommonSimpleRadio.info("Ticking death via distance");
+                    CommonSimpleRadio.debug("Ticking wire death via distance");
                     this.tickDeath();
                     return;
                 }

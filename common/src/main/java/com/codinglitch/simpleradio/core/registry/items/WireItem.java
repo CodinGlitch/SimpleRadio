@@ -37,7 +37,6 @@ public class WireItem extends Item implements WorldTicking {
 
         BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof Socket interactingSocket) {
-            CommonSimpleRadio.info(interactingSocket.getReference());
 
             if (!interactingSocket.canConnect()) return super.useOn(context);
 
