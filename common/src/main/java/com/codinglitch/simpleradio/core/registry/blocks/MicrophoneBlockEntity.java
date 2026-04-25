@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Listening;
@@ -92,7 +93,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         this.isActive = false;
     }
     public void activate() {
-        WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+        WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
         this.listener.setActive(this.listening);

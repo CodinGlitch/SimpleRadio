@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
@@ -107,7 +108,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
 
     public static void tick(Level level, BlockPos pos, BlockState state, InsulatorBlockEntity blockEntity) {
         if (blockEntity.router == null && blockEntity.id != null) {
-            WorldlyPosition location = Services.COMPAT.modifyPosition(WorldlyPosition.of(pos, level, pos));
+            WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(pos, level, pos));
 
             blockEntity.router = (RadioRouter) SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, blockEntity.id, state);
         }

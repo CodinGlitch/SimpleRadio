@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.CommonSableCompat;
 import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.platform.Services;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.joml.Quaternionf;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +47,9 @@ public class CompatCore {
     public static CompatibilityInstance AUDIO_PLAYER = new CompatibilityInstance(
             "AudioPlayer", "audioplayer", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.audioplayer
     );
+    public static CompatibilityInstance SABLE = new CompatibilityInstance(
+            "Sable", "sable", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.sable
+    );
 
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
@@ -56,6 +61,7 @@ public class CompatCore {
 
         VALKYRIEN_SKIES.spout();
         CREATE.spout();
+        SABLE.spout();
         COMPUTER_CRAFT.spout();
 
         ETCHED.spout();
@@ -99,6 +105,27 @@ public class CompatCore {
         Optional<Holder<JukeboxSong>> song = JukeboxSong.fromStack(provider, stack);
         return song.map(s -> s.value().soundEvent().value().getLocation().toString()).orElse(null);
     }
+
+    public static WorldlyPosition modifyPosition(WorldlyPosition position) {
+
+        if (CompatCore.SABLE.enabled) {
+            WorldlyPosition newPosition = CommonSableCompat.modifyPosition(position);
+            if (newPosition != null) return newPosition;
+        }
+
+        return Services.COMPAT.modifyPosition(position);
+    }
+
+    public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+
+        if (CompatCore.SABLE.enabled) {
+            Quaternionf newRotation = CommonSableCompat.modifyRotation(position, rotation);
+            if (newRotation != null) return newRotation;
+        }
+
+        return Services.COMPAT.modifyRotation(position, rotation);
+    }
+
 
     public static RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {
         RadioManager.CollectionResult result = Services.COMPAT.verifyLocationCollection(position, clazz);

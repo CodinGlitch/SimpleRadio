@@ -385,8 +385,8 @@ public class RadioRouter implements Socket, Router {
     public void tick(int tickCount) {
         // Calculate velocity and/or modify position/rotation for things like VS integration
         if (position != null) {
-            this.updateRotation(Services.COMPAT.modifyRotation(position, rotation));
-            this.updateLocation(Services.COMPAT.modifyPosition(position));
+            this.updateRotation(CompatCore.modifyRotation(position, rotation));
+            this.updateLocation(CompatCore.modifyPosition(position));
 
             Vector3f currentPosition = position.position();
             if (currentPosition != oldPosition) {

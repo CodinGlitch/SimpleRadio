@@ -358,5 +358,18 @@ public class SimpleRadioServerConfig extends LexiconData {
             @Override
             public boolean isEnabled() { return enabled; }
         }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency Sable/Create Aeronautics.")
+        public Sable sable = new Sable();
+
+        public static class Sable extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for Sable. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
     }
 }
