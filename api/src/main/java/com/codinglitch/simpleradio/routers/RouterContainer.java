@@ -33,11 +33,22 @@ public class RouterContainer<R extends Router> extends AbstractList<R> {
         return content.remove(index);
     }
 
-    public boolean removeIf(Predicate<? super R> filter) {
+    @Override
+    public boolean removeIf(@NotNull Predicate<? super R> criteria) {
         return content.removeIf(router -> {
-            if (router == null) return true;
+            if (criteria.test(router)) {
+                SimpleRadioApi.getInstance().info("Removing router {}", router);
+                return true;
+            }
+            return false;
+        });
+    }
 
-            if (filter.test(router)) {
+    public void garbageCollect(Predicate<Router> criteria) {
+        content.removeIf(router -> {
+            if (router == null) return true;
+            if (criteria.test(router)) {
+                SimpleRadioApi.getInstance().info("Invalidating router {}", router);
                 ServerSimpleRadioApi.getInstance().removeRouter(router.getIdentifier());
                 return true;
             }
