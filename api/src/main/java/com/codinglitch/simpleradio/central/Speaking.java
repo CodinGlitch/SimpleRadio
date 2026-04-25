@@ -38,41 +38,16 @@ public interface Speaking extends Auricular {
 
     /**
      * Stop speaking in the world.
-     * @param owner the Entity that will stop speaking
-     * @param isClient if to remove in client
+     * This will remove the speaker from <b>both</b> global and specific router maps.
+     * @param reference the UUID of the router that will stop speaking
      */
-    default void stopSpeaking(UUID owner, boolean isClient) {
-        Router router;
+    default void stopSpeaking(UUID reference, boolean isClient) {
         if (isClient) {
-            router = ClientSimpleRadioApi.getInstance().removeRouter(owner, "RadioSpeaker");
+            ClientSimpleRadioApi.getInstance().removeSpeaker(reference);
         } else {
-            router = ServerSimpleRadioApi.getInstance().listeners().remove(owner);
-        }
-        if (router != null) router.invalidate();
-    }
-
-    /**
-     * Stop speaking in the world.
-     * @param location the location of the speaker to remove
-     */
-    default void stopSpeaking(WorldlyPosition location) {
-        Router router;
-        if (location.isClientSide()) {
-            router = ClientSimpleRadioApi.getInstance().removeRouter(location, "RadioSpeaker");
-        } else {
-            router = ServerSimpleRadioApi.getInstance().listeners().remove(location);
-        }
-        if (router != null) router.invalidate();
-    }
-
-    /**
-     * Stop speaking in the world. Infers information from itself.
-     */
-    default void stopSpeaking() {
-        if (this instanceof AuditoryBlockEntity blockEntity) {
-            if (blockEntity.speaker != null) {
-                stopSpeaking(blockEntity.speaker.getLocation());
-            }
+            ServerSimpleRadioApi.getInstance().removeRouter(
+                    ServerSimpleRadioApi.getInstance().speakers().remove(reference)
+            );
         }
     }
 }

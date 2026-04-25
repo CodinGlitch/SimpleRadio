@@ -1,5 +1,7 @@
 package com.codinglitch.simpleradio.central;
 
+import com.codinglitch.simpleradio.ClientSimpleRadioApi;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Receiver;
 import net.minecraft.world.entity.Entity;
@@ -46,27 +48,15 @@ public interface Receiving extends Frequencing {
 
 
     /**
-     * Stop listening in a certain frequency
+     * Stop listening in a certain frequency.
+     * This will remove the receiver from <b>both</b> global and specific router maps.
      * @param frequencyName the frequency to stop listening to
      * @param modulation the modulation type of the frequency
-     * @param owner the UUID to remove
+     * @param reference the UUID to remove
      */
-    default void stopReceiving(String frequencyName, Frequency.Modulation modulation, UUID owner) {
-        Frequency frequency = SimpleRadioApi.getInstance().frequencies().get(frequencyName, modulation);
-        if (frequency != null) {
-            frequency.removeReceiver(owner);
-        }
+    default void stopReceiving(String frequencyName, Frequency.Modulation modulation, UUID reference, boolean isClient) {
+        Frequency frequency = SimpleRadioApi.getInstance(isClient).frequencies().get(frequencyName, modulation);
+        if (frequency != null)
+            SimpleRadioApi.removeRouterSided(frequency.removeReceiver(reference), isClient);
     }
-
-    /**
-     * Stop receiving. Infers information from itself.
-     */
-    /*default void stopReceiving() {
-        if (this instanceof AuditoryBlockEntity blockEntity) {
-            if (blockEntity.receiver != null && blockEntity.receiver.frequency != null) {
-                stopReceiving(blockEntity.receiver.frequency.frequency, blockEntity.receiver.frequency.modulation, blockEntity.id);
-                blockEntity.receiver.invalidate();
-            }
-        }
-    }*/
 }

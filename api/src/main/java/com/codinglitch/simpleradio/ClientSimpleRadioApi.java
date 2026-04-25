@@ -61,4 +61,9 @@ public abstract class ClientSimpleRadioApi extends SimpleRadioApi {
 
     public abstract Router removeRouter(WorldlyPosition location);
     public abstract Router removeRouter(WorldlyPosition location, @Nullable String type);
+
+    public abstract Listener removeListener(UUID uuid);
+    public abstract Speaker removeSpeaker(UUID uuid);
+    public abstract Receiver removeReceiver(UUID uuid);
+    public abstract Transmitter removeTransmitter(UUID uuid);
 }

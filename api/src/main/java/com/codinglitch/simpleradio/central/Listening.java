@@ -2,8 +2,10 @@ package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,41 +48,16 @@ public interface Listening extends Auricular {
 
     /**
      * Stop listening in the world.
-     * @param owner the Entity that will stop listening
-     * @param isClient if to remove in client
+     * This will remove the listener from <b>both</b> global and specific router maps.
+     * @param reference the UUID of the router that will stop speaking
      */
-    default void stopListening(UUID owner, boolean isClient) {
-        Router router;
+    default void stopListening(UUID reference, boolean isClient) {
         if (isClient) {
-            router = ClientSimpleRadioApi.getInstance().removeRouter(owner, "RadioListener");
+            ClientSimpleRadioApi.getInstance().removeListener(reference);
         } else {
-            router = ServerSimpleRadioApi.getInstance().listeners().remove(owner);
-        }
-        if (router != null) router.invalidate();
-    }
-
-    /**
-     * Stop listening in the world.
-     * @param location the location of the listener to remove
-     */
-    default void stopListening(WorldlyPosition location) {
-        Router router;
-        if (location.isClientSide()) {
-            router = ClientSimpleRadioApi.getInstance().removeRouter(location, "RadioListener");
-        } else {
-            router = ServerSimpleRadioApi.getInstance().listeners().remove(location);
-        }
-        if (router != null) router.invalidate();
-    }
-
-    /**
-     * Stop listening in the world. Infers information from itself. <b>Only call this on the server.</b>
-     */
-    default void stopListening() {
-        if (this instanceof AuditoryBlockEntity blockEntity) {
-            if (blockEntity.listener != null) {
-                stopListening(blockEntity.listener.getLocation());
-            }
+            ServerSimpleRadioApi.getInstance().removeRouter(
+                    ServerSimpleRadioApi.getInstance().listeners().remove(reference)
+            );
         }
     }
 }

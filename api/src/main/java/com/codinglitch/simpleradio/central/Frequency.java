@@ -45,11 +45,11 @@ public interface Frequency extends Medium {
     Receiver tryAddReceiver(UUID id, Entity entity);
     Receiver addReceiver(UUID id, Entity entity);
 
-    void removeReceiver(Predicate<Receiver> criteria);
-    void removeReceiver(Receiver receiver);
-    void removeReceiver(Entity owner);
-    void removeReceiver(WorldlyPosition location);
-    void removeReceiver(UUID id);
+    Receiver removeReceiver(Predicate<Receiver> criteria);
+    Receiver removeReceiver(Receiver receiver);
+    Receiver removeReceiver(Entity owner);
+    Receiver removeReceiver(WorldlyPosition location);
+    Receiver removeReceiver(UUID id);
 
     //---- Transmitters ----\\
 
@@ -68,9 +68,9 @@ public interface Frequency extends Medium {
     Transmitter tryAddTransmitter(UUID id, Entity entity);
     Transmitter addTransmitter(UUID id, Entity entity);
 
-    void removeTransmitter(Predicate<Transmitter> criteria);
-    void removeTransmitter(Transmitter transmitter);
-    void removeTransmitter(Entity owner);
-    void removeTransmitter(WorldlyPosition location);
-    void removeTransmitter(UUID id);
+    Transmitter removeTransmitter(Predicate<Transmitter> criteria);
+    Transmitter removeTransmitter(Transmitter transmitter);
+    Transmitter removeTransmitter(Entity owner);
+    Transmitter removeTransmitter(WorldlyPosition location);
+    Transmitter removeTransmitter(UUID id);
 }

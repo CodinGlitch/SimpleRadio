@@ -1,26 +1,27 @@
 package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.RouterContainer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 public interface RouterHolder<R extends Router> {
     List<R> get();
+    RouterContainer<R> contents();
 
     default R remove(Predicate<R> criteria) {
-        List<R> list = get();
-        List<R> removal = list.stream()
+        RouterContainer<R> list = contents();
+        Optional<R> first = list.stream()
                 .filter(criteria)
-                .toList();
+                .findFirst();
 
-        if (removal.isEmpty()) return null;
-
-        removal.forEach(list::remove);
-        return removal.stream().findFirst().get();
+        list.removeIf(criteria);
+        return first.orElse(null);
     }
     default R remove(R R) {
         get().remove(R);
