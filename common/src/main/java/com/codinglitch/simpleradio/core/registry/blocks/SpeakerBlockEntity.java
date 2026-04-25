@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Speaking;
@@ -72,17 +74,19 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
     public void inactivate() {
         if (this.isActive) {
-            stopSpeaking();
-            //stopReceiving(frequency.frequency, frequency.modulation, id);
+            stopSpeaking(id, level.isClientSide);
         }
 
         this.isActive = false;
     }
 
     public void activate() {
+        CommonSimpleRadio.info("Activating speaker with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
+        this.speaker.setPosition(location);
+
         if (!level.isClientSide) {
             level.playSound(
                     null, location.x, location.y, location.z,

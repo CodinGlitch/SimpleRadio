@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.RouterContainer;
+import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -26,6 +27,10 @@ public class ListenersImpl implements Listeners {
     @Override
     public List<Listener> get() {
         return new ArrayList<>(LISTENERS);
+    }
+    @Override
+    public RouterContainer<Listener> contents() {
+        return LISTENERS;
     }
 
     @Override

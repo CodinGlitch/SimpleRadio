@@ -22,7 +22,7 @@ public class FrequencerRenderer implements BlockEntityRenderer<FrequencerBlockEn
         poseStack.pushPose();
 
         poseStack.translate(0.5f, 1.0f + offset, 0.5f);
-        poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
+        //poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
         poseStack.scale(-0.025F, -0.025F, 0.025F);
         Matrix4f matrix4f = poseStack.last().pose();
 

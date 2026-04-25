@@ -29,6 +29,10 @@ public class SpeakersImpl implements Speakers {
     public List<Speaker> get() {
         return new ArrayList<>(SPEAKERS);
     }
+    @Override
+    public RouterContainer<Speaker> contents() {
+        return SPEAKERS;
+    }
 
     @Override
     public RadioSpeaker get(Entity owner) {

@@ -22,7 +22,7 @@ import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
 import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
-import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.*;
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
 import com.mojang.blaze3d.audio.SoundBuffer;
@@ -96,6 +96,23 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
     public ClientRouterWrapper getWrapper(RadioRouter router) {
         return getWrapper(wrapper -> router.equals(wrapper.router));
+    }
+
+    @Override
+    public void info(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
+    }
+    @Override
+    public void debug(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
+    }
+    @Override
+    public void warn(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
+    }
+    @Override
+    public void error(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
     }
 
     @Override
@@ -301,6 +318,23 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     @Override
     public Router removeRouter(WorldlyPosition location, @Nullable String type) {
         return removeRouter(router -> location.equals(router.getPosition()) && routerMatches(router, type));
+    }
+
+    @Override
+    public Listener removeListener(UUID uuid) {
+        return (RadioListener) removeRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioListener);
+    }
+    @Override
+    public Speaker removeSpeaker(UUID uuid) {
+        return (RadioSpeaker) removeRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioSpeaker);
+    }
+    @Override
+    public Receiver removeReceiver(UUID uuid) {
+        return (RadioReceiver) removeRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioReceiver);
+    }
+    @Override
+    public Transmitter removeTransmitter(UUID uuid) {
+        return (RadioTransmitter) removeRouter(router -> uuid.equals(router.getReference()) && router instanceof RadioTransmitter);
     }
 
     public static void finalizeRouter(short mapping, short identifier) {
@@ -716,8 +750,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.lines());
 
         AABB boundingBox = new AABB(
-                -0.5f, -0.5f, -0.5f,
-                0.5f, 0.5f, 0.5f
+                -0.51f, -0.51f, -0.51f,
+                0.51f, 0.51f, 0.51f
         );
         LevelRenderer.renderLineBox(poseStack, consumer, boundingBox, r, g, b, 0.8f);
 

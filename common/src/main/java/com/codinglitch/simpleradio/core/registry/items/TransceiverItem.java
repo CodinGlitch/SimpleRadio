@@ -91,8 +91,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         stopListening(owner, level.isClientSide);
         stopSpeaking(owner, level.isClientSide);
-        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner);
-        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner);
+        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner, level.isClientSide);
+        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner, level.isClientSide);
     }
 
     public int getCooldown() {

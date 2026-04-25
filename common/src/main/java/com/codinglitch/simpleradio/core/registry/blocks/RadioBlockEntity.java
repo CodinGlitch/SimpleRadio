@@ -96,9 +96,8 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
 
     public void inactivate() {
         if (this.frequency != null) {
-            SimpleRadioApi.removeRouterSided(this.id, this.level.isClientSide);
-            if (!this.level.isClientSide) stopReceiving(frequency.getFrequency(), frequency.getModulation(), this.id);
-            if (!this.level.isClientSide) stopSpeaking();
+            stopReceiving(frequency.getFrequency(), frequency.getModulation(), id, level.isClientSide);
+            stopSpeaking(id, level.isClientSide);
         }
 
         this.isActive = false;

@@ -48,7 +48,6 @@ public class RadioListener extends RadioRouter implements Listener {
         this(uuid);
         this.position = location;
 
-
         boolean isClient = location.isClientSide();
         SimpleRadioApi.registerRouterSided(this, isClient, null);
     }
