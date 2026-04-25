@@ -110,8 +110,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
     public void inactivate() {
         if (this.frequency != null) {
-            SimpleRadioApi.removeRouterSided(this.id, this.level.isClientSide);
-            stopTransmitting(frequency.getFrequency(), frequency.getModulation(), this.id);
+            stopTransmitting(frequency.getFrequency(), frequency.getModulation(), id, level.isClientSide);
         }
 
         this.isActive = false;

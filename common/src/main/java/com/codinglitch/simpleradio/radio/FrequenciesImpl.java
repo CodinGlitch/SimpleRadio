@@ -145,8 +145,8 @@ public class FrequenciesImpl implements Frequencies {
     public void garbageCollect() {
         for (Frequency frequency : FREQUENCIES.values()) {
             FrequencyChannel frequencyChannel = (FrequencyChannel) frequency;
-            RadioManager.validate(frequencyChannel.receivers.getContent());
-            RadioManager.validate(frequencyChannel.transmitters.getContent());
+            RadioManager.validate(frequencyChannel.receivers);
+            RadioManager.validate(frequencyChannel.transmitters);
         }
 
         FREQUENCIES.entrySet().removeIf(entry -> !((FrequencyChannel) entry.getValue()).validate());

@@ -1,10 +1,8 @@
 package com.codinglitch.simpleradio.core.central;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.radio.FrequenciesImpl;
 import com.codinglitch.simpleradio.radio.RadioManager;
@@ -106,7 +104,7 @@ public class FrequencyChannel implements Frequency {
 
         RadioManager.registerRouterSided(receiver, isClient, this);
 
-        CommonSimpleRadio.debug("Added receiver {} to frequency {}", receiver.getReference(), this.frequency);
+        CommonSimpleRadio.info("Added receiver {} to frequency {}", receiver.getReference(), this.frequency);
         return receiver;
     }
 
@@ -149,26 +147,31 @@ public class FrequencyChannel implements Frequency {
     }
 
     @Override
-    public void removeReceiver(Predicate<Receiver> criteria) {
-        receivers.removeIf(criteria);
+    public Receiver removeReceiver(Predicate<Receiver> criteria) {
+        Optional<Receiver> first = receivers.stream()
+                .filter(criteria)
+                .findFirst();
 
+        receivers.removeIf(criteria);
         if (!this.validate()) RadioManager.getInstance().frequencies().remove(this);
+
+        return first.orElse(null);
     }
     @Override
-    public void removeReceiver(Receiver receiver) {
-        removeReceiver(receiver::equals);
+    public Receiver removeReceiver(Receiver receiver) {
+        return removeReceiver(receiver::equals);
     }
     @Override
-    public void removeReceiver(Entity owner) {
-        removeReceiver(receiver -> owner.equals(receiver.getOwner()));
+    public Receiver removeReceiver(Entity owner) {
+        return removeReceiver(receiver -> owner.equals(receiver.getOwner()));
     }
     @Override
-    public void removeReceiver(WorldlyPosition location) {
-        removeReceiver(receiver -> location.equals(receiver.getPosition()));
+    public Receiver removeReceiver(WorldlyPosition location) {
+        return removeReceiver(receiver -> location.equals(receiver.getPosition()));
     }
     @Override
-    public void removeReceiver(UUID id) {
-        removeReceiver(receiver -> id.equals(receiver.getReference()));
+    public Receiver removeReceiver(UUID id) {
+        return removeReceiver(receiver -> id.equals(receiver.getReference()));
     }
 
     //---- Transmitters ----\\
@@ -247,26 +250,31 @@ public class FrequencyChannel implements Frequency {
     }
 
     @Override
-    public void removeTransmitter(Predicate<Transmitter> criteria) {
-        transmitters.removeIf(criteria);
+    public Transmitter removeTransmitter(Predicate<Transmitter> criteria) {
+        Optional<Transmitter> first = transmitters.stream()
+                .filter(criteria)
+                .findFirst();
 
+        transmitters.removeIf(criteria);
         if (!this.validate()) RadioManager.getInstance().frequencies().remove(this);
+
+        return first.orElse(null);
     }
     @Override
-    public void removeTransmitter(Transmitter transmitter) {
-        removeTransmitter(transmitter::equals);
+    public Transmitter removeTransmitter(Transmitter transmitter) {
+        return removeTransmitter(transmitter::equals);
     }
     @Override
-    public void removeTransmitter(Entity owner) {
-        removeTransmitter(transmitter -> owner.equals(transmitter.getOwner()));
+    public Transmitter removeTransmitter(Entity owner) {
+        return removeTransmitter(transmitter -> owner.equals(transmitter.getOwner()));
     }
     @Override
-    public void removeTransmitter(WorldlyPosition location) {
-        removeTransmitter(transmitter -> location.equals(transmitter.getPosition()));
+    public Transmitter removeTransmitter(WorldlyPosition location) {
+        return removeTransmitter(transmitter -> location.equals(transmitter.getPosition()));
     }
     @Override
-    public void removeTransmitter(UUID id) {
-        removeTransmitter(transmitter -> id.equals(transmitter.getReference()));
+    public Transmitter removeTransmitter(UUID id) {
+        return removeTransmitter(transmitter -> id.equals(transmitter.getReference()));
     }
 
     public void serverTick(int tickCount) {

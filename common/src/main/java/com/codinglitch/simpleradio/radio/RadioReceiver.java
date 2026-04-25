@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.FrequencingType;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
@@ -34,6 +35,9 @@ public class RadioReceiver extends RadioRouter implements Receiver {
     public RadioReceiver(Frequency frequency, Entity owner, UUID uuid) {
         this(frequency, uuid);
         this.owner = owner;
+
+        boolean isClient = owner.level().isClientSide();
+        SimpleRadioApi.registerRouterSided(this, isClient, frequency);
     }
     public RadioReceiver(Frequency frequency, WorldlyPosition location) {
         this(frequency, location, UUID.randomUUID());

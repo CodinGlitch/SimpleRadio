@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Listening;
@@ -93,7 +94,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
 
     public void inactivate() {
         if (this.isActive) {
-            stopListening();
+            stopListening(this.id, level.isClientSide);
         }
 
         this.isActive = false;
