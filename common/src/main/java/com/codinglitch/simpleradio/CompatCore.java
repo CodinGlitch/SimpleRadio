@@ -45,6 +45,9 @@ public class CompatCore {
     public static CompatibilityInstance AUDIO_PLAYER = new CompatibilityInstance(
             "AudioPlayer", "audioplayer", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.audioplayer
     );
+    public static CompatibilityInstance SABLE = new CompatibilityInstance(
+            "Sable", "sable", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.sable
+    );
 
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
@@ -56,6 +59,7 @@ public class CompatCore {
 
         VALKYRIEN_SKIES.spout();
         CREATE.spout();
+        SABLE.spout();
         COMPUTER_CRAFT.spout();
 
         ETCHED.spout();
@@ -98,7 +102,7 @@ public class CompatCore {
             CommonValkyrienCompat.modifyPosition(position);
         }
 
-        return position;
+        return Services.COMPAT.modifyPosition(position);;
     }
 
     public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
@@ -106,7 +110,7 @@ public class CompatCore {
             CommonValkyrienCompat.modifyRotation(position, rotation);
         }
 
-        return rotation;
+        return Services.COMPAT.modifyRotation(position, rotation);
     }
 
 
@@ -120,6 +124,7 @@ public class CompatCore {
 
         return null;
     }
+
 
     public static RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {
         RadioManager.CollectionResult result = Services.COMPAT.verifyLocationCollection(position, clazz);
