@@ -10,6 +10,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
@@ -65,5 +66,11 @@ public class SimpleRadioTestHelper extends GameTestHelper {
         if (!list.isEmpty()) {
             throw new GameTestAssertPosException("Did not expect " + type.toShortString() + " between ", BlockPos.containing(from), BlockPos.containing(to), getTick());
         }
+    }
+
+    public void killAllEntities() {
+        AABB bounds = this.testInfo.getStructureBounds();
+        List<Entity> list = this.getLevel().getEntitiesOfClass(Entity.class, bounds.inflate(3f), (entity) -> !(entity instanceof Player));
+        list.forEach(Entity::kill);
     }
 }
