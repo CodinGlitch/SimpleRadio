@@ -102,7 +102,7 @@ public class CompatCore {
             CommonValkyrienCompat.modifyPosition(position);
         }
 
-        return Services.COMPAT.modifyPosition(position);;
+        return position;
     }
 
     public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
@@ -110,7 +110,7 @@ public class CompatCore {
             CommonValkyrienCompat.modifyRotation(position, rotation);
         }
 
-        return Services.COMPAT.modifyRotation(position, rotation);
+        return rotation;
     }
 
 
