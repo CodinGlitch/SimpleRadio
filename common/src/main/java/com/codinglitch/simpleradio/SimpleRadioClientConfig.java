@@ -43,8 +43,8 @@ public class SimpleRadioClientConfig extends LexiconData {
     }
 
     public static class Speaker extends LexiconPageData {
-        @LexiconEntry(comment = "This is how often (in ticks) the speaker will emit a particle when active. Set to -1 to disable. Defaults to 10.")
-        public Integer particleInterval = 10;
+        @LexiconEntry(comment = "This is how often (in ticks) the speaker will emit a particle when active. Set to -1 to disable. Defaults to 20.")
+        public Integer particleInterval = 20;
     }
 
     public static class Microphone extends LexiconPageData {

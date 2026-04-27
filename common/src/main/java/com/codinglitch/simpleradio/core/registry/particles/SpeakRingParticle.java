@@ -9,6 +9,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 public class SpeakRingParticle extends ActivityParticle {
     SpeakRingParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
+        this.lifetime = 6;
         this.growth = 0.01f;
     }
 

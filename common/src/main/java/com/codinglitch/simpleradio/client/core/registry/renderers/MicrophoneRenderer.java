@@ -40,19 +40,19 @@ public class MicrophoneRenderer implements BlockEntityRenderer<MicrophoneBlockEn
             float targetTilt = blockEntity.tilt - 1.5f;
             blockEntity.currentTilt = Math.lerp(blockEntity.currentTilt, targetTilt, Math.min(Minecraft.getInstance().getDeltaFrameTime() * 0.3f, 1));
 
-            model.plug.visible = !blockEntity.getWires().isEmpty();
+            //model.plug.visible = !blockEntity.getWires().isEmpty();
 
             model.body.xRot = blockEntity.currentTilt;
 
             Router router = ClientRadioManager.getInstance().getRouter(blockEntity.id); // workaround for create
             if (router != null) {
                 float rotation = Math.toRadians(SimpleRadioBlocks.MICROPHONE.getYRotationDegrees(state) - 90);
-                float tilt = blockEntity.currentTilt - 0.5f;
+                float tilt = blockEntity.currentTilt - 1f;
                 Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
 
                 router.setConnectionOffset(new Vec3(
                         normal.x * Math.cos(tilt)*0.25f,
-                        Math.sin(tilt)*0.25f,
+                        Math.sin(tilt)*0.3f - 0.2f,
                         normal.z * Math.cos(tilt)*0.25f
                 ));
             }

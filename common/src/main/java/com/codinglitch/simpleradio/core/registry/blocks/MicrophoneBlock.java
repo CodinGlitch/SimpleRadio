@@ -66,7 +66,7 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
 
         float rotation = Math.toRadians(getYRotationDegrees(state) - 90);
         Vector3f normal = new Vector3f(Math.cos(rotation), 0, Math.sin(rotation));
-        listener.setConnectionOffset(new Vec3(normal.x*0.1f, -0.2f, normal.z*0.1f));
+        listener.setConnectionOffset(new Vec3(normal.x*0.1f, -0f, normal.z*0.3f));
 
         // Allow distribution through wires
         listener.allowDistribution();
@@ -131,7 +131,8 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof MicrophoneBlockEntity mic) {
             if (player.isCrouching()) {
-                mic.tilt = (mic.tilt + 0.1f) % 3;
+                //TODO: move this to a constant range
+                mic.tilt = 1.8f + (mic.tilt - 1.7f) % 2.4f;
 
                 if (!level.isClientSide)
                     level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.TILT_MICROPHONE, SoundSource.BLOCKS, 0.1f, 0.9f + level.random.nextFloat()*0.2f);

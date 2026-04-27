@@ -9,7 +9,8 @@ import net.minecraft.core.particles.SimpleParticleType;
 public class SpeakLineParticle extends AlignedParticle {
     SpeakLineParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
-        this.lifetime = 5;
+        this.lifetime = 16;
+        this.scale(1.25f);
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {

@@ -24,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listening {
     public boolean isActive = false;
     private boolean listening = true;
-    public float tilt = 1.5f;
-    public float currentTilt = tilt - 1.5f;
+    public float tilt = 3f;
+    public float currentTilt = tilt - 3f;
 
     public MicrophoneBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.MICROPHONE, pos, state);

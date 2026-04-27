@@ -20,7 +20,6 @@ public class ActivityParticle extends TextureSheetParticle {
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        this.lifetime = 7;
         this.sprites = sprites;
         this.age = 0;
         this.setSpriteFromAge(sprites);
