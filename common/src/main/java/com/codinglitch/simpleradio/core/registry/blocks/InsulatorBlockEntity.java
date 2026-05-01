@@ -118,6 +118,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.router = (RadioRouter) SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, id, this.getBlockState());
+        router.setOrigin(this);
     }
     public void deactivate() {
         if (router != null) {

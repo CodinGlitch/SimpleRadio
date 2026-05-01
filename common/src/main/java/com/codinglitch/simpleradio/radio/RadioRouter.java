@@ -59,6 +59,8 @@ public class RadioRouter implements Socket, Router {
     public short identifier;
     public UUID reference;
 
+    public Socket origin;
+
     public Entity owner;
     public WorldlyPosition position;
     public Vector3f oldPosition = new Vector3f();
@@ -144,6 +146,10 @@ public class RadioRouter implements Socket, Router {
     @Override
     public Vec3 getConnectionOffset() {
         return connectionOffset;
+    }
+    @Override
+    public Socket getOrigin() {
+        return origin;
     }
     @Override
     public Class<?> getLink() {
@@ -255,6 +261,10 @@ public class RadioRouter implements Socket, Router {
     @Override
     public void setActive(boolean active) {
         this.active = active;
+    }
+    @Override
+    public void setOrigin(Socket origin) {
+        this.origin = origin;
     }
     @Override
     public void setLink(Class<?> link) {
@@ -509,6 +519,12 @@ public class RadioRouter implements Socket, Router {
                 }
             }
         }
+    }
+
+    @Override
+    public void connectionUpdated() {
+        Socket.super.connectionUpdated();
+        if (origin != null) origin.connectionUpdated();
     }
 
     @Override
