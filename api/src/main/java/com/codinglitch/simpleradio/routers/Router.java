@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.routers;
 
 import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.Source;
@@ -46,6 +47,7 @@ public interface Router {
     boolean isActive();
     boolean isValid();
     Vec3 getConnectionOffset();
+    Socket getOrigin();
     Class<?> getLink();
     Vector3f getVelocity();
     float getActivity();
@@ -58,6 +60,7 @@ public interface Router {
     void allowDistribution();
     void setOwner(Entity owner);
     void setActive(boolean active);
+    void setOrigin(Socket origin);
     void setLink(Class<?> link);
     void setConnectionOffset(Vec3 connectionOffset);
     void setPosition(WorldlyPosition position);

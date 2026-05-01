@@ -63,9 +63,16 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     /**
      * This is called whenever the block is initially activated (placed, on world load, chunk loaded, etc.)
      * Use this to create and register the associated routers for this block.
+     * <p>
+     * This method will also set the origins of the associated routers to this socket.
      */
     public void activate() {
         active = true;
+
+        if (receiver != null) receiver.setOrigin(this);
+        if (transmitter != null) transmitter.setOrigin(this);
+        if (listener != null) listener.setOrigin(this);
+        if (speaker != null) speaker.setOrigin(this);
     }
 
     /**
@@ -79,7 +86,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
 
         if (receiver != null && !receiver.isValid()) receiver = null;
         if (transmitter != null && !transmitter.isValid()) transmitter = null;
-        if (listener != null && !listener.isValid()) speaker = null;
+        if (listener != null && !listener.isValid()) listener = null;
         if (speaker != null && !speaker.isValid()) speaker = null;
     }
 

@@ -67,12 +67,15 @@ public interface Socket {
 
     default void connect(Wiring wire) {
         this.getWires().add(wire);
+        this.connectionUpdated();
     }
     default void disconnect(Wiring wire) {
         this.getWires().removeIf(otherWire -> otherWire.equals(wire));
+        this.connectionUpdated();
     }
     default void disconnect(UUID wire) {
         this.getWires().removeIf(otherWire -> otherWire.getReference().equals(wire));
+        this.connectionUpdated();
     }
 
     default UUID getReference() {
@@ -93,7 +96,8 @@ public interface Socket {
         }
 
         this.getWires().clear();
-        this.getRouter().getRouters();
+        this.getRouter().getRouters(); // what the hell is this
+        this.connectionUpdated();
     }
 
     /**
@@ -102,6 +106,11 @@ public interface Socket {
      * @return The router to be exposed
      */
     Router getRouter();
+
+    /**
+     * Called whenever the connection state updates, that is, a wire is connected or disconnected.
+     */
+    default void connectionUpdated() {}
 
     default List<Wiring> getWires() {
         Router router = getRouter();
