@@ -116,6 +116,8 @@ public abstract class SimpleRadioApi {
 
     /**
      * Removes the given router from the <b>global map</b> given the indicated side.
+     * This will consequently make this router <b>invalid</b>.
+     * <p>
      * It should be noted that this does <i>not</i> remove it from the individual router maps (Listeners, Speakers, etc.)
      * @param uuid The UUID of the router to remove.
      * @param isClient Whether or not to remove it from the client or server map.
@@ -131,6 +133,8 @@ public abstract class SimpleRadioApi {
 
     /**
      * Removes the given router from the <b>global map</b> given the indicated side.
+     * This will consequently make this router <b>invalid</b>.
+     * <p>
      * It should be noted that this does <i>not</i> remove it from the individual router maps (Listeners, Speakers, etc.)
      * @param router The router to remove.
      * @param isClient Whether or not to remove it from the client or server map.
@@ -146,6 +150,8 @@ public abstract class SimpleRadioApi {
 
     /**
      * Removes the given router from the <b>global map</b> given the indicated side.
+     * This will consequently make this router <b>invalid</b>.
+     * <p>
      * It should be noted that this does <i>not</i> remove it from the individual router maps (Listeners, Speakers, etc.)
      * @param position The position of the router to remove.
      * @param isClient Whether or not to remove it from the client or server map.
