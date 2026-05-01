@@ -5,10 +5,12 @@ import com.codinglitch.simpleradio.central.Routing;
 import com.codinglitch.simpleradio.central.Speaking;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -20,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -32,16 +35,7 @@ import java.util.UUID;
 
 public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
-
-    private static final Map<Direction, Vec3> CONNECTION_OFFSETS = Map.of(
-        Direction.UP, new Vec3(0, -0.5, -0.3),
-        Direction.DOWN, new Vec3(0, 0.5, 0.3),
-
-        Direction.NORTH, new Vec3(0, -0.3, 0.5),
-        Direction.EAST, new Vec3(-0.5, -0.3, 0),
-        Direction.SOUTH, new Vec3(0, -0.3, -0.5),
-        Direction.WEST, new Vec3(0.5, -0.3, 0)
-    );
+    public static final BooleanProperty WIRED = BooleanProperty.create("wired");
 
     public SpeakerBlock(Properties properties) {
         super(properties);
@@ -54,20 +48,26 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         speaker.setRange(SimpleRadioLibrary.SERVER_CONFIG.speaker.speakingRange);
         speaker.setCategory(CommonRadioPlugin.SPEAKERS_CATEGORY);
 
-        speaker.setConnectionOffset(CONNECTION_OFFSETS.get(state.getValue(FACING)));
+        Vec3i normal = state.getValue(FACING).getNormal();
+        speaker.setConnectionOffset(new Vec3(
+                normal.getX()*-0.55f,
+                normal.getY()*-0.55f,
+                normal.getZ()*-0.55f
+        ));
 
         return speaker;
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        super.createBlockStateDefinition(stateBuilder.add(FACING));
+        super.createBlockStateDefinition(stateBuilder.add(FACING, WIRED));
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
-                .setValue(FACING, context.getNearestLookingDirection().getOpposite());
+                .setValue(FACING, context.getNearestLookingDirection().getOpposite())
+                .setValue(WIRED, false);
     }
 
     @Override

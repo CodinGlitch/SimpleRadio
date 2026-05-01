@@ -1,30 +1,57 @@
 {
 	"variants": {
-		"facing=down": {
-			"model": "simpleradio:block/speaker",
+		"facing=down,wired=false": {
+			"model": "simpleradio:block/speaker_wireless",
 			"x": 180
 		},
-		"facing=east": {
-			"model": "simpleradio:block/speaker",
+		"facing=east,wired=false": {
+			"model": "simpleradio:block/speaker_wireless",
 			"x": 90,
 			"y": 90
 		},
-		"facing=north": {
-			"model": "simpleradio:block/speaker",
+		"facing=north,wired=false": {
+			"model": "simpleradio:block/speaker_wireless",
 			"x": 90
 		},
-		"facing=south": {
-			"model": "simpleradio:block/speaker",
+		"facing=south,wired=false": {
+			"model": "simpleradio:block/speaker_wireless",
 			"x": 90,
 			"y": 180
 		},
-		"facing=up": {
-			"model": "simpleradio:block/speaker"
+		"facing=up,wired=false": {
+			"model": "simpleradio:block/speaker_wireless"
 		},
-		"facing=west": {
-			"model": "simpleradio:block/speaker",
+		"facing=west,wired=false": {
+			"model": "simpleradio:block/speaker_wireless",
 			"x": 90,
 			"y": 270
-		}
-	}
+		},
+
+        "facing=down,wired=true": {
+          "model": "simpleradio:block/speaker_wired",
+          "x": 180
+        },
+        "facing=east,wired=true": {
+          "model": "simpleradio:block/speaker_wired",
+          "x": 90,
+          "y": 90
+        },
+        "facing=north,wired=true": {
+          "model": "simpleradio:block/speaker_wired",
+          "x": 90
+        },
+        "facing=south,wired=true": {
+          "model": "simpleradio:block/speaker_wired",
+          "x": 90,
+          "y": 180
+        },
+        "facing=up,wired=true": {
+          "model": "simpleradio:block/speaker_wired"
+        },
+        "facing=west,wired=true": {
+          "model": "simpleradio:block/speaker_wired",
+          "x": 90,
+          "y": 270
+        }
+    }
 }

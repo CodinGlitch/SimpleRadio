@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Speaking;
@@ -11,12 +10,12 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
-import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking {
@@ -104,6 +103,16 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
         // Mark this block as active.
         super.activate();
+    }
+
+    @Override
+    public void connectionUpdated() {
+        if (!hasLevel() || level.isClientSide) return;
+
+        BlockState state = getBlockState();
+        boolean wired = !getWires().isEmpty();
+        if (state.getValue(SpeakerBlock.WIRED) != wired)
+            level.setBlock(worldPosition, state.setValue(SpeakerBlock.WIRED, wired), Block.UPDATE_CLIENTS);
     }
 
     @Override
