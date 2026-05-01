@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Transmitting {
-    public boolean isActive = false;
     public boolean isDirty = true;
     public int antennaPower = 0;
 
@@ -43,8 +42,6 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
                     1f, 1f
             );
         }
-
-        inactivate();
 
         super.setRemoved();
     }
@@ -83,7 +80,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, TransmitterBlockEntity blockEntity) {
-        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
+        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.active) {
             blockEntity.activate();
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
@@ -103,14 +100,16 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         }
     }
 
-    public void inactivate() {
-        if (this.frequency != null) {
+    @Override
+    public void deactivate() {
+        if (this.frequency != null)
             stopTransmitting(frequency.getFrequency(), frequency.getModulation(), id, level.isClientSide);
-        }
 
-        this.isActive = false;
+        // Clean up the invalidated routers.
+        super.deactivate();
     }
 
+    @Override
     public void activate() {
         CommonSimpleRadio.info("Activating transmitter with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
@@ -125,7 +124,9 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
             );
         }
 
-        this.isActive = true;
+        // Mark this block as active.
+        super.activate();
+        markDirty();
     }
 
     public int getAntennaPower() {
