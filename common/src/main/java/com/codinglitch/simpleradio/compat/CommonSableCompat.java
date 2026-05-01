@@ -24,6 +24,7 @@ public class CommonSableCompat {
     public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
         SubLevelAccess subLevel = SableCompanion.INSTANCE.getContaining(position.level, position.realLocation());
         if (subLevel == null) return null;
-        return new Quaternionf(subLevel.logicalPose().orientation());
+        rotation.set(subLevel.logicalPose().orientation());
+        return rotation;
     }
 }

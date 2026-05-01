@@ -109,8 +109,7 @@ public class CompatCore {
     public static WorldlyPosition modifyPosition(WorldlyPosition position) {
 
         if (CompatCore.SABLE.enabled) {
-            WorldlyPosition newPosition = CommonSableCompat.modifyPosition(position);
-            if (newPosition != null) return newPosition;
+            CommonSableCompat.modifyPosition(position);
         }
 
         return Services.COMPAT.modifyPosition(position);
@@ -119,8 +118,7 @@ public class CompatCore {
     public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
 
         if (CompatCore.SABLE.enabled) {
-            Quaternionf newRotation = CommonSableCompat.modifyRotation(position, rotation);
-            if (newRotation != null) return newRotation;
+            CommonSableCompat.modifyRotation(position, rotation);
         }
 
         return Services.COMPAT.modifyRotation(position, rotation);
