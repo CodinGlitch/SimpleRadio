@@ -215,7 +215,10 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         if (removal.isEmpty()) return null;
 
-        removal.forEach(routers.entrySet()::remove);
+        removal.forEach(entry -> {
+            entry.getValue().invalidate();
+            routers.entrySet().remove(entry);
+        });
         return removal.stream().findFirst().get().getValue();
     }
     @Override

@@ -20,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking {
-    public boolean isActive = false;
 
     public SpeakerBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.SPEAKER, pos, state);
@@ -36,8 +35,6 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
                     1f, 1f
             );
         }
-
-        inactivate();
 
         super.setRemoved();
     }
@@ -61,7 +58,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, SpeakerBlockEntity blockEntity) {
-        if (!blockEntity.isActive && blockEntity.id != null) {
+        if (!blockEntity.active && blockEntity.id != null) {
             blockEntity.activate();
         }
 
@@ -78,14 +75,17 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
     }
 
-    public void inactivate() {
-        if (this.isActive) {
+    @Override
+    public void deactivate() {
+        if (active) {
             stopSpeaking(id, level.isClientSide);
         }
 
-        this.isActive = false;
+        // Clean up the invalidated routers.
+        super.deactivate();
     }
 
+    @Override
     public void activate() {
         CommonSimpleRadio.info("Activating speaker with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
@@ -102,12 +102,12 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
             );
         }
 
-        this.isActive = true;
+        // Mark this block as active.
+        super.activate();
     }
 
     @Override
     public void loadTag(CompoundTag tag) {
-        inactivate();
         super.loadTag(tag);
     }
 }

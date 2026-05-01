@@ -52,7 +52,7 @@ public class WireItem extends Item implements WorldTicking {
                     }
 
                     if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
-                        insulatorBlockEntity.removeConnector();;
+                        insulatorBlockEntity.removeConnector();
                     }
 
                     tag.remove("connectTo");

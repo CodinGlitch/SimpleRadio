@@ -284,6 +284,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         removal.forEach(entry -> {
             entry.getValue().close();
+            entry.getValue().router.invalidate();
             ROUTERS.remove(entry.getKey());
         });
 
