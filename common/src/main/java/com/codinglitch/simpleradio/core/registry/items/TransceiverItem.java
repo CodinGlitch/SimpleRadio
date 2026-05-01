@@ -49,6 +49,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
+        CommonSimpleRadio.info("Activating transceiver with reference {}", owner);
         Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
 
         Listener listener = startListening(entity, owner);
@@ -56,6 +57,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         Receiver receiver = startReceiving(entity, frequencyName, frequencies.modulationOf(modulation), owner);
         Transmitter transmitter = startTransmitting(entity, frequencyName, frequencies.modulationOf(modulation), owner);
 
+        // what the hell was this for
         if (speaker.getOwner().level() != level) {
             CommonSimpleRadio.info(level);
         }
@@ -92,8 +94,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         stopListening(owner, level.isClientSide);
         stopSpeaking(owner, level.isClientSide);
-        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner);
-        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner);
+        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner, level.isClientSide);
+        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner, level.isClientSide);
     }
 
     public int getCooldown() {

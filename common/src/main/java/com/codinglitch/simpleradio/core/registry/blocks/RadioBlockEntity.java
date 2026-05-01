@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.*;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, Speaking, Animatable {
-    public boolean isActive = false;
     public int antennaPower = 0;
 
     private final Map<Integer, AnimationInstance> animations = new HashMap<>();
@@ -61,8 +61,6 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
             );
         }
 
-        inactivate();
-
         super.setRemoved();
     }
 
@@ -90,7 +88,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, RadioBlockEntity blockEntity) {
-        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
+        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.active) {
             blockEntity.activate();
         }
 
@@ -103,17 +101,20 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
         }
     }
 
-    public void inactivate() {
-        if (this.frequency != null) {
-            SimpleRadioApi.removeRouterSided(this.id, this.level.isClientSide);
-            if (!this.level.isClientSide) stopReceiving(frequency.getFrequency(), frequency.getModulation(), this.id);
-            if (!this.level.isClientSide) stopSpeaking();
+    @Override
+    public void deactivate() {
+        if (this.active) {
+            stopReceiving(frequency.getFrequency(), frequency.getModulation(), id, level.isClientSide);
+            stopSpeaking(id, level.isClientSide);
         }
 
-        this.isActive = false;
+        // Clean up the invalidated routers.
+        super.deactivate();
     }
 
+    @Override
     public void activate() {
+        CommonSimpleRadio.info("Activating radio with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());
@@ -131,7 +132,8 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
 
         receiver.addRouter(speaker);
 
-        this.isActive = true;
+        // Mark this block as active.
+        super.activate();
     }
 
     @Override

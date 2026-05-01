@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Listening;
@@ -22,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listening {
-    public boolean isActive = false;
     private boolean listening = true;
     public float tilt = 3f;
     public float currentTilt = tilt - 3f;
@@ -41,8 +42,6 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
                     1f, 1f
             );
         }
-
-        inactivate();
 
         super.setRemoved();
     }
@@ -66,7 +65,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, MicrophoneBlockEntity blockEntity) {
-        if (!blockEntity.isActive && blockEntity.id != null) {
+        if (!blockEntity.active && blockEntity.id != null) {
             blockEntity.activate();
         }
 
@@ -91,14 +90,19 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
         if (this.listener != null) this.listener.setActive(this.listening);
     }
 
-    public void inactivate() {
-        if (this.isActive) {
-            stopListening();
+    @Override
+    public void deactivate() {
+        if (this.active) {
+            stopListening(this.id, level.isClientSide);
         }
 
-        this.isActive = false;
+        // Clean up the invalidated routers.
+        super.deactivate();
     }
+
+    @Override
     public void activate() {
+        CommonSimpleRadio.info("Activating microphone with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
@@ -113,12 +117,12 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
             );
         }
 
-        this.isActive = true;
+        // Mark this block as active.
+        super.activate();
     }
 
     @Override
     public void loadTag(CompoundTag tag) {
-        inactivate();
         super.loadTag(tag);
 
         if (tag.contains("tilt")) {

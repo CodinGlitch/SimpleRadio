@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Receiving;
@@ -19,7 +20,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiving {
-    public boolean isActive = false;
     public boolean isDirty = true;
     public int antennaPower = 0;
 
@@ -42,8 +42,6 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
                     1f, 1f
             );
         }
-
-        inactivate();
 
         super.setRemoved();
     }
@@ -89,7 +87,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, ReceiverBlockEntity blockEntity) {
-        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.isActive) {
+        if (blockEntity.frequency != null && blockEntity.id != null && !blockEntity.active) {
             blockEntity.activate();
         }
         CatalyzingBlockEntity.tick(level, pos, blockState, blockEntity);
@@ -109,16 +107,18 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         }
     }
 
-    public void inactivate() {
-        if (this.frequency != null) {
-            SimpleRadioApi.removeRouterSided(this.id, this.getLevel().isClientSide);
-            stopReceiving(frequency.getFrequency(), frequency.getModulation(), this.id);
-        }
+    @Override
+    public void deactivate() {
+        if (this.frequency != null)
+            stopReceiving(frequency.getFrequency(), frequency.getModulation(), id, level.isClientSide);
 
-        this.isActive = false;
+        // Clean up the invalidated routers.
+        super.deactivate();
     }
 
+    @Override
     public void activate() {
+        CommonSimpleRadio.info("Activating receiver with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());
@@ -131,7 +131,8 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
             );
         }
 
-        this.isActive = true;
+        // Mark this block as active.
+        super.activate();
         markDirty();
     }
 

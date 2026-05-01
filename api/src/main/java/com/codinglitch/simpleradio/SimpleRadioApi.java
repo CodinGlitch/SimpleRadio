@@ -91,6 +91,11 @@ public abstract class SimpleRadioApi {
 
     public abstract Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume);
 
+    public abstract void info(Object object, Object... substitutions);
+    public abstract void debug(Object object, Object... substitutions);
+    public abstract void warn(Object object, Object... substitutions);
+    public abstract void error(Object object, Object... substitutions);
+
     // ---- Sided Methods ---- \\
 
     public static Router getRouterSided(UUID reference, boolean isClient) {
@@ -109,6 +114,15 @@ public abstract class SimpleRadioApi {
         }
     }
 
+    /**
+     * Removes the given router from the <b>global map</b> given the indicated side.
+     * This will consequently make this router <b>invalid</b>.
+     * <p>
+     * It should be noted that this does <i>not</i> remove it from the individual router maps (Listeners, Speakers, etc.)
+     * @param uuid The UUID of the router to remove.
+     * @param isClient Whether or not to remove it from the client or server map.
+     * @return The router that was removed, if it exists.
+     */
     public static Router removeRouterSided(UUID uuid, boolean isClient) {
         if (isClient) {
             return ClientSimpleRadioApi.getInstance().removeRouter(uuid);
@@ -117,6 +131,15 @@ public abstract class SimpleRadioApi {
         }
     }
 
+    /**
+     * Removes the given router from the <b>global map</b> given the indicated side.
+     * This will consequently make this router <b>invalid</b>.
+     * <p>
+     * It should be noted that this does <i>not</i> remove it from the individual router maps (Listeners, Speakers, etc.)
+     * @param router The router to remove.
+     * @param isClient Whether or not to remove it from the client or server map.
+     * @return The router that was removed, if it exists.
+     */
     public static Router removeRouterSided(Router router, boolean isClient) {
         if (isClient) {
             return ClientSimpleRadioApi.getInstance().removeRouter(router);
@@ -125,6 +148,15 @@ public abstract class SimpleRadioApi {
         }
     }
 
+    /**
+     * Removes the given router from the <b>global map</b> given the indicated side.
+     * This will consequently make this router <b>invalid</b>.
+     * <p>
+     * It should be noted that this does <i>not</i> remove it from the individual router maps (Listeners, Speakers, etc.)
+     * @param position The position of the router to remove.
+     * @param isClient Whether or not to remove it from the client or server map.
+     * @return The router that was removed, if it exists.
+     */
     public static Router removeRouterSided(WorldlyPosition position, boolean isClient) {
         if (isClient) {
             return ClientSimpleRadioApi.getInstance().removeRouter(position);

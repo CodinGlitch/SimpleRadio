@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Speaking;
@@ -18,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking {
-    public boolean isActive = false;
 
     public SpeakerBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.SPEAKER, pos, state);
@@ -34,8 +35,6 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
                     1f, 1f
             );
         }
-
-        inactivate();
 
         super.setRemoved();
     }
@@ -59,7 +58,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, SpeakerBlockEntity blockEntity) {
-        if (!blockEntity.isActive && blockEntity.id != null) {
+        if (!blockEntity.active && blockEntity.id != null) {
             blockEntity.activate();
         }
 
@@ -76,19 +75,24 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
         }
     }
 
-    public void inactivate() {
-        if (this.isActive) {
-            stopSpeaking();
-            //stopReceiving(frequency.frequency, frequency.modulation, id);
+    @Override
+    public void deactivate() {
+        if (active) {
+            stopSpeaking(id, level.isClientSide);
         }
 
-        this.isActive = false;
+        // Clean up the invalidated routers.
+        super.deactivate();
     }
 
+    @Override
     public void activate() {
+        CommonSimpleRadio.info("Activating speaker with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
+        this.speaker.setPosition(location);
+
         if (!level.isClientSide) {
             level.playSound(
                     null, location.x, location.y, location.z,
@@ -98,12 +102,12 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
             );
         }
 
-        this.isActive = true;
+        // Mark this block as active.
+        super.activate();
     }
 
     @Override
     public void loadTag(CompoundTag tag) {
-        inactivate();
         super.loadTag(tag);
     }
 }

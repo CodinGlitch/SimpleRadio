@@ -36,8 +36,6 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     public RadioTransmitter(Frequency frequency, Entity owner, UUID uuid) {
         this(frequency, uuid);
         this.owner = owner;
-        CommonSimpleRadio.info(Thread.currentThread().getName());
-        CommonSimpleRadio.info(owner);
     }
     public RadioTransmitter(Frequency frequency, WorldlyPosition location) {
         this(frequency, location, UUID.randomUUID());

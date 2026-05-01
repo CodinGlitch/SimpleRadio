@@ -1,9 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
-import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.*;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
@@ -17,6 +14,7 @@ import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.routers.Listener;
 import com.codinglitch.simpleradio.routers.Router;
+import com.codinglitch.simpleradio.routers.RouterContainer;
 import com.codinglitch.simpleradio.routers.Speaker;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
@@ -88,6 +86,23 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     public static RadioManager getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public void info(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
+    }
+    @Override
+    public void debug(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
+    }
+    @Override
+    public void warn(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
+    }
+    @Override
+    public void error(Object object, Object... substitutions) {
+        CommonSimpleRadio.info(object, substitutions);
     }
 
     @Override
@@ -189,6 +204,7 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     @Override
     public Router removeRouter(Router router) {
+        if (router == null) return null;
         return removeRouter(router::equals);
     }
     @Override
@@ -199,7 +215,10 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         if (removal.isEmpty()) return null;
 
-        removal.forEach(routers.entrySet()::remove);
+        removal.forEach(entry -> {
+            entry.getValue().invalidate();
+            routers.entrySet().remove(entry);
+        });
         return removal.stream().findFirst().get().getValue();
     }
     @Override
@@ -288,9 +307,9 @@ public class RadioManager extends ServerSimpleRadioApi {
         routers.clear();
     }
 
-    public static <R extends Router> void validate(List<R> container) {
-        container.removeIf(Predicate.not(Router::validate));
-        container.removeIf(entry -> entry.getOwner() == null && entry.getPosition() == null);
+    public static <R extends Router> void validate(RouterContainer<R> container) {
+        container.garbageCollect(Predicate.not(Router::validate));
+        container.garbageCollect(entry -> entry.getOwner() == null && entry.getPosition() == null);
     }
 
     public static void garbageCollect() {

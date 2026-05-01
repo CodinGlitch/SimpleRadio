@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Socket;
@@ -62,10 +63,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
 
     @Override
     public void setRemoved() {
-        if (router != null) {
-            SimpleRadioApi.removeRouterSided(router, this.level.isClientSide);
-        }
-
+        this.deactivate();
         super.setRemoved();
     }
 
@@ -106,10 +104,25 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, InsulatorBlockEntity blockEntity) {
-        if (blockEntity.router == null && blockEntity.id != null) {
-            WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(pos, level, pos));
+        if (blockEntity.router != null && !blockEntity.router.isValid()) {
+            blockEntity.deactivate();
+        }
 
-            blockEntity.router = (RadioRouter) SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, blockEntity.id, state);
+        if (blockEntity.router == null && blockEntity.id != null) {
+            blockEntity.activate();
+        }
+    }
+
+    public void activate() {
+        CommonSimpleRadio.info("Activating insulator with reference {}", id);
+        WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+
+        this.router = (RadioRouter) SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, id, this.getBlockState());
+    }
+    public void deactivate() {
+        if (router != null) {
+            SimpleRadioApi.removeRouterSided(router, this.level.isClientSide);
+            this.router = null;
         }
     }
 }
