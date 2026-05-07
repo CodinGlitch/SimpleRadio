@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
@@ -613,6 +614,18 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
     //
     private static final List<Pair<UUID, UUID>> connections = new ArrayList<>();
+
+    public static void renderLevel(float frameTime) {
+        for (Map.Entry<Short, ClientRouterWrapper> wrapperEntry : ROUTERS.entrySet()) {
+            ClientRouterWrapper wrapper = wrapperEntry.getValue();
+            RadioRouter router = (RadioRouter) wrapper.router;
+
+            if (router.position == null) continue;
+
+            router.updateRotation(ClientCompat.modifyRotation(router.position, router.rotation));
+            router.updateLocation(ClientCompat.modifyPosition(router.position));
+        }
+    }
 
     public static void renderDebug(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, Vector3f camera) {
         connections.clear();

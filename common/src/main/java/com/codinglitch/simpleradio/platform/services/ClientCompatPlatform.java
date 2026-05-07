@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.platform.services;
 
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -8,6 +9,7 @@ import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
+import org.joml.Quaternionf;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,4 +33,8 @@ public interface ClientCompatPlatform {
     }
 
     SoundInstance makeSound(Router router, String soundString, float volume, float pitch, float severity, float offset, long seed);
+
+    WorldlyPosition modifyPosition(WorldlyPosition position);
+
+    Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation);
 }

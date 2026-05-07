@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio;
 
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.compat.CommonSableCompat;
+import com.codinglitch.simpleradio.compat.sable.CommonSableCompat;
 import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.platform.Services;
@@ -109,7 +109,8 @@ public class CompatCore {
     public static WorldlyPosition modifyPosition(WorldlyPosition position) {
 
         if (CompatCore.SABLE.enabled) {
-            CommonSableCompat.modifyPosition(position);
+            WorldlyPosition newPosition = CommonSableCompat.modifyPosition(position);
+            if (newPosition != null) return newPosition;
         }
 
         return Services.COMPAT.modifyPosition(position);
@@ -118,7 +119,8 @@ public class CompatCore {
     public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
 
         if (CompatCore.SABLE.enabled) {
-            CommonSableCompat.modifyRotation(position, rotation);
+            Quaternionf newRotation = CommonSableCompat.modifyRotation(position, rotation);
+            if (newRotation != null) return newRotation;
         }
 
         return Services.COMPAT.modifyRotation(position, rotation);

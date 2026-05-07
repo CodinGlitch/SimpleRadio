@@ -2,10 +2,12 @@ package com.codinglitch.simpleradio.client.core.registry.renderers;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
+import com.codinglitch.simpleradio.client.ClientCompat;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.routers.Router;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -134,13 +136,13 @@ public class WireRenderer extends EntityRenderer<Wire> {
         Optional<UUID> toRef = wire.getTo();
 
         if (fromRef.isPresent()) {
-            Router from = ClientRadioManager.getInstance().getRouter(fromRef.get());
+            RadioRouter from = (RadioRouter) ClientRadioManager.getInstance().getRouter(fromRef.get());
             if (from == null) return;
 
             //wire.setPos(new Vec3(from.getLocation().position()));
 
             if (toRef.isPresent()) {
-                Router to = ClientRadioManager.getInstance().getRouter(toRef.get());
+                RadioRouter to = (RadioRouter) ClientRadioManager.getInstance().getRouter(toRef.get());
                 if (to == null) return;
 
                 Vec3 fromPosition = from.getConnectionPosition();
