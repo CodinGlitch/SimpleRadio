@@ -139,9 +139,12 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
 
                 return InteractionResult.SUCCESS;
             } else {
-                mic.setListening(!mic.isListening());
 
                 if (!level.isClientSide) {
+                    mic.setListening(!mic.isListening()); // just let the server handle it
+                    level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+                    blockEntity.setChanged();
+
                     float pitch = mic.isListening() ? 1.1f : 0.9f;
                     level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.PRESS_MICROPHONE, SoundSource.BLOCKS, 0.4f, pitch + level.random.nextFloat()*0.1f);
                 }
