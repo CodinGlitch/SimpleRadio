@@ -118,6 +118,6 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
 
     @Override
     public int getCooldown() {
-        return 60;
+        return SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.cooldown;
     }
 }

@@ -97,7 +97,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     public int getCooldown() {
-        return 20;
+        return SimpleRadioLibrary.SERVER_CONFIG.transceiver.cooldown;
     }
 
     @Override
