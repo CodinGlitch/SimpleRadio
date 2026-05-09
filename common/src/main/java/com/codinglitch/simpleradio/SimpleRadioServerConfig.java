@@ -72,6 +72,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
         public Double transmissionDiminishment = 1d;
 
+        @LexiconEntry(comment = "This is the cooldown in ticks after using. Defaults to 20.")
+        public Integer cooldown = 20;
+
         @LexiconEntry(comment = "This is the range for the transceiver that it can hear from. Defaults to 4.")
         public Integer listeningRange = 4;
         @LexiconEntry(comment = "This is the range for the transceiver in which the audio played from it can be heard. Defaults to 4.")
@@ -105,6 +108,9 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 1.")
         public Double transmissionDiminishment = 1d;
+
+        @LexiconEntry(comment = "This is the cooldown in ticks after using. Defaults to 60.")
+        public Integer cooldown = 60;
 
         @LexiconEntry(comment = "This is the range for the walkie that it can hear from. Defaults to 4.")
         public Integer listeningRange = 4;
