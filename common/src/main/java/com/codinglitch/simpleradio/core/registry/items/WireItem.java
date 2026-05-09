@@ -49,6 +49,7 @@ public class WireItem extends Item implements WorldTicking {
 
                         //connecting.connectTo(centralBlockEntity);
                         level.playSound(null, pos, SoundEvents.LEASH_KNOT_PLACE, SoundSource.PLAYERS, 1.0f, 0.8f);
+                        stack.shrink(1);
                     }
 
                     if (connectToBlockEntity instanceof InsulatorBlockEntity insulatorBlockEntity) {
@@ -58,7 +59,7 @@ public class WireItem extends Item implements WorldTicking {
                     tag.remove("connectTo");
                     tag.remove("connectToPos");
 
-                    return InteractionResult.SUCCESS;
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             } else {
                 tag.putUUID("connectTo", interactingSocket.getReference());
