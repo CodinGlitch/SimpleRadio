@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.*;
@@ -24,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -48,19 +48,13 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         transmitter.setLink(this.getClass());
     }
 
-    private void activate(Level level, ItemStack stack, String frequencyName, String modulation, Entity entity, UUID owner) {
+    private void activate(Level level, ItemStack stack, String frequencyName, Frequency.Modulation modulation, Entity entity, UUID owner) {
         CommonSimpleRadio.info("Activating transceiver with reference {}", owner);
-        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
 
         Listener listener = startListening(entity, owner);
         Speaker speaker = startSpeaking(entity, owner);
-        Receiver receiver = startReceiving(entity, frequencyName, frequencies.modulationOf(modulation), owner);
-        Transmitter transmitter = startTransmitting(entity, frequencyName, frequencies.modulationOf(modulation), owner);
-
-        // what the hell was this for
-        if (speaker.getOwner().level() != level) {
-            CommonSimpleRadio.info(level);
-        }
+        Receiver receiver = startReceiving(entity, frequencyName, modulation, owner);
+        Transmitter transmitter = startTransmitting(entity, frequencyName, modulation, owner);
 
         listener.setOwner(entity);
         speaker.setOwner(entity);
@@ -72,34 +66,18 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         this.setupRouters(listener, speaker, receiver, transmitter);
 
-        transmitter.setRoutingCriteria((source, router) -> {
-            if (entity instanceof Player player) {
-                ItemStack using = player.getUseItem();
-                if (!(using.getItem() instanceof TransceiverItem)) return false;
-
-                CompoundTag usingTag = using.getOrCreateTag();
-
-                if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return false;
-                if (!usingTag.getString("frequency").equals(frequencyName) || !usingTag.getString("modulation").equals(modulation)) return false;
-            }
-
-            Frequency frequency = getFrequency(stack);
-            if (frequency == null) return false;
-
-            return true;
-        });
+        // Set transmitter activation state only if a player isn't holding it
+        transmitter.setActive(!(entity instanceof Player));
     }
-    private void inactivate(Level level, String frequencyName, String modulation, UUID owner) {
-        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
-
+    private void inactivate(Level level, String frequencyName, Frequency.Modulation modulation, UUID owner) {
         stopListening(owner, level.isClientSide);
         stopSpeaking(owner, level.isClientSide);
-        stopReceiving(frequencyName, frequencies.modulationOf(modulation), owner, level.isClientSide);
-        stopTransmitting(frequencyName, frequencies.modulationOf(modulation), owner, level.isClientSide);
+        stopReceiving(frequencyName, modulation, owner, level.isClientSide);
+        stopTransmitting(frequencyName, modulation, owner, level.isClientSide);
     }
 
     public int getCooldown() {
-        return 20;
+        return SimpleRadioLibrary.SERVER_CONFIG.transceiver.cooldown;
     }
 
     @Override
@@ -197,8 +175,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         if (activationUUID == null) return;
 
-
-
         CommonSimpleRadio.debug("Activated transceiver using UUID {}!", activationUUID);
 
         frequency = tag.getString("frequency");
@@ -227,7 +203,6 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
         level.playSound(
                 player, player.blockPosition(),
                 SimpleRadioSounds.RADIO_OPEN,
@@ -236,17 +211,15 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         );
         player.startUsingItem(hand);
 
+        // Get the transmitter and activate it
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
+            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
+            if (transmitter != null) transmitter.setActive(true);
+        }
+
         return InteractionResultHolder.consume(stack);
-    }
-
-    @Override
-    public int getUseDuration(ItemStack stack) {
-        return 72000;
-    }
-
-    @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.TOOT_HORN;
     }
 
     @Override
@@ -262,6 +235,23 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             player.getCooldowns().addCooldown(this, this.getCooldown());
         }
 
+        // Get the transmitter and deactivate it
+        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
+            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
+            if (transmitter != null) transmitter.setActive(false);
+        }
+
         super.releaseUsing(stack, level, user, remainingUseTicks);
+    }
+
+    @Override
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+        return 72000;
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.TOOT_HORN;
     }
 }

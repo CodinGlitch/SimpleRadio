@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
@@ -14,7 +15,10 @@ import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -43,27 +47,6 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
         speaker.setLink(this.getClass());
         receiver.setLink(this.getClass());
         transmitter.setLink(this.getClass());
-
-        // --- Half-duplex implementation
-
-        receiver.setAcceptingCriteria(((source) -> {
-            Entity entity = receiver.getOwner();
-            Frequency frequency = receiver.getFrequency();
-            if (frequency == null) return false;
-
-            if (entity instanceof Player player) {
-                ItemStack using = player.getUseItem();
-
-                CompoundTag usingTag = using.getOrCreateTag();
-                if (!usingTag.contains("frequency") || !usingTag.contains("modulation")) return true;
-
-                if (!(using.getItem() instanceof TransceiverItem)) return true;
-                if (!usingTag.getString("frequency").equals(frequency.getFrequency())) return true;
-                return !usingTag.getString("modulation").equals(frequency.getModulation().shorthand);
-            }
-
-            return true;
-        }));
     }
 
     @Override
@@ -119,7 +102,32 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     }
 
     @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        // Get the receiver and deactivate it (half-duplex)
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
+            Receiver receiver = frequency.getReceiver(stack.get(REFERENCE));
+            if (receiver != null) receiver.setActive(false);
+        }
+
+        return super.use(level, player, hand);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int remainingUseTicks) {
+        // Get the receiver and reactivate it (half-duplex)
+        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
+            Receiver receiver = frequency.getReceiver(stack.get(REFERENCE));
+            if (receiver != null) receiver.setActive(true);
+        }
+
+        super.releaseUsing(stack, level, user, remainingUseTicks);
+    }
+
+    @Override
     public int getCooldown() {
-        return 60;
+        return SimpleRadioLibrary.SERVER_CONFIG.walkie_talkie.cooldown;
     }
 }
