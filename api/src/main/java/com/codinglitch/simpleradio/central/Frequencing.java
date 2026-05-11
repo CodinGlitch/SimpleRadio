@@ -76,7 +76,7 @@ public interface Frequencing {
      */
     default void setFrequency(ItemStack stack, String frequencyName, Frequency.Modulation modulation) {
         stack.set(FREQUENCY, frequencyName);
-        stack.set(MODULATION, modulation.shorthand);
+        stack.set(MODULATION, modulation);
     }
     /**
      * Sets the frequency for a BlockEntity.
@@ -106,7 +106,7 @@ public interface Frequencing {
         if (!stack.has(FREQUENCY) || !stack.has(MODULATION)) return null;
 
         String frequencyName = stack.get(FREQUENCY);
-        Frequency.Modulation modulation = SimpleRadioApi.getInstance().frequencies().modulationOf(stack.get(MODULATION));
+        Frequency.Modulation modulation = stack.get(MODULATION);
         return SimpleRadioApi.getInstance().frequencies().getOrCreate(frequencyName, modulation);
     }
     /**
@@ -153,7 +153,7 @@ public interface Frequencing {
     default void appendTooltip(ItemStack stack, List<Component> components) {
         if (stack.has(FREQUENCY)) {
             components.add(Component.literal(
-                    stack.get(FREQUENCY) + stack.get(MODULATION)
+                    stack.get(FREQUENCY) + stack.get(MODULATION).shorthand
             ).withStyle(ChatFormatting.DARK_GRAY));
         }
 

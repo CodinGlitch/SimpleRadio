@@ -115,7 +115,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
 
     public static CompoundTag tagFromComponents(ItemStack stack, CompoundTag tag) {
         if (stack.has(FREQUENCY))  tag.putString("frequency",  stack.get(FREQUENCY));
-        if (stack.has(MODULATION)) tag.putString("modulation", stack.get(MODULATION));
+        if (stack.has(MODULATION)) tag.putString("modulation", stack.get(MODULATION).shorthand);
         if (stack.has(REFERENCE))  tag.putUUID("reference",    stack.get(REFERENCE));
         return tag;
     }
@@ -124,7 +124,7 @@ public abstract class AuditoryBlockEntity extends BlockEntity implements Socket 
     public void saveToItem(ItemStack stack, HolderLookup.Provider provider) {
         if (this.frequency != null) {
             stack.set(FREQUENCY, this.frequency.getFrequency());
-            stack.set(MODULATION, this.frequency.getModulation().shorthand);
+            stack.set(MODULATION, this.frequency.getModulation());
         }
 
         if (this.id != null) {
