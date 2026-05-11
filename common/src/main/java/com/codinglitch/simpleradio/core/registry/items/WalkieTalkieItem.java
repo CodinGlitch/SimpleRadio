@@ -105,9 +105,10 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         // Get the receiver and deactivate it (half-duplex)
         ItemStack stack = player.getItemInHand(hand);
-        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
-            Receiver receiver = frequency.getReceiver(stack.get(REFERENCE));
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Receiver receiver = frequency.getReceiver(tag.getUUID("reference"));
             if (receiver != null) receiver.setActive(false);
         }
 
@@ -117,9 +118,10 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int remainingUseTicks) {
         // Get the receiver and reactivate it (half-duplex)
-        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
-            Receiver receiver = frequency.getReceiver(stack.get(REFERENCE));
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Receiver receiver = frequency.getReceiver(tag.getUUID("reference"));
             if (receiver != null) receiver.setActive(true);
         }
 

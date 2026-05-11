@@ -26,6 +26,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +51,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
     private void activate(Level level, ItemStack stack, String frequencyName, Frequency.Modulation modulation, Entity entity, UUID owner) {
         CommonSimpleRadio.info("Activating transceiver with reference {}", owner);
+        Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
 
         Listener listener = startListening(entity, owner);
         Speaker speaker = startSpeaking(entity, owner);
@@ -93,7 +95,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         super.onDestroyed(itemEntity);
         CompoundTag tag = itemEntity.getItem().getOrCreateTag();
         if (tag.contains("frequency") && tag.contains("modulation") && tag.contains("reference")) {
-            inactivate(itemEntity.level(), tag.getString("frequency"), tag.getString("modulation"), tag.getUUID("reference"));
+            inactivate(itemEntity.level(), tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")), tag.getUUID("reference"));
         }
     }
 
@@ -179,7 +181,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         frequency = tag.getString("frequency");
         modulation = tag.getString("modulation");
-        activate(level, stack, frequency, modulation, entity, activationUUID);
+        activate(level, stack, frequency, Frequency.modulationOf(modulation), entity, activationUUID);
     }
 
     @Override
@@ -213,9 +215,10 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
         // Get the transmitter and activate it
         ItemStack stack = player.getItemInHand(hand);
-        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
-            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
             if (transmitter != null) transmitter.setActive(true);
         }
 
@@ -236,9 +239,10 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
 
         // Get the transmitter and deactivate it
-        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
-            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
             if (transmitter != null) transmitter.setActive(false);
         }
 
@@ -246,7 +250,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(ItemStack stack) {
         return 72000;
     }
 
