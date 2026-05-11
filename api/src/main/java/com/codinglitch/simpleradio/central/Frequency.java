@@ -3,6 +3,7 @@ package com.codinglitch.simpleradio.central;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.Transmitter;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,13 @@ public interface Frequency extends Medium {
         Modulation(String shorthand) {
             this.shorthand = shorthand;
         }
+    }
+
+    @Nullable
+    static Frequency.Modulation modulationOf(String shorthand) {
+        for (Frequency.Modulation modulation : Frequency.Modulation.values())
+            if (modulation.shorthand.equals(shorthand)) return modulation;
+        return null;
     }
 
     String getFrequency();
