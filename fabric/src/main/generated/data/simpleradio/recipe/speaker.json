@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "speaker"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "Y": {
+      "item": "simpleradio:speaker_module"
+    }
+  },
+  "pattern": [
+    " Y ",
+    "ICI",
+    "RI "
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:speaker"
+  }
+}

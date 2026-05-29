@@ -1,0 +1,47 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "simpleradio:items_enabled",
+      "values": [
+        "transceiver"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "simpleradio:antenna"
+    },
+    "C": {
+      "item": "simpleradio:copper_wire"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "Q": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "W": {
+      "item": "simpleradio:listener_module"
+    },
+    "X": {
+      "item": "simpleradio:transmitting_module"
+    },
+    "Y": {
+      "item": "simpleradio:speaker_module"
+    },
+    "Z": {
+      "item": "simpleradio:receiving_module"
+    }
+  },
+  "pattern": [
+    "AWC",
+    "XIZ",
+    "QYQ"
+  ],
+  "result": {
+    "count": 1,
+    "id": "simpleradio:transceiver"
+  }
+}

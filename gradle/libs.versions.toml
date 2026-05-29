@@ -154,7 +154,7 @@ fabric_environment = [
     "fabric_computercraft",
     "fabric_voicechatinteraction",
     "fabric_polymer",
-    "fabric_sable",
+#    "fabric_sable",
 #    "vibrativevoice",
 #    "fabric_valkyrienskies",
 #    "fabric_create",
