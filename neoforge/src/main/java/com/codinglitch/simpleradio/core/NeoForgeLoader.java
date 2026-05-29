@@ -1,6 +1,8 @@
 package com.codinglitch.simpleradio.core;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.*;
@@ -17,8 +19,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -103,7 +107,17 @@ public class NeoForgeLoader {
         event.register(SimpleRadioTests.class);
     }
 
-    public static void load() {
+    @SubscribeEvent
+    public static void register(RegisterCapabilitiesEvent event) {
+        // oh no! this is going to run before our compatibility configurations are loaded
+        // this means we will never be able to disable CC:Tweaked compat for neo
+        // we call the method to check if the mod is loaded rather than the property which is for the compatibility instance
+        if (CompatCore.COMPUTER_CRAFT.isLoaded()) {
+            CCCompat.register(event);
+        }
+    }
+
+    public static void load(IEventBus modBus) {
         loadItems();
     }
 }
