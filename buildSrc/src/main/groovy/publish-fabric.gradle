@@ -8,6 +8,6 @@ publishMods {
         requires("fabric-api")
     }
     modrinth {
-
+        requires("fabric-api")
     }
 }
