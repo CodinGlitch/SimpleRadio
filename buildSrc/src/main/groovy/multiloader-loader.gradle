@@ -112,6 +112,9 @@ publishMods {
             end   = minecraft_max
         }
 
+        requires(required.split(","))
+        optional(optional.split(","))
+
         client = true
         server = true
     }
@@ -119,6 +122,9 @@ publishMods {
     modrinth {
         projectId = modrinth_id
         accessToken = System.getenv("modrinth_token")
+
+        requires(required.split(","))
+        optional(optional.split(","))
 
         minecraftVersionRange {
             start = minecraft_min
