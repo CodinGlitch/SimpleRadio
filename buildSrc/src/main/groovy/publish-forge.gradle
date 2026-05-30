@@ -1,0 +1,13 @@
+publishMods {
+    file = jarJar.archiveFile
+
+    modLoaders.add("forge")
+    dryRun = debug_mode.toBoolean()
+
+    curseforge {
+
+    }
+    modrinth {
+
+    }
+}

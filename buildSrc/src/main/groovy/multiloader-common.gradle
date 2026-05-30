@@ -156,10 +156,10 @@ processResources {
             "credits"                       : credits,
 
             "minecraft_version"             : libs.versions.minecraft.asProvider().get(),
-            "minecraft_version_range"       : libs.versions.minecraft.range.get(),
+            "minecraft_range_interval"      : libs.versions.minecraft.range.interval.get(),
+            "minecraft_range_builder"       : libs.versions.minecraft.range.builder.get(),
             "fabric_version"                : libs.versions.fabric.api.get(),
             "fabric_loader_version"         : libs.versions.fabric.loader.get(),
-            "fabric_minecraft_version_range": libs.versions.fabric.mc.range.get(),
             "forge_version"                 : libs.versions.forge.asProvider().get(),
             "forge_version_range"           : libs.versions.forge.range.get(),
 

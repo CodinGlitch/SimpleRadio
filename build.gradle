@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.loom) apply false
-    alias(libs.plugins.legacyforge) apply false
+    alias(libs.plugins.loom)         apply false
+    alias(libs.plugins.legacyforge)  apply false
+    alias(libs.plugins.modpublish)   apply false
 
     // load-bearing version 💔
     alias(libs.plugins.ideaext)
