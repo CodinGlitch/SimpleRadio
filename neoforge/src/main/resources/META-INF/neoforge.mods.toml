@@ -31,7 +31,7 @@ issueTrackerURL="https://github.com/CodinGlitch/SimpleRadio/issues"
 [[dependencies.${mod_id}]]
     modId = "minecraft"
     type = "required"
-    versionRange = "${minecraft_version_range}"
+    versionRange = "${minecraft_range_interval}"
     ordering = "NONE"
     side = "BOTH"
 [[dependencies.${mod_id}]]
