@@ -41,6 +41,16 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            // adding these ranges dependent on the properties
+            version("minecraft_range_interval", "[${minecraft_min},${minecraft_max}]")
+            version("minecraft_range_builder", ">=${minecraft_min} <=${minecraft_max}")
+        }
+    }
+}
+
 // This should match the folder name of the project, or else IDEA may complain (see https://youtrack.jetbrains.com/issue/IDEA-317606)
 rootProject.name = 'SimpleRadio-1.21.1'
 include("common")

@@ -1,0 +1,13 @@
+publishMods {
+    file = remapJar.archiveFile
+
+    modLoaders.add("fabric")
+    dryRun = debug_mode.toBoolean()
+
+    curseforge {
+        requires("fabric-api")
+    }
+    modrinth {
+
+    }
+}

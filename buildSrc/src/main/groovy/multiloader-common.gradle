@@ -157,10 +157,10 @@ processResources {
             "credits"                       : credits,
 
             "minecraft_version"             : libs.versions.minecraft.asProvider().get(),
-            "minecraft_version_range"       : libs.versions.minecraft.range.get(),
+            "minecraft_range_interval"      : libs.versions.minecraft.range.interval.get(),
+            "minecraft_range_builder"       : libs.versions.minecraft.range.builder.get(),
             "fabric_version"                : libs.versions.fabric.api.get(),
             "fabric_loader_version"         : libs.versions.fabric.loader.get(),
-            "fabric_minecraft_version_range": libs.versions.fabric.mc.range.get(),
             "neoforge_version"              : libs.versions.neoforge.asProvider().get(),
             "neoforge_version_range"        : libs.versions.neoforge.range.get(),
 
