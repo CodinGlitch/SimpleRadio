@@ -43,6 +43,6 @@ issueTrackerURL="https://github.com/CodinGlitch/SimpleRadio/issues"
 [[dependencies.${mod_id}]]
     modId="lexiconfig"
     type = "required"
-    versionRange="[${lexiconfig_version},)"
+    versionRange="[1.4,1.5)"
     ordering="AFTER"
     side="BOTH"
