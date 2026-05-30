@@ -18,8 +18,6 @@ loom                = "1.10-SNAPSHOT"
 legacy_forge        = "2.0.141"
 idea_ext            = "1.2"
 
-minotaur            = "2.+"
-curse_gradle        = "1.4.0"
 mod_publish         = "2.0.0-beta.2"
 
 #---- Dependencies ----#
@@ -124,8 +122,6 @@ forge_configured = { group="com.mrcrayfish", name="configured-forge", version.re
 
 [plugins]
 #---- Publishing ----#
-minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
-cursegradle = { id = "net.darkhax.curseforgegradle", version.ref = "curse_gradle" }
 modpublish = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod_publish" }
 
 #---- Loaders ----#
