@@ -1,12 +1,11 @@
 plugins {
     id 'multiloader-loader'
-
     alias(libs.plugins.loom)
+
+    id 'publish-fabric'
 }
 
-//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
-//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/curseforge.gradle'
-//apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/site-publishers/modrinth.gradle'
+apply from: 'https://raw.githubusercontent.com/CodinGlitch/gradle-templates/main/repository-publishers/codinglitch.gradle'
 
 dependencies {
     minecraft(libs.fabric.minecraft)
