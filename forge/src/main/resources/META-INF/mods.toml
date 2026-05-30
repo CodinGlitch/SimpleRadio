@@ -38,6 +38,6 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="lexiconfig"
 mandatory=true
-versionRange="[${lexiconfig_version},)"
+versionRange="[1.4,1.5)"
 ordering="AFTER"
 side="BOTH"
