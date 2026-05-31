@@ -164,8 +164,6 @@ processResources {
             "neoforge_version"              : libs.versions.neoforge.asProvider().get(),
             "neoforge_version_range"        : libs.versions.neoforge.range.get(),
 
-            "lexiconfig_version"            : libs.versions.lexiconfig.get(),
-
             "voicechat_api_version"         : libs.versions.voicechat.api.get(),
             "voicechat_version"             : libs.versions.voicechat.asProvider().get(),
     ]

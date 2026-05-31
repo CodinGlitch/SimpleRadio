@@ -25,7 +25,8 @@ mixin               = "0.8.5"
 mixin_extras        = "0.4.1"
 voicechat_api       = "2.6.0"
 voicechat           = "2.6.12"
-lexiconfig          = "1.4.19"
+lexiconfig_api      = "1.4.19"
+lexiconfig          = "1.21-1.4.19"
 
 #---- Environment ----#
 fabric_voicechat    = "fabric-1.21.1-2.6.12"
@@ -68,7 +69,7 @@ mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixinextras-common = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin_extras" }
 
 voicechat_api = { group="de.maxhenkel.voicechat", name="voicechat-api", version.ref="voicechat_api" }
-lexiconfig_api = { group="com.codinglitch.lexiconfig", name="lexiconfig-api", version.ref="lexiconfig" }
+lexiconfig_api = { group="com.codinglitch.lexiconfig", name="lexiconfig-api", version.ref="lexiconfig_api" }
 
 computercraft_common = { group="cc.tweaked", name="cc-tweaked-1.21.1-common-api", version.ref="computercraft" }
 computercraft_core = { group="cc.tweaked", name="cc-tweaked-1.21.1-core-api", version.ref="computercraft" }
