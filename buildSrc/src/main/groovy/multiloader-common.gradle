@@ -163,8 +163,6 @@ processResources {
             "forge_version"                 : libs.versions.forge.asProvider().get(),
             "forge_version_range"           : libs.versions.forge.range.get(),
 
-            "lexiconfig_version"            : libs.versions.lexiconfig.get(),
-
             "voicechat_api_version"         : libs.versions.voicechat.api.get(),
             "voicechat_version"             : libs.versions.voicechat.asProvider().get(),
     ]
