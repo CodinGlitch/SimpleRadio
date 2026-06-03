@@ -100,7 +100,7 @@ publishMods {
     displayName = "[${project.name.toUpperCase()}] ${mod_name} ${libs.versions.minecraft.asProvider().get()}-${providers.gradleProperty("version").get()}"
 
     changelog = file("${project.rootDir}/changelog.md").text
-    type = release_type
+    type = STABLE
 
     curseforge {
         projectId = curseforge_id

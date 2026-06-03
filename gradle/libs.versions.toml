@@ -25,8 +25,8 @@ mixin               = "0.8.5"
 mixin_extras        = "0.4.1"
 voicechat_api       = "2.6.0"
 voicechat           = "2.6.12"
-lexiconfig_api      = "1.4.19"
-lexiconfig          = "1.20-1.4.19"
+lexiconfig_api      = "1.4.20"
+lexiconfig          = "1.4.20-epic"
 
 #---- Environment ----#
 fabric_voicechat    = "fabric-1.20.1-2.4.32"
