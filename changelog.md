@@ -1,23 +1,7 @@
-- [Feature] **New routers system**
-- [Feature] **New wiring system**
-- [Feature] **Rework of the audio transmission system**
-- [Feature] **Compatibility with Create contraptions**
-- [Feature] **Enhanced compatibility with Valkyrien Skies**
-- [Feature] Antenna building logic
-- [Feature] Antenna strength logic
-- [Feature] Radio-activity as redstone signals
-- [Added] Transmitter block
-- [Added] Receiver block
-- [Added] Socket block
-- [Added] Copper Wire
-- [Added] New configurations
-- [Change] New Antenna models
-- [Change] New Radiosmithing Table model
-- [Change] New Module textures
-- [Change] Transceiver redesign
-- [Change] Microphone redesign
-- [Change] Speaker redesign
-- [Change] Different recipes
-- [Fix] FFAPI recipe incompatibility
-- [Fix] Crash upon holding certain radio items
-- [Experimental] In-world audio listening config (including jukeboxes)
+- [Feature] **API restructure**
+- [Compatibility] **CC: Tweaked integration**
+- [Compatibility] **Sable/Create Aeronautics integration**
+- [Compatibility] Partial (experimental) Etched integration
+- [Compatibility] Partial (experimental) Etched integration
+- [Change] New debug visuals
+- [Fix] (hopefully) Improved router stability
