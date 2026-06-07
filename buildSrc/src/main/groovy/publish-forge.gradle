@@ -1,5 +1,5 @@
 publishMods {
-    file = jar.archiveFile
+    file project(":forge")
 
     modLoaders.add("forge")
     dryRun = debug_mode.toBoolean()
