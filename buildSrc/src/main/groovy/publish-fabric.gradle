@@ -1,5 +1,5 @@
 publishMods {
-    file = remapJar.archiveFile
+    file project(":fabric")
 
     modLoaders.add("fabric")
     dryRun = debug_mode.toBoolean()

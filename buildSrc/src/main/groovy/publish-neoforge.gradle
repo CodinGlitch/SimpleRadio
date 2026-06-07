@@ -1,5 +1,5 @@
 publishMods {
-    file = jar.archiveFile
+    file project(":neoforge")
 
     modLoaders.add("neoforge")
     dryRun = debug_mode.toBoolean()
