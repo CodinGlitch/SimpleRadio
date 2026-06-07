@@ -105,7 +105,7 @@ publishMods {
     curseforge {
         projectId = curseforge_id
         projectSlug = "simple-voice-radio"
-        accessToken = System.getenv("curseforge_token")
+        accessToken = project.findProperty("curseforge_token")
 
         minecraftVersionRange {
             start = minecraft_min
@@ -121,7 +121,7 @@ publishMods {
 
     modrinth {
         projectId = modrinth_id
-        accessToken = System.getenv("modrinth_token")
+        accessToken = project.findProperty("modrinth_token")
 
         requires(required.split(","))
         optional(optional.split(","))
