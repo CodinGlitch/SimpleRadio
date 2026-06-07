@@ -80,20 +80,16 @@ dependencies {
     modCompileOnly(libs.forge.valkyrienskies) { transitive = false }
 
     compileOnly(libs.mixinextras.common)
+    annotationProcessor(libs.mixinextras.common)
     implementation(jarJar(libs.forge.mixinextras.get()))
 
     modRuntimeOnly libs.bundles.forge.environment
 }
 
-tasks.named('jarJar') {
-    archiveClassifier = ''
-    //finalizedBy reobfJarJar
-}
 jar {
-    archiveClassifier = "slim"
-    finalizedBy('reobfJar')
+//    finalizedBy('reobfJar')
     manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json,${mod_id}.api.mixins.json"
     ])
 }
 
