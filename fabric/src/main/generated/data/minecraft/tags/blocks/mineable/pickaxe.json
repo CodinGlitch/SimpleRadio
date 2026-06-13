@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "simpleradio:antenna",
+    "simpleradio:radio",
+    "simpleradio:frequencer",
+    "simpleradio:radiosmither",
+    "simpleradio:receiver",
+    "simpleradio:transmitter",
+    "simpleradio:speaker",
+    "simpleradio:microphone"
+  ]
+}
