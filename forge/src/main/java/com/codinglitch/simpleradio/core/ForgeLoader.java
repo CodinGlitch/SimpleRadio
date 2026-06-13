@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
+import com.codinglitch.simpleradio.datagen.SimpleRadioBlockTagProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
 import com.codinglitch.simpleradio.gametest.SimpleRadioTests;
 import net.minecraft.core.registries.Registries;
@@ -45,6 +46,11 @@ public class ForgeLoader {
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
+
+        generator.addProvider(
+                event.includeServer(),
+                new SimpleRadioBlockTagProvider(generator.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper())
+        );
 
         generator.addProvider(
                 event.includeServer(),
