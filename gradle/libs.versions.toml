@@ -29,8 +29,8 @@ lexiconfig_api      = "1.4.21"
 lexiconfig          = "1.4.21-novel"
 
 #---- Environment ----#
-fabric_voicechat    = "fabric-1.20.1-2.6.18"
-forge_voicechat     = "forge-1.20.1-2.6.18"
+fabric_voicechat    = "fabric-1.21.1-2.6.18"
+neoforge_voicechat  = "neoforge-1.21.1-2.6.18"
 
 audioplayer         = "fabric-1.21.1-1.13.2"
 admiral             = "0.4.5+1.21+fabric"
