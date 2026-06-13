@@ -10,5 +10,6 @@ public class SimpleRadioDataGenerator implements DataGeneratorEntrypoint {
 
         pack.addProvider(SimpleRadioLootTableProvider::new);
         pack.addProvider(SimpleRadioRecipeProvider::new);
+        pack.addProvider(SimpleRadioBlockTagProvider::new);
     }
 }
