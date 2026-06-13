@@ -46,6 +46,7 @@ legacyForge {
         data {
             data()
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            sourceSet = sourceSets.datagen
         }
         server {
             server()
@@ -68,7 +69,7 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
-    implementation(libs.forge.etched)
+    compileOnly(libs.forge.etched)
 
     compileOnly(libs.forge.computercraft.api)
     compileOnly(libs.forge.voicechat)
@@ -98,6 +99,3 @@ sourceSets.each {
     it.output.resourcesDir = dir
     it.java.destinationDirectory = dir
 }
-
-substituteResources.dependsOn compileDatagenJava, processDatagenResources, compileJava, processResources
-datagenClasses.finalizedBy substituteResources
