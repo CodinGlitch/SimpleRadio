@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry;
 
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Catalyst;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -30,6 +31,10 @@ public class CatalystRegistry {
 
     public static Catalyst register(ResourceLocation location, Catalyst catalyst) {
         catalyst.location = location;
+
+        if (CATALYSTS.get(location) != null) {
+            SimpleRadioApi.getInstance().warn("A conflicting catalyst for {} already exists and will be overwritten!", location);
+        }
 
         CATALYSTS.put(location, catalyst);
         return catalyst;
