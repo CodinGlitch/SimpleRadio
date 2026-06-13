@@ -4,6 +4,7 @@ import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
+import com.codinglitch.simpleradio.central.Listening;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
@@ -29,6 +30,7 @@ import com.mojang.blaze3d.audio.SoundBuffer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -50,6 +52,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
@@ -83,6 +86,16 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     // im, losing it
+
+    // series of checks if the current item being used can (and is) listening
+    public static boolean isUsingHandheld() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return false;
+        if (!player.isUsingItem()) return false;
+
+        ItemStack useItem = player.getUseItem();
+        return useItem.getItem() instanceof Listening;
+    }
 
     private boolean routerMatches(Router router, @Nullable String type) {
         return (type == null ? router.getClass().equals(RadioRouter.class) : router.getClass().getSimpleName().equals(type));
