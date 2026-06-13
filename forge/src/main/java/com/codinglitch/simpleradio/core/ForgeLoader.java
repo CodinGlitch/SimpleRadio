@@ -16,11 +16,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterGameTestsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -90,6 +93,10 @@ public class ForgeLoader {
         event.register(SimpleRadioTests.class);
     }
 
+    public static void addReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new SimpleRadioCatalysts());
+    }
+
     public static void loadPackets() {
         AtomicInteger index = new AtomicInteger();
 
@@ -125,6 +132,8 @@ public class ForgeLoader {
     public static void load() {
         loadItems();
         loadPackets();
+
+        MinecraftForge.EVENT_BUS.addListener(ForgeLoader::addReloadListeners);
     }
 
     public static void loadClient() {
