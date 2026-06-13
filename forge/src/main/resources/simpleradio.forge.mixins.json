@@ -12,6 +12,7 @@
     "MixinStreamingAudioSource"
   ],
   "client": [
+    "MixinPTTMicrophoneProcessor"
   ],
   "server": [
   ],
