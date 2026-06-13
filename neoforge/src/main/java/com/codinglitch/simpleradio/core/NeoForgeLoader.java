@@ -7,6 +7,7 @@ import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.*;
 import com.codinglitch.simpleradio.datagen.SimpleRadioBlockLootTableProvider;
+import com.codinglitch.simpleradio.datagen.SimpleRadioBlockTagProvider;
 import com.codinglitch.simpleradio.datagen.SimpleRadioRecipeProvider;
 import com.codinglitch.simpleradio.gametest.SimpleRadioTests;
 import net.minecraft.core.registries.Registries;
@@ -23,7 +24,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -40,6 +43,11 @@ public class NeoForgeLoader {
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
+
+        generator.addProvider(
+                event.includeServer(),
+                new SimpleRadioBlockTagProvider(generator.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper())
+        );
 
         generator.addProvider(
                 event.includeServer(),
@@ -107,6 +115,10 @@ public class NeoForgeLoader {
         event.register(SimpleRadioTests.class);
     }
 
+    public static void addReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new SimpleRadioCatalysts());
+    }
+
     @SubscribeEvent
     public static void register(RegisterCapabilitiesEvent event) {
         // oh no! this is going to run before our compatibility configurations are loaded
@@ -119,5 +131,7 @@ public class NeoForgeLoader {
 
     public static void load(IEventBus modBus) {
         loadItems();
+
+        NeoForge.EVENT_BUS.addListener(NeoForgeLoader::addReloadListeners);
     }
 }

@@ -1,15 +1,17 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "com.codinglitch.simpleradio.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "mixins": [
-    ],
-    "client": [
-    ],
-    "server": [
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.codinglitch.simpleradio.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinLocationalAudioChannelImpl"
+  ],
+  "client": [
+    "MixinPTTMicrophoneProcessor"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
