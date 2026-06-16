@@ -377,5 +377,31 @@ public class SimpleRadioServerConfig extends LexiconData {
             @Override
             public boolean isEnabled() { return enabled; }
         }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency Curios.")
+        public Curios curios = new Curios();
+
+        public static class Curios extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for Curios. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
+
+        //----
+
+        @LexiconPage(comment = "These are the configurations for the optional dependency Trinkets.")
+        public Trinkets trinkets = new Trinkets();
+
+        public static class Trinkets extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+            @LexiconEntry(comment = "When false, removes compatibility for Trinkets. Defaults to true.")
+            public Boolean enabled = true;
+
+            @Override
+            public boolean isEnabled() { return enabled; }
+        }
     }
 }

@@ -51,6 +51,13 @@ public class CompatCore {
             "Sable", "sable", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.sable
     );
 
+    public static CompatibilityInstance CURIOS = new CompatibilityInstance(
+            "Curios", "curios", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.curios
+    );
+    public static CompatibilityInstance TRINKETS = new CompatibilityInstance(
+            "Trinkets", "trinkets", SimpleRadioLibrary.SERVER_CONFIG.compatibilities.trinkets
+    );
+
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
     }
@@ -66,6 +73,9 @@ public class CompatCore {
 
         ETCHED.spout();
         AUDIO_PLAYER.spout();
+
+        CURIOS.spout();
+        TRINKETS.spout();
 
         if (!initialized) {
             initialized = true;
