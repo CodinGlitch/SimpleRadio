@@ -40,6 +40,9 @@ public class SimpleRadioClientConfig extends LexiconData {
     public static class Transceiver extends LexiconPageData {
         @LexiconEntry(comment = "This is whether or not using the transceiver slows the player. Defaults to true.")
         public Boolean transceiverSlow = true;
+
+        @LexiconEntry(comment = "This is whether or not using the transceiver should enable push to talk. Defaults to true.")
+        public Boolean transceiverPTT = true;
     }
 
     public static class Speaker extends LexiconPageData {
@@ -55,5 +58,8 @@ public class SimpleRadioClientConfig extends LexiconData {
     public static class WalkieTalkie extends LexiconPageData {
         @LexiconEntry(comment = "This is whether or not using the walkie talkie slows the player. Defaults to true.")
         public Boolean walkieTalkieSlow = true;
+
+        @LexiconEntry(comment = "This is whether or not using the walkie talkie should enable push to talk. Defaults to true.")
+        public Boolean walkieTalkiePTT = true;
     }
 }

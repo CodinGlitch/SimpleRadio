@@ -19,6 +19,7 @@ import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlockEntity;
+import com.codinglitch.simpleradio.core.registry.items.WalkieTalkieItem;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.radio.effects.AudioEffect;
@@ -95,6 +96,15 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
 
         ItemStack useItem = player.getUseItem();
         return useItem.getItem() instanceof Listening;
+    }
+
+    public static boolean shouldEnablePTT() {
+        if (!isUsingHandheld()) return false;
+
+        ItemStack useItem = Minecraft.getInstance().player.getUseItem();
+        return useItem.getItem() instanceof WalkieTalkieItem ?
+                SimpleRadioLibrary.CLIENT_CONFIG.walkie_talkie.walkieTalkiePTT :
+                SimpleRadioLibrary.CLIENT_CONFIG.transceiver.transceiverPTT;
     }
 
     private boolean routerMatches(Router router, @Nullable String type) {
