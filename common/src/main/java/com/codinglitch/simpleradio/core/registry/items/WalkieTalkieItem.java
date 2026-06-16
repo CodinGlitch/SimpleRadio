@@ -48,7 +48,9 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     }
 
     @Override
-    public void begin(ItemStack stack, Level level) {
+    public void begin(ItemStack stack, Entity entity) {
+        Level level = entity.level();
+
         // Get the receiver and deactivate it (half-duplex)
         if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
             Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
@@ -56,11 +58,13 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
             if (receiver != null) receiver.setActive(false);
         }
 
-        super.begin(stack, level);
+        super.begin(stack, entity);
     }
 
     @Override
-    public void end(ItemStack stack, Level level) {
+    public void end(ItemStack stack, Entity entity) {
+        Level level = entity.level();
+
         // Get the receiver and reactivate it (half-duplex)
         if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
             Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
@@ -68,7 +72,7 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
             if (receiver != null) receiver.setActive(true);
         }
 
-        super.end(stack, level);
+        super.end(stack, entity);
     }
 
     @Override
