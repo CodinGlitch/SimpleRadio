@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.core.FabricLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -34,9 +35,7 @@ public class SimpleRadioClient implements ClientModInitializer {
             }
         });
 
-        for (Keybinds.Binding binding : Keybinds.BINDINGS) {
-            KeyBindingHelper.registerKeyBinding(binding.mapping);
-        }
+        Keybinds.register(KeyBindingHelper::registerKeyBinding);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             for (Keybinds.Binding binding : Keybinds.BINDINGS) {
                 Keybinds.processBinding(binding);
