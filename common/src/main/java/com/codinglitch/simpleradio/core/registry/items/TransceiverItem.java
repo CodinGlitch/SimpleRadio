@@ -77,6 +77,23 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         stopTransmitting(frequencyName, modulation, owner, level.isClientSide);
     }
 
+    public void begin(ItemStack stack, Level level) {
+        // Get the transmitter and activate it
+        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
+            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
+            if (transmitter != null) transmitter.setActive(true);
+        }
+    }
+    public void end(ItemStack stack, Level level) {
+        // Get the transmitter and deactivate it
+        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
+            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
+            if (transmitter != null) transmitter.setActive(false);
+        }
+    }
+
     public int getCooldown() {
         return SimpleRadioLibrary.SERVER_CONFIG.transceiver.cooldown;
     }
@@ -214,13 +231,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         );
         player.startUsingItem(hand);
 
-        // Get the transmitter and activate it
         ItemStack stack = player.getItemInHand(hand);
-        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
-            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
-            if (transmitter != null) transmitter.setActive(true);
-        }
+        begin(stack, level);
 
         return InteractionResultHolder.consume(stack);
     }
@@ -238,12 +250,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             player.getCooldowns().addCooldown(this, this.getCooldown());
         }
 
-        // Get the transmitter and deactivate it
-        if (stack.has(REFERENCE) && stack.has(FREQUENCY) && stack.has(MODULATION)) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(stack.get(FREQUENCY), stack.get(MODULATION));
-            Transmitter transmitter = frequency.getTransmitter(stack.get(REFERENCE));
-            if (transmitter != null) transmitter.setActive(false);
-        }
+        end(stack, level);
 
         super.releaseUsing(stack, level, user, remainingUseTicks);
     }
