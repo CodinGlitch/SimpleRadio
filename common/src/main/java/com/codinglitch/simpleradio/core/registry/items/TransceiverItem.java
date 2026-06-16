@@ -49,7 +49,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         transmitter.setLink(this.getClass());
     }
 
-    private void activate(Level level, ItemStack stack, String frequencyName, Frequency.Modulation modulation, Entity entity, UUID owner) {
+    public void activate(Level level, ItemStack stack, String frequencyName, Frequency.Modulation modulation, Entity entity, UUID owner) {
         CommonSimpleRadio.info("Activating transceiver with reference {}", owner);
         Frequencies frequencies = SimpleRadioApi.getInstance(level.isClientSide).frequencies();
 
@@ -71,11 +71,30 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         // Set transmitter activation state only if a player isn't holding it
         transmitter.setActive(!(entity instanceof Player));
     }
-    private void inactivate(Level level, String frequencyName, Frequency.Modulation modulation, UUID owner) {
+    public void inactivate(Level level, String frequencyName, Frequency.Modulation modulation, UUID owner) {
         stopListening(owner, level.isClientSide);
         stopSpeaking(owner, level.isClientSide);
         stopReceiving(frequencyName, modulation, owner, level.isClientSide);
         stopTransmitting(frequencyName, modulation, owner, level.isClientSide);
+    }
+
+    public void begin(ItemStack stack, Level level) {
+        // Get the transmitter and activate it
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
+            if (transmitter != null) transmitter.setActive(true);
+        }
+    }
+    public void end(ItemStack stack, Level level) {
+        // Get the transmitter and deactivate it
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
+            if (transmitter != null) transmitter.setActive(false);
+        }
     }
 
     public int getCooldown() {
@@ -213,14 +232,8 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         );
         player.startUsingItem(hand);
 
-        // Get the transmitter and activate it
         ItemStack stack = player.getItemInHand(hand);
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
-            Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
-            if (transmitter != null) transmitter.setActive(true);
-        }
+        begin(stack, level);
 
         return InteractionResultHolder.consume(stack);
     }
@@ -238,13 +251,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             player.getCooldowns().addCooldown(this, this.getCooldown());
         }
 
-        // Get the transmitter and deactivate it
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
-            Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
-            if (transmitter != null) transmitter.setActive(false);
-        }
+        end(stack, level);
 
         super.releaseUsing(stack, level, user, remainingUseTicks);
     }

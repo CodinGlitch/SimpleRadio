@@ -50,6 +50,32 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     }
 
     @Override
+    public void begin(ItemStack stack, Level level) {
+        // Get the receiver and deactivate it (half-duplex)
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Receiver receiver = frequency.getReceiver(tag.getUUID("reference"));
+            if (receiver != null) receiver.setActive(false);
+        }
+
+        super.begin(stack, level);
+    }
+
+    @Override
+    public void end(ItemStack stack, Level level) {
+        // Get the receiver and reactivate it (half-duplex)
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
+            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
+            Receiver receiver = frequency.getReceiver(tag.getUUID("reference"));
+            if (receiver != null) receiver.setActive(true);
+        }
+
+        super.end(stack, level);
+    }
+
+    @Override
     public String getDefaultFrequency() {
         StringBuilder frequency = new StringBuilder();
 
@@ -99,33 +125,6 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
                 }
             }
         }
-    }
-
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        // Get the receiver and deactivate it (half-duplex)
-        ItemStack stack = player.getItemInHand(hand);
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
-            Receiver receiver = frequency.getReceiver(tag.getUUID("reference"));
-            if (receiver != null) receiver.setActive(false);
-        }
-
-        return super.use(level, player, hand);
-    }
-
-    @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int remainingUseTicks) {
-        // Get the receiver and reactivate it (half-duplex)
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
-            Frequency frequency = SimpleRadioApi.getInstance(level.isClientSide).frequencies().get(tag.getString("frequency"), Frequency.modulationOf(tag.getString("modulation")));
-            Receiver receiver = frequency.getReceiver(tag.getUUID("reference"));
-            if (receiver != null) receiver.setActive(true);
-        }
-
-        super.releaseUsing(stack, level, user, remainingUseTicks);
     }
 
     @Override
