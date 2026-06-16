@@ -1,7 +1,3 @@
-- [Feature] **API restructure**
-- [Compatibility] **CC: Tweaked integration**
-- [Compatibility] **Sable/Create Aeronautics integration**
-- [Compatibility] Partial (experimental) Etched integration
-- [Compatibility] Partial (experimental) Etched integration
-- [Change] New debug visuals
-- [Fix] (hopefully) Improved router stability
+- [Feature] **Data-driven support for catalysts**
+- [Change] Lowered break time for blocks
+- [Change] Using a handheld enables PTT
