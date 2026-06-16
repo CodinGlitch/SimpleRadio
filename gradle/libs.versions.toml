@@ -57,6 +57,8 @@ ponder              = "1.0.51"
 flywheel            = "1.0.1"
 registrate          = "MC1.20-1.3.3"
 
+curios              = "5.3.1+1.20.1"
+trinkets            = "3.7.2"
 
 [libraries]
 #---- Common ----#
@@ -100,6 +102,8 @@ fabric_jei = { group="mezz.jei", name="jei-1.20.1-fabric", version.ref="jei"}
 
 fabric_configured = { group="com.mrcrayfish", name="configured-fabric", version.ref="configured"}
 
+fabric_trinkets = { group="dev.emi", name="trinkets", version.ref="trinkets"}
+
 #---- Forge ----#
 forge_lexiconfig = { group="com.codinglitch.lexiconfig", name="lexiconfig-forge", version.ref="lexiconfig" }
 forge_voicechat = { group="maven.modrinth", name="simple-voice-chat", version.ref="forge_voicechat" }
@@ -120,6 +124,8 @@ forge_ponder = { group="net.createmod.ponder", name="Ponder-Forge-1.20.1", versi
 forge_jei = { group="mezz.jei", name="jei-1.20.1-forge", version.ref="jei"}
 
 forge_configured = { group="com.mrcrayfish", name="configured-forge", version.ref="configured"}
+
+forge_curios = { group="top.theillusivec4.curios", name="curios-forge", version.ref="curios"}
 
 [plugins]
 #---- Publishing ----#
@@ -165,6 +171,7 @@ forge_environment = [
     #    "forge_create",
 
     "forge_jei",
+    "forge_curios",
 
     "forge_configured"
 ]
