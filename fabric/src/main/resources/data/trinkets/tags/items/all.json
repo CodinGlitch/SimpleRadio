@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "simpleradio:transceiver",
+    "simpleradio:walkie_talkie"
+  ]
+}
