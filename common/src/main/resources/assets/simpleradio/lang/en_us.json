@@ -70,6 +70,10 @@
   "subtitles.simpleradio.spin_insulator": "Insulator spins",
 
   "tooltip.simpleradio.transceiver_frequency": "Frequency: %s",
-  "tooltip.simpleradio.receiver_user": "User: %s"
+  "tooltip.simpleradio.receiver_user": "User: %s",
+
+  "key.simpleradio.use_handheld": "Use Handheld",
+
+  "key.categories.simpleradio.simpleradio": "Simple Radio"
 }
 
