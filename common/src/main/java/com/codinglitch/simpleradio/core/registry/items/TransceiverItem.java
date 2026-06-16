@@ -78,7 +78,17 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         stopTransmitting(frequencyName, modulation, owner, level.isClientSide);
     }
 
-    public void begin(ItemStack stack, Level level) {
+    public void begin(ItemStack stack, Entity entity) {
+        Level level = entity.level();
+
+        // Play the sound
+        level.playSound(
+                entity, entity.blockPosition(),
+                SimpleRadioSounds.RADIO_OPEN,
+                SoundSource.PLAYERS,
+                1f,1f
+        );
+
         // Get the transmitter and activate it
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
@@ -87,7 +97,22 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             if (transmitter != null) transmitter.setActive(true);
         }
     }
-    public void end(ItemStack stack, Level level) {
+    public void end(ItemStack stack, Entity entity) {
+        Level level = entity.level();
+
+        // Play the sound
+        level.playSound(
+                entity, entity.blockPosition(),
+                SimpleRadioSounds.RADIO_CLOSE,
+                SoundSource.PLAYERS,
+                1f,1f
+        );
+
+        // Add cooldowns
+        if (entity instanceof Player player) {
+            player.getCooldowns().addCooldown(this, this.getCooldown());
+        }
+
         // Get the transmitter and deactivate it
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
@@ -224,34 +249,17 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        level.playSound(
-                player, player.blockPosition(),
-                SimpleRadioSounds.RADIO_OPEN,
-                SoundSource.PLAYERS,
-                1f,1f
-        );
         player.startUsingItem(hand);
 
         ItemStack stack = player.getItemInHand(hand);
-        begin(stack, level);
+        begin(stack, player);
 
         return InteractionResultHolder.consume(stack);
     }
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity user, int remainingUseTicks) {
-        if (user instanceof Player player) {
-            level.playSound(
-                    player, user.blockPosition(),
-                    SimpleRadioSounds.RADIO_CLOSE,
-                    SoundSource.PLAYERS,
-                    1f,1f
-            );
-
-            player.getCooldowns().addCooldown(this, this.getCooldown());
-        }
-
-        end(stack, level);
+        end(stack, user);
 
         super.releaseUsing(stack, level, user, remainingUseTicks);
     }

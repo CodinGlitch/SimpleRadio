@@ -50,7 +50,9 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
     }
 
     @Override
-    public void begin(ItemStack stack, Level level) {
+    public void begin(ItemStack stack, Entity entity) {
+        Level level = entity.level();
+
         // Get the receiver and deactivate it (half-duplex)
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
@@ -59,11 +61,13 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
             if (receiver != null) receiver.setActive(false);
         }
 
-        super.begin(stack, level);
+        super.begin(stack, entity);
     }
 
     @Override
-    public void end(ItemStack stack, Level level) {
+    public void end(ItemStack stack, Entity entity) {
+        Level level = entity.level();
+
         // Get the receiver and reactivate it (half-duplex)
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("reference") && tag.contains("frequency") && tag.contains("modulation")) {
@@ -72,7 +76,7 @@ public class WalkieTalkieItem extends TransceiverItem implements WorldTicking {
             if (receiver != null) receiver.setActive(true);
         }
 
-        super.end(stack, level);
+        super.end(stack, entity);
     }
 
     @Override
