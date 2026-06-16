@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
@@ -60,7 +61,7 @@ public class Keybinds {
 	public static Binding HANDHELD = bind(new KeyMapping(
 			"key.simpleradio.use_handheld",
 			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_G,
+			GLFW.GLFW_KEY_B,
 			"key.categories.simpleradio.simpleradio"
 	), Keybinds::handleHandheld);
 
@@ -68,6 +69,12 @@ public class Keybinds {
 		Binding binding = new Binding(mapping, handler);
 		BINDINGS.add(binding);
 		return binding;
+	}
+
+	public static void register(Consumer<KeyMapping> registry) {
+		if (CompatCore.TRINKETS.isLoaded() || CompatCore.CURIOS.isLoaded()) {
+			registry.accept(HANDHELD.mapping);
+		}
 	}
 
 	public static void processBinding(Binding binding) {
