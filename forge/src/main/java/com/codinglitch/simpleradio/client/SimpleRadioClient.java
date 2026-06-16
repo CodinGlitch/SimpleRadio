@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.platform.ForgeClientRegistryHelper;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -33,7 +34,7 @@ public class SimpleRadioClient {
     }
 
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) { // Only call code once as the tick event is called twice every tick
+        if (event.phase == TickEvent.Phase.END) {
             for (Keybinds.Binding binding : Keybinds.BINDINGS) {
                 Keybinds.processBinding(binding);
             }
@@ -42,9 +43,7 @@ public class SimpleRadioClient {
 
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
-        for (Keybinds.Binding binding : Keybinds.BINDINGS) {
-            event.register(binding.mapping);
-        }
+        Keybinds.register(event::register);
     }
 
     @SubscribeEvent
