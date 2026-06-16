@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.platform;
 
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.CuriosCompat;
 import com.codinglitch.simpleradio.compat.etched.EtchedCompat;
 import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.create.CreateCompat;
@@ -64,6 +65,10 @@ public class ForgeCompatPlatform implements CompatPlatform {
 
         if (CompatCore.COMPUTER_CRAFT.isLoaded) {
             CCCompat.postInitialize();
+        }
+
+        if (CompatCore.CURIOS.isLoaded) {
+            CuriosCompat.postInitialize();
         }
     }
 }

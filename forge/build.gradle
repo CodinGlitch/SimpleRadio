@@ -72,6 +72,8 @@ dependencies {
     compileOnly(libs.forge.etched)
 
     compileOnly(libs.forge.computercraft.api)
+    compileOnly(libs.forge.curios) { artifact { classifier = "api" } }
+
     compileOnly(libs.forge.voicechat)
     runtimeOnly(libs.forge.lexiconfig)
 
