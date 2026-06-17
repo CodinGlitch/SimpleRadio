@@ -10,8 +10,8 @@ import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 import java.util.function.Predicate;
 
@@ -53,6 +53,22 @@ public class FabricCompatPlatform implements CompatPlatform {
 
     @Override
     public RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria) {
+
+        // Prevent router collection if it's in a trinket slot
+        if (CompatCore.TRINKETS.isLoaded && entity instanceof Player player) {
+            ItemStack stack = TrinketsCompat.getAccessory(player, inventoryCriteria);
+            if (stack != ItemStack.EMPTY) return RadioManager.CollectionResult.IGNORE;
+        }
+
         return RadioManager.CollectionResult.PASS;
+    }
+
+    @Override
+    public ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
+        if (CompatCore.TRINKETS.isLoaded) {
+            return TrinketsCompat.getAccessory(player, filter);
+        }
+
+        return ItemStack.EMPTY;
     }
 }

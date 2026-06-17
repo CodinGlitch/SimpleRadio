@@ -18,7 +18,7 @@ dependencies {
     modImplementation libs.bundles.fabric.modImpl
 
     modCompileOnly(libs.fabric.computercraft.api)
-    modCompileOnly(libs.fabric.trinkets) { transitive = false } // dont include dependencies
+    modCompileOnly(libs.fabric.trinkets)
 
     modCompileOnly(libs.fabric.voicechat)
     modCompileOnly(libs.fabric.voicechatinteraction)
@@ -26,7 +26,6 @@ dependencies {
     modCompileOnly(libs.fabric.valkyrienskies) { transitive = false }
 
     modLocalRuntime libs.bundles.fabric.environment
-//    modLocalRuntime(libs.fabric.trinkets) { transitive = false }
 }
 
 fabricApi {
