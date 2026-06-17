@@ -1,0 +1,6 @@
+{
+  "entities": ["minecraft:player"],
+  "slots": [
+    "body"
+  ]
+}

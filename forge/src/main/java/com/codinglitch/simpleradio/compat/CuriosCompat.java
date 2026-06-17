@@ -4,19 +4,25 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import org.valkyrienskies.core.impl.shadow.It;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class CuriosCompat {
 
@@ -42,5 +48,15 @@ public class CuriosCompat {
             });
 
         }));
+    }
+
+    public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
+        Optional<ICuriosItemHandler> itemHandler = CuriosApi.getCuriosInventory(player).resolve();
+        if (itemHandler.isEmpty()) return ItemStack.EMPTY;
+
+        Optional<SlotResult> result = itemHandler.get().findFirstCurio(filter);
+        if (result.isEmpty()) return ItemStack.EMPTY;
+
+        return result.get().stack();
     }
 }
