@@ -63,7 +63,7 @@ flywheel            = "1.0.6"
 registrate          = "MC1.21-1.3.0+67"
 
 curios              = "5.3.1+1.20.1"
-trinkets            = "3.7.2"
+trinkets            = "3.7.1"
 
 [libraries]
 #---- Common ----#
@@ -163,6 +163,7 @@ fabric_environment = [
 #    "fabric_create",
 
     "fabric_jei",
+    "fabric_trinkets"
 
 #    "fabric_configured" currently having issues including later fapi transitively (which breaks in dev for some reason??)
 ]
