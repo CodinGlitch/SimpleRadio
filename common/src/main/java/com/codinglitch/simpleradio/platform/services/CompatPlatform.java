@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
@@ -23,4 +24,6 @@ public interface CompatPlatform {
     RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria);
 
     String getSound(ItemStack stack);
+
+	ItemStack getAccessory(Player player, Predicate<ItemStack> filter);
 }

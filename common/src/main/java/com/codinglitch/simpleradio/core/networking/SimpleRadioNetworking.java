@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.core.networking;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.client.core.SimpleRadioClientNetworking;
+import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.Services;
@@ -38,6 +39,7 @@ public class SimpleRadioNetworking {
     public static void loadServerbound(ServerboundRegistry registry) {
         registry.register(ServerboundRadioUpdatePacket.TYPE, ServerboundRadioUpdatePacket.class, ServerboundRadioUpdatePacket.STREAM_CODEC, SimpleRadioNetworking::handleRadioUpdate);
         registry.register(ServerboundRequestRouterPacket.TYPE, ServerboundRequestRouterPacket.class, ServerboundRequestRouterPacket.STREAM_CODEC, SimpleRadioNetworking::handleRequestRouter);
+        registry.register(ServerboundUseHandheldPacket.TYPE, ServerboundUseHandheldPacket.class, ServerboundRequestRouterPacket.STREAM_CODEC, SimpleRadioNetworking::handleUseHandheld);
     }
 
     public static void loadClientbound(ClientboundRegistry registry) {
@@ -80,6 +82,14 @@ public class SimpleRadioNetworking {
             Services.NETWORKING.sendToPlayer(player, new ClientboundRegisterRouterPacket(
                     mapping, identifier
             ));
+        });
+    }
+
+    public static void handleUseHandheld(ServerboundUseHandheldPacket packet, MinecraftServer server, ServerPlayer player) {
+        boolean state = packet.state();
+
+        server.execute(() -> {
+            AccessoryCompat.setHandheld(player, state);
         });
     }
 }
