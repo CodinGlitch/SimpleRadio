@@ -8,6 +8,7 @@
     "MixinLocationalAudioChannelImpl"
   ],
   "client": [
+    "MixinArmPose",
     "MixinPTTMicrophoneProcessor"
   ],
   "server": [
