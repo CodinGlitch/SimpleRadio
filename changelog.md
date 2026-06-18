@@ -1,6 +1,0 @@
-- [Feature] **API restructure**
-- [Compatibility] **CC: Tweaked integration**
-- [Compatibility] **Sable/Create Aeronautics integration**
-- [Compatibility] Partial (experimental) Etched integration
-- [Change] New debug visuals
-- [Fix] (hopefully) Improved router stability
