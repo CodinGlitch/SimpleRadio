@@ -16,6 +16,6 @@ public abstract class MixinPTTMicrophoneProcessor {
             remap = false
     )
     private boolean simpleradio$processInternal_handheldPTT(PTTMicrophoneProcessor instance, Operation<Boolean> original) {
-        return ClientRadioManager.isUsingHandheld() || original.call(instance);
+        return ClientRadioManager.shouldEnablePTT() || original.call(instance);
     }
 }
