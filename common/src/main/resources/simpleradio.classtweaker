@@ -1,4 +1,6 @@
-accessWidener v1 named
+classTweaker v2 named
+
+extend-enum net/minecraft/client/model/HumanoidModel$ArmPose SIMPLE_RADIO_HOLD_LAPEL
 
 # Result in ShapedRecipeBuilder
 accessible class net/minecraft/data/recipes/ShapedRecipeBuilder$Result

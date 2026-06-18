@@ -35,9 +35,9 @@ fabricApi {
 }
 
 loom {
-    def aw = project(":common").file("src/main/resources/${mod_id}.accesswidener")
-    if (aw.exists()) {
-        accessWidenerPath.set(aw)
+    def ct = project(":common").file("src/main/resources/${mod_id}.classtweaker")
+    if (ct.exists()) {
+        accessWidenerPath.set(ct)
     }
     mixin {
         defaultRefmapName.set("${mod_id}.refmap.json")
