@@ -1,7 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.*;
@@ -9,7 +8,7 @@ import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
-import com.codinglitch.simpleradio.radio.*;
+import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -96,6 +95,9 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
             if (transmitter != null) transmitter.setActive(true);
         }
+
+        // required to change the arm pose for accessories
+        if (tag != null) tag.putBoolean("using", true);
     }
     public void end(ItemStack stack, Entity entity) {
         Level level = entity.level();
@@ -120,6 +122,9 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
             Transmitter transmitter = frequency.getTransmitter(tag.getUUID("reference"));
             if (transmitter != null) transmitter.setActive(false);
         }
+
+        // required to change the arm pose for accessories
+        if (tag != null) tag.putBoolean("using", false);
     }
 
     public int getCooldown() {
