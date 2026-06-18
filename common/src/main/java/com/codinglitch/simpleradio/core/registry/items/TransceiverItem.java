@@ -95,7 +95,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
 
         // required to change the arm pose for accessories
-        if (tag != null) tag.putBoolean("using", true);
+        stack.set(USING, true);
     }
     public void end(ItemStack stack, Entity entity) {
         Level level = entity.level();
@@ -121,7 +121,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
 
         // required to change the arm pose for accessories
-        if (tag != null) tag.putBoolean("using", false);
+        stack.set(USING, false);
     }
 
     public int getCooldown() {

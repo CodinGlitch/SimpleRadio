@@ -3,11 +3,13 @@ package com.codinglitch.simpleradio.platform;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.CCCompat;
+import com.codinglitch.simpleradio.compat.CuriosCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
@@ -49,6 +51,12 @@ public class NeoForgeCompatPlatform implements CompatPlatform {
         if (CompatCore.CREATE.enabled) {
         }
 
+        // Prevent router collection if it's in a curio slot
+        if (CompatCore.CURIOS.isLoaded && entity instanceof Player player) {
+            ItemStack stack = CuriosCompat.getAccessory(player, inventoryCriteria);
+            if (stack != ItemStack.EMPTY) return RadioManager.CollectionResult.IGNORE;
+        }
+
         return RadioManager.CollectionResult.PASS;
     }
 
@@ -67,5 +75,18 @@ public class NeoForgeCompatPlatform implements CompatPlatform {
     public void postInitialize() {
         if (CompatCore.CREATE.isLoaded && CompatCore.CREATE.fitsVersion) {
         }
+
+        if (CompatCore.CURIOS.isLoaded) {
+            CuriosCompat.postInitialize();
+        }
+    }
+
+    @Override
+    public ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
+        if (CompatCore.CURIOS.isLoaded) {
+            return CuriosCompat.getAccessory(player, filter);
+        }
+
+        return ItemStack.EMPTY;
     }
 }

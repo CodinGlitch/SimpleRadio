@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.client.core;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import net.minecraft.client.model.HumanoidModel;
@@ -13,11 +14,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.*;
+
 public class SimpleRadioArmPoses {
 
     public static final Map<String, Pose> POSES = new HashMap<>();
 
-    public record Pose(boolean twoHanded, Transform transform) {}
+    public record Pose(String name, boolean twoHanded, Transform transform) {
+        public boolean is(HumanoidModel.ArmPose pose) {
+            return name.equals(pose.name());
+        }
+        public HumanoidModel.ArmPose get() {
+            return HumanoidModel.ArmPose.valueOf(name);
+        }
+    }
 
     @FunctionalInterface
     public interface Transform {
@@ -25,7 +35,7 @@ public class SimpleRadioArmPoses {
     }
 
     public static final Pose HOLD_LAPEL = makePose(
-            "SIMPLE_RADIO_HOLD_LAPEL",
+            "SIMPLERADIO_HOLD_LAPEL",
             false,
             (model, livingEntity, arm) -> {
                 if (arm == HumanoidArm.RIGHT) {
@@ -39,7 +49,7 @@ public class SimpleRadioArmPoses {
     );
 
     private static Pose makePose(String name, boolean twoHanded, Transform transform) {
-        Pose pose = new Pose(twoHanded, transform);
+        Pose pose = new Pose(name, twoHanded, transform);
         POSES.put(name, pose);
         return pose;
     }
@@ -72,9 +82,8 @@ public class SimpleRadioArmPoses {
 
         ItemStack stack = AccessoryCompat.getAccessory(player, test -> test.getItem() instanceof TransceiverItem);
         if (stack.isEmpty()) return null;
-        if (!stack.hasTag()) return null;
-        if (!stack.getTag().contains("using")) return null;
+        if (!stack.has(USING)) return null;
 
-        return stack.getTag().getBoolean("using") ? HumanoidModel.ArmPose.valueOf("SIMPLE_RADIO_HOLD_LAPEL") : null;
+        return stack.get(USING) ? HOLD_LAPEL.get() : null;
     }
 }

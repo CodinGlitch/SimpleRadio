@@ -25,8 +25,12 @@ public class NeoForgePlatformHelper implements PlatformHelper {
 
     @Override
     public boolean isModLoaded(String modId) {
-
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public boolean isClient() {
+        return FMLLoader.getDist().isClient();
     }
 
     @Override

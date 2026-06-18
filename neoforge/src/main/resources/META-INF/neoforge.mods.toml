@@ -13,6 +13,8 @@ issueTrackerURL="https://github.com/CodinGlitch/SimpleRadio/issues"
     authors = "${mod_author}"
     description = '''${description}'''
 
+    enumExtensions="META-INF/enumextensions.json"
+
 [[mixins]]
     config = "${mod_id}.mixins.json"
 

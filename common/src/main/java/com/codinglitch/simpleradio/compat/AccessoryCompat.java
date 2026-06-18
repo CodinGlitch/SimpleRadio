@@ -18,6 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.USING;
+
 /**
  * Meant to serve as an abstracted layer between accessory mods of different loaders.
  */
@@ -80,7 +82,7 @@ public class AccessoryCompat {
             poseStack.scale(0.4f, 0.4f, 0.4f);
 
             // Tilt it slightly towards the head if using
-            if (stack.hasTag() && stack.getTag().contains("using") && stack.getTag().getBoolean("using")) {
+            if (stack.has(USING) && stack.get(USING)) {
                 poseStack.translate(0.0f, 0.2f, 0);
                 poseStack.mulPose(Axis.XP.rotationDegrees(30));
                 poseStack.mulPose(Axis.YP.rotationDegrees(15));

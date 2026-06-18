@@ -62,8 +62,8 @@ ponder              = "1.0.81"
 flywheel            = "1.0.6"
 registrate          = "MC1.21-1.3.0+67"
 
-curios              = "5.3.1+1.20.1"
-trinkets            = "3.7.1"
+curios              = "9.5.1+1.21.1"
+trinkets            = "3.10.0"
 
 [libraries]
 #---- Common ----#
@@ -132,8 +132,7 @@ neoforge_jei = { group="mezz.jei", name="jei-1.21.1-neoforge", version.ref="jei"
 
 neoforge_configured = { group="com.mrcrayfish", name="configured-neoforge", version.ref="configured"}
 
-
-neoforge_curios = { group="top.theillusivec4.curios", name="curios-forge", version.ref="curios"}
+neoforge_curios = { group="top.theillusivec4.curios", name="curios-neoforge", version.ref="curios"}
 
 [plugins]
 #---- Publishing ----#

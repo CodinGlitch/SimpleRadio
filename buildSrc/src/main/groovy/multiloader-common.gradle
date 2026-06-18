@@ -54,7 +54,7 @@ repositories {
     exclusiveGroup("https://maven.theillusivec4.top", "top.theillusivec4.curios") // Curios
     exclusiveGroup("https://maven.nucleoid.xyz", "eu.pb4") // Polymer
     exclusiveGroup("https://maven.terraformersmc.com/", "dev.emi") // ModMenu, Trinkets
-    exclusiveGroup("https://maven.ladysnake.org/releases/", "dev.onyxstudios.cardinal-components-api") // Cardinal Components
+    exclusiveGroup("https://maven.ladysnake.org/releases/", "org.ladysnake.cardinal-components-api") // Cardinal Components
     exclusiveGroup("https://maven.maxhenkel.de/repository/public", "de.maxhenkel.voicechat") // SVC
     exclusiveGroup("https://maven.blamejared.com", "mezz.jei") // JEI
     exclusiveGroup("https://maven.squiddev.cc", "cc.tweaked") // CC: Tweaked

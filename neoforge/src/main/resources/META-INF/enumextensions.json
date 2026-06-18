@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "SIMPLERADIO_HOLD_LAPEL",
+      "constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "com/codinglitch/simpleradio/client/SimpleRadioClient",
+        "field": "HOLD_LAPEL_ENUM_PROXY"
+      }
+    }
+  ]
+}

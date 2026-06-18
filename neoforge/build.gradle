@@ -55,6 +55,7 @@ dependencies {
     compileOnly(libs.neoforge.voicechat)
 
     compileOnly(libs.sablecompanion)
+    compileOnly(libs.neoforge.curios) { artifact { classifier = "api" } }
 
     runtimeOnly libs.neoforge.lexiconfig
     runtimeOnly libs.bundles.neoforge.environment

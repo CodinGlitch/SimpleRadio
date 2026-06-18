@@ -67,6 +67,10 @@ public class SimpleRadioComponents {
             "reference", DataComponentType.<UUID>builder().persistent(Codecs.UUID).build()
     );
 
+    public static final DataComponentType<Boolean> USING = register(
+            "using", DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
+    );
+
     public static final DataComponentType<Boolean> ACTIVATED = register(
             "activated", DataComponentType.<Boolean>builder().persistent(Codec.BOOL).build()
     );
