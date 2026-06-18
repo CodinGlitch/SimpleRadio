@@ -1,3 +1,0 @@
-- [Feature] **Data-driven support for catalysts**
-- [Change] Lowered break time for blocks
-- [Change] Using a handheld enables PTT
