@@ -4,12 +4,16 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.platform.Services;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -57,5 +61,39 @@ public class AccessoryCompat {
         } else {
             transceiver.end(stack, player);
         }
+    }
+
+    public static class HandheldRenderer {
+        public static <T extends LivingEntity, M extends EntityModel<T>> void render(
+                ItemStack stack,
+                LivingEntity livingEntity,
+                PoseStack poseStack,
+                MultiBufferSource buffer,
+                int light
+        ) {
+            Minecraft minecraft = Minecraft.getInstance();
+
+            poseStack.pushPose();
+
+            poseStack.translate(-0.125f, 0.1f, -0.15f);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+            poseStack.scale(0.4f, 0.4f, 0.4f);
+
+            // Tilt it slightly towards the head if using
+            if (stack.hasTag() && stack.getTag().contains("using") && stack.getTag().getBoolean("using")) {
+                poseStack.translate(0.0f, 0.2f, 0);
+                poseStack.mulPose(Axis.XP.rotationDegrees(30));
+                poseStack.mulPose(Axis.YP.rotationDegrees(15));
+            }
+
+            minecraft.getItemRenderer().renderStatic(
+                    stack, ItemDisplayContext.FIXED,
+                    light, 0,
+                    poseStack, buffer, livingEntity.level(), 0
+            );
+
+            poseStack.popPose();
+        }
+
     }
 }
