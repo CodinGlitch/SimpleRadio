@@ -24,6 +24,12 @@ public interface PlatformHelper {
      */
     boolean isModLoaded(String modId);
 
+    boolean isClient();
+
+    default void forClient(Runnable runnable) {
+        if (isClient()) runnable.run();
+    }
+
     /**
      * Gets the version string of a mod if it is loaded
      *
