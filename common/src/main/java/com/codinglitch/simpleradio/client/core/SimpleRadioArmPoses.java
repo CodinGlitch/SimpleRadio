@@ -17,7 +17,14 @@ public class SimpleRadioArmPoses {
 
     public static final Map<String, Pose> POSES = new HashMap<>();
 
-    public record Pose(boolean twoHanded, Transform transform) {}
+    public record Pose(String name, boolean twoHanded, Transform transform) {
+        public boolean is(HumanoidModel.ArmPose pose) {
+            return name.equals(pose.name());
+        }
+        public HumanoidModel.ArmPose get() {
+            return HumanoidModel.ArmPose.valueOf(name);
+        }
+    }
 
     @FunctionalInterface
     public interface Transform {
@@ -25,7 +32,7 @@ public class SimpleRadioArmPoses {
     }
 
     public static final Pose HOLD_LAPEL = makePose(
-            "SIMPLE_RADIO_HOLD_LAPEL",
+            "SIMPLERADIO_HOLD_LAPEL",
             false,
             (model, livingEntity, arm) -> {
                 if (arm == HumanoidArm.RIGHT) {
@@ -39,7 +46,7 @@ public class SimpleRadioArmPoses {
     );
 
     private static Pose makePose(String name, boolean twoHanded, Transform transform) {
-        Pose pose = new Pose(twoHanded, transform);
+        Pose pose = new Pose(name, twoHanded, transform);
         POSES.put(name, pose);
         return pose;
     }
@@ -75,6 +82,6 @@ public class SimpleRadioArmPoses {
         if (!stack.hasTag()) return null;
         if (!stack.getTag().contains("using")) return null;
 
-        return stack.getTag().getBoolean("using") ? HumanoidModel.ArmPose.valueOf("SIMPLE_RADIO_HOLD_LAPEL") : null;
+        return stack.getTag().getBoolean("using") ? HOLD_LAPEL.get() : null;
     }
 }

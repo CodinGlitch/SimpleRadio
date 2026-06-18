@@ -1,6 +1,6 @@
 classTweaker v2 named
 
-extend-enum net/minecraft/client/model/HumanoidModel$ArmPose SIMPLE_RADIO_HOLD_LAPEL
+extend-enum net/minecraft/client/model/HumanoidModel$ArmPose SIMPLERADIO_HOLD_LAPEL
 
 # Result in ShapedRecipeBuilder
 accessible class net/minecraft/data/recipes/ShapedRecipeBuilder$Result
