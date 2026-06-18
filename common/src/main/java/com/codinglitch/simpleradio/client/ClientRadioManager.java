@@ -10,6 +10,7 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
+import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
@@ -48,6 +49,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -92,10 +94,15 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     public static boolean isUsingHandheld() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return false;
-        if (!player.isUsingItem()) return false;
 
         ItemStack useItem = player.getUseItem();
-        return useItem.getItem() instanceof Listening;
+        if (useItem.getItem() instanceof Listening) return true;
+
+        ItemStack accessory = AccessoryCompat.getAccessory(player, stack -> stack.getItem() instanceof Listening);
+        if (accessory.isEmpty()) return false;
+
+        CompoundTag tag = accessory.getTag();
+        return tag != null && tag.contains("using") && tag.getBoolean("using");
     }
 
     public static boolean shouldEnablePTT() {
