@@ -2,8 +2,9 @@ package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.platform.ForgeClientRegistryHelper;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import com.codinglitch.simpleradio.client.core.SimpleRadioArmPoses;
+import com.codinglitch.simpleradio.compat.CuriosCompat;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -14,6 +15,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+import java.util.Map;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = CommonSimpleRadio.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SimpleRadioClient {
@@ -52,6 +55,16 @@ public class SimpleRadioClient {
         CommonSimpleRadioClient.loadProperties(ItemProperties::register);
 
         event.enqueueWork(CommonSimpleRadioClient::loadScreens);
+
+        if (CompatCore.CURIOS.isLoaded()) {
+            CuriosCompat.initialize();
+        }
+
+        for (Map.Entry<String, SimpleRadioArmPoses.Pose> entry : SimpleRadioArmPoses.POSES.entrySet()) {
+            SimpleRadioArmPoses.Pose pose = entry.getValue();
+            SimpleRadioArmPoses.Transform transform = pose.transform();
+            HumanoidModel.ArmPose.create(entry.getKey(), pose.twoHanded(), transform::apply);
+        }
 
         MinecraftForge.EVENT_BUS.addListener(SimpleRadioClient::onClientTick);
     }

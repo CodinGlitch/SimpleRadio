@@ -1,27 +1,24 @@
 package com.codinglitch.simpleradio.compat;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
-import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.platform.Services;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.*;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.valkyrienskies.core.impl.shadow.It;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
-import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CuriosCompat {
@@ -58,5 +55,31 @@ public class CuriosCompat {
         if (result.isEmpty()) return ItemStack.EMPTY;
 
         return result.get().stack();
+    }
+
+    public static void initialize() {
+        Services.PLATFORM.forClient(() -> CuriosRendererRegistry.register(SimpleRadioItems.TRANSCEIVER, CurioHandheldRenderer::new));
+    }
+
+    public static class CurioHandheldRenderer implements ICurioRenderer {
+        @Override
+        public <T extends LivingEntity, M extends EntityModel<T>> void render(
+            ItemStack stack,
+            SlotContext slotContext,
+            PoseStack poseStack,
+            RenderLayerParent<T, M> renderLayerParent,
+            MultiBufferSource buffer,
+            int light,
+            float limbSwing, float limbSwingAmount,
+            float partialTicks, float ageInTicks,
+            float netHeadYaw, float headPitch
+        ) {
+            LivingEntity livingEntity = slotContext.entity();
+            M contextModel = renderLayerParent.getModel();
+
+            if (!(contextModel instanceof HumanoidModel<?>)) return;
+
+            AccessoryCompat.HandheldRenderer.render(stack, livingEntity, poseStack, buffer, light);
+        }
     }
 }
