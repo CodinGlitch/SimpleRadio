@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.compat.TrinketsCompat;
 import com.codinglitch.simpleradio.core.FabricLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -42,5 +43,8 @@ public class SimpleRadioClient implements ClientModInitializer {
             }
         });
 
+        if (CompatCore.TRINKETS.isLoaded()) {
+            TrinketsCompat.initialize();
+        }
     }
 }
