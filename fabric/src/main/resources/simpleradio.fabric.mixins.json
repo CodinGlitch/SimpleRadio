@@ -9,6 +9,7 @@
     "MixinShapedRecipeResult"
   ],
   "client": [
+    "MixinArmPose",
     "MixinPTTMicrophoneProcessor"
   ],
   "server": [
