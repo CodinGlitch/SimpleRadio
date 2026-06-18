@@ -17,6 +17,7 @@
   "client": [
     "MixinClientLevel",
     "MixinDebugRenderer",
+    "MixinHumanoidModel",
     "MixinItemBlockRenderTypes",
     "MixinItemRenderer",
     "MixinLevelRenderer",
