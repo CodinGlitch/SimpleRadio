@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.client.core;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import net.minecraft.client.model.HumanoidModel;
@@ -76,7 +75,6 @@ public class SimpleRadioArmPoses {
         if (!stack.hasTag()) return null;
         if (!stack.getTag().contains("using")) return null;
 
-        CommonSimpleRadio.info(HumanoidModel.ArmPose.values());
         return stack.getTag().getBoolean("using") ? HumanoidModel.ArmPose.valueOf("SIMPLE_RADIO_HOLD_LAPEL") : null;
     }
 }
