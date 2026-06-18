@@ -7,14 +7,14 @@ parchment_mappings  = "2024.11.17"
 
 #---- Fabric ----#
 fabric_api          = "0.104.0+1.21.1"
-fabric_loader       = "0.18.4"
+fabric_loader       = "0.19.3"
 
 #---- NeoForge ----#
 neoforge            = "21.1.219"
 neoforge_range      = "[1,)"
 
 #---- Plugins ----#
-loom                = "1.15-SNAPSHOT"
+loom                = "1.16-SNAPSHOT"
 neoform             = "1.21.1-20240808.144430"
 mod_dev_gradle      = "2.0.123"
 
