@@ -11,6 +11,7 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
+import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
@@ -75,6 +76,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static com.codinglitch.simpleradio.core.SimpleRadioComponents.USING;
+
 public class ClientRadioManager extends ClientSimpleRadioApi {
     public static final ClientRadioManager INSTANCE = new ClientRadioManager();
 
@@ -92,10 +95,14 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     public static boolean isUsingHandheld() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return false;
-        if (!player.isUsingItem()) return false;
 
         ItemStack useItem = player.getUseItem();
-        return useItem.getItem() instanceof Listening;
+        if (useItem.getItem() instanceof Listening) return true;
+
+        ItemStack accessory = AccessoryCompat.getAccessory(player, stack -> stack.getItem() instanceof Listening);
+        if (accessory.isEmpty()) return false;
+
+        return accessory.has(USING) && accessory.get(USING);
     }
 
     public static boolean shouldEnablePTT() {
