@@ -42,6 +42,7 @@ public class AccessoryCompat {
 
         registry.register(SimpleRadioItems.TRANSCEIVER, handheldTicker);
         registry.register(SimpleRadioItems.WALKIE_TALKIE, handheldTicker);
+        registry.register(SimpleRadioItems.SPUDDIE_TALKIE, handheldTicker);
     }
 
     public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
