@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio.routers;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
- * Routes {@link Source}s to other routers.
+ * Routes {@link Message}s to other routers.
  */
 public interface Router {
     UUID getReference();
@@ -65,41 +65,41 @@ public interface Router {
     void setConnectionOffset(Vec3 connectionOffset);
     void setPosition(WorldlyPosition position);
     void setRotation(Quaternionf position);
-    void setRoutingCriteria(BiPredicate<Source, Router> criteria);
-    void setAcceptingCriteria(Predicate<Source> criteria);
+    void setRoutingCriteria(BiPredicate<Message, Router> criteria);
+    void setAcceptingCriteria(Predicate<Message> criteria);
 
     double distanceTo(Router other);
 
 
-    void route(Source source);
-    void accept(Source source);
+    void route(Message source);
+    void accept(Message source);
 
     void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed);
     void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed);
 
     /**
-     * Builds a {@link Source} and sends it to this router.
+     * Builds a {@link Message} and sends it to this router.
      * @param at The location to send it from.
      * @param sender The sender of the audio.
      * @param data The data to send, in raw PCM format.
      * @param volume The overall volume of the audio.
      */
-    Source send(WorldlyPosition at, UUID sender, short[] data, float volume);
-    Source send(WorldlyPosition at, short[] data, float volume);
-    Source send(UUID sender, short[] data, float volume);
-    Source send(short[] data, float volume);
+    Message send(WorldlyPosition at, UUID sender, short[] data, float volume);
+    Message send(WorldlyPosition at, short[] data, float volume);
+    Message send(UUID sender, short[] data, float volume);
+    Message send(short[] data, float volume);
 
     /**
-     * Builds a {@link Source} and sends it to this router.
+     * Builds a {@link Message} and sends it to this router.
      * @param at The location to send it from.
      * @param sender The sender of the audio.
      * @param data The data to send, in Opus-encoded format.
      * @param volume The overall volume of the audio.
      */
-    Source send(WorldlyPosition at, UUID sender, byte[] data, float volume);
-    Source send(WorldlyPosition at, byte[] data, float volume);
-    Source send(UUID sender, byte[] data, float volume);
-    Source send(byte[] data, float volume);
+    Message send(WorldlyPosition at, UUID sender, byte[] data, float volume);
+    Message send(WorldlyPosition at, byte[] data, float volume);
+    Message send(UUID sender, byte[] data, float volume);
+    Message send(byte[] data, float volume);
 
     boolean validate();
     void invalidate();

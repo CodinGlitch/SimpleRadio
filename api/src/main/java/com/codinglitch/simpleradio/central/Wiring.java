@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.central;
 
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -30,11 +30,11 @@ public interface Wiring extends Medium {
     Router transport(UUID reference);
 
     /**
-     * Relay a {@link Source} along this wire.
-     * @param source The {@link Source} to relay
+     * Relay a {@link Message} along this wire.
+     * @param source The {@link Message} to relay
      * @param originSocket The {@link Socket} the source came from
      */
-    void relay(Source source, Socket originSocket);
+    void relay(Message source, Socket originSocket);
 
     float getLength();
 

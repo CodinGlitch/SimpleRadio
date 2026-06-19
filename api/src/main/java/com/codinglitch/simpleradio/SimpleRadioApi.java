@@ -4,13 +4,12 @@ import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.SimpleRadioEvent;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -89,7 +88,7 @@ public abstract class SimpleRadioApi {
      */
     public abstract Router newRouter(UUID reference, WorldlyPosition position);
 
-    public abstract Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume);
+    public abstract Message newSource(UUID owner, WorldlyPosition location, byte[] data, float volume);
 
     public abstract void info(Object object, Object... substitutions);
     public abstract void debug(Object object, Object... substitutions);

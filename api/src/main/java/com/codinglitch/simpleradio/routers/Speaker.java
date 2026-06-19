@@ -1,9 +1,9 @@
 package com.codinglitch.simpleradio.routers;
 
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 
 /**
- * A type of {@link Router} that accepts {@link Source}s and emits them in-world.
+ * A type of {@link Router} that accepts {@link Message}s and emits them in-world.
  * <br>
  * Often serves as the end of the audio pipeline.
  * <br>

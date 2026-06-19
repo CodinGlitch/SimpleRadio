@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundEvent;
 
 import java.util.UUID;
 
-public interface Source {
+public interface Message {
     byte[] getData();
     SoundEvent getSoundEvent();
     String getSound();
@@ -36,7 +36,7 @@ public interface Source {
 
     void addPower(float power);
 
-    Source copy();
+    Message copy();
 
     boolean willShort(Router router);
     double computeSeverity();

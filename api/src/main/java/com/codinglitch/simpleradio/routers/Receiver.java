@@ -2,10 +2,10 @@ package com.codinglitch.simpleradio.routers;
 
 import com.codinglitch.simpleradio.central.FrequencingType;
 import com.codinglitch.simpleradio.central.Frequency;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 
 /**
- * A type of {@link Router} that accepts {@link Source}s from its connected {@link Frequency}.
+ * A type of {@link Router} that accepts {@link Message}s from its connected {@link Frequency}.
  * <br>
  * <b>Does route further.</b>
  */
