@@ -1,6 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.*;
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
@@ -24,20 +27,15 @@ import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -173,7 +171,7 @@ public class RadioManager extends ServerSimpleRadioApi {
                 if (wires.isEmpty()) continue;
 
                 Wiring wire = wires.get(0);
-                Router router = wire.transport(insulatorBlockEntity.getRouter());
+                Router router = wire.transport(insulatorBlockEntity.getRouter().reference);
                 if (router == null) continue;
 
                 BlockPos routerPos = router.getLocation().blockPos();

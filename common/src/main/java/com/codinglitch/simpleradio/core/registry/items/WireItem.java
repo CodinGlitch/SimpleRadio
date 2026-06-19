@@ -1,10 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.items;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.central.Wiring;
+import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
+import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
@@ -12,12 +14,15 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.joml.Vector3f;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WireItem extends Item implements WorldTicking {
@@ -31,12 +36,44 @@ public class WireItem extends Item implements WorldTicking {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = context.getItemInHand();
+        Player player = context.getPlayer();
 
         BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof Socket interactingSocket) {
-
             if (!interactingSocket.canConnect()) return super.useOn(context);
 
+            // Disconnecting functionality
+            if (player != null && player.isCrouching()) {
+
+                Router router = interactingSocket.getRouter();
+                if (router == null) return super.useOn(context);
+
+                WorldlyPosition origin = router.getLocation();
+                Vector3f look = player.getLookAngle().toVector3f();
+
+                // Sort the wires by their direction; the one that most closely matches where the player is looking will be chosen first
+                Optional<Wiring> bestWire = interactingSocket
+                        .getWires().stream().min((first, second) -> {
+                            Router firstOpposite = first.transport(interactingSocket);
+                            Router secondOpposite = second.transport(interactingSocket);
+
+                            if (firstOpposite == null) return 0;
+                            if (secondOpposite == null) return 0;
+
+                            float firstScore = origin.sub(firstOpposite.getLocation(), new Vector3f()).normalize().dot(look);
+                            float secondScore = origin.sub(secondOpposite.getLocation(), new Vector3f()).normalize().dot(look);
+
+                            return (int) ((secondScore - firstScore) * 10);
+                        });
+
+                if (bestWire.isPresent()) {
+                    bestWire.get().burnOut();
+                    return InteractionResult.SUCCESS;
+                }
+
+            }
+
+            // Connecting functionality
             CompoundTag tag = stack.getOrCreateTag();
             if (tag.contains("connectTo")) {
                 BlockPos connectTo = BlockPos.of(tag.getLong("connectToPos"));

@@ -792,7 +792,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
             drawRouterConnection(router, (RadioRouter) otherRouter, null, poseStack, consumer, camera);
         }
         for (Wiring wire : new ArrayList<>(router.wires)) {
-            Router otherRouter = wire.transport(router);
+            Router otherRouter = wire.transport(router.getReference());
             if (otherRouter == null) continue;
             drawRouterConnection(router, (RadioRouter) otherRouter, wire, poseStack, consumer, camera);
         }
