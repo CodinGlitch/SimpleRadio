@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio.compat;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.RadioMessage;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import de.maxhenkel.vcinteraction.AudioUtils;
 import de.maxhenkel.vcinteraction.VoicechatInteraction;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InteractionCompat {
     private static ConcurrentHashMap<UUID, Long> cooldowns = new ConcurrentHashMap<>();;
 
-    public static void onData(RadioSpeaker channel, RadioSource source, short[] decodedData) {
+    public static void onData(RadioSpeaker channel, RadioMessage source, short[] decodedData) {
         UUID sourceOwner = source.getRealOwner();
         VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(sourceOwner);
 

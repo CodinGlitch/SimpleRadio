@@ -7,7 +7,7 @@ import com.codinglitch.simpleradio.compat.InteractionCompat;
 import com.codinglitch.simpleradio.compat.TrinketsCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioSource;
+import com.codinglitch.simpleradio.radio.RadioMessage;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 
 public class FabricCompatPlatform implements CompatPlatform {
     @Override
-    public void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
+    public void onData(RadioSpeaker channel, RadioMessage source, short[] decoded) {
 
         // ---- Voice Chat Interaction ---- \\
         if (CompatCore.VC_INTERACTION.enabled) {
