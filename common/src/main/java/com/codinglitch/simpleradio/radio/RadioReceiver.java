@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 /**
- * A type of {@link RadioRouter} that accepts {@link RadioSource}s from its connected {@link Frequency}.
+ * A type of {@link RadioRouter} that accepts {@link RadioMessage}s from its connected {@link Frequency}.
  * <br>
  * <b>Does route further.</b>
  */
@@ -88,7 +88,7 @@ public class RadioReceiver extends RadioRouter implements Receiver {
     }
 
     @Override
-    public void take(Source source) {
+    public void take(Message source) {
         //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (!this.active) return;

@@ -12,7 +12,6 @@ import com.codinglitch.simpleradio.routers.Speaker;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -24,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
- * A type of {@link RadioRouter} that accepts {@link RadioSource}s and emits them in-world.
+ * A type of {@link RadioRouter} that accepts {@link RadioMessage}s and emits them in-world.
  * <br>
  * Often serves as the end of the audio pipeline.
  * <br>
@@ -151,16 +150,16 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     }
 
     @Override
-    public void take(Source source) {
+    public void take(Message source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         super.take(source);
         speak(source);
     }
 
-    public void speak(Source source) {
+    public void speak(Message source) {
         this.compileActivity(source);
-        RadioSource radioSource = (RadioSource) source;
+        RadioMessage radioSource = (RadioMessage) source;
 
         // Severity calculation
         ServerLevel level = null;

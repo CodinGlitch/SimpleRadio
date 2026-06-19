@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.compat.cc;
 
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,7 +26,7 @@ public class CommonCCCompat { // thats a lot of Cs
         }
     }
 
-    public static void acceptSource(Router router, Source source) {
+    public static void acceptSource(Router router, Message source) {
         WorldlyPosition position = router.getPosition();
         if (position == null) return;
 

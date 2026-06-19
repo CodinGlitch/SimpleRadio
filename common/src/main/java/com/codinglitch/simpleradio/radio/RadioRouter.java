@@ -47,10 +47,10 @@ public class RadioRouter implements Socket, Router {
 
     public List<Wiring> wires = new ArrayList<>();
     public List<Router> routers = new ArrayList<>();
-    public Function<RadioSource, Boolean> routerAcceptor; // kept just in case
+    public Function<RadioMessage, Boolean> routerAcceptor; // kept just in case
 
-    public BiPredicate<Source, Router> routeCriteria;
-    public Predicate<Source> acceptCriteria;
+    public BiPredicate<Message, Router> routeCriteria;
+    public Predicate<Message> acceptCriteria;
 
     public boolean active = true;
     public boolean distributes = false;
@@ -110,11 +110,11 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public void setRoutingCriteria(BiPredicate<Source, Router> criteria) {
+    public void setRoutingCriteria(BiPredicate<Message, Router> criteria) {
         this.routeCriteria = criteria;
     }
     @Override
-    public void setAcceptingCriteria(Predicate<Source> criteria) {
+    public void setAcceptingCriteria(Predicate<Message> criteria) {
         this.acceptCriteria = criteria;
     }
 
@@ -300,12 +300,12 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public void accept(Source source) {
+    public void accept(Message source) {
         CompatCore.acceptSource(this, source);
         this.take(source);
     }
 
-    public void take(Source source) {
+    public void take(Message source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
         this.route(source);
@@ -318,7 +318,7 @@ public class RadioRouter implements Socket, Router {
 
     @Override
     public void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed) {
-        RadioSource newSource = new RadioSource(sender, at, soundHolder.value(), volume);
+        RadioMessage newSource = new RadioMessage(sender, at, soundHolder.value(), volume);
         newSource.pitch = pitch;
         newSource.offset = offset;
         newSource.seed = seed;
@@ -328,48 +328,48 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public Source send(WorldlyPosition at, UUID sender, short[] data, float volume) {
+    public Message send(WorldlyPosition at, UUID sender, short[] data, float volume) {
         OpusEncoder encoder = this.getEncoder(sender);
 
-        RadioSource newSource = new RadioSource(sender, at, encoder.encode(data), volume);
+        RadioMessage newSource = new RadioMessage(sender, at, encoder.encode(data), volume);
         newSource.activity = CommonRadioPlugin.analyzeActivity(data);
 
         this.accept(newSource);
         return newSource;
     }
     @Override
-    public Source send(WorldlyPosition at, short[] data, float volume) {
+    public Message send(WorldlyPosition at, short[] data, float volume) {
         return this.send(at, this.reference, data, volume);
     }
     @Override
-    public Source send(UUID sender, short[] data, float volume) {
+    public Message send(UUID sender, short[] data, float volume) {
         return this.send(this.getLocation(), sender, data, volume);
     }
     @Override
-    public Source send(short[] data, float volume) {
+    public Message send(short[] data, float volume) {
         return this.send(this.getLocation(), this.reference, data, volume);
     }
 
     @Override
-    public Source send(WorldlyPosition at, UUID sender, byte[] data, float volume) {
+    public Message send(WorldlyPosition at, UUID sender, byte[] data, float volume) {
         OpusDecoder decoder = this.getDecoder(sender);
 
-        RadioSource newSource = new RadioSource(sender, at, data, volume);
+        RadioMessage newSource = new RadioMessage(sender, at, data, volume);
         newSource.activity = CommonRadioPlugin.analyzeActivity(decoder.decode(data));
 
         this.accept(newSource);
         return newSource;
     }
     @Override
-    public Source send(WorldlyPosition at, byte[] data, float volume) {
+    public Message send(WorldlyPosition at, byte[] data, float volume) {
         return this.send(at, this.reference, data, volume);
     }
     @Override
-    public Source send(UUID sender, byte[] data, float volume) {
+    public Message send(UUID sender, byte[] data, float volume) {
         return this.send(this.getLocation(), sender, data, volume);
     }
     @Override
-    public Source send(byte[] data, float volume) {
+    public Message send(byte[] data, float volume) {
         return this.send(this.getLocation(), this.reference, data, volume);
     }
 
@@ -421,20 +421,20 @@ public class RadioRouter implements Socket, Router {
         }
     }
 
-    public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
+    public RadioMessage prepareSource(RadioMessage source, RadioRouter destination) {
         if (this.getLocation().equals(destination.getLocation())) return source;
 
         source.travel(this, destination, getFrequency());
         return source;
     }
 
-    public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
+    public boolean shouldRouteTo(RadioMessage source, RadioRouter destination) {
         return true;
     }
 
-    public void route(Source source, @Nullable Predicate<RadioRouter> criteria) {
+    public void route(Message source, @Nullable Predicate<RadioRouter> criteria) {
         if (!this.active) return;
-        RadioSource radioSource = (RadioSource) source;
+        RadioMessage radioSource = (RadioMessage) source;
 
         if (!radioSource.isValid()) {
             CommonSimpleRadio.warn("Invalid source; discarded");
@@ -467,18 +467,18 @@ public class RadioRouter implements Socket, Router {
 
             radioSource = this.prepareSource(radioSource, router);
 
-            RadioSource oldSource = radioSource;
+            RadioMessage oldSource = radioSource;
             if (i < routers.size()-1) radioSource = radioSource.copy();
             router.accept(oldSource);
         }
     }
 
     @Override
-    public void route(Source source) {
+    public void route(Message source) {
         this.route(source, null);
     }
 
-    public void compileActivity(Source source) {
+    public void compileActivity(Message source) {
         if (!this.active) return;
 
         if (source.getData() == null) {

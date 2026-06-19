@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * A type of {@link RadioRouter} that accepts {@link RadioSource}s and transmits them along its connected {@link Frequency}.
+ * A type of {@link RadioRouter} that accepts {@link RadioMessage}s and transmits them along its connected {@link Frequency}.
  * <br>
  * <b>Does route further.</b>
  */
@@ -85,7 +85,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
 
     @Override
-    public boolean shouldRouteTo(RadioSource source, RadioRouter destination) {
+    public boolean shouldRouteTo(RadioMessage source, RadioRouter destination) {
         if (destination instanceof RadioReceiver receiver) {
             if (source.willShort(receiver)) return false;
 
@@ -102,7 +102,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
 
     @Override
-    public RadioSource prepareSource(RadioSource source, RadioRouter destination) {
+    public RadioMessage prepareSource(RadioMessage source, RadioRouter destination) {
         if (source.frequencingType == -1) {
             float transmissionPower = getPower(frequency.getModulation());
 
@@ -116,7 +116,7 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
 
     @Override
-    public void take(Source source) {
+    public void take(Message source) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(source)) return;
 

@@ -6,10 +6,7 @@ import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 import com.codinglitch.simpleradio.compat.VibrativeCompat;
 import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioSource;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.*;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -88,7 +85,7 @@ public class CompatCore {
         spoutCompatibilities();
     }
 
-    public static void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
+    public static void onData(RadioSpeaker channel, RadioMessage source, short[] decoded) {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE.enabled) {
             VibrativeCompat.onData(channel, source, decoded);
@@ -101,7 +98,7 @@ public class CompatCore {
         }
     }
 
-    public static void acceptSource(Router router, Source source) {
+    public static void acceptSource(Router router, Message source) {
         if (CompatCore.COMPUTER_CRAFT.isLoaded) {
             CommonCCCompat.acceptSource(router, source);
         }

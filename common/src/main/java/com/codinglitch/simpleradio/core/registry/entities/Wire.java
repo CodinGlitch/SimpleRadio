@@ -11,9 +11,9 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffect
 import com.codinglitch.simpleradio.core.registry.SimpleRadioEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
-import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -130,7 +130,7 @@ public class Wire extends Entity implements Wiring {
     }
 
     @Override
-    public void relay(Source source, Socket originSocket) {
+    public void relay(Message source, Socket originSocket) {
         if (!this.isValid()) return;
 
         UUID fromRef = this.getFrom().orElse(null);

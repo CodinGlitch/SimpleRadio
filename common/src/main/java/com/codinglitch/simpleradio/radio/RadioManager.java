@@ -64,11 +64,11 @@ public class RadioManager extends ServerSimpleRadioApi {
     private static final List<QueuedSource> sourceQueue = new ArrayList<>();
 
     public static class QueuedSource {
-        public Source source;
+        public Message source;
 
         public Router router;
         public int time;
-        public QueuedSource(Source source, Router router, int time) {
+        public QueuedSource(Message source, Router router, int time) {
             this.source = source;
             this.router = router;
             this.time = time;
@@ -156,8 +156,8 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
-        return new RadioSource(owner, location, data, volume);
+    public Message newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+        return new RadioMessage(owner, location, data, volume);
     }
 
     @Override
@@ -377,7 +377,7 @@ public class RadioManager extends ServerSimpleRadioApi {
         }
     }
 
-    public void queueSource(Source source, Router destination, int delay) {
+    public void queueSource(Message source, Router destination, int delay) {
         pendingSources.add(new QueuedSource(source, destination, delay));
     }
     public void dequeueSource(Predicate<QueuedSource> criteria) {
@@ -527,9 +527,9 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
     public void stopRecord(ServerLevel level, long identifier) {
 
-        Map<Listener, Source> sources = new HashMap<>();
+        Map<Listener, Message> sources = new HashMap<>();
         for (Listener listener : LISTENERS.get()) {
-            RadioSource newSource = new RadioSource(
+            RadioMessage newSource = new RadioMessage(
                     listener.getReference(),
                     listener.getLocation(),
                     "", 0
@@ -567,14 +567,14 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
 
-        Map<Listener, Source> sources = new HashMap<>();
+        Map<Listener, Message> sources = new HashMap<>();
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
 
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.getRange());
 
-            RadioSource newSource = new RadioSource(
+            RadioMessage newSource = new RadioMessage(
                     listener.getReference(),
                     WorldlyPosition.of(location, level),
                     sound,
@@ -596,14 +596,14 @@ public class RadioManager extends ServerSimpleRadioApi {
         Level level = location.level;
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
 
-        Map<Listener, Source> sources = new HashMap<>();
+        Map<Listener, Message> sources = new HashMap<>();
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
 
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
 
-            RadioSource newSource = new RadioSource(
+            RadioMessage newSource = new RadioMessage(
                     sender,
                     WorldlyPosition.of(location, level),
                     data,

@@ -7,19 +7,26 @@ import com.codinglitch.simpleradio.core.registry.FrequencingRegistry;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.routers.Router;
+import de.maxhenkel.voicechat.api.opus.OpusDecoder;
+import de.maxhenkel.voicechat.api.opus.OpusEncoder;
+import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A source containing the audio data as well as other data collected while travelling.
  */
-public class RadioSource implements Source {
+public class RadioMessage implements Message {
+
+    private static final Map<UUID, OpusDecoder> decoders = new ConcurrentHashMap<>();
+    private Map<UUID, OpusEncoder> encoders;
+
     public UUID owner;
     public UUID originalOwner;
     public WorldlyPosition origin;
@@ -35,7 +42,7 @@ public class RadioSource implements Source {
 
     public float activity;
 
-    public List<Short> record = new ArrayList<>();
+    public ShortArrayList record = new ShortArrayList();
 
     public Frequency frequencyMedium;
     public Wire wireMedium;
@@ -43,9 +50,9 @@ public class RadioSource implements Source {
     public float transmissionCap = 50;
     public float transmissionPower = 50;
 
-    protected RadioSource() {}
+    protected RadioMessage() {}
 
-    public RadioSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+    public RadioMessage(UUID owner, WorldlyPosition location, byte[] data, float volume) {
         this.owner = owner;
         this.origin = location;
         this.volume = volume;
@@ -53,7 +60,7 @@ public class RadioSource implements Source {
         this.data = data;
     }
 
-    public RadioSource(UUID owner, WorldlyPosition location, String sound, float volume) {
+    public RadioMessage(UUID owner, WorldlyPosition location, String sound, float volume) {
         this.owner = owner;
         this.origin = location;
         this.volume = volume;
@@ -61,7 +68,7 @@ public class RadioSource implements Source {
         this.sound = sound;
     }
 
-    public RadioSource(UUID owner, WorldlyPosition location, SoundEvent soundEvent, float volume) {
+    public RadioMessage(UUID owner, WorldlyPosition location, SoundEvent soundEvent, float volume) {
         this(owner, location, soundEvent.getLocation().toString(), volume);
     }
 
@@ -117,7 +124,7 @@ public class RadioSource implements Source {
     }
 
     @Override
-    public List<Short> getTravelRecord() {
+    public ShortArrayList getTravelRecord() {
         return record;
     }
 
@@ -165,8 +172,8 @@ public class RadioSource implements Source {
     }
 
     @Override
-    public RadioSource copy() {
-        RadioSource copy = new RadioSource();
+    public RadioMessage copy() {
+        RadioMessage copy = new RadioMessage();
 
         copy.owner = this.owner;
         copy.originalOwner = this.originalOwner;
@@ -181,7 +188,7 @@ public class RadioSource implements Source {
         copy.offset = this.offset;
         copy.seed = this.seed;
 
-        copy.record = new ArrayList<>(this.record);
+        copy.record = this.record.clone();
 
         copy.frequencyMedium = this.frequencyMedium;
         copy.wireMedium = this.wireMedium;

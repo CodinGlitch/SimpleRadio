@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 /**
- * A type of {@link RadioRouter} that accepts {@link RadioSource}s.
+ * A type of {@link RadioRouter} that accepts {@link RadioMessage}s.
  * <br>
  * Often serves as the beginning of the audio pipeline.
  * <br>
@@ -18,7 +18,7 @@ import java.util.function.UnaryOperator;
  */
 public class RadioListener extends RadioRouter implements Listener {
 
-    private UnaryOperator<Source> dataTransformer;
+    private UnaryOperator<Message> dataTransformer;
 
     public float range = 8;
 
@@ -63,7 +63,7 @@ public class RadioListener extends RadioRouter implements Listener {
     }
 
     @Override
-    public void transformer(UnaryOperator<Source> transformer) {
+    public void transformer(UnaryOperator<Message> transformer) {
         this.dataTransformer = transformer;
     }
 
@@ -72,7 +72,7 @@ public class RadioListener extends RadioRouter implements Listener {
     }
 
     @Override
-    public void listen(Source source) {
+    public void listen(Message source) {
         if (dataTransformer != null) {
             source = dataTransformer.apply(source);
         }
