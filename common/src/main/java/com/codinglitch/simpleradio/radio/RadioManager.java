@@ -1,6 +1,9 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.*;
+import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.ServerSimpleRadioApi;
+import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
@@ -169,7 +172,7 @@ public class RadioManager extends ServerSimpleRadioApi {
                 if (wires.isEmpty()) continue;
 
                 Wiring wire = wires.get(0);
-                Router router = wire.transport(insulatorBlockEntity.getRouter());
+                Router router = wire.transport(insulatorBlockEntity.getRouter().reference);
                 if (router == null) continue;
 
                 BlockPos routerPos = router.getLocation().blockPos();
