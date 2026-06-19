@@ -1,17 +1,13 @@
 package com.codinglitch.simpleradio.client;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
-import com.codinglitch.simpleradio.core.networking.packets.ServerboundRadioUpdatePacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundUseHandheldPacket;
-import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -72,7 +68,7 @@ public class Keybinds {
 	public static Binding HANDHELD = bind(new KeyMapping(
 			"key.simpleradio.use_handheld",
 			InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_B,
+			GLFW.GLFW_KEY_Z,
 			"key.categories.simpleradio.simpleradio"
 	), Keybinds::handleHandheld);
 
