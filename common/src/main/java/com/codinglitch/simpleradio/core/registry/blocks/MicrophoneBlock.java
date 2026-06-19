@@ -100,8 +100,19 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), MAX_ROTATIONS));
     }
 
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        ItemStack stack = new ItemStack(this);
+        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (blockEntity instanceof RadioBlockEntity radioBlockEntity)
+            radioBlockEntity.saveToItem(stack);
+
+        return List.of(stack);
+    }
+
+    // ---- Redstone ---- \\
+
     @Override
-    public boolean hasAnalogOutputSignal(BlockState $$0) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
@@ -117,19 +128,37 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         return 0;
     }
 
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-        ItemStack stack = new ItemStack(this);
-        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (blockEntity instanceof RadioBlockEntity radioBlockEntity)
-            radioBlockEntity.saveToItem(stack);
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof MicrophoneBlockEntity mic) {
 
-        return List.of(stack);
+                // Toggle the microphone listening state
+                boolean hasSignal = level.hasNeighborSignal(pos);
+                if (hasSignal != mic.powered) {
+                    mic.powered = hasSignal;
+
+                    if (mic.powered) {
+                        mic.setListening(!mic.isListening());
+                        level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+                        blockEntity.setChanged();
+
+                        float pitch = mic.isListening() ? 1.1f : 0.9f;
+                        level.playSound(null, mic.getBlockPos(), SimpleRadioSounds.PRESS_MICROPHONE, SoundSource.BLOCKS, 0.4f, pitch + level.random.nextFloat()*0.1f);
+                    }
+                }
+
+            }
+        }
     }
+
+    // ---- Interactions ---- \\
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof MicrophoneBlockEntity mic) {
+        if (player.getItemInHand(hand).isEmpty() && blockEntity instanceof MicrophoneBlockEntity mic) {
             if (player.isCrouching()) {
                 mic.tilt = (mic.tilt + 0.1f) % 3;
 
