@@ -180,8 +180,8 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     @Override
-    public Source newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
-        return new RadioSource(owner, location, data, volume);
+    public Message newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+        return new RadioMessage(owner, location, data, volume);
     }
 
     @Override

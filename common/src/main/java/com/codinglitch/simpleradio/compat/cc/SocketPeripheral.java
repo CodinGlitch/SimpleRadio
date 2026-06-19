@@ -2,7 +2,7 @@ package com.codinglitch.simpleradio.compat.cc;
 
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.radio.RadioRouter;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.lua.*;
 import dan200.computercraft.api.peripheral.AttachedComputerSet;
@@ -27,7 +27,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         CommonCCCompat.putPeripheral(socket, this);
     }
 
-    public void accept(Router router, Source source) {
+    public void accept(Router router, Message source) {
         RadioRouter radioRouter = (RadioRouter) router;
         OpusDecoder decoder = radioRouter.getDecoder(source.getOwner());
 
