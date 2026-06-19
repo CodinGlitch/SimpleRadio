@@ -30,7 +30,7 @@ public class AccessoryCompat {
         void register(Item accessory, BiConsumer<Context, ItemStack> ticker);
     }
 
-    public static void makeItems(AccessoryRegistry registry) {
+    public static void makeItems(AccessoryRegistry registry, BiConsumer<Item, AccessoryRenderer> rendererProvider) {
         BiConsumer<Context, ItemStack> handheldTicker = (context, stack) -> {
             if (!context.identifier().equals("trinket")) return;
 
@@ -43,6 +43,13 @@ public class AccessoryCompat {
         registry.register(SimpleRadioItems.TRANSCEIVER, handheldTicker);
         registry.register(SimpleRadioItems.WALKIE_TALKIE, handheldTicker);
         registry.register(SimpleRadioItems.SPUDDIE_TALKIE, handheldTicker);
+
+        Services.PLATFORM.forClient(() -> {
+            rendererProvider.accept(SimpleRadioItems.TRANSCEIVER, new HandheldRenderer());
+            rendererProvider.accept(SimpleRadioItems.WALKIE_TALKIE, new HandheldRenderer());
+            rendererProvider.accept(SimpleRadioItems.SPUDDIE_TALKIE, new HandheldRenderer());
+        });
+
     }
 
     public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
@@ -64,8 +71,20 @@ public class AccessoryCompat {
         }
     }
 
-    public static class HandheldRenderer {
-        public static <T extends LivingEntity, M extends EntityModel<T>> void render(
+    public abstract static class AccessoryRenderer {
+        public abstract <T extends LivingEntity, M extends EntityModel<T>> void render(
+                ItemStack stack,
+                LivingEntity livingEntity,
+                PoseStack poseStack,
+                MultiBufferSource buffer,
+                int light
+        );
+    }
+
+    public static class HandheldRenderer extends AccessoryRenderer {
+
+        @Override
+        public <T extends LivingEntity, M extends EntityModel<T>> void render(
                 ItemStack stack,
                 LivingEntity livingEntity,
                 PoseStack poseStack,
@@ -95,6 +114,5 @@ public class AccessoryCompat {
 
             poseStack.popPose();
         }
-
     }
 }
