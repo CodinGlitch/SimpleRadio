@@ -5,9 +5,9 @@ import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Medium;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.routers.Router;
+import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 import net.minecraft.sounds.SoundEvent;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface Source {
@@ -18,7 +18,7 @@ public interface Source {
     float getPitch();
     UUID getOwner();
     float getPower();
-    List<Short> getTravelRecord();
+    ShortArrayList getTravelRecord();
     Frequency getFrequencyMedium();
     Wiring getWireMedium();
     UUID getRealOwner();

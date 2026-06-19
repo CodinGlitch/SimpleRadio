@@ -17,6 +17,9 @@ import java.util.UUID;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+/**
+ * Routes {@link Source}s to other routers.
+ */
 public interface Router {
     UUID getReference();
 
