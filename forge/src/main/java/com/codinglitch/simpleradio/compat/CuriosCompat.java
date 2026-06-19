@@ -1,7 +1,5 @@
 package com.codinglitch.simpleradio.compat;
 
-import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
-import com.codinglitch.simpleradio.platform.Services;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -24,7 +22,7 @@ import java.util.function.Predicate;
 public class CuriosCompat {
 
     public static void postInitialize() {
-        AccessoryCompat.makeItems(((accessory, ticker) -> {
+        AccessoryCompat.makeItems((accessory, ticker) -> {
 
             // we reconstruct the entire item and context to keep it platform-agnostic
             CuriosApi.registerCurio(accessory, new ICurioItem() {
@@ -44,7 +42,9 @@ public class CuriosCompat {
                 }
             });
 
-        }));
+        }, (item, renderer) -> {
+            CuriosRendererRegistry.register(item, () -> new GenericCurioRenderer(renderer));
+        });
     }
 
     public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
@@ -58,10 +58,15 @@ public class CuriosCompat {
     }
 
     public static void initialize() {
-        Services.PLATFORM.forClient(() -> CuriosRendererRegistry.register(SimpleRadioItems.TRANSCEIVER, CurioHandheldRenderer::new));
     }
 
-    public static class CurioHandheldRenderer implements ICurioRenderer {
+    public static class GenericCurioRenderer implements ICurioRenderer {
+        private final AccessoryCompat.AccessoryRenderer internalRenderer;
+
+        public GenericCurioRenderer(AccessoryCompat.AccessoryRenderer internalRenderer) {
+            this.internalRenderer = internalRenderer;
+        }
+
         @Override
         public <T extends LivingEntity, M extends EntityModel<T>> void render(
             ItemStack stack,
@@ -79,7 +84,7 @@ public class CuriosCompat {
 
             if (!(contextModel instanceof HumanoidModel<?>)) return;
 
-            AccessoryCompat.HandheldRenderer.render(stack, livingEntity, poseStack, buffer, light);
+            internalRenderer.render(stack, livingEntity, poseStack, buffer, light);
         }
     }
 }
