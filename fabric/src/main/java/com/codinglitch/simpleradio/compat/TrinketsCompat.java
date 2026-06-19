@@ -24,11 +24,10 @@ import java.util.function.Predicate;
 public class TrinketsCompat {
 
     public static void initialize() {
-        Services.PLATFORM.forClient(() -> TrinketRendererRegistry.registerRenderer(SimpleRadioItems.TRANSCEIVER, TrinketHandheldRenderer.INSTANCE));
     }
 
     public static void postInitialize() {
-        AccessoryCompat.makeItems(((accessory, ticker) -> {
+        AccessoryCompat.makeItems((accessory, ticker) -> {
 
             TrinketsApi.registerTrinket(accessory, new Trinket() {
                 @Override
@@ -47,7 +46,9 @@ public class TrinketsCompat {
                 }
             });
 
-        }));
+        }, (item, renderer) -> {
+            TrinketRendererRegistry.registerRenderer(item, new GenericTrinketRenderer(renderer));
+        });
     }
 
     public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
@@ -62,8 +63,12 @@ public class TrinketsCompat {
                 .get().getB();
     }
 
-    public static class TrinketHandheldRenderer implements TrinketRenderer {
-        public static TrinketHandheldRenderer INSTANCE = new TrinketHandheldRenderer();
+    public static class GenericTrinketRenderer implements TrinketRenderer {
+        private final AccessoryCompat.AccessoryRenderer internalRenderer;
+
+        public GenericTrinketRenderer(AccessoryCompat.AccessoryRenderer internalRenderer) {
+            this.internalRenderer = internalRenderer;
+        }
 
         @Override
         public void render(
@@ -79,7 +84,7 @@ public class TrinketsCompat {
         ) {
             if (!(contextModel instanceof HumanoidModel<?>)) return;
 
-            AccessoryCompat.HandheldRenderer.render(stack, livingEntity, poseStack, buffer, light);
+            internalRenderer.render(stack, livingEntity, poseStack, buffer, light);
         }
     }
 }
