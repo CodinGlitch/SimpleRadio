@@ -1,11 +1,11 @@
 package com.codinglitch.simpleradio.routers;
 
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 
 import java.util.function.UnaryOperator;
 
 /**
- * A type of {@link Router} that accepts {@link Source}s.
+ * A type of {@link Router} that accepts {@link Message}s.
  * <br>
  * Often serves as the beginning of the audio pipeline.
  * <br>
@@ -16,7 +16,7 @@ public interface Listener extends Router {
     float getRange();
     void setRange(float range);
 
-    void transformer(UnaryOperator<Source> transformer);
+    void transformer(UnaryOperator<Message> transformer);
 
-    void listen(Source source);
+    void listen(Message source);
 }

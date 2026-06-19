@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
-import com.codinglitch.simpleradio.radio.Source;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
 
 import java.util.List;
@@ -21,11 +21,11 @@ public interface Socket {
     }
 
     /**
-     * Distribute a {@link Source} along every wire connected to this socket.
-     * @param source The {@link Source} to distribute
+     * Distribute a {@link Message} along every wire connected to this socket.
+     * @param source The {@link Message} to distribute
      * @return Whether or not the source was distributed across any wires.
      */
-    default boolean distribute(Source source) {
+    default boolean distribute(Message source) {
         boolean result = false;
 
         List<Wiring> wires = this.getWires();
@@ -35,7 +35,7 @@ public interface Socket {
             Wiring wire = wires.get(i);
             if (source.getWireMedium() != null && source.getWireMedium().getReference().equals(wire.getReference())) continue;
 
-            Source oldSource = source;
+            Message oldSource = source;
             if (i < wires.size()-1) source = source.copy();
 
             wire.relay(oldSource, this);
