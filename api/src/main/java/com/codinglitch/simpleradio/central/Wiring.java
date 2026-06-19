@@ -17,6 +17,18 @@ public interface Wiring extends Medium {
     Router transport(Router source);
 
     /**
+     * Get the router opposite to the one provided.
+     * @param source The originating socket
+     */
+    Router transport(Socket source);
+
+    /**
+     * Get the router opposite to the one provided.
+     * @param reference The originating UUID
+     */
+    Router transport(UUID reference);
+
+    /**
      * Relay a {@link Source} along this wire.
      * @param source The {@link Source} to relay
      * @param originSocket The {@link Socket} the source came from
