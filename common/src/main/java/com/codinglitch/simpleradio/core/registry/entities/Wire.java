@@ -110,11 +110,21 @@ public class Wire extends Entity implements Wiring {
 
     @Override
     public RadioRouter transport(Router source) {
-        RadioRouter from = this.getFromRouter();
-        RadioRouter to = this.getToRouter();
+        return transport(source.getReference());
+    }
 
-        if (source == from) return to;
-        if (source == to) return from;
+    @Override
+    public RadioRouter transport(Socket source) {
+        return transport(source.getReference());
+    }
+
+    @Override
+    public RadioRouter transport(UUID reference) {
+        UUID fromRef = this.getFrom().orElse(null);
+        if (reference.equals(fromRef)) return getToRouter();
+
+        UUID toRef = this.getTo().orElse(null);
+        if (reference.equals(toRef)) return getFromRouter();
 
         return null;
     }
