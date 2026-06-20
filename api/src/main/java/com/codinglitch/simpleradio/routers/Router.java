@@ -71,8 +71,8 @@ public interface Router {
     double distanceTo(Router other);
 
 
-    void route(Message source);
-    void accept(Message source);
+    void route(Message message);
+    void accept(Message message);
 
     void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, long seed);
     void send(WorldlyPosition at, UUID sender, Holder<SoundEvent> soundHolder, float volume, float pitch, float offset, long seed);

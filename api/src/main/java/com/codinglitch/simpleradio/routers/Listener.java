@@ -18,5 +18,5 @@ public interface Listener extends Router {
 
     void transformer(UnaryOperator<Message> transformer);
 
-    void listen(Message source);
+    void listen(Message message);
 }

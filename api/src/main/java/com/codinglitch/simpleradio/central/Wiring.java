@@ -30,10 +30,10 @@ public interface Wiring extends Medium {
 
     /**
      * Relay a {@link Message} along this wire.
-     * @param source The {@link Message} to relay
-     * @param originSocket The {@link Socket} the source came from
+     * @param message The {@link Message} to relay
+     * @param originSocket The {@link Socket} the message came from
      */
-    void relay(Message source, Socket originSocket);
+    void relay(Message message, Socket originSocket);
 
     float getLength();
 

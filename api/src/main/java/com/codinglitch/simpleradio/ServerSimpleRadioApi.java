@@ -1,19 +1,17 @@
 package com.codinglitch.simpleradio;
 
-import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.Speakers;
+import com.codinglitch.simpleradio.radio.DelayedMessage;
+import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
-import com.codinglitch.simpleradio.routers.RouterContainer;
-import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -64,4 +62,24 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
     public abstract void sendAudio(WorldlyPosition location, UUID sender, byte[] data);
 
     public abstract void shortAt(WorldlyPosition location);
+
+    public abstract void sendAudio(WorldlyPosition location, UUID sender, short[] data);
+
+    // ---- Messaging ---- \\
+
+    /**
+     * Send a message with a delay to the given router.
+     * @param message The message to send
+     * @param destination The router to send the message to
+     * @param delay The delay in seconds to send the message after
+     */
+    public abstract void sendMessage(Message message, Router destination, float delay);
+
+    /**
+     * Cancel the queued messages that match the criteria.
+     * @param criteria The criteria to check
+     */
+    public abstract void cancelMessage(Predicate<DelayedMessage> criteria);
+
+
 }

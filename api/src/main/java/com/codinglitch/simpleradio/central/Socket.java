@@ -22,10 +22,10 @@ public interface Socket {
 
     /**
      * Distribute a {@link Message} along every wire connected to this socket.
-     * @param source The {@link Message} to distribute
-     * @return Whether or not the source was distributed across any wires.
+     * @param message The {@link Message} to distribute
+     * @return Whether or not the message was distributed across any wires.
      */
-    default boolean distribute(Message source) {
+    default boolean distribute(Message message) {
         boolean result = false;
 
         List<Wiring> wires = this.getWires();
@@ -33,12 +33,12 @@ public interface Socket {
 
         for (int i = 0; i < wires.size(); i++) {
             Wiring wire = wires.get(i);
-            if (source.getWireMedium() != null && source.getWireMedium().getReference().equals(wire.getReference())) continue;
+            if (message.getWireMedium() != null && message.getWireMedium().getReference().equals(wire.getReference())) continue;
 
-            Message oldSource = source;
-            if (i < wires.size()-1) source = source.copy();
+            Message oldMessage = message;
+            if (i < wires.size()-1) message = message.copy();
 
-            wire.relay(oldSource, this);
+            wire.relay(oldMessage, this);
 
             result = true;
         }

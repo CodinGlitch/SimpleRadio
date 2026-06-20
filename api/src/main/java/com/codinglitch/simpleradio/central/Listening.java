@@ -2,10 +2,7 @@ package com.codinglitch.simpleradio.central;
 
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
-import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.routers.Listener;
-import com.codinglitch.simpleradio.routers.Router;
-import com.codinglitch.simpleradio.routers.Speaker;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,10 +31,10 @@ public interface Listening extends Auricular {
 
     default Listener setupListener(Listener listener) {
         if (this instanceof AuditoryBlockEntity blockEntity) {
-            listener.transformer(source -> {
-                source.delegate(blockEntity.id);
+            listener.transformer(message -> {
+                message.delegate(blockEntity.id);
 
-                return source;
+                return message;
             });
         }
 

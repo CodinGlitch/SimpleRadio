@@ -19,8 +19,8 @@ public class Catalyst {
         return this;
     }
 
-    public Message acceptSource(Message source) {
-        source.addPower(source.getPower() * (efficiency - 1));
-        return source;
+    public Message acceptSource(Message message) {
+        message.addPower(message.getPower() * (efficiency - 1));
+        return message;
     }
 }
