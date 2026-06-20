@@ -107,20 +107,6 @@ public interface Router {
     double distanceTo(Router other);
 
     /**
-     * Routes the given message to all the routers connected to this one.
-     * <br>
-     * If the router allows distribution through wires, this will also relay it across those.
-     * @param message The message to be routed
-     */
-    void route(Message message);
-
-    /**
-     * Accepts the message, notifying any integrations (such as CC:Tweaked) before taking the message.
-     * @param message The message to be accepted
-     */
-    void accept(Message message);
-
-    /**
      * Takes the message, and pushes it if this router is capable of doing so.
      * @param message The message to be taken
      */

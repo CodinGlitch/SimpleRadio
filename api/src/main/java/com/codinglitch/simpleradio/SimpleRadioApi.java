@@ -88,7 +88,7 @@ public abstract class SimpleRadioApi {
      */
     public abstract Router newRouter(UUID reference, WorldlyPosition position);
 
-    public abstract Message newSource(UUID owner, WorldlyPosition location, byte[] data, float volume);
+    public abstract Message newMessage(UUID owner, WorldlyPosition location, byte[] data, float volume);
 
     public abstract void info(Object object, Object... substitutions);
     public abstract void debug(Object object, Object... substitutions);

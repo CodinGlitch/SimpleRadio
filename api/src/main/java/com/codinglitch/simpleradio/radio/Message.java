@@ -1,32 +1,39 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.central.FrequencingType;
-import com.codinglitch.simpleradio.central.Frequency;
-import com.codinglitch.simpleradio.central.Medium;
-import com.codinglitch.simpleradio.central.Wiring;
+import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.routers.Router;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
-import net.minecraft.sounds.SoundEvent;
 
 import java.util.UUID;
 
+/**
+ * A message representing a packet for radio transmission containing the
+ * audio data in a {@link Source} as well as other data collected while travelling.
+ */
 public interface Message {
-    byte[] getData();
-    SoundEvent getSoundEvent();
-    String getSound();
+    Source getSource();
 
     float getPitch();
-    UUID getOwner();
+    float getVolume();
     float getPower();
+    float getOffset();
+
+    UUID getOwner();
+    UUID getRealOwner();
+
+    long getSeed();
+
     ShortArrayList getTravelRecord();
+
     Frequency getFrequencyMedium();
     Wiring getWireMedium();
-    UUID getRealOwner();
     FrequencingType getFrequencingType();
+
+    WorldlyPosition getOrigin();
+
     float getActivity();
 
     void setPitch(float pitch);
-    void setData(byte[] data);
     void setOwner(UUID owner);
     void setPower(float transmissionPower);
     void setFrequencyMedium(Frequency frequencyMedium);
