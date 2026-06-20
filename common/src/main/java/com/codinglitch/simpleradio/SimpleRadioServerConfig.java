@@ -129,8 +129,9 @@ public class SimpleRadioServerConfig extends LexiconData {
         public String diminishmentMethod = "MULTIPLICATIVE";
         @LexiconEntry(comment = "This is how much transmission power diminishes per block. Defaults to 0.01.")
         public Double transmissionDiminishment = 0.01d;
-        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire takes to relay data. Defaults to 4.")
-        public Integer transmissionTime = 4;
+
+        @LexiconEntry(comment = "This is the amount of time (in seconds) per block a wire takes to relay data. Defaults to 0.1.")
+        public Double transmissionTime = 0.1d;
 
         @LexiconEntry(comment = "This is the amount of time (in ticks) between each header sent. Defaults to 5.")
         public Integer headerInterval = 5;
@@ -248,9 +249,6 @@ public class SimpleRadioServerConfig extends LexiconData {
         public Boolean crossDimensional = false;
         @LexiconEntry(comment = "The base amount of interference to give to radio transmission per block across dimensions. Defaults to 4.")
         public Double dimensionalInterference = 4d;
-
-        @LexiconEntry(comment = "The packet buffer for packet transmission. You likely won't need to worry about this. Defaults to 2.")
-        public Integer packetBuffer = 2;
     }
 
     public static class Router extends LexiconPageData implements ConfigHolder {

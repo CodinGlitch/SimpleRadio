@@ -72,17 +72,17 @@ public class RadioListener extends RadioRouter implements Listener {
     }
 
     @Override
-    public void listen(Message source) {
+    public void listen(Message message) {
         if (dataTransformer != null) {
-            source = dataTransformer.apply(source);
+            message = dataTransformer.apply(message);
         }
 
-        this.compileActivity(source);
+        this.compileActivity(message);
 
-        source.delegate(this.reference);
+        message.delegate(this.reference);
 
-        CompatCore.acceptSource(this, source);
-        this.route(source);
+        CompatCore.acceptSource(this, message);
+        this.route(message);
     }
 
     @Override

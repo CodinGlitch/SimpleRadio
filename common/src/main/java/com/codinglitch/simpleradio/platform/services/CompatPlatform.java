@@ -14,7 +14,7 @@ public interface CompatPlatform {
     void postInitialize();
     void postCompatibilityLoad();
 
-    void onData(RadioSpeaker channel, RadioMessage source, short[] decoded);
+    void onData(RadioSpeaker channel, RadioMessage message, short[] decoded);
 
     WorldlyPosition modifyPosition(WorldlyPosition position);
     Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation);

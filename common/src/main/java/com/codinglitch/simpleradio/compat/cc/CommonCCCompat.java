@@ -27,7 +27,7 @@ public class CommonCCCompat { // thats a lot of Cs
         }
     }
 
-    public static void acceptSource(Router router, Message source) {
+    public static void acceptSource(Router router, Message message) {
         WorldlyPosition position = router.getPosition();
         if (position == null) return;
 
@@ -36,7 +36,7 @@ public class CommonCCCompat { // thats a lot of Cs
             SocketPeripheral<?> peripheral = SOCKET_PERIPHERALS.get(blockEntity);
             if (peripheral == null) return;
 
-            peripheral.accept(router, source);
+            peripheral.accept(router, message);
         }
     }
 }

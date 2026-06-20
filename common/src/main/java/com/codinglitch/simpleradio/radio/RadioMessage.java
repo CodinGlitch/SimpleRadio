@@ -7,33 +7,24 @@ import com.codinglitch.simpleradio.core.registry.FrequencingRegistry;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.routers.Router;
-import de.maxhenkel.voicechat.api.opus.OpusDecoder;
-import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Math;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A source containing the audio data as well as other data collected while travelling.
+ * A message representing a packet for radio transmission containing the
+ * audio data in a {@link Source} as well as other data collected while travelling.
  */
 public class RadioMessage implements Message {
-
-    private static final Map<UUID, OpusDecoder> decoders = new ConcurrentHashMap<>();
-    private Map<UUID, OpusEncoder> encoders;
 
     public UUID owner;
     public UUID originalOwner;
     public WorldlyPosition origin;
     public short frequencingType = -1;
 
-    public byte[] data;
-    public String sound;
+    public Source source;
 
     public float pitch = 1;
     public float volume;
@@ -52,20 +43,24 @@ public class RadioMessage implements Message {
 
     protected RadioMessage() {}
 
-    public RadioMessage(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+    public RadioMessage(UUID owner, WorldlyPosition location, float volume, RadioSource source) {
         this.owner = owner;
         this.origin = location;
         this.volume = volume;
 
-        this.data = data;
+        this.source = source;
+    }
+
+    public RadioMessage(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+        this(owner, location, volume, new RadioSource(data));
+    }
+
+    public RadioMessage(UUID owner, WorldlyPosition location, short[] data, float volume) {
+        this(owner, location, volume, new RadioSource(data));
     }
 
     public RadioMessage(UUID owner, WorldlyPosition location, String sound, float volume) {
-        this.owner = owner;
-        this.origin = location;
-        this.volume = volume;
-
-        this.sound = sound;
+        this(owner, location, volume, new RadioSource(sound));
     }
 
     public RadioMessage(UUID owner, WorldlyPosition location, SoundEvent soundEvent, float volume) {
@@ -73,8 +68,33 @@ public class RadioMessage implements Message {
     }
 
     @Override
+    public Source getSource() {
+        return source;
+    }
+
+    @Override
+    public WorldlyPosition getOrigin() {
+        return origin;
+    }
+
+    @Override
     public float getActivity() {
         return activity;
+    }
+
+    @Override
+    public float getOffset() {
+        return offset;
+    }
+
+    @Override
+    public float getVolume() {
+        return volume;
+    }
+
+    @Override
+    public long getSeed() {
+        return seed;
     }
 
     @Override
@@ -84,25 +104,6 @@ public class RadioMessage implements Message {
     @Override
     public void setPitch(float pitch) {
         this.pitch = pitch;
-    }
-
-    @Override
-    public byte[] getData() {
-        return data;
-    }
-    @Override
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
-    @Override
-    public String getSound() {
-        return this.sound;
-    }
-
-    @Override
-    public SoundEvent getSoundEvent() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.tryParse(this.sound));
     }
 
     @Override
@@ -180,21 +181,22 @@ public class RadioMessage implements Message {
         copy.origin = this.origin;
         copy.frequencingType = this.frequencingType;
 
-        copy.data = this.data;
-        copy.sound = this.sound;
-
         copy.volume = this.volume;
         copy.pitch = this.pitch;
         copy.offset = this.offset;
         copy.seed = this.seed;
-
-        copy.record = this.record.clone();
 
         copy.frequencyMedium = this.frequencyMedium;
         copy.wireMedium = this.wireMedium;
 
         copy.transmissionPower = this.transmissionPower;
         copy.transmissionCap = this.transmissionCap;
+
+        // copy the record of the travel so far in case of splitting
+        copy.record = this.record.clone();
+
+        // don't copy the source since we don't know if it'll be any different from the origin at this point
+        copy.source = this.source;
 
         return copy;
     }
