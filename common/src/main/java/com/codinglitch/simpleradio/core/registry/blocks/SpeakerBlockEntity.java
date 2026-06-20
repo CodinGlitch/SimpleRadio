@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Speaking;
@@ -11,7 +10,6 @@ import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
-import com.codinglitch.simpleradio.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -23,6 +21,11 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
     public SpeakerBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.SPEAKER, pos, state);
+    }
+
+    @Override
+    public boolean canConnect() {
+        return this.getWires().isEmpty();
     }
 
     @Override

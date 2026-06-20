@@ -14,7 +14,7 @@ public interface CompatPlatform {
     void postInitialize();
     void postCompatibilityLoad();
 
-    void onData(RadioSpeaker channel, RadioMessage source, short[] decoded);
+    void onData(RadioSpeaker channel, RadioMessage message, short[] decoded);
 
     RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
     RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria);

@@ -1,14 +1,14 @@
 package com.codinglitch.simpleradio.compat.cc;
 
 import com.codinglitch.simpleradio.central.Socket;
-import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.Message;
+import com.codinglitch.simpleradio.radio.RadioRouter;
+import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.lua.*;
 import dan200.computercraft.api.peripheral.AttachedComputerSet;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -27,20 +27,19 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         CommonCCCompat.putPeripheral(socket, this);
     }
 
-    public void accept(Router router, Message source) {
+    public void accept(Router router, Message message) {
         RadioRouter radioRouter = (RadioRouter) router;
-        OpusDecoder decoder = radioRouter.getDecoder(source.getOwner());
 
         LuaTable<?, ?> data;
         String sound;
-        byte[] encodedData = source.getData();
-        if (encodedData == null) {
+        Source source = message.getSource();
+        if (source.getSound() != null) {
             data = null;
             sound = source.getSound();
         } else {
             sound = null;
 
-            short[] decoded = decoder.decode(source.getData());
+            short[] decoded = source.getDecoded(message.getRealOwner());
             Map<Integer, Short> mapped = new HashMap<>();
             for (int i = 0; i < decoded.length; i++) {
                 mapped.put(i+1, decoded[i]);
@@ -48,7 +47,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
             data = new ObjectLuaTable(mapped);
         }
 
-        float power = source.getPower();
+        float power = message.getPower();
 
         computers.forEach((computer) -> {
             computer.queueEvent("receive_signal", data == null ? sound : data, power);

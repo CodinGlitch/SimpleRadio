@@ -74,7 +74,8 @@ public class WireRenderer extends EntityRenderer<Wire> {
             if (wire != null && SimpleRadioLibrary.CLIENT_CONFIG.wire.effect) {
                 double effectDuration = distance * SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime;
                 for (Wire.Effect effect : wire.effectList) {
-                    float effectProgress = (float) ((effect.progress + (effect.direction * partialTick)) / effectDuration);
+                    float partialSecond = (effect.direction*partialTick*0.05f);
+                    float effectProgress = (float) ((effect.progress + partialSecond) / effectDuration);
 
                     float effectDistance = Math.abs(effectProgress - progress);
                     if (effectDistance <= 0.1f) {

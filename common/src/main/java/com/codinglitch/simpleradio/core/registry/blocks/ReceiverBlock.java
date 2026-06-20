@@ -89,6 +89,17 @@ public class ReceiverBlock extends BaseEntityBlock implements Routing, Receiving
         return RenderShape.MODEL;
     }
 
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        ItemStack stack = new ItemStack(this);
+        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (blockEntity instanceof AuditoryBlockEntity auditoryBlockEntity)
+            auditoryBlockEntity.saveToItem(stack);
+
+        return List.of(stack);
+    }
+
+    // ---- Redstone ---- \\
+
     @Override
     public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
@@ -99,14 +110,8 @@ public class ReceiverBlock extends BaseEntityBlock implements Routing, Receiving
         return 0;
     }
 
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-        ItemStack stack = new ItemStack(this);
-        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (blockEntity instanceof AuditoryBlockEntity auditoryBlockEntity)
-            auditoryBlockEntity.saveToItem(stack);
 
-        return List.of(stack);
-    }
+    // ---- Interactions ---- \\
 
     @Override
     public void setPlacedBy(Level level, BlockPos blockPos, BlockState blockState, @Nullable LivingEntity entity, ItemStack stack) {

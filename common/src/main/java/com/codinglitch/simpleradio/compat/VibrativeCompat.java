@@ -6,7 +6,7 @@ import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import com.codinglitch.vibrativevoice.VibrativeVoiceApi;
 
 public class VibrativeCompat {
-    public static void onData(RadioSpeaker speaker, RadioMessage source, short[] decodedData) {
+    public static void onData(RadioSpeaker speaker, RadioMessage message, short[] decodedData) {
         VibrativeVoiceApi.VibrationType type = VibrativeVoiceApi.INSTANCE.getQualifyingType(decodedData);
         if (type == null) return;
 

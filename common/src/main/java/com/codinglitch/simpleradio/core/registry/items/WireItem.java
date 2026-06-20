@@ -40,7 +40,6 @@ public class WireItem extends Item implements WorldTicking {
 
         BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof Socket interactingSocket) {
-            if (!interactingSocket.canConnect()) return super.useOn(context);
 
             // Disconnecting functionality
             if (player != null && player.isCrouching()) {
@@ -70,8 +69,9 @@ public class WireItem extends Item implements WorldTicking {
                     bestWire.get().burnOut();
                     return InteractionResult.SUCCESS;
                 }
-
             }
+
+            if (!interactingSocket.canConnect()) return super.useOn(context);
 
             // Connecting functionality
             CompoundTag tag = stack.getOrCreateTag();

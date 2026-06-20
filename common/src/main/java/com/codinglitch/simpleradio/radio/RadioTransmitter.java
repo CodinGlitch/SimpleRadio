@@ -85,12 +85,12 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
     }
 
     @Override
-    public boolean shouldRouteTo(RadioMessage source, RadioRouter destination) {
+    public boolean shouldRouteTo(RadioMessage message, RadioRouter destination) {
         if (destination instanceof RadioReceiver receiver) {
-            if (source.willShort(receiver)) return false;
+            if (message.willShort(receiver)) return false;
 
-            FrequencingType type = source.frequencingType == -1 ? this.frequencingType : source.getFrequencingType();
-            double transmissionPower = source.frequencingType == -1 ? this.getPower(this.frequency.getModulation()) : source.transmissionPower;
+            FrequencingType type = message.frequencingType == -1 ? this.frequencingType : message.getFrequencingType();
+            double transmissionPower = message.frequencingType == -1 ? this.getPower(this.frequency.getModulation()) : message.transmissionPower;
 
             double distance = this.getLocation().distance(receiver.getLocation());
             double cost = distance * type.transmissionDiminishment;
@@ -98,30 +98,30 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
             return (transmissionPower + receiver.getPower()) >= cost;
         }
 
-        return super.shouldRouteTo(source, destination);
+        return super.shouldRouteTo(message, destination);
     }
 
     @Override
-    public RadioMessage prepareSource(RadioMessage source, RadioRouter destination) {
-        if (source.frequencingType == -1) {
+    public RadioMessage prepareSource(RadioMessage message, RadioRouter destination) {
+        if (message.frequencingType == -1) {
             float transmissionPower = getPower(frequency.getModulation());
 
-            source.frequencingType = this.frequencingType.id;
-            source.transmissionCap = transmissionPower;
-            source.addPower(transmissionPower);
+            message.frequencingType = this.frequencingType.id;
+            message.transmissionCap = transmissionPower;
+            message.addPower(transmissionPower);
 
             //CommonSimpleRadio.info("transmitting at {}", source.transmissionPower);
         }
-        return super.prepareSource(source, destination);
+        return super.prepareSource(message, destination);
     }
 
     @Override
-    public void take(Message source) {
+    public void take(Message message) {
         if (!this.active) return;
-        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
+        if (acceptCriteria != null && !acceptCriteria.test(message)) return;
 
-        this.route(source, router -> {
-            return source.getOwner() == null || !source.getOwner().equals(router.reference);
+        this.route(message, router -> {
+            return message.getOwner() == null || !message.getOwner().equals(router.reference);
         });
     }
 }

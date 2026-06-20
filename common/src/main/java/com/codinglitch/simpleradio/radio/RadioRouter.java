@@ -23,7 +23,10 @@ import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -33,14 +36,6 @@ import java.util.function.Predicate;
  * Routes RadioSources to other routers.
  */
 public class RadioRouter implements Socket, Router {
-    public static class Compiled<E> extends LinkedList<E> {
-        @Override
-        public boolean add(E value) {
-            super.add(value);
-            while (size() > 20) super.remove();
-            return true;
-        }
-    }
 
     private Map<UUID, OpusDecoder> decoders;
     private Map<UUID, OpusEncoder> encoders;
@@ -300,15 +295,15 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public void accept(Message source) {
-        CompatCore.acceptSource(this, source);
-        this.take(source);
+    public void accept(Message message) {
+        CompatCore.acceptSource(this, message);
+        this.take(message);
     }
 
-    public void take(Message source) {
+    public void take(Message message) {
         if (!this.active) return;
-        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        this.route(source);
+        if (acceptCriteria != null && !acceptCriteria.test(message)) return;
+        this.route(message);
     }
 
     @Override
@@ -373,6 +368,10 @@ public class RadioRouter implements Socket, Router {
         return this.send(this.getLocation(), this.reference, data, volume);
     }
 
+    public void push(short[] data) {
+
+    }
+
     //this method is so dumb bro
     public void updateLocation(WorldlyPosition location) {
     }
@@ -382,6 +381,9 @@ public class RadioRouter implements Socket, Router {
     }
 
     public void tick(int tickCount) {
+        // Accept pending routers
+
+
         // Calculate velocity and/or modify position/rotation for things like VS integration
         if (position != null) {
             this.updateRotation(CompatCore.modifyRotation(position, rotation));
@@ -421,23 +423,23 @@ public class RadioRouter implements Socket, Router {
         }
     }
 
-    public RadioMessage prepareSource(RadioMessage source, RadioRouter destination) {
-        if (this.getLocation().equals(destination.getLocation())) return source;
+    public RadioMessage prepareSource(RadioMessage message, RadioRouter destination) {
+        if (this.getLocation().equals(destination.getLocation())) return message;
 
-        source.travel(this, destination, getFrequency());
-        return source;
+        message.travel(this, destination, getFrequency());
+        return message;
     }
 
-    public boolean shouldRouteTo(RadioMessage source, RadioRouter destination) {
+    public boolean shouldRouteTo(RadioMessage message, RadioRouter destination) {
         return true;
     }
 
-    public void route(Message source, @Nullable Predicate<RadioRouter> criteria) {
+    public void route(Message message, @Nullable Predicate<RadioRouter> criteria) {
         if (!this.active) return;
-        RadioMessage radioSource = (RadioMessage) source;
+        RadioMessage radioSource = (RadioMessage) message;
 
         if (!radioSource.isValid()) {
-            CommonSimpleRadio.warn("Invalid source; discarded");
+            CommonSimpleRadio.warn("Invalid message; discarded");
             return;
         }
 
@@ -474,19 +476,19 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public void route(Message source) {
-        this.route(source, null);
+    public void route(Message message) {
+        this.route(message, null);
     }
 
-    public void compileActivity(Message source) {
+    public void compileActivity(Message message) {
         if (!this.active) return;
 
-        if (source.getData() == null) {
-            this.activity = source.getActivity();
+        if (message.getSource().getSound() != null) {
+            this.activity = message.getActivity();
             compiledActivity = 0;
             compiledSamples = 0;
         } else {
-            compiledActivity += source.getActivity();
+            compiledActivity += message.getActivity();
             if (compiledSamples++ >= SimpleRadioLibrary.SERVER_CONFIG.router.compileAmount) {
                 this.activity = Math.sqrt(compiledActivity);
                 compiledActivity = 0;

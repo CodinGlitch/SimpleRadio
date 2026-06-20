@@ -5,13 +5,11 @@ import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioAudioEffects;
 import com.codinglitch.simpleradio.platform.Services;
-import com.codinglitch.simpleradio.radio.effects.AudioEffect;
-import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import com.codinglitch.simpleradio.routers.Speaker;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
-import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -20,7 +18,6 @@ import org.joml.Vector3f;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 /**
  * A type of {@link RadioRouter} that accepts {@link RadioMessage}s and emits them in-world.
@@ -29,12 +26,11 @@ import java.util.function.Supplier;
  * <br>
  * <b>Does not route further.</b>
  */
-public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Speaker {
+public class RadioSpeaker extends RadioRouter implements Speaker {
     // migrated to locational audio channels only due to alternatives not having range property
     public LocationalAudioChannel audioChannel;
     public AudioPlayer audioPlayer;
     private final Map<UUID, Map<UUID, Queue<short[]>>> packetBuffer;
-    private final Map<UUID, OpusDecoder> decoders;
     private final AudioEffect effect;
 
     public String category;
@@ -46,8 +42,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         super(id);
 
         packetBuffer = new ConcurrentHashMap<>();
-        decoders = new ConcurrentHashMap<>();
-        effect = new BaseAudioEffect();
+        effect = SimpleRadioAudioEffects.RADIO.make(); // easier to dynamically change
     }
     protected RadioSpeaker() {
         this(UUID.randomUUID());
@@ -97,8 +92,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         return speakingTime;
     }
 
-    @Override
-    public short[] get() {
+    public short[] retrieveFrame() {
         short[] audio = generatePacket();
         if (audio == null) {
             if (audioPlayer != null)
@@ -111,26 +105,23 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     }
 
     public short[] generatePacket() {
-        List<short[]> totalPacketsToCombine = new ArrayList<>();
+        List<short[]> packets = new ArrayList<>();
 
         for (Map.Entry<UUID, Map<UUID, Queue<short[]>>> listenerPacket : packetBuffer.entrySet()) {
             Map<UUID, Queue<short[]>> playerPackets = listenerPacket.getValue();
             if (playerPackets.isEmpty()) continue;
 
-            List<short[]> playerPacketsToCombine = new ArrayList<>();
             for (Map.Entry<UUID, Queue<short[]>> playerPacket : playerPackets.entrySet()) {
                 short[] audio = playerPacket.getValue().poll();
-                if (audio != null) playerPacketsToCombine.add(audio);
+                if (audio != null) packets.add(audio);
             }
             playerPackets.values().removeIf(Queue::isEmpty);
 
-            totalPacketsToCombine.add(CommonRadioPlugin.combineAudio(playerPacketsToCombine));
         }
         packetBuffer.values().removeIf(Map::isEmpty);
 
-        if (totalPacketsToCombine.isEmpty()) return null;
-
-        return CommonRadioPlugin.combineAudio(totalPacketsToCombine);
+        if (packets.isEmpty()) return null;
+        return CommonRadioPlugin.combineAudio(packets);
     }
 
     @Override
@@ -150,16 +141,16 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
     }
 
     @Override
-    public void take(Message source) {
+    public void take(Message message) {
         if (!this.active) return;
-        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        super.take(source);
-        speak(source);
+        if (acceptCriteria != null && !acceptCriteria.test(message)) return;
+        super.take(message);
+        speak(message);
     }
 
-    public void speak(Message source) {
-        this.compileActivity(source);
-        RadioMessage radioSource = (RadioMessage) source;
+    public void speak(Message message) {
+        this.compileActivity(message);
+        Source source = message.getSource();
 
         // Severity calculation
         ServerLevel level = null;
@@ -173,21 +164,19 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         }
         if (level == null || position == null) return;
 
-        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != radioSource.origin.level) return;
+        if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != message.getOrigin().level) return;
 
-        this.effect.severity = (float) radioSource.computeSeverity();
-        this.effect.volume = radioSource.volume;
+        this.effect.severity = (float) message.computeSeverity();
+        this.effect.volume = message.getVolume();
         if (this.effect.severity >= 100) return;
 
         // Parsing sound event
-        if (radioSource.data == null) {
-            if (radioSource.sound == null) return;
-
+        if (source.getSound() != null) {
             for (ServerPlayer player : level.players()) {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
                     Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
-                            this.getReference(), radioSource.sound,
-                            radioSource.volume, radioSource.pitch, this.effect.severity, radioSource.offset, radioSource.seed
+                            this.getReference(), source.getSound(),
+                            message.getVolume(), message.getPitch(), this.effect.severity, message.getOffset(), message.getSeed()
                     ));
                 }
             }
@@ -196,40 +185,24 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         }
 
         // Packet buffer
-        Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(radioSource.owner, k -> new ConcurrentHashMap<>());
-        Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(radioSource.getRealOwner(), k -> new LinkedList<>());
-        if (playerPackets.isEmpty()) {
-            for (int i = 0; i < SimpleRadioLibrary.SERVER_CONFIG.frequency.packetBuffer; i++) {
-                //playerPackets.offer(null);
-            }
-        }
+        Map<UUID, Queue<short[]>> listenerPackets = packetBuffer.computeIfAbsent(message.getOwner(), k -> new ConcurrentHashMap<>());
+        Queue<short[]> playerPackets = listenerPackets.computeIfAbsent(message.getRealOwner(), k -> new ArrayDeque<>());
 
         // Decoding
-        byte[] data = radioSource.data;
-
-        OpusDecoder decoder = getDecoder(radioSource.owner);
-        if (data == null || data.length == 0) {
-            decoder.resetState();
-            return;
-        }
-        short[] decoded = decoder.decode(data);
+        short[] decoded = source.getDecoded(message.getRealOwner()).clone();
         short[] filtered = effect.apply(decoded);
 
         if (!CommonRadioPlugin.isAudioValid(filtered)) return;
         playerPackets.offer(filtered);
 
         // Loader-specific compat
-        Services.COMPAT.onData(this, radioSource, decoded);
+        Services.COMPAT.onData(this, (RadioMessage) message, decoded);
 
         // Common compat
-        CompatCore.onData(this, radioSource, decoded);
+        CompatCore.onData(this, (RadioMessage) message, decoded);
 
         if (this.audioPlayer == null)
             getAudioPlayer().startPlaying();
-    }
-
-    public OpusDecoder getDecoder(UUID sender) {
-        return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
     }
 
     private AudioPlayer getAudioPlayer() {
@@ -243,7 +216,7 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
             audioChannel.setDistance(range);
             audioChannel.setCategory(category);
 
-            this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this);
+            this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this::retrieveFrame);
         }
         return this.audioPlayer;
     }

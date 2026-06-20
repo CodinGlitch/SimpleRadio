@@ -88,16 +88,16 @@ public class RadioReceiver extends RadioRouter implements Receiver {
     }
 
     @Override
-    public void take(Message source) {
+    public void take(Message message) {
         //CommonSimpleRadio.info("receiving at {}", source.transmissionPower);
 
         if (!this.active) return;
-        if (acceptCriteria != null && !acceptCriteria.test(source)) return;
-        if (source.getPower() <= 0) return;
+        if (acceptCriteria != null && !acceptCriteria.test(message)) return;
+        if (message.getPower() <= 0) return;
 
-        this.compileActivity(source);
+        this.compileActivity(message);
 
         //super.accept(source);
-        this.route(source);//, router -> !source.owner.equals(router.owner.getUUID()));
+        this.route(message);//, router -> !source.owner.equals(router.owner.getUUID()));
     }
 }

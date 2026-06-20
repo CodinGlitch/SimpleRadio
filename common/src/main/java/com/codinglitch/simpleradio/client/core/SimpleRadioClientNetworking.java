@@ -10,7 +10,6 @@ import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
-import org.joml.Math;
 
 public class SimpleRadioClientNetworking {
 
@@ -51,7 +50,7 @@ public class SimpleRadioClientNetworking {
             if (entity instanceof Wire wire) {
                 Wire.Effect effect = new Wire.Effect();
                 if (reversed) {
-                    effect.progress = Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * wire.getLength());
+                    effect.progress = (float) (SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * wire.getLength());
                     effect.direction = -1;
                 } else {
                     effect.progress = 0;

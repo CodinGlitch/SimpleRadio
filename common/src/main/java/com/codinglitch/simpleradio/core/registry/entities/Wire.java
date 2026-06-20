@@ -55,7 +55,7 @@ public class Wire extends Entity implements Wiring {
 
     public static class Effect {
         public int direction = 0;
-        public int progress = 0;
+        public float progress = 0;
     }
 
     public Wire(EntityType<?> entityType, Level level) {
@@ -130,7 +130,7 @@ public class Wire extends Entity implements Wiring {
     }
 
     @Override
-    public void relay(Message source, Socket originSocket) {
+    public void relay(Message message, Socket originSocket) {
         if (!this.isValid()) return;
 
         UUID fromRef = this.getFrom().orElse(null);
@@ -156,21 +156,23 @@ public class Wire extends Entity implements Wiring {
         RadioRouter destination = isReversed ? from : to;
 
         // Short circuit a socket if we have visited it previously
-        if (source.willShort(destination)) {
+        if (message.willShort(destination)) {
             destination.shortCircuit();
             return;
         }
 
         // Short circuit a wire if two sources are colliding on it
-        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime != -1) {
+        if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime > 0) {
             AtomicInteger timeUntilDemise = new AtomicInteger();
             AtomicReference<Float> placeOfDemise = new AtomicReference<>((float) 0);
-            if (RadioManager.getInstance().readQueue(queued -> {
-                if (queued.source.getWireMedium().equals(this) && queued.router.equals(origin)) {
-                    int maxProgress = Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength());
-                    float progress = (float) queued.time / maxProgress;
+            if (RadioManager.getInstance().hasQueued(queued -> {
+                if (queued.message.getWireMedium().equals(this) && queued.destination.equals(origin)) {
+                    float seconds = queued.secondsLeft();
 
-                    timeUntilDemise.set((int) Math.ceil((float)queued.time / 2f));
+                    float maxProgress = (float) (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength());
+                    float progress = seconds / maxProgress;
+
+                    timeUntilDemise.set((int) Math.ceil(seconds*20f));
                     if (isReversed) {
                         placeOfDemise.set(1 - progress);
                     } else {
@@ -184,24 +186,24 @@ public class Wire extends Entity implements Wiring {
             }
         }
 
-        if (!level.isClientSide() && !effectCooldowns.containsKey(source.getOwner()) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
+        if (!level.isClientSide() && !effectCooldowns.containsKey(message.getOwner()) && SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval != -1) {
             for (Player player : level.players()) {
                 if (player.distanceTo(this) <= 100) {
                     Services.NETWORKING.sendToPlayer((ServerPlayer) player, new ClientboundWireEffectPacket(this.getId(), isReversed));
                 }
             }
 
-            this.effectCooldowns.put(source.getOwner(), SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
+            this.effectCooldowns.put(message.getOwner(), SimpleRadioLibrary.SERVER_CONFIG.wire.effectInterval);
         }
 
         //CommonSimpleRadio.info("Relaying from {} to {}", origin, destination);
 
-        source.travel(from, to, this);
+        message.travel(from, to, this);
 
         if (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime <= 0) {
-            destination.accept(source);
+            destination.accept(message);
         } else {
-            RadioManager.getInstance().queueSource(source, destination, Math.round(SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));
+            RadioManager.getInstance().sendMessage(message, destination, (float) (SimpleRadioLibrary.SERVER_CONFIG.wire.transmissionTime * this.getLength()));
         }
     }
 
@@ -270,7 +272,7 @@ public class Wire extends Entity implements Wiring {
 
     @Override
     public void burnOut() {
-        RadioManager.getInstance().dequeueSource(queuedSource -> queuedSource.source.getWireMedium() == this);
+        RadioManager.getInstance().cancelMessage(queuedSource -> queuedSource.message.getWireMedium() == this);
         this.kill();
     }
 
@@ -313,7 +315,7 @@ public class Wire extends Entity implements Wiring {
         UUID toRef = this.getTo().orElse(null);
 
         if (this.level().isClientSide) {
-            int effectDuration = Math.round(SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
+            float effectDuration = (float) (SimpleRadioLibrary.CLIENT_CONFIG.wire.effectTime * this.getLength());
 
             Iterator<Effect> iterator = this.effectList.iterator();
             while (iterator.hasNext()) {
@@ -325,7 +327,7 @@ public class Wire extends Entity implements Wiring {
                     if (effect.progress > effectDuration) iterator.remove();
                 }
 
-                effect.progress += effect.direction;
+                effect.progress += effect.direction/20f;
             }
 
             if (fromRef != null && toRef != null) {

@@ -28,6 +28,7 @@ import de.maxhenkel.voicechat.api.packets.EntitySoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -58,28 +59,27 @@ public class RadioManager extends ServerSimpleRadioApi {
     private static final SpeakersImpl SPEAKERS = new SpeakersImpl();
     private static final ListenersImpl LISTENERS = new ListenersImpl();
 
-
-    // double queue for the win
-    private static final List<QueuedSource> pendingSources = new ArrayList<>();
-    private static final List<QueuedSource> sourceQueue = new ArrayList<>();
-
-    public static class QueuedSource {
-        public Message source;
-
-        public Router router;
-        public int time;
-        public QueuedSource(Message source, Router router, int time) {
-            this.source = source;
-            this.router = router;
-            this.time = time;
-        }
-
-    }
+    private static MessagingThread messagingThread;
 
     private static final Queue<Runnable> pendingModifications = new LinkedList<>();
     static final Map<Short, Router> routers = new HashMap<>();
 
-    public static void load() {
+    public static void load() {}
+
+    public static void open(MinecraftServer server) {
+        // Start the messaging thread
+        messagingThread = new MessagingThread(server);
+        messagingThread.setDaemon(true);
+        messagingThread.start();
+    }
+
+    public static void close() {
+        FREQUENCIES.close();
+
+        SPEAKERS.close();
+        LISTENERS.close();
+
+        routers.clear();
     }
 
     public static RadioManager getInstance() {
@@ -156,7 +156,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public Message newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+    public Message newMessage(UUID owner, WorldlyPosition location, byte[] data, float volume) {
         return new RadioMessage(owner, location, data, volume);
     }
 
@@ -296,15 +296,6 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     // -------- \\
 
-    public static void close() {
-        FREQUENCIES.close();
-
-        SPEAKERS.close();
-        LISTENERS.close();
-
-        routers.clear();
-    }
-
     public static <R extends Router> void validate(RouterContainer<R> container) {
         container.garbageCollect(Predicate.not(Router::validate));
         container.garbageCollect(entry -> entry.getOwner() == null && entry.getPosition() == null);
@@ -343,30 +334,6 @@ public class RadioManager extends ServerSimpleRadioApi {
         }
 
         applyModifications();
-
-        sourceQueue.addAll(pendingSources);
-        pendingSources.clear();
-
-        // i must be stupid
-        List<QueuedSource> acceptedSources = new ArrayList<>();
-        Iterator<QueuedSource> iterator = sourceQueue.iterator();
-        while (iterator.hasNext()) {
-            QueuedSource source = iterator.next();
-            if (source == null) {
-                iterator.remove();
-                continue;
-            }
-
-            source.time--;
-            if (source.time <= 0) {
-                acceptedSources.add(source);
-                iterator.remove();
-            }
-        }
-
-        for (QueuedSource source : acceptedSources) {
-            source.router.accept(source.source);
-        }
     }
 
     private void applyModifications() {
@@ -377,25 +344,18 @@ public class RadioManager extends ServerSimpleRadioApi {
         }
     }
 
-    public void queueSource(Message source, Router destination, int delay) {
-        pendingSources.add(new QueuedSource(source, destination, delay));
-    }
-    public void dequeueSource(Predicate<QueuedSource> criteria) {
-        pendingSources.removeIf(criteria);
-        sourceQueue.removeIf(criteria);
+    @Override
+    public void sendMessage(Message message, Router destination, float delay) {
+        messagingThread.send(message, destination, delay);
     }
 
-    public boolean readQueue(Predicate<QueuedSource> filter) {
-        for (QueuedSource source : sourceQueue) {
-            if (source == null) continue;
-            if (filter.test(source)) return true;
-        }
-        for (QueuedSource source : pendingSources) {
-            if (source == null) continue;
-            if (filter.test(source)) return true;
-        }
+    @Override
+    public void cancelMessage(Predicate<DelayedMessage> criteria) {
+        messagingThread.cancel(criteria);
+    }
 
-        return false;
+    public boolean hasQueued(Predicate<DelayedMessage> filter) {
+        return messagingThread.queuedMessages.stream().anyMatch(filter);
     }
 
     @Override
@@ -566,8 +526,9 @@ public class RadioManager extends ServerSimpleRadioApi {
         if (!level.isLoaded(location.blockPos())) return;
 
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
+        if (qualified.isEmpty()) return;
 
-        Map<Listener, Message> sources = new HashMap<>();
+        Map<Listener, Message> messages = new HashMap<>();
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
@@ -585,43 +546,53 @@ public class RadioManager extends ServerSimpleRadioApi {
             newSource.seed = seed;
             newSource.activity = (float) (Math.clamp(0, 15, Math.round((1 - (distance / listener.getRange()))*15)) * SimpleRadioLibrary.SERVER_CONFIG.router.activityRedstoneFactor);
 
-            sources.put(listener, newSource);
+            messages.put(listener, newSource);
         }
 
-        level.getServer().execute(() -> sources.forEach(Listener::listen));
+        level.getServer().execute(() -> messages.forEach(Listener::listen));
     }
 
     @Override
     public void sendAudio(WorldlyPosition location, UUID sender, byte[] data) {
+        Map<Float, Listener> qualified = LISTENERS.getAt(location);
+        if (qualified.isEmpty()) return;
+
+        // Decoding the audio data so it can be read and freely manipulated
+        OpusDecoder decoder = RadioSource.getDecoder(sender);
+        if (data == null || data.length == 0) {
+            decoder.resetState();
+        } else {
+            short[] decoded = decoder.decode(data);
+            sendAudio(location, sender, decoded);
+        }
+    }
+
+    @Override
+    public void sendAudio(WorldlyPosition location, UUID sender, short[] data) {
         Level level = location.level;
         Map<Float, Listener> qualified = LISTENERS.getAt(location);
+        if (qualified.isEmpty()) return;
 
-        Map<Listener, Message> sources = new HashMap<>();
+        float activity = CommonRadioPlugin.analyzeActivity(data);
+
+        Map<Listener, Message> messages = new HashMap<>();
         for (Map.Entry<Float, Listener> entry : qualified.entrySet()) {
             float distance = entry.getKey();
             RadioListener listener = (RadioListener) entry.getValue();
 
             double falloff = CommonRadioPlugin.getFalloff(distance, listener.range);
 
-            RadioMessage newSource = new RadioMessage(
+            RadioMessage newMessage = new RadioMessage(
                     sender,
                     WorldlyPosition.of(location, level),
                     data,
                     (float) falloff
             );
+            newMessage.activity = activity;
 
-            // Decoding for initial reading
-            OpusDecoder decoder = listener.getDecoder(sender);
-            if (data == null || data.length == 0) {
-                decoder.resetState();
-            } else {
-                short[] decoded = decoder.decode(data);
-                newSource.activity = CommonRadioPlugin.analyzeActivity(decoded);
-            }
-
-            sources.put(listener, newSource);
+            messages.put(listener, newMessage);
         }
 
-        level.getServer().execute(() -> sources.forEach(Listener::listen));
+        level.getServer().execute(() -> messages.forEach(Listener::listen));
     }
 }

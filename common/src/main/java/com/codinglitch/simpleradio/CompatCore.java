@@ -85,10 +85,10 @@ public class CompatCore {
         spoutCompatibilities();
     }
 
-    public static void onData(RadioSpeaker channel, RadioMessage source, short[] decoded) {
+    public static void onData(RadioSpeaker channel, RadioMessage message, short[] decoded) {
         // ---- Vibrative Voice ---- \\
         if (CompatCore.VIBRATIVE_VOICE.enabled) {
-            VibrativeCompat.onData(channel, source, decoded);
+            VibrativeCompat.onData(channel, message, decoded);
         }
     }
 
@@ -98,9 +98,9 @@ public class CompatCore {
         }
     }
 
-    public static void acceptSource(Router router, Message source) {
+    public static void acceptSource(Router router, Message message) {
         if (CompatCore.COMPUTER_CRAFT.isLoaded) {
-            CommonCCCompat.acceptSource(router, source);
+            CommonCCCompat.acceptSource(router, message);
         }
     }
 

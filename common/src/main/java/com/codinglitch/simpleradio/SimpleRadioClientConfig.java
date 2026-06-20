@@ -28,8 +28,8 @@ public class SimpleRadioClientConfig extends LexiconData {
         @LexiconEntry(comment = "This determines whether or not wire effects will be processed. Defaults to true.")
         public Boolean effect = true;
 
-        @LexiconEntry(comment = "This is the amount of time (in ticks) per block a wire effect lasts. Best if matching 'transmissionTime'. Defaults to 4.")
-        public Integer effectTime = 4;
+        @LexiconEntry(comment = "This is the amount of time (in seconds) per block a wire effect lasts. Best if matching 'transmissionTime'. Defaults to 0.1.")
+        public Double effectTime = 0.1d;
 
         @LexiconEntry(comment = "This is how much wires drop from gravity. Defaults to 0.75.")
         public Double baseSag = 0.75d;

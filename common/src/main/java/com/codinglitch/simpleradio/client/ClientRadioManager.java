@@ -15,6 +15,7 @@ import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.SimpleRadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioAudioEffects;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.MicrophoneBlockEntity;
@@ -23,8 +24,6 @@ import com.codinglitch.simpleradio.core.registry.blocks.SpeakerBlockEntity;
 import com.codinglitch.simpleradio.core.registry.items.WalkieTalkieItem;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import com.codinglitch.simpleradio.radio.*;
-import com.codinglitch.simpleradio.radio.effects.AudioEffect;
-import com.codinglitch.simpleradio.radio.effects.BaseAudioEffect;
 import com.codinglitch.simpleradio.routers.*;
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;
@@ -180,7 +179,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     @Override
-    public Message newSource(UUID owner, WorldlyPosition location, byte[] data, float volume) {
+    public Message newMessage(UUID owner, WorldlyPosition location, byte[] data, float volume) {
         return new RadioMessage(owner, location, data, volume);
     }
 
@@ -527,7 +526,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         // --- Audio Streaming --- \\
         CompletableFuture<AudioStream> future = ClientServices.COMPAT.makeSubstream(instance);
 
-        AudioEffect effect = new BaseAudioEffect();
+        AudioEffect effect = SimpleRadioAudioEffects.RADIO.make();
         effect.volume = 1;
         effect.severity = severity;
 
