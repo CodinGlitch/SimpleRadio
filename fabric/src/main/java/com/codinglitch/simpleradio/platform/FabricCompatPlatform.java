@@ -17,11 +17,11 @@ import java.util.function.Predicate;
 
 public class FabricCompatPlatform implements CompatPlatform {
     @Override
-    public void onData(RadioSpeaker channel, RadioMessage source, short[] decoded) {
+    public void onData(RadioSpeaker channel, RadioMessage message, short[] decoded) {
 
         // ---- Voice Chat Interaction ---- \\
         if (CompatCore.VC_INTERACTION.enabled) {
-            InteractionCompat.onData(channel, source, decoded);
+            InteractionCompat.onData(channel, message, decoded);
         }
     }
 

@@ -4,14 +4,16 @@ import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
-import com.codinglitch.simpleradio.core.registry.*;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
@@ -114,6 +116,7 @@ public class FabricLoader {
         loadParticles();
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(CatalystReloadListener.INSTANCE);
+        ServerLifecycleEvents.SERVER_STARTING.register(CommonSimpleRadio::startServer);
 
         CommonSimpleRadio.load();
     }

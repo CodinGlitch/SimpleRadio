@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InteractionCompat {
     private static ConcurrentHashMap<UUID, Long> cooldowns = new ConcurrentHashMap<>();;
 
-    public static void onData(RadioSpeaker channel, RadioMessage source, short[] decodedData) {
-        UUID sourceOwner = source.getRealOwner();
+    public static void onData(RadioSpeaker channel, RadioMessage message, short[] decodedData) {
+        UUID sourceOwner = message.getRealOwner();
         VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(sourceOwner);
 
         if (AudioUtils.calculateAudioLevel(decodedData) < VoicechatInteraction.SERVER_CONFIG.minActivationThreshold.get().doubleValue()) {
