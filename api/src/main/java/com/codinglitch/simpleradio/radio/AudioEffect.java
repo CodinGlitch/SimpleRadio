@@ -1,4 +1,4 @@
-package com.codinglitch.simpleradio.radio.effects;
+package com.codinglitch.simpleradio.radio;
 
 public abstract class AudioEffect {
     public float severity;
