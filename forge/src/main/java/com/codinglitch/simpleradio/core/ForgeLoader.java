@@ -21,6 +21,7 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterGameTestsEvent;
+import net.minecraftforge.event.server.ServerLifecycleEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkRegistry;
@@ -96,6 +97,10 @@ public class ForgeLoader {
         event.addListener(new SimpleRadioCatalysts());
     }
 
+    public static void serverLifecycle(ServerLifecycleEvent event) {
+        CommonSimpleRadio.startServer(event.getServer());
+    }
+
     public static void loadPackets() {
         AtomicInteger index = new AtomicInteger();
 
@@ -133,6 +138,7 @@ public class ForgeLoader {
         loadPackets();
 
         MinecraftForge.EVENT_BUS.addListener(ForgeLoader::addReloadListeners);
+        MinecraftForge.EVENT_BUS.addListener(ForgeLoader::serverLifecycle);
     }
 
     public static void loadClient() {

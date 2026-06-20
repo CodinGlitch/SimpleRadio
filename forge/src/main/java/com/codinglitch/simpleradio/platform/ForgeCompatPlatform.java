@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 
 public class ForgeCompatPlatform implements CompatPlatform {
     @Override
-    public void onData(RadioSpeaker channel, RadioMessage source, short[] decoded) {
+    public void onData(RadioSpeaker channel, RadioMessage message, short[] decoded) {
 
     }
 
