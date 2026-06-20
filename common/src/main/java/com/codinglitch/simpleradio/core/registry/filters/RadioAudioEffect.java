@@ -1,13 +1,15 @@
-package com.codinglitch.simpleradio.radio.effects;
+package com.codinglitch.simpleradio.core.registry.filters;
+
+import com.codinglitch.simpleradio.radio.AudioEffect;
 
 import java.util.Random;
 
-public class BaseAudioEffect extends AudioEffect {
+public class RadioAudioEffect extends AudioEffect {
     public static Random RANDOM = new Random();
 
     private float lastSample = 0;
 
-    public BaseAudioEffect() {}
+    public RadioAudioEffect() {}
 
     @Override
     public short[] apply(short[] data) {

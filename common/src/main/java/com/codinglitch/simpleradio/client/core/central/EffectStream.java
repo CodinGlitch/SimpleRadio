@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.core.central;
 
-import com.codinglitch.simpleradio.radio.effects.AudioEffect;
+import com.codinglitch.simpleradio.radio.AudioEffect;
 import com.mojang.blaze3d.audio.OggAudioStream;
 import net.minecraft.client.sounds.AudioStream;
 
