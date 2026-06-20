@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 
 public class NeoForgeCompatPlatform implements CompatPlatform {
     @Override
-    public void onData(RadioSpeaker channel, RadioSource source, short[] decoded) {
+    public void onData(RadioSpeaker channel, RadioMessage message, short[] decoded) {
 
     }
 
