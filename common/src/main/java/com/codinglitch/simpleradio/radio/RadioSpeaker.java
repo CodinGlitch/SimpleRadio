@@ -104,6 +104,11 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
         return audio;
     }
 
+    @Override
+    public void accept(Source source) {
+        this.take(source);
+    }
+
     public short[] generatePacket() {
         List<short[]> packets = new ArrayList<>();
 
