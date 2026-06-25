@@ -16,7 +16,7 @@ public class CommonCCCompat { // thats a lot of Cs
 
     public static void putPeripheral(BlockEntity blockEntity, IPeripheral peripheral) {
         if (blockEntity instanceof Socket) {
-            SOCKET_PERIPHERALS.put(blockEntity, (SocketPeripheral<?>) peripheral);
+            SOCKET_PERIPHERALS.putIfAbsent(blockEntity, (SocketPeripheral<?>) peripheral);
         }
     }
 
