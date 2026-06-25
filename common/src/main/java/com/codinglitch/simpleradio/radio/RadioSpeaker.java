@@ -111,6 +111,11 @@ public class RadioSpeaker extends RadioRouter implements Supplier<short[]>, Spea
         return audio;
     }
 
+    @Override
+    public void accept(Source source) {
+        this.take(source);
+    }
+
     public short[] generatePacket() {
         List<short[]> totalPacketsToCombine = new ArrayList<>();
 
