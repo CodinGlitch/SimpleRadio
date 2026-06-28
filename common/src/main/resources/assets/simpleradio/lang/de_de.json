@@ -1,0 +1,79 @@
+{
+  "item_group.simpleradio": "Simple Radio",
+
+  "item.simpleradio.transmitting_module": "Sendemodul",
+  "item.simpleradio.receiving_module": "Empfangsmodul",
+  "item.simpleradio.speaker_module": "Lautsprechermodul",
+  "item.simpleradio.listener_module": "Hörermodul",
+
+  "item.simpleradio.iron_module": "Eisernes %1$smodul",
+  "item.simpleradio.gold_module": "Goldenes %1$smodul",
+  "item.simpleradio.diamond_module": "Diamantenes %1$smodul",
+  "item.simpleradio.netherite_module": "Netherit %1$smodul",
+
+  "module.simpleradio.empty": "Leer",
+
+  "module.simpleradio.clarity": "Klarheit",
+  "module.simpleradio.clarity.effects": "Bietet klareren Ton",
+
+  "module.simpleradio.range": "Reichweite",
+  "module.simpleradio.range.transmitting.effects": "Erhöht die Reichweite",
+  "module.simpleradio.range.receiving.effects": "Erhöht die Reichweite",
+
+  "module.simpleradio.latch": "Schalter",
+  "module.simpleradio.latch.effects": "Erlaubt das Umschalten des Hörzustandes",
+
+  "module.simpleradio.battery": "Batterie",
+  "module.simpleradio.battery.effects": "Speichert mehr Energie in der Batterie",
+
+  "module.simpleradio.solar": "Solar",
+  "module.simpleradio.solar.effects": "Lädt die Batterie im Sonnenlicht",
+
+  "item.modifiers.transmitting": "Wenn in sendendem Gegenstand:",
+  "item.modifiers.receiving": "Wenn in empfangendem Gegenstand:",
+  "item.modifiers.emitting": "Wenn in ausgebendem Gegenstand:",
+  "item.modifiers.listening": "Wenn in hörendem Gegenstand:",
+  "item.modifiers.powering": "Wenn in Strom lieferndem Gegenstand:",
+
+  "item.simpleradio.transceiver": "Sende-Empfangsgerät",
+  "item.simpleradio.walkie_talkie": "Funkgerät",
+  "item.simpleradio.spuddie_talkie": "Funkgerät mit Kartoffelantrieb™",
+  "item.simpleradio.copper_wire": "Kupferkabel",
+  "block.simpleradio.radio": "Radio",
+  "block.simpleradio.antenna": "Antenne",
+  "block.simpleradio.speaker": "Lautsprecher",
+  "block.simpleradio.microphone": "Mikrofon",
+  "block.simpleradio.radiosmither": "Funkwerkstatt",
+  "block.simpleradio.frequencer": "Frequenzer",
+  "block.simpleradio.receiver": "Empfänger",
+  "block.simpleradio.transmitter": "Sender",
+  "block.simpleradio.insulator": "Isolator",
+
+  "screen.simpleradio.frequencing.catalyst": "KATALYSATOR",
+  "screen.simpleradio.frequencing.efficiency": "EFFIZIENZ: %s%%",
+  "screen.simpleradio.frequencing.antenna_strength": "ANTENNENSTÄRKE:",
+
+  "screen.simpleradio.radiosmither": "Funkwerkstatt",
+  "screen.simpleradio.radiosmither.am": "AM",
+  "screen.simpleradio.radiosmither.fm": "FM",
+  "screen.simpleradio.radiosmither.am_description": "Mehr Reichweite, schlechtere Tonqualität",
+  "screen.simpleradio.radiosmither.fm_description": "Bessere Tonqualität, weniger Reichweite",
+
+  "subtitles.simpleradio.radio_open": "Radio fäng an zu senden",
+  "subtitles.simpleradio.radio_close": "Radio hört auf zu senden",
+
+  "subtitles.simpleradio.short_circuit": "Kabel schließt kurz",
+
+  "subtitles.simpleradio.tilt_microphone": "Mikrofon kippt",
+  "subtitles.simpleradio.press_microphone": "Mikrofon schaltet um",
+
+  "subtitles.simpleradio.spin_insulator": "Isolator dreht sich",
+
+  "tooltip.simpleradio.transceiver_frequency": "Frequenz: %s",
+  "tooltip.simpleradio.receiver_user": "Nutzer: %s",
+
+  "key.simpleradio.use_handheld": "Handheld verwenden",
+
+  "key.categories.simpleradio.simpleradio": "Simple Radio"
+}
+
