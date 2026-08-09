@@ -110,7 +110,7 @@ public class CompatCore {
 
     public static String getSound(HolderLookup.Provider provider, ItemStack stack) {
         String result = Services.COMPAT.getSound(stack);
-        if (result != null) return result;
+        if (result != null && !result.isBlank()) return result;
 
         Optional<Holder<JukeboxSong>> song = JukeboxSong.fromStack(provider, stack);
         return song.map(s -> s.value().soundEvent().value().getLocation().toString()).orElse(null);
