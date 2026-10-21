@@ -49,7 +49,7 @@ public abstract class CatalyzingBlockEntity extends AuditoryBlockEntity {
             }
         } else {
             if (stack.isEmpty()) {
-                player.setItemInHand(hand, new ItemStack(this.catalyst.associate));
+                player.setItemInHand(hand, new ItemStack(this.catalyst.associate()));
                 this.catalyst = null;
                 level.sendBlockUpdated(pos, state, state, 2);
                 this.setChanged();
@@ -92,7 +92,7 @@ public abstract class CatalyzingBlockEntity extends AuditoryBlockEntity {
         super.saveTag(tag);
 
         if (this.catalyst != null) {
-            tag.putString("catalyst", this.catalyst.location.toString());
+            tag.putString("catalyst", this.catalyst.location().toString());
         }
     }
 }
