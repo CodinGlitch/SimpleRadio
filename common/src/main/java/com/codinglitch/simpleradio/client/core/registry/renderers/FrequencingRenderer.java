@@ -38,7 +38,7 @@ public class FrequencingRenderer {
         poseStack.translate(0.5f, 0.1f, 0.5f);
         poseStack.mulPose(Axis.YP.rotationDegrees(-state.getValue(ReceiverBlock.FACING).toYRot()));
 
-        Item item = blockEntity.catalyst.associate;
+        Item item = blockEntity.catalyst.associate();
 
         if (item instanceof BlockItem blockItem) {
             poseStack.scale(0.5f, 0.5f, 0.5f);
@@ -80,7 +80,7 @@ public class FrequencingRenderer {
                 //poseStack.mulPose(Axis.YP.rotationDegrees(time*60));
 
                 minecraft.getItemRenderer().renderStatic(
-                        new ItemStack(catalyst.associate), ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT, overlay,
+                        new ItemStack(catalyst.associate()), ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT, overlay,
                         poseStack, bufferSource, blockEntity.getLevel(), 0
                 );
                 poseStack.popPose();
@@ -106,7 +106,7 @@ public class FrequencingRenderer {
         poseStack.mulPose(Axis.YP.rotationDegrees(time*60));
 
         minecraft.getItemRenderer().renderStatic(
-                new ItemStack(blockEntity.catalyst.associate), ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT,
+                new ItemStack(blockEntity.catalyst.associate()), ItemDisplayContext.GUI, LightTexture.FULL_BRIGHT,
                 OverlayTexture.pack((int) Math.floor((Math.sin(time * 5f) + 1) * 5), 15), poseStack, bufferSource, blockEntity.getLevel(), 0
         );
         poseStack.popPose();
@@ -118,7 +118,7 @@ public class FrequencingRenderer {
 
         String text = Component.translatable(
                 "screen.simpleradio.frequencing.efficiency",
-                Math.round(blockEntity.catalyst.efficiency*100)
+                Math.round(blockEntity.catalyst.efficiency()*100)
         ).getString();
         font.drawInBatch(text, 0, 0, -1, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 255);
         poseStack.popPose();
