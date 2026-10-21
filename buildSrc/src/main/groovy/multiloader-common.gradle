@@ -49,7 +49,7 @@ repositories {
         }
     }, "com.mrcrayfish")
 
-    exclusiveRegex("https://maven.codinglitch.com/repository/releases", "com\\.codinglitch.*") // Lexiconfig, Vibrative Voice
+    exclusiveRegex("https://maven.codinglitch.com/releases", "com\\.codinglitch\\..*") // Lexiconfig, Vibrative Voice
 
     exclusiveGroup("https://maven.theillusivec4.top", "top.theillusivec4.curios") // Curios
     exclusiveGroup("https://maven.nucleoid.xyz", "eu.pb4") // Polymer
