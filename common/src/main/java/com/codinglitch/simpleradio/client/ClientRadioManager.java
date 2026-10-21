@@ -13,7 +13,7 @@ import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.Frequencies;
-import com.codinglitch.simpleradio.core.SimpleRadioEvent;
+import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundRequestRouterPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioAudioEffects;
@@ -151,7 +151,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     }
 
     @Override
-    public <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener) {
+    public <E extends RadioEvent> void listen(Class<E> event, Consumer<E> listener) {
         RadioManager.getInstance().listen(event, listener);
     }
 
