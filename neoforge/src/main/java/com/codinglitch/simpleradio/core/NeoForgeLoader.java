@@ -27,6 +27,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -37,6 +38,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = CommonSimpleRadio.ID)
 public class NeoForgeLoader {
@@ -119,6 +121,10 @@ public class NeoForgeLoader {
         event.addListener(new SimpleRadioCatalysts());
     }
 
+    public static void onDatapackSync(OnDatapackSyncEvent event) {
+        SimpleRadioCatalysts.sync(event.getRelevantPlayers().toList());
+    }
+
     @SubscribeEvent
     public static void register(RegisterCapabilitiesEvent event) {
         // oh no! this is going to run before our compatibility configurations are loaded
@@ -133,5 +139,6 @@ public class NeoForgeLoader {
         loadItems();
 
         NeoForge.EVENT_BUS.addListener(NeoForgeLoader::addReloadListeners);
+        NeoForge.EVENT_BUS.addListener(NeoForgeLoader::onDatapackSync);
     }
 }

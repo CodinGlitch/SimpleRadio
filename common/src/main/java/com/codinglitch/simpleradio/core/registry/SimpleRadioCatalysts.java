@@ -2,18 +2,22 @@ package com.codinglitch.simpleradio.core.registry;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Catalyst;
+import com.codinglitch.simpleradio.core.networking.packets.ClientboundCatalystSyncPacket;
+import com.codinglitch.simpleradio.platform.Services;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
+import java.util.List;
 import java.util.Map;
 
 public class SimpleRadioCatalysts extends SimpleJsonResourceReloadListener {
@@ -47,7 +51,13 @@ public class SimpleRadioCatalysts extends SimpleJsonResourceReloadListener {
             }
 
             float efficiency = contents.get("efficiency").getAsFloat();
-            CatalystRegistry.register(location, new Catalyst(associate).setEfficiency(efficiency));
+            CatalystRegistry.register(location, new Catalyst(location, associate, efficiency));
         }
+    }
+
+    public static void sync(List<ServerPlayer> players) {
+        ClientboundCatalystSyncPacket packet = new ClientboundCatalystSyncPacket(CatalystRegistry.get());
+        for (ServerPlayer player : players)
+            Services.NETWORKING.sendToPlayer(player, packet);
     }
 }

@@ -1,15 +1,20 @@
 package com.codinglitch.simpleradio.core.networking;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.central.Catalyst;
 import com.codinglitch.simpleradio.client.core.SimpleRadioClientNetworking;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -47,6 +52,7 @@ public class SimpleRadioNetworking {
         registry.register(ClientboundRegisterRouterPacket.TYPE, ClientboundRegisterRouterPacket.class, ClientboundRegisterRouterPacket.STREAM_CODEC, SimpleRadioClientNetworking::handleRegisterRouter);
         registry.register(ClientboundSpeakSoundPacket.TYPE, ClientboundSpeakSoundPacket.class, ClientboundSpeakSoundPacket.STREAM_CODEC, SimpleRadioClientNetworking::handleSpeakSound);
         registry.register(ClientboundWireEffectPacket.TYPE, ClientboundWireEffectPacket.class, ClientboundWireEffectPacket.STREAM_CODEC, SimpleRadioClientNetworking::handleWireEffect);
+        registry.register(ClientboundCatalystSyncPacket.TYPE, ClientboundCatalystSyncPacket.class, ClientboundCatalystSyncPacket.STREAM_CODEC, SimpleRadioClientNetworking::handleCatalystSyncPacket);
     }
 
     // ---- Handlers ---- \\
@@ -91,5 +97,17 @@ public class SimpleRadioNetworking {
         server.execute(() -> {
             AccessoryCompat.setHandheld(player, state);
         });
+    }
+
+    // ---- Read/Write ---- \\
+
+    public static Catalyst readCatalyst(RegistryFriendlyByteBuf buffer, ResourceLocation location) {
+        return new Catalyst(location, BuiltInRegistries.ITEM.get(buffer.readResourceKey(Registries.ITEM)), buffer.readFloat());
+    }
+
+    public static FriendlyByteBuf writeCatalyst(FriendlyByteBuf buffer, Catalyst catalyst) {
+        buffer.writeResourceKey(BuiltInRegistries.ITEM.getResourceKey(catalyst.associate()).orElseThrow());
+        buffer.writeFloat(catalyst.efficiency());
+        return buffer;
     }
 }

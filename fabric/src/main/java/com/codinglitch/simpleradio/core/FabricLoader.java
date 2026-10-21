@@ -5,12 +5,14 @@ import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioCatalysts;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -116,6 +118,12 @@ public class FabricLoader {
         return new ItemsEnabledCondition(List.of(items));
     }
 
+    // ---- Events ---- \\
+
+    public static void onDatapackSync(ServerPlayer serverPlayer, boolean joined) {
+        SimpleRadioCatalysts.sync(List.of(serverPlayer));
+    }
+
     public static void load() {
         loadItems();
         loadBlocks();
@@ -124,9 +132,11 @@ public class FabricLoader {
         loadComponents();
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(CatalystReloadListener.INSTANCE);
+        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(FabricLoader::onDatapackSync);
 
         CommonSimpleRadio.load();
 
         ResourceConditions.register(ITEMS_ENABLED);
+
     }
 }
