@@ -11,10 +11,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class WorldlyPosition extends Vector3f {
-    public Level level;
 
     // immutable, set on creation
     private final BlockPos realLocation;
+    public final Level level;
 
     public WorldlyPosition(float x, float y, float z, Level level, BlockPos realLocation) {
         super(x, y, z);
