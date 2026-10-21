@@ -3,7 +3,7 @@ package com.codinglitch.simpleradio;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Frequencies;
-import com.codinglitch.simpleradio.core.SimpleRadioEvent;
+import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
@@ -50,7 +50,7 @@ public abstract class SimpleRadioApi {
      * Sets a config entry from a specified path
      * <p>
      * To set the <b>soundListening</b> entry from the <b>router</b> config:
-     * <pre>{@code ServerSimpleRadioApi.getInstance().getConfig("router.soundListening", true);}</pre>
+     * <pre>{@code ServerSimpleRadioApi.getInstance().setConfig("router.soundListening", true);}</pre>
      * @param path The path to the config entry
      * @param value The value to set the config entry to
      */
@@ -59,7 +59,7 @@ public abstract class SimpleRadioApi {
     /**
      *
      */
-    public abstract <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener);
+    public abstract <E extends RadioEvent> void listen(Class<E> event, Consumer<E> listener);
 
     public abstract BlockPos travelExtension(BlockPos pos, LevelAccessor level);
 
