@@ -44,7 +44,7 @@ configured          = "1.20.1-2.2.3"
 #---- Integrations ----#
 computercraft       = "1.116.1"
 
-vibrative_voice     = "1.0.0"
+vibrative_voice     = "1.2.0"
 
 etched              = "5999495"
 
