@@ -10,7 +10,6 @@ import com.codinglitch.simpleradio.routers.Receiver;
 import com.codinglitch.simpleradio.routers.Router;
 import com.codinglitch.simpleradio.routers.Transmitter;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
-import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,10 +22,7 @@ import org.joml.Math;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -38,10 +34,11 @@ import java.util.function.Predicate;
 public class RadioRouter implements Socket, Router {
 
     private Map<UUID, OpusDecoder> decoders;
-    private Map<UUID, OpusEncoder> encoders;
 
     public List<Wiring> wires = new ArrayList<>();
     public List<Router> routers = new ArrayList<>();
+    public Map<UUID, Queue<Message>> pending = new ConcurrentHashMap<>();
+
     public Function<RadioMessage, Boolean> routerAcceptor; // kept just in case
 
     public BiPredicate<Message, Router> routeCriteria;
@@ -56,9 +53,6 @@ public class RadioRouter implements Socket, Router {
 
     public Entity owner;
     public WorldlyPosition position;
-    public Vector3f oldPosition = new Vector3f();
-
-    public Vector3f velocity = new Vector3f();
 
     public float activity = 0;
     public int activityTime = 0;
@@ -70,6 +64,8 @@ public class RadioRouter implements Socket, Router {
 
     public Quaternionf rotation = null;
     public Vec3 connectionOffset = Vec3.ZERO; // A given offset for the rendering of wires connected to it. Relative to rotation if given.
+
+    private AudioBuffer buffer;
 
     public RadioRouter(UUID reference) {
         this.reference = reference;
@@ -155,11 +151,6 @@ public class RadioRouter implements Socket, Router {
         return decoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createDecoder());
     }
 
-    public OpusEncoder getEncoder(UUID sender) {
-        if (encoders == null) encoders = new ConcurrentHashMap<>();
-        return encoders.computeIfAbsent(sender, uuid -> CommonRadioPlugin.serverApi.createEncoder());
-    }
-
     @Nullable
     @Override
     public Frequency getFrequency() {
@@ -214,8 +205,8 @@ public class RadioRouter implements Socket, Router {
     }
 
     @Override
-    public Vector3f getVelocity() {
-        return velocity;
+    public Map<UUID, Queue<Message>> getPending() {
+        return pending;
     }
 
     @Override
@@ -300,10 +291,37 @@ public class RadioRouter implements Socket, Router {
         this.take(message);
     }
 
+    @Override
     public void take(Message message) {
         if (!this.active) return;
         if (acceptCriteria != null && !acceptCriteria.test(message)) return;
-        this.route(message);
+        this.insert(message);
+    }
+
+    @Override
+    public void insert(Message message) {
+        Router router = message.whereDidYouComeFrom();
+        UUID reference = router == null ? getReference() : router.getReference();
+
+        Queue<Message> messages = pending.computeIfAbsent(reference, k -> new ArrayDeque<>());
+        messages.offer(message);
+
+        ((RadioMessage) message).currentlyAt = this;
+    }
+
+    @Override
+    public void push(short[] audio) {
+        if (buffer == null) buffer = new AudioBuffer(960);
+        buffer.push(audio);
+
+        while (buffer.canPull()) {
+            send(buffer.pull(), 1);
+        }
+    }
+
+    public List<Message> extract() {
+        if (pending.isEmpty()) return List.of();
+        return pending.values().stream().map(Queue::poll).toList();
     }
 
     @Override
@@ -324,13 +342,12 @@ public class RadioRouter implements Socket, Router {
 
     @Override
     public Message send(WorldlyPosition at, UUID sender, short[] data, float volume) {
-        OpusEncoder encoder = this.getEncoder(sender);
 
-        RadioMessage newSource = new RadioMessage(sender, at, encoder.encode(data), volume);
-        newSource.activity = CommonRadioPlugin.analyzeActivity(data);
+        RadioMessage newMessage = new RadioMessage(sender, at, data, volume);
+        newMessage.activity = CommonRadioPlugin.analyzeActivity(data);
 
-        this.accept(newSource);
-        return newSource;
+        this.accept(newMessage);
+        return newMessage;
     }
     @Override
     public Message send(WorldlyPosition at, short[] data, float volume) {
@@ -368,10 +385,6 @@ public class RadioRouter implements Socket, Router {
         return this.send(this.getLocation(), this.reference, data, volume);
     }
 
-    public void push(short[] data) {
-
-    }
-
     //this method is so dumb bro
     public void updateLocation(WorldlyPosition location) {
     }
@@ -388,14 +401,6 @@ public class RadioRouter implements Socket, Router {
         if (position != null) {
             this.updateRotation(CompatCore.modifyRotation(position, rotation));
             this.updateLocation(CompatCore.modifyPosition(position));
-
-            Vector3f currentPosition = position.position();
-            if (currentPosition != oldPosition) {
-                currentPosition.sub(oldPosition, velocity);
-            } else {
-                velocity.set(0);
-            }
-            oldPosition.set(currentPosition);
         } else if (owner != null) {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }
@@ -567,5 +572,62 @@ public class RadioRouter implements Socket, Router {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "[" + this.getIdentifier() + "]" + this.getLocation().toString();
+    }
+
+    public static class AudioBuffer {
+        private short[] buffer;
+        private final int extractionSize;
+
+        private int head = 0;
+        private int size = 0;
+
+        public AudioBuffer(int size) {
+            this.extractionSize = size;
+            buffer = new short[Math.max(size, 1)];
+        }
+
+        public void push(short[] values) {
+            ensure(size + values.length);
+            for (short value : values) {
+                buffer[(head + size) % buffer.length] = value;
+                size++;
+            }
+        }
+
+        public int available() {
+            return size;
+        }
+
+        public boolean canPull() {
+            return size >= extractionSize;
+        }
+
+        public short[] pull() {
+            if (extractionSize > size) {
+                throw new NoSuchElementException(
+                        "Requested " + extractionSize + " but only " + size + " available");
+            }
+            short[] result = new short[extractionSize];
+            for (int i = 0; i < extractionSize; i++) {
+                result[i] = buffer[(head + i) % buffer.length];
+            }
+            head = (head + extractionSize) % buffer.length;
+            size -= extractionSize;
+            return result;
+        }
+
+        private void ensure(int needed) {
+            if (needed <= buffer.length) return;
+
+            int newCapacity = buffer.length;
+            while (newCapacity < needed) newCapacity *= 2;
+
+            short[] newBuffer = new short[newCapacity];
+            for (int i = 0; i < size; i++)
+                newBuffer[i] = buffer[(head + i) % buffer.length];
+
+            buffer = newBuffer;
+            head = 0;
+        }
     }
 }
