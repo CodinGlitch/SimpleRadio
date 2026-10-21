@@ -50,4 +50,6 @@ public interface Message {
 
     void visit(Router router);
     void travel(Router from, Router to, Medium medium);
+
+    Router whereDidYouComeFrom();
 }
