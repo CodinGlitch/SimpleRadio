@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 public class CatalystRegistry {
-    private static final HashMap<ResourceLocation, Catalyst> CATALYSTS = new HashMap<>();
+    private static final Map<ResourceLocation, Catalyst> CATALYSTS = new HashMap<>();
+
+    public static Map<ResourceLocation, Catalyst> get() {
+        return CATALYSTS;
+    }
 
     public static List<Catalyst> getCatalysts() {
         return CATALYSTS.values().stream().toList();
@@ -23,15 +27,13 @@ public class CatalystRegistry {
     public static Catalyst get(Item item) {
         for (Map.Entry<ResourceLocation, Catalyst> entry : CATALYSTS.entrySet()) {
             Catalyst catalyst = entry.getValue();
-            if (catalyst.associate == item) return catalyst;
+            if (catalyst.associate() == item) return catalyst;
         }
 
         return null;
     }
 
     public static Catalyst register(ResourceLocation location, Catalyst catalyst) {
-        catalyst.location = location;
-
         if (CATALYSTS.get(location) != null) {
             SimpleRadioApi.getInstance().warn("A conflicting catalyst for {} already exists and will be overwritten!", location);
         }
