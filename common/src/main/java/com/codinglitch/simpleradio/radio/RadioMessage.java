@@ -25,6 +25,7 @@ public class RadioMessage implements Message {
     public short frequencingType = -1;
 
     public Source source;
+    public Router currentlyAt;
 
     public float pitch = 1;
     public float volume;
@@ -260,6 +261,11 @@ public class RadioMessage implements Message {
         }
 
         this.visit(to);
+    }
+
+    @Override
+    public Router whereDidYouComeFrom() {
+        return currentlyAt;
     }
 
     @Override
