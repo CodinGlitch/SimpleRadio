@@ -9,7 +9,7 @@ import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
-import com.codinglitch.simpleradio.core.SimpleRadioEvent;
+import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.core.Speakers;
 import com.codinglitch.simpleradio.core.central.FrequencyChannel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -47,30 +47,39 @@ import org.joml.Math;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class RadioManager extends ServerSimpleRadioApi {
     public static final RadioManager INSTANCE = new RadioManager();
 
-    private static final Map<Consumer<? extends SimpleRadioEvent>, Class<? extends SimpleRadioEvent>> EVENT_LISTENERS = new HashMap<>();
+    private static final Map<Consumer<? extends RadioEvent>, Class<? extends RadioEvent>> EVENT_LISTENERS = new HashMap<>();
 
     private static final FrequenciesImpl FREQUENCIES = new FrequenciesImpl();
     private static final SpeakersImpl SPEAKERS = new SpeakersImpl();
     private static final ListenersImpl LISTENERS = new ListenersImpl();
 
-    private static MessagingThread messagingThread;
+    private static CourierThread courier;
+    private static DispatcherThread dispatcher;
 
-    private static final Queue<Runnable> pendingModifications = new LinkedList<>();
-    static final Map<Short, Router> routers = new HashMap<>();
+    // should be concurrent now that multiple threads are involved
+    static final Map<Short, Router> routers = new ConcurrentHashMap<>();
 
     public static void load() {}
 
     public static void open(MinecraftServer server) {
+        CommonSimpleRadio.info("Starting essentials");
+
         // Start the messaging thread
-        messagingThread = new MessagingThread(server);
-        messagingThread.setDaemon(true);
-        messagingThread.start();
+        courier = new CourierThread(server);
+        courier.setDaemon(true);
+        courier.start();
+
+        // Start the courier scheduler
+        dispatcher = new DispatcherThread(server);
+        dispatcher.setDaemon(true);
+        dispatcher.start();
     }
 
     public static void close() {
@@ -80,6 +89,9 @@ public class RadioManager extends ServerSimpleRadioApi {
         LISTENERS.close();
 
         routers.clear();
+
+        courier.interrupt();
+        dispatcher.interrupt();
     }
 
     public static RadioManager getInstance() {
@@ -104,13 +116,13 @@ public class RadioManager extends ServerSimpleRadioApi {
     }
 
     @Override
-    public <E extends SimpleRadioEvent> void listen(Class<E> event, Consumer<E> listener) {
+    public <E extends RadioEvent> void listen(Class<E> event, Consumer<E> listener) {
         EVENT_LISTENERS.put(listener, event);
     }
 
-    public static <E extends SimpleRadioEvent> void post(E event) {
+    public static <E extends RadioEvent> void post(E event) {
         Class<?> type = event.getClass();
-        for (Map.Entry<Consumer<? extends SimpleRadioEvent>, Class<? extends SimpleRadioEvent>> entry : EVENT_LISTENERS.entrySet()) {
+        for (Map.Entry<Consumer<? extends RadioEvent>, Class<? extends RadioEvent>> entry : EVENT_LISTENERS.entrySet()) {
             if (!type.equals(entry.getValue())) continue;
             Consumer<E> listener = (Consumer<E>) entry.getKey();
             listener.accept(event);
@@ -332,30 +344,21 @@ public class RadioManager extends ServerSimpleRadioApi {
         for (Speaker speaker : SPEAKERS.get()) {
             ((RadioSpeaker) speaker).tick(tickCount);
         }
-
-        applyModifications();
-    }
-
-    private void applyModifications() {
-        for (int i = 0; i < pendingModifications.size(); i++) {
-            Runnable modification = pendingModifications.poll();
-            if (modification == null) break;
-            modification.run();
-        }
     }
 
     @Override
     public void sendMessage(Message message, Router destination, float delay) {
-        messagingThread.send(message, destination, delay);
+        courier.send(message, destination, delay);
     }
 
     @Override
     public void cancelMessage(Predicate<DelayedMessage> criteria) {
-        messagingThread.cancel(criteria);
+        courier.cancel(criteria);
     }
 
+    @Override
     public boolean hasQueued(Predicate<DelayedMessage> filter) {
-        return messagingThread.queuedMessages.stream().anyMatch(filter);
+        return courier.queuedMessages.stream().anyMatch(filter);
     }
 
     @Override
