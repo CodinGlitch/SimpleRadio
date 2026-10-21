@@ -2,16 +2,18 @@ package com.codinglitch.simpleradio.client.core;
 
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundRegisterRouterPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
-import com.codinglitch.simpleradio.core.networking.packets.ClientboundWireEffectPacket;
+import com.codinglitch.simpleradio.core.networking.packets.*;
+import com.codinglitch.simpleradio.core.registry.CatalystRegistry;
 import com.codinglitch.simpleradio.core.registry.entities.Wire;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 
 public class SimpleRadioClientNetworking {
+
+    public static void handleCatalystSyncPacket(ClientboundCatalystSyncPacket packet) {
+        packet.catalysts().forEach(CatalystRegistry::register);
+    }
 
     public static void handleActivityPacket(ClientboundActivityPacket packet) {
         float activity = packet.activity();

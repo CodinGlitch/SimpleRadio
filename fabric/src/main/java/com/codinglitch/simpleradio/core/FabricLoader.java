@@ -5,6 +5,7 @@ import com.codinglitch.simpleradio.core.central.ItemHolder;
 import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioCatalysts;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioParticles;
 import com.google.gson.JsonArray;
@@ -107,6 +108,12 @@ public class FabricLoader {
 
             return true;
         });
+    }
+
+    // ---- Events ---- \\
+
+    public static void onDatapackSync(ServerPlayer serverPlayer, boolean joined) {
+        SimpleRadioCatalysts.sync(List.of(serverPlayer));
     }
 
     public static void load() {

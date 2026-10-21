@@ -1,12 +1,15 @@
 package com.codinglitch.simpleradio.core.networking;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.central.Catalyst;
 import com.codinglitch.simpleradio.client.core.SimpleRadioClientNetworking;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.networking.packets.*;
 import com.codinglitch.simpleradio.core.registry.menus.RadiosmitherMenu;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -45,6 +48,7 @@ public class SimpleRadioNetworking {
     }
 
     public static void loadClientbound(ClientboundRegistry registry) {
+        registry.register(ClientboundCatalystSyncPacket.ID, ClientboundCatalystSyncPacket.class, ClientboundCatalystSyncPacket::read, ClientboundCatalystSyncPacket::write, SimpleRadioClientNetworking::handleCatalystSyncPacket);
         registry.register(ClientboundActivityPacket.ID, ClientboundActivityPacket.class, ClientboundActivityPacket::read, ClientboundActivityPacket::write, SimpleRadioClientNetworking::handleActivityPacket);
         registry.register(ClientboundRegisterRouterPacket.ID, ClientboundRegisterRouterPacket.class, ClientboundRegisterRouterPacket::read, ClientboundRegisterRouterPacket::write, SimpleRadioClientNetworking::handleRegisterRouter);
         registry.register(ClientboundSpeakSoundPacket.ID, ClientboundSpeakSoundPacket.class, ClientboundSpeakSoundPacket::read, ClientboundSpeakSoundPacket::write, SimpleRadioClientNetworking::handleSpeakSound);
@@ -93,5 +97,17 @@ public class SimpleRadioNetworking {
         server.execute(() -> {
             AccessoryCompat.setHandheld(player, state);
         });
+    }
+
+    // ---- Read/Write ---- \\
+
+    public static Catalyst readCatalyst(FriendlyByteBuf buffer, ResourceLocation location) {
+        return new Catalyst(location, BuiltInRegistries.ITEM.get(buffer.readResourceKey(Registries.ITEM)), buffer.readFloat());
+    }
+
+    public static FriendlyByteBuf writeCatalyst(FriendlyByteBuf buffer, Catalyst catalyst) {
+        buffer.writeResourceKey(BuiltInRegistries.ITEM.getResourceKey(catalyst.associate()).orElseThrow());
+        buffer.writeFloat(catalyst.efficiency());
+        return buffer;
     }
 }
