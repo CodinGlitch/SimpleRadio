@@ -9,15 +9,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
 public class FrequenciesImpl implements Frequencies {
     // negative for AM, positive for FM; this will need to be changed if we add PM
-    private final Map<Integer, Frequency> FREQUENCIES = new HashMap<>();
+    private final Map<Integer, Frequency> FREQUENCIES = new ConcurrentHashMap<>();
 
     public static String DEFAULT_FREQUENCY = "000.00FM";
     public static Frequency.Modulation DEFAULT_MODULATION = Frequency.Modulation.FREQUENCY;
