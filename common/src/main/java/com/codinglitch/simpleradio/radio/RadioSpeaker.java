@@ -113,7 +113,9 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
 
             for (Map.Entry<UUID, Queue<short[]>> playerPacket : playerPackets.entrySet()) {
                 short[] audio = playerPacket.getValue().poll();
-                if (audio != null) packets.add(audio);
+                if (audio != null) {
+                    packets.add(audio);
+                }
             }
             playerPackets.values().removeIf(Queue::isEmpty);
 
