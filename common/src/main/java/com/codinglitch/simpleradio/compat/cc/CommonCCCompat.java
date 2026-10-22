@@ -15,6 +15,7 @@ public class CommonCCCompat { // thats a lot of Cs
     public static final Map<BlockEntity, SocketPeripheral<?>> SOCKET_PERIPHERALS = new ConcurrentHashMap<>();
 
     public static void putPeripheral(BlockEntity blockEntity, IPeripheral peripheral) {
+
         if (blockEntity instanceof Socket) {
             SOCKET_PERIPHERALS.put(blockEntity, (SocketPeripheral<?>) peripheral);
         }
