@@ -21,7 +21,7 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterGameTestsEvent;
-import net.minecraftforge.event.server.ServerLifecycleEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkRegistry;
@@ -97,7 +97,7 @@ public class ForgeLoader {
         event.addListener(new SimpleRadioCatalysts());
     }
 
-    public static void serverLifecycle(ServerLifecycleEvent event) {
+    public static void serverLifecycle(ServerAboutToStartEvent event) {
         CommonSimpleRadio.startServer(event.getServer());
     }
 
