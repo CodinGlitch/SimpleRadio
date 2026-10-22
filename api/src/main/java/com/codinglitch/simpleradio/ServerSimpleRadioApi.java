@@ -63,5 +63,7 @@ public abstract class ServerSimpleRadioApi extends SimpleRadioApi {
 
     public abstract void sendAudio(WorldlyPosition location, UUID sender, byte[] data);
 
+    public abstract boolean hasQueued(Predicate<DelayedMessage> filter);
+
     public abstract void shortAt(WorldlyPosition location);
 }
