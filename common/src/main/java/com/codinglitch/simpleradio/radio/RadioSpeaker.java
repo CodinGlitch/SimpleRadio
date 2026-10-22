@@ -105,8 +105,8 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
     }
 
     @Override
-    public void accept(Source source) {
-        this.take(source);
+    public void accept(Message message) {
+        this.take(message);
     }
 
     public short[] generatePacket() {

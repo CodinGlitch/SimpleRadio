@@ -6,6 +6,7 @@ import com.codinglitch.simpleradio.compat.CCCompat;
 import com.codinglitch.simpleradio.compat.CuriosCompat;
 import com.codinglitch.simpleradio.platform.services.CompatPlatform;
 import com.codinglitch.simpleradio.radio.RadioManager;
+import com.codinglitch.simpleradio.radio.RadioMessage;
 import com.codinglitch.simpleradio.radio.RadioSource;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
 import net.minecraft.world.entity.Entity;
