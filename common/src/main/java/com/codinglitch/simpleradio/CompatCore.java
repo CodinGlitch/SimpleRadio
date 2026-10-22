@@ -55,6 +55,10 @@ public class CompatCore {
 
     public static void postInitialize() {
         Services.COMPAT.postInitialize();
+
+        if (COMPUTER_CRAFT.isLoaded()) {
+            CommonCCCompat.postInitialize();
+        }
     }
 
     public static void spoutCompatibilities() {
