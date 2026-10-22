@@ -6,24 +6,18 @@ import com.codinglitch.simpleradio.core.networking.CustomPacket;
 import com.codinglitch.simpleradio.core.networking.SimpleRadioNetworking;
 import com.google.common.collect.Maps;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public record ClientboundCatalystSyncPacket(Map<ResourceLocation, Catalyst> catalysts) implements CustomPacket {
-    public static Type<ClientboundCatalystSyncPacket> TYPE = new Type<>(CommonSimpleRadio.id("catalyst_sync"));
-    public static StreamCodec<RegistryFriendlyByteBuf, ClientboundCatalystSyncPacket> STREAM_CODEC = StreamCodec.ofMember(
-            ClientboundCatalystSyncPacket::write, ClientboundCatalystSyncPacket::read
-    );
-
+    public static ResourceLocation ID = new ResourceLocation(CommonSimpleRadio.ID, "catalyst_sync");
     @Override
-    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    public ResourceLocation id() {
+        return ID;
+    }
 
-    public void write(RegistryFriendlyByteBuf buffer) {
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeVarInt(catalysts.size());
         catalysts.forEach((location, catalyst) -> {
             buffer.writeResourceLocation(location);
@@ -31,7 +25,7 @@ public record ClientboundCatalystSyncPacket(Map<ResourceLocation, Catalyst> cata
         });
     }
 
-    public static ClientboundCatalystSyncPacket read(RegistryFriendlyByteBuf buffer) {
+    public static ClientboundCatalystSyncPacket read(FriendlyByteBuf buffer) {
         int count = buffer.readVarInt();
         Map<ResourceLocation, Catalyst> data = Maps.newHashMapWithExpectedSize(count);
 

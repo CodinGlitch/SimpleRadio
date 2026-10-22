@@ -441,20 +441,20 @@ public class RadioRouter implements Socket, Router {
 
     public void route(Message message, @Nullable Predicate<RadioRouter> criteria) {
         if (!this.active) return;
-        RadioMessage radioSource = (RadioMessage) message;
+        RadioMessage radioMessage = (RadioMessage) message;
 
-        if (!radioSource.isValid()) {
+        if (!radioMessage.isValid()) {
             CommonSimpleRadio.warn("Invalid message; discarded");
             return;
         }
 
         if (routerAcceptor != null) {
-            if (routerAcceptor.apply(radioSource))
-                radioSource = radioSource.copy();
+            if (routerAcceptor.apply(radioMessage))
+                radioMessage = radioMessage.copy();
         }
 
         if (distributes) {
-            if (this.distribute(radioSource)) radioSource = radioSource.copy();
+            if (this.distribute(radioMessage)) radioMessage = radioMessage.copy();
         }
 
         for (int i = 0; i < routers.size(); i++) {
@@ -463,20 +463,20 @@ public class RadioRouter implements Socket, Router {
             if (criteria != null) {
                 if (!criteria.test(router)) continue;
             }
-            if (!shouldRouteTo(radioSource, router)) continue;
+            if (!shouldRouteTo(radioMessage, router)) continue;
 
-            if (routeCriteria != null && !routeCriteria.test(radioSource, router)) continue;
+            if (routeCriteria != null && !routeCriteria.test(radioMessage, router)) continue;
 
-            if (radioSource.willShort(router)) {
+            if (radioMessage.willShort(router)) {
                 router.shortCircuit();
                 continue;
             }
 
-            radioSource = this.prepareSource(radioSource, router);
+            radioMessage = this.prepareSource(radioMessage, router);
 
-            RadioMessage oldSource = radioSource;
-            if (i < routers.size()-1) radioSource = radioSource.copy();
-            router.accept(oldSource);
+            RadioMessage oldMessage = radioMessage;
+            if (i < routers.size()-1) radioMessage = radioMessage.copy();
+            router.accept(oldMessage);
         }
     }
 
