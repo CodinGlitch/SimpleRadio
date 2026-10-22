@@ -2,7 +2,6 @@ package com.codinglitch.simpleradio.compat.cc;
 
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.radio.Message;
-import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.radio.Source;
 import com.codinglitch.simpleradio.routers.Router;
 import dan200.computercraft.api.lua.*;
@@ -27,9 +26,13 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         CommonCCCompat.putPeripheral(socket, this);
     }
 
-    public void accept(Router router, Message message) {
-        RadioRouter radioRouter = (RadioRouter) router;
+    public void emptied(Router router) {
+        computers.forEach((computer) -> {
+            computer.queueEvent("socket_buffer_empty");
+        });
+    }
 
+    public void accept(Router router, Message message) {
         LuaTable<?, ?> data;
         String sound;
         Source source = message.getSource();
@@ -50,7 +53,7 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
         float power = message.getPower();
 
         computers.forEach((computer) -> {
-            computer.queueEvent("receive_signal", data == null ? sound : data, power);
+            computer.queueEvent("socket_receive_signal", data == null ? sound : data, power);
         });
     }
 
@@ -116,13 +119,37 @@ public class SocketPeripheral<T extends BlockEntity & Socket> implements IPeriph
                 datas.add(data);
             }
 
-            context.executeMainThreadTask(() -> {
-                for (short[] data : datas) {
-                    router.send(data, volume.orElse(1d).floatValue());
-                }
-                return new Object[0];
-            });
+            for (short[] data : datas) {
+                router.send(data, volume.orElse(1d).floatValue());
+            }
 
+            return true;
+        }
+    }
+
+    @LuaFunction(
+            unsafe = true
+    )
+    public final boolean push(ILuaContext context, LuaTable<?, ?> audio) throws LuaException {
+        Router router = socket.getRouter();
+        if (router == null) return false;
+        
+        int length = audio.length();
+        if (length <= 0) {
+            throw new LuaException("Cannot play empty audio");
+        } else if (length > 131072) {
+            throw new LuaException("Audio data is too large");
+        } else {
+            short[] data = new short[length];
+            for (int i = 1; i < length; i++) {
+                int level = audio.getInt(i);
+                if (level < Short.MIN_VALUE || level > Short.MAX_VALUE) {
+                    throw new LuaException("table item #" + i + " must be between -32768 and 32767");
+                }
+                data[i] = (short) level;
+            }
+
+            router.push(data);
             return true;
         }
     }
