@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
@@ -8,8 +9,8 @@ import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSound
 import com.codinglitch.simpleradio.core.registry.SimpleRadioAudioEffects;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.routers.Speaker;
-import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.LocationalAudioChannel;
+import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -29,14 +30,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RadioSpeaker extends RadioRouter implements Speaker {
     // migrated to locational audio channels only due to alternatives not having range property
     public LocationalAudioChannel audioChannel;
-    public AudioPlayer audioPlayer;
+    private OpusEncoder encoder;
+
     private final Map<UUID, Map<UUID, Queue<short[]>>> packetBuffer;
-    private final AudioEffect effect;
+    private final AudioFilter effect;
 
     public String category;
     public float range = 8;
 
-    public int speakingTime = 0;
+    public boolean isSpeaking = false;
+    public int gracePeriod = 0;
 
     protected RadioSpeaker(UUID id) {
         super(id);
@@ -87,26 +90,34 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
         this.category = category;
     }
 
-    @Override
-    public int getSpeakingTime() {
-        return speakingTime;
+    /**
+     * Starts streaming audio data through this speaker.
+     * Creates the audio channel and encoder.
+     */
+    public void open() {
+        isSpeaking = true;
+        encoder = CommonRadioPlugin.serverApi.createEncoder();
+
+        CommonSimpleRadio.info("opened");
+
+        WorldlyPosition location = this.getLocation();
+        this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.reference,
+                CommonRadioPlugin.serverApi.fromServerLevel(location.level),
+                CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
+        );
+        audioChannel.setDistance(range);
+        audioChannel.setCategory(category);
     }
 
-    public short[] retrieveFrame() {
-        short[] audio = generatePacket();
-        if (audio == null) {
-            if (audioPlayer != null)
-                audioPlayer.stopPlaying();
 
-            audioPlayer = null;
-            return null;
-        }
-        return audio;
-    }
+    public void close() {
+        if (encoder != null) encoder.close();
+        if (audioChannel != null) audioChannel.flush();
 
-    @Override
-    public void accept(Message message) {
-        this.take(message);
+        CommonSimpleRadio.info("closed");
+
+        encoder = null;
+        isSpeaking = false;
     }
 
     public short[] generatePacket() {
@@ -132,6 +143,39 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
     }
 
     @Override
+    public void dispatch() {
+        if (!isSpeaking) return;
+
+        CommonSimpleRadio.info("generating");
+        short[] audio = generatePacket();
+        if (audio == null) {
+            gracePeriod--;
+            if (gracePeriod > 0) return;
+
+            close();
+            return;
+        }
+
+        if (audio.length != 960) {
+            return;
+        }
+
+        gracePeriod = 10;
+
+        CommonSimpleRadio.info("encoding");
+        byte[] encoded = this.encoder.encode(audio);
+
+        CommonSimpleRadio.info("sending");
+        this.audioChannel.send(encoded);
+        CommonSimpleRadio.info("done");
+    }
+
+    @Override
+    public void accept(Message message) {
+        this.take(message);
+    }
+
+    @Override
     public void updateLocation(WorldlyPosition location) {
         super.updateLocation(location);
 
@@ -143,8 +187,6 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
     @Override
     public void tick(int tickCount) {
         super.tick(tickCount);
-
-        if (speakingTime > 0) speakingTime--;
     }
 
     @Override
@@ -173,9 +215,9 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
 
         if (!SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional && level != message.getOrigin().level) return;
 
-        this.effect.severity = (float) message.computeSeverity();
+        this.effect.setSeverity((float) message.computeSeverity());
         this.effect.volume = message.getVolume();
-        if (this.effect.severity >= 100) return;
+        if (this.effect.getSeverity() >= 100) return;
 
         // Parsing sound event
         if (source.getSound() != null) {
@@ -183,7 +225,7 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
                 if (player.position().distanceTo(new Vec3(position)) < 50) {
                     Services.NETWORKING.sendToPlayer(player, new ClientboundSpeakSoundPacket(
                             this.getReference(), source.getSound(),
-                            message.getVolume(), message.getPitch(), this.effect.severity, message.getOffset(), message.getSeed()
+                            message.getVolume(), message.getPitch(), this.effect.getSeverity(), message.getOffset(), message.getSeed()
                     ));
                 }
             }
@@ -199,8 +241,8 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
         short[] decoded = source.getDecoded(message.getRealOwner()).clone();
         short[] filtered = effect.apply(decoded);
 
-        if (!CommonRadioPlugin.isAudioValid(filtered)) return;
-        playerPackets.offer(filtered);
+        if (!CommonRadioPlugin.isAudioValid(decoded)) return;
+        playerPackets.offer(decoded);
 
         // Loader-specific compat
         Services.COMPAT.onData(this, (RadioMessage) message, decoded);
@@ -208,31 +250,13 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
         // Common compat
         CompatCore.onData(this, (RadioMessage) message, decoded);
 
-        if (this.audioPlayer == null)
-            getAudioPlayer().startPlaying();
-    }
-
-    private AudioPlayer getAudioPlayer() {
-        if (this.audioPlayer == null) {
-
-            WorldlyPosition location = this.getLocation();
-            this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.reference,
-                    CommonRadioPlugin.serverApi.fromServerLevel(location.level),
-                    CommonRadioPlugin.serverApi.createPosition(location.x + 0.5, location.y + 0.5, location.z + 0.5)
-            );
-            audioChannel.setDistance(range);
-            audioChannel.setCategory(category);
-
-            this.audioPlayer = CommonRadioPlugin.serverApi.createAudioPlayer(audioChannel, CommonRadioPlugin.serverApi.createEncoder(), this::retrieveFrame);
-        }
-        return this.audioPlayer;
+        if (!isSpeaking)
+            open();
     }
 
     @Override
     public void invalidate() {
-        if (this.audioPlayer != null)
-            this.audioPlayer.stopPlaying();
-
+        close();
         super.invalidate();
     }
 }
