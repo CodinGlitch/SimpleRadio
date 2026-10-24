@@ -17,5 +17,4 @@ public interface Speaker extends Router {
     String getCategory();
     void setCategory(String category);
 
-    int getSpeakingTime();
 }

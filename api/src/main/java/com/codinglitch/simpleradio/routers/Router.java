@@ -107,6 +107,14 @@ public interface Router {
     double distanceTo(Router other);
 
     /**
+     * This method is called on the dispatcher thread, when every audio frame is meant to move at once.
+     * It is overridden by the speaker to stream audio data to clients.
+     * <br>
+     * (Note that this is called <i>after</i> the router has received its message)
+     */
+    void dispatch();
+
+    /**
      * Routes the given message to all the routers connected to this one.
      * <br>
      * If the router allows distribution through wires, this will also relay it across those.
