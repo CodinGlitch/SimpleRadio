@@ -18,7 +18,7 @@ public class DispatcherThread extends Thread {
     private static long SAMPLE_RATE = 48000;
 
     // Amount of padding in nanoseconds to prevent some artifacts
-    private static long PADDING = 240000;
+    private static long PADDING = 0;
 
     final MinecraftServer server;
 
@@ -44,36 +44,43 @@ public class DispatcherThread extends Thread {
                 // go through all the routers and deliver their messages for the messaging thread
                 for (Router router : RadioManager.routers.values()) {
                     Collection<Queue<Message>> buffers = router.getPending().values();
-                    if (buffers.isEmpty()) continue;
+                    if (!buffers.isEmpty()) {
+                        // Remove empty buffers before pulling so empty buffers have a window to re-add messages before being removed
+                        buffers.removeIf(Queue::isEmpty);
 
-                    // Remove empty buffers before pulling so empty buffers have a window to re-add messages before being removed
-                    buffers.removeIf(Queue::isEmpty);
+                        List<Message> deliveries = ((RadioRouter) router).extract();
+                        server.execute(() -> {
+                            for (Message message : deliveries) {
+                                if (message == null) continue;
+                                router.route(message);
+                            }
+                        });
 
-                    List<Message> deliveries = ((RadioRouter) router).extract();
-                    server.execute(() -> {
-                        for (Message message : deliveries) {
-                            if (message == null) continue;
-                            router.route(message);
+                        // Notify others of emptied buffer
+                        for (Queue<Message> queue : buffers) {
+                            if (!queue.isEmpty()) continue;
+                            RadioManager.post(new BufferEvent.Emptied(router, server));
                         }
-                    });
-
-                    // Notify others of emptied buffer
-                    for (Queue<Message> queue : buffers) {
-                        if (!queue.isEmpty()) continue;
-                        RadioManager.post(new BufferEvent.Emptied(router, server));
                     }
+
+                    router.dispatch();
                 }
 
-                long timeTook = System.nanoTime()-current;
-                long timeToWait = interval-timeTook;
-                Thread.sleep(TimeUnit.NANOSECONDS.toMillis(timeToWait), (int)(timeToWait % 1_000_000L));
+                long timeTook = System.nanoTime() - current;
+                long timeToWait = interval - timeTook;
+                CommonSimpleRadio.info("waiting {}", timeToWait);
+                Thread.sleep(TimeUnit.NANOSECONDS.toMillis(timeToWait), (int) (timeToWait % 1_000_000L));
 
             } catch (InterruptedException e) {
+                CommonSimpleRadio.warn("The dispatcher was interrupted! {}", e);
+
                 // thread interrupted
                 Thread.currentThread().interrupt();
                 break;
             }
         }
+
+        CommonSimpleRadio.info("Dispatcher stopped!");
     }
 
     public void reload(long sampleRate) {

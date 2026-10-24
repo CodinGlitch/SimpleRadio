@@ -265,6 +265,7 @@ public class RadioRouter implements Socket, Router {
     public double distanceTo(Router other) {
         return distanceTo((RadioRouter) other);
     }
+
     public double distanceTo(RadioRouter other) {
         return this.getLocation().distance(other.getLocation());
     }
@@ -291,6 +292,9 @@ public class RadioRouter implements Socket, Router {
         CompatCore.acceptSource(this, message);
         this.take(message);
     }
+
+    @Override
+    public void dispatch() {}
 
     @Override
     public void take(Message message) {

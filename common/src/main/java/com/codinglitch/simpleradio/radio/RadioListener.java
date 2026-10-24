@@ -82,7 +82,7 @@ public class RadioListener extends RadioRouter implements Listener {
         message.delegate(this.reference);
 
         CompatCore.acceptSource(this, message);
-        this.route(message);
+        this.insert(message);
     }
 
     @Override
