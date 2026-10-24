@@ -1,8 +1,8 @@
 package com.codinglitch.simpleradio.core.registry.filters;
 
-import com.codinglitch.simpleradio.radio.AudioEffect;
+import com.codinglitch.simpleradio.radio.AudioFilter;
 
-public class BasicAudioEffect extends AudioEffect {
+public class BasicAudioFilter extends AudioFilter {
     public float severity;
     public float volume;
 
