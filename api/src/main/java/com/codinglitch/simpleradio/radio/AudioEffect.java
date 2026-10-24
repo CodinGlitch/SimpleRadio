@@ -1,15 +1,16 @@
 package com.codinglitch.simpleradio.radio;
 
-public abstract class AudioEffect {
-    public float severity;
-    public float volume;
+/**
+ * Chainable audio effects that modify the audio in-place, uses floats instead of shorts
+ */
+public interface AudioEffect {
+    double SAMPLE_RATE = 48000;
+    double DT = 1.0f / SAMPLE_RATE;
 
-    public short[] apply(short[] data) {
-        for (int i = 0; i < data.length; i++) {
-            short audio = data[i];
-            data[i] = (short) (audio * volume);
-        }
-
-        return data;
+    static float cutoffAlpha(double cutoff) {
+        double rc = 1.0 / (2 * Math.PI * cutoff);
+        return (float) (DT / (rc + DT));
     }
+
+    void process(float[] data);
 }

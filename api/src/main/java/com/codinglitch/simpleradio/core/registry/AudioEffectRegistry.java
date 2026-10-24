@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.core.registry;
 
-import com.codinglitch.simpleradio.radio.AudioEffect;
+import com.codinglitch.simpleradio.radio.AudioFilter;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -18,14 +18,14 @@ public class AudioEffectRegistry {
         return EFFECTS.get(location);
     }
 
-    public static <E extends AudioEffect> AudioEffectLoader<E> register(ResourceLocation location, Supplier<E> maker) {
+    public static <E extends AudioFilter> AudioEffectLoader<E> register(ResourceLocation location, Supplier<E> maker) {
         AudioEffectLoader<E> loader = new AudioEffectLoader<>(maker);
 
         EFFECTS.put(location, loader);
         return loader;
     }
 
-    public static class AudioEffectLoader<E extends AudioEffect> {
+    public static class AudioEffectLoader<E extends AudioFilter> {
         private final Supplier<E> maker;
 
         public AudioEffectLoader(Supplier<E> maker) {
