@@ -458,7 +458,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
                     }
                     return;
                 } else if (existingChannelHandle.currentSound.equals(soundString)) {
-                    existingChannelHandle.effect.severity = severity;
+                    existingChannelHandle.effect.setSeverity(severity);
                     existingChannelHandle.effect.volume = volume;
 
                     existingChannelHandle.execute(channel -> {
@@ -526,9 +526,9 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         // --- Audio Streaming --- \\
         CompletableFuture<AudioStream> future = ClientServices.COMPAT.makeSubstream(instance);
 
-        AudioEffect effect = SimpleRadioAudioEffects.RADIO.make();
+        AudioFilter effect = SimpleRadioAudioEffects.RADIO.make();
         effect.volume = 1;
-        effect.severity = severity;
+        effect.setSeverity(severity);
 
         if (sound.shouldStream()) {
             ChannelHandleWrapper channelWrapper = ChannelHandleWrapper.of(channelHandle);

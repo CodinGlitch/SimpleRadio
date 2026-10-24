@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.core.central;
 
-import com.codinglitch.simpleradio.radio.AudioEffect;
+import com.codinglitch.simpleradio.radio.AudioFilter;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.JOrbisAudioStream;
 
@@ -12,7 +12,7 @@ import java.nio.ShortBuffer;
 
 public class EffectStream implements AudioStream {
     private final AudioStream substream;
-    public AudioEffect effect;
+    public AudioFilter effect;
 
     public EffectStream(InputStream inputStream) throws IOException {
         this(new JOrbisAudioStream(inputStream));

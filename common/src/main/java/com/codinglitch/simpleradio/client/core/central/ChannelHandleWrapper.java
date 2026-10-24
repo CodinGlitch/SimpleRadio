@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.core.central;
 
-import com.codinglitch.simpleradio.radio.AudioEffect;
+import com.codinglitch.simpleradio.radio.AudioFilter;
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public class ChannelHandleWrapper {
     public final ChannelAccess.ChannelHandle channelHandle;
-    public AudioEffect effect;
+    public AudioFilter effect;
     public String currentSound;
     public SoundInstance instance;
 

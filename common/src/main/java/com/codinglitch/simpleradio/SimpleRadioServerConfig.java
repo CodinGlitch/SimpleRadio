@@ -11,6 +11,9 @@ import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 
 @Lexicon(name = CommonSimpleRadio.ID+"-server", location = LexiconfigApi.Location.SERVER)
 public class SimpleRadioServerConfig extends LexiconData {
+    @LexiconPage(comment = "These are the configurations for the audio.")
+    public Audio audio = new Audio();
+
     @LexiconPage(comment = "These are the configurations for the wires.")
     public Wire wire = new Wire();
 
@@ -400,6 +403,58 @@ public class SimpleRadioServerConfig extends LexiconData {
 
             @Override
             public boolean isEnabled() { return enabled; }
+        }
+    }
+
+    public static class Audio extends LexiconPageData {
+
+        @LexiconPage(comment = "These are the configurations for the noise filter.")
+        public Noise noise = new Noise();
+
+        @LexiconPage(comment = "These are the configurations for the high pass filter.")
+        public HighPass highPass = new HighPass();
+
+        @LexiconPage(comment = "These are the configurations for the low pass filter.")
+        public LowPass lowPass = new LowPass();
+
+        @LexiconPage(comment = "These are the configurations for the middle EQ filter.")
+        public Peak peak = new Peak();
+
+        @LexiconPage(comment = "These are the configurations for the downsampling filter.")
+        public Downsample downsample = new Downsample();
+
+        public static class Noise extends LexiconPageData {
+            @LexiconEntry(comment = "This is the amount of background noise. Defaults to true.")
+            public Float background = 0.03f;
+
+            @LexiconEntry(comment = "This is the amount of voice distortion noise. Defaults to true.")
+            public Float distort = 0.25f;
+        }
+
+        public static class HighPass extends LexiconPageData {
+            @LexiconEntry(comment = "This is the cutoff in HZ for the high pass filter. Defaults to 400.")
+            public Integer cutoff = 400;
+        }
+
+        public static class LowPass extends LexiconPageData {
+            @LexiconEntry(comment = "This is the cutoff in HZ for the low pass filter. Defaults to 3200.")
+            public Integer cutoff = 3200;
+        }
+
+        public static class Peak extends LexiconPageData {
+            @LexiconEntry(comment = "This is the lower bound in HZ for the middle EQ peaking. Defaults to 1000.")
+            public Integer low = 1000;
+
+            @LexiconEntry(comment = "This is the upper bound in HZ for the middle EQ peaking. Defaults to 2000.")
+            public Integer high = 2000;
+
+            @LexiconEntry(comment = "This is the strength of the middle EQ peaking. Defaults to 1.0.")
+            public Float strength = 1.0f;
+        }
+
+        public static class Downsample extends LexiconPageData {
+            @LexiconEntry(comment = "This is the factor to downsample by. Defaults to 6.")
+            public Integer factor = 6;
         }
     }
 }
