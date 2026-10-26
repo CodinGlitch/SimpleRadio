@@ -170,6 +170,19 @@ public class InsulatorBlock extends BaseEntityBlock implements Routing {
         return 0;
     }
 
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof InsulatorBlockEntity insulator && insulator.router != null) {
+
+                // Toggle the radio state
+                boolean hasSignal = level.hasNeighborSignal(pos);
+                insulator.router.setActive(!hasSignal);
+            }
+        }
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
