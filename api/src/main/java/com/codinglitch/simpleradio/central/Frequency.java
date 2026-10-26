@@ -31,6 +31,9 @@ public interface Frequency extends Medium {
     String getFrequency();
     Modulation getModulation();
 
+    boolean is(String frequencyName);
+    boolean is(String frequency, Modulation modulation);
+
     int getIndex();
 
     List<Receiver> getReceivers();
