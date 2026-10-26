@@ -102,7 +102,7 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
 
     @Override
     public void activate() {
-        CommonSimpleRadio.info("Activating microphone with reference {}", id);
+        CommonSimpleRadio.debug("Activating microphone with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());

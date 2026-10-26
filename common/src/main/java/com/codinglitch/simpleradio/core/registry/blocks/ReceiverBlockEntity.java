@@ -118,7 +118,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
 
     @Override
     public void activate() {
-        CommonSimpleRadio.info("Activating receiver with reference {}", id);
+        CommonSimpleRadio.debug("Activating receiver with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());

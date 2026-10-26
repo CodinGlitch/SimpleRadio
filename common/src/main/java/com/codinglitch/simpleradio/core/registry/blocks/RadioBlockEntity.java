@@ -114,7 +114,7 @@ public class RadioBlockEntity extends AuditoryBlockEntity implements Receiving, 
 
     @Override
     public void activate() {
-        CommonSimpleRadio.info("Activating radio with reference {}", id);
+        CommonSimpleRadio.debug("Activating radio with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.RADIO.getOrCreateSpeaker(location, id, this.getBlockState());

@@ -90,7 +90,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
     @Override
     public void activate() {
-        CommonSimpleRadio.info("Activating speaker with reference {}", id);
+        CommonSimpleRadio.debug("Activating speaker with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
