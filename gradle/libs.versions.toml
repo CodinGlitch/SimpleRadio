@@ -14,7 +14,7 @@ neoforge            = "21.1.219"
 neoforge_range      = "[1,)"
 
 #---- Plugins ----#
-loom                = "1.16-SNAPSHOT"
+loom                = "1.18-SNAPSHOT"
 neoform             = "1.21.1-20240808.144430"
 mod_dev_gradle      = "2.0.123"
 
