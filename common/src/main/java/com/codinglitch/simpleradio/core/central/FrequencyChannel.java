@@ -56,6 +56,16 @@ public class FrequencyChannel implements Frequency {
     }
 
     @Override
+    public boolean is(String frequencyName) {
+        return frequencyName.equals(frequency + modulation.shorthand);
+    }
+
+    @Override
+    public boolean is(String frequency, Modulation modulation) {
+        return this.frequency.equals(frequency) && this.modulation == modulation;
+    }
+
+    @Override
     public int getIndex() {
         return FrequenciesImpl.getFrequencyIndex(this.frequency, this.modulation);
     }
