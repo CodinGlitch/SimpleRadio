@@ -88,6 +88,8 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
+    // ---- Redstone ---- \\
+
     @Override
     public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
@@ -103,6 +105,19 @@ public class SpeakerBlock extends BaseEntityBlock implements Routing, Speaking {
         }
 
         return 0;
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof SpeakerBlockEntity speaker && speaker.speaker != null) {
+
+                // Toggle the speaker state
+                boolean hasSignal = level.hasNeighborSignal(pos);
+                speaker.speaker.setActive(!hasSignal);
+            }
+        }
     }
 
     @Override
