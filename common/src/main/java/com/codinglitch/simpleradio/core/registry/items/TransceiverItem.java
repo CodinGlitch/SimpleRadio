@@ -209,7 +209,9 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                     stack.get(REFERENCE), "RadioTransmitter", level.isClientSide
             );
             if (transmitter != null && !transmitter.getFrequency().is(frequency, modulation)) {
+                Frequency oldFrequency = transmitter.getFrequency();
                 activeRouter = null; // force the routers to reactivate if the frequency has changed
+                inactivate(level, oldFrequency.getFrequency(), oldFrequency.getModulation(), stack.get(REFERENCE));
             }
         }
 
