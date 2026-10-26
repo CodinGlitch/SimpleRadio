@@ -133,6 +133,7 @@ public class FabricLoader {
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(CatalystReloadListener.INSTANCE);
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(FabricLoader::onDatapackSync);
+        ServerLifecycleEvents.SERVER_STARTING.register(CommonSimpleRadio::startServer);
 
         CommonSimpleRadio.load();
 
