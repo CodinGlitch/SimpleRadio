@@ -40,8 +40,13 @@ legacyForge {
         configureEach {
             ideName = "Forge ${it.name.capitalize()} (${project.path})"
         }
-        client {
+        clientMain {
             client()
+            devLogin = true
+        }
+        clientAlt {
+            client()
+            programArguments.addAll '--username', 'Dev'
         }
         data {
             data()
