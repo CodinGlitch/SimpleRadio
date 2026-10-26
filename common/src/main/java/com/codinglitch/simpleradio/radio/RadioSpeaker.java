@@ -1,6 +1,5 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
@@ -98,8 +97,6 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
         isSpeaking = true;
         encoder = CommonRadioPlugin.serverApi.createEncoder();
 
-        CommonSimpleRadio.info("opened");
-
         WorldlyPosition location = this.getLocation();
         this.audioChannel = CommonRadioPlugin.serverApi.createLocationalAudioChannel(this.reference,
                 CommonRadioPlugin.serverApi.fromServerLevel(location.level),
@@ -113,8 +110,6 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
     public void close() {
         if (encoder != null) encoder.close();
         if (audioChannel != null) audioChannel.flush();
-
-        CommonSimpleRadio.info("closed");
 
         encoder = null;
         isSpeaking = false;
@@ -146,7 +141,6 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
     public void dispatch() {
         if (!isSpeaking) return;
 
-        CommonSimpleRadio.info("generating");
         short[] audio = generatePacket();
         if (audio == null) {
             gracePeriod--;
@@ -162,12 +156,9 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
 
         gracePeriod = 10;
 
-        CommonSimpleRadio.info("encoding");
         byte[] encoded = this.encoder.encode(audio);
 
-        CommonSimpleRadio.info("sending");
         this.audioChannel.send(encoded);
-        CommonSimpleRadio.info("done");
     }
 
     @Override
