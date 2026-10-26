@@ -250,8 +250,14 @@ public class SimpleRadioServerConfig extends LexiconData {
 
         @LexiconEntry(comment = "Whether or not the radios work across dimensions. Defaults to false.")
         public Boolean crossDimensional = false;
-        @LexiconEntry(comment = "The base amount of interference to give to radio transmission per block across dimensions. Defaults to 4.")
-        public Double dimensionalInterference = 4d;
+
+        @LexiconEntry(comment = "The flat amount of interference to give to AM transmission across dimensions. Defaults to 50.")
+        public Double dimensionalAMInterference = 50d;
+        @LexiconEntry(comment = "The flat amount of interference to give to FM transmission across dimensions. Defaults to 75.")
+        public Double dimensionalFMInterference = 75d;
+
+        @LexiconEntry(comment = "How the transmission scales across dimensions. In general, a higher number yields higher effective range. Defaults to 0.75.")
+        public Double dimensionalScaling = 0.75d;
     }
 
     public static class Router extends LexiconPageData implements ConfigHolder {
