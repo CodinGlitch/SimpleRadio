@@ -62,8 +62,6 @@ public class RadioTransmitter extends RadioRouter implements Transmitter {
 
     @Override
     public RadioTransmitter frequency(Frequency frequency) {
-        CommonSimpleRadio.info(frequency);
-
         if (this.frequency != null) {
             this.frequency.removeTransmitter(this);
         }

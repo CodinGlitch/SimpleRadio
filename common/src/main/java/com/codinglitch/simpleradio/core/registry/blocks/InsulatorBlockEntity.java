@@ -115,7 +115,7 @@ public class InsulatorBlockEntity extends BlockEntity implements Socket {
     }
 
     public void activate() {
-        CommonSimpleRadio.info("Activating insulator with reference {}", id);
+        CommonSimpleRadio.debug("Activating insulator with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.router = (RadioRouter) SimpleRadioBlocks.INSULATOR.getOrCreateRouter(location, id, this.getBlockState());

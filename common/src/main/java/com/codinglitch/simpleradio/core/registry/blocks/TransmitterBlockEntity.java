@@ -111,7 +111,7 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
 
     @Override
     public void activate() {
-        CommonSimpleRadio.info("Activating transmitter with reference {}", id);
+        CommonSimpleRadio.debug("Activating transmitter with reference {}", id);
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.transmitter = SimpleRadioBlocks.TRANSMITTER.getOrCreateTransmitter(location, frequency, id, this.getBlockState());
