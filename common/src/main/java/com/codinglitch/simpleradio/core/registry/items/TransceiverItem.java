@@ -9,6 +9,7 @@ import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
+import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -49,7 +50,7 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
     }
 
     private void activate(Level level, ItemStack stack, String frequencyName, Frequency.Modulation modulation, Entity entity, UUID owner) {
-        CommonSimpleRadio.info("Activating transceiver with reference {}", owner);
+        CommonSimpleRadio.debug("Activating transceiver with reference {}", owner);
 
         Listener listener = startListening(entity, owner);
         Speaker speaker = startSpeaking(entity, owner);
@@ -201,6 +202,14 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                 }
 
                 if (!stack.has(REFERENCE)) activeRouter = null;
+            }
+
+            // Frequency mutability
+            Transmitter transmitter = (Transmitter) SimpleRadioApi.getRouterSided(
+                    stack.get(REFERENCE), "RadioTransmitter", level.isClientSide
+            );
+            if (transmitter != null && !transmitter.getFrequency().is(frequency, modulation)) {
+                activeRouter = null; // force the routers to reactivate if the frequency has changed
             }
         }
 
