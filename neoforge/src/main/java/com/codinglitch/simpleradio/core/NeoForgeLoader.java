@@ -29,6 +29,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -121,6 +122,10 @@ public class NeoForgeLoader {
         event.addListener(new SimpleRadioCatalysts());
     }
 
+    public static void serverLifecycle(ServerAboutToStartEvent event) {
+        CommonSimpleRadio.startServer(event.getServer());
+    }
+
     public static void onDatapackSync(OnDatapackSyncEvent event) {
         SimpleRadioCatalysts.sync(event.getRelevantPlayers().toList());
     }
@@ -139,6 +144,7 @@ public class NeoForgeLoader {
         loadItems();
 
         NeoForge.EVENT_BUS.addListener(NeoForgeLoader::addReloadListeners);
+        NeoForge.EVENT_BUS.addListener(NeoForgeLoader::serverLifecycle);
         NeoForge.EVENT_BUS.addListener(NeoForgeLoader::onDatapackSync);
     }
 }
