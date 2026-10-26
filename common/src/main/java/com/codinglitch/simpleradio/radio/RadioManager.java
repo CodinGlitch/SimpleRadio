@@ -11,6 +11,7 @@ import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.core.Speakers;
+import com.codinglitch.simpleradio.core.central.Executor;
 import com.codinglitch.simpleradio.core.central.FrequencyChannel;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
@@ -60,26 +61,34 @@ public class RadioManager extends ServerSimpleRadioApi {
     private static final SpeakersImpl SPEAKERS = new SpeakersImpl();
     private static final ListenersImpl LISTENERS = new ListenersImpl();
 
-    private static CourierThread courier;
-    private static DispatcherThread dispatcher;
+    private static Courier courier;
+    private static Dispatcher dispatcher;
 
     // should be concurrent now that multiple threads are involved
     static final Map<Short, Router> routers = new ConcurrentHashMap<>();
 
     public static void load() {}
 
+    public static void monitorThreads(MinecraftServer server) {
+        // monitor the courier
+        Executor.MonitorState courierState = courier.monitor();
+        if (courierState == Executor.MonitorState.DEAD) {
+            CommonSimpleRadio.info("Restarting the courier after an exception!");
+            courier = Courier.open(server);
+        }
+
+        // monitor the dispatcher
+        Executor.MonitorState dispatcherState = dispatcher.monitor();
+        if (dispatcherState == Executor.MonitorState.DEAD) {
+            CommonSimpleRadio.info("Restarting the dispatcher after an exception!");
+            dispatcher = Dispatcher.open(server);
+        }
+    }
+
     public static void open(MinecraftServer server) {
-        CommonSimpleRadio.info("Starting essentials");
-
-        // Start the messaging thread
-        courier = new CourierThread(server);
-        courier.setDaemon(true);
-        courier.start();
-
-        // Start the courier scheduler
-        dispatcher = new DispatcherThread(server);
-        dispatcher.setDaemon(true);
-        dispatcher.start();
+        CommonSimpleRadio.info("Starting essentials!");
+        courier = Courier.open(server);
+        dispatcher = Dispatcher.open(server);
     }
 
     public static void close() {
@@ -90,8 +99,11 @@ public class RadioManager extends ServerSimpleRadioApi {
 
         routers.clear();
 
-        courier.interrupt();
-        dispatcher.interrupt();
+        if (courier != null) courier.close();
+        courier = null;
+
+        if (dispatcher != null) dispatcher.close();
+        dispatcher = null;
     }
 
     public static RadioManager getInstance() {
@@ -327,10 +339,14 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     }
 
-    public void serverTick(int tickCount) {
+    public void serverTick(MinecraftServer server, int tickCount) {
         if (tickCount % 20 == 0) {
             garbageCollect();
+            monitorThreads(server);
         }
+
+        if (courier != null) courier.tick();
+        if (dispatcher != null) dispatcher.tick();
 
         // -- Receiver, Transmitter and Listener ticking -- \\
         List<Frequency> frequencies = FREQUENCIES.get();
