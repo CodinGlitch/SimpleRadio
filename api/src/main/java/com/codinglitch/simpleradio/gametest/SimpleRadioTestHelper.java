@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class SimpleRadioTestHelper extends GameTestHelper {
-    protected final GameTestInfo testInfo; // they made it private 🙄
+    protected final GameTestInfo testInfo; // they made it private
 
     public SimpleRadioTestHelper(GameTestInfo testInfo) {
         super(testInfo);

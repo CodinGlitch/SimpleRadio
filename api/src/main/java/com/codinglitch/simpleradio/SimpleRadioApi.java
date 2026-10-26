@@ -21,7 +21,7 @@ public abstract class SimpleRadioApi {
     }
 
     public static SimpleRadioApi getInstance() {
-        String threadName = Thread.currentThread().getName(); // ☹
+        String threadName = Thread.currentThread().getName(); //
         if (threadName.contains("Render")) {
             return getInstance(true);
         } else if (threadName.contains("Server")) {
