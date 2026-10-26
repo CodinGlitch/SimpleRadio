@@ -243,8 +243,9 @@ public class RadioMessage implements Message {
 
             if (fromPos.level.dimensionType() != toPos.level.dimensionType()) {
                 if (SimpleRadioLibrary.SERVER_CONFIG.frequency.crossDimensional) {
-                    double interference = SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalInterference;
-                    transmissionDiminishment += frequency.getModulation() == Frequency.Modulation.FREQUENCY ? interference : interference/2;
+                    this.transmissionPower -= frequency.getModulation() == Frequency.Modulation.FREQUENCY ?
+                            SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalFMInterference :
+                            SimpleRadioLibrary.SERVER_CONFIG.frequency.dimensionalAMInterference;
                 } else {
                     this.transmissionPower = 0;
                     transmissionDiminishment = 0;
