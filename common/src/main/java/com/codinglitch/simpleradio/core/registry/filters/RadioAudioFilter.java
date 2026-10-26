@@ -12,7 +12,8 @@ public class RadioAudioFilter extends AudioFilter {
             new PeakAudioEffect(SERVER_CONFIG.audio.peak.low, SERVER_CONFIG.audio.peak.high, SERVER_CONFIG.audio.peak.strength),
             new LowPassAudioEffect(SERVER_CONFIG.audio.lowPass.cutoff),
             new DownsampleAudioEffect(SERVER_CONFIG.audio.downsample.factor),
-            new CompressorAudioEffect(-24f, 8f, 3f, 80f, 10f)
+            new CompressorAudioEffect(-24f, 8f, 3f, 80f, 10f),
+            new RangeAudioEffect()
     );
 
     public RadioAudioFilter() {}
@@ -23,6 +24,7 @@ public class RadioAudioFilter extends AudioFilter {
 
         // updating effect severity
         effects.get(NoiseAudioEffect.class).setSeverity(severity);
+        effects.get(RangeAudioEffect.class).setSeverity(severity);
     }
 
     @Override
