@@ -84,7 +84,10 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
     private static final Map<Short, PendingRouter<?>> PENDING_ROUTERS = new HashMap<>();
     private static final Map<Short, ClientRouterWrapper> ROUTERS = new HashMap<>();
 
-    public static void load() {
+    public static void load() {}
+
+    public static ClientRadioManager getInstance() {
+        return INSTANCE;
     }
 
     // im, losing it
