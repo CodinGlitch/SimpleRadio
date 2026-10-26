@@ -114,6 +114,22 @@ public class RadioBlock extends BaseEntityBlock implements Routing, Speaking, Re
         return 0;
     }
 
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (!level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof RadioBlockEntity radio && radio.receiver != null) {
+
+                // Toggle the radio state
+                boolean hasSignal = level.hasNeighborSignal(pos);
+                radio.receiver.setActive(!hasSignal);
+                //radio.speaker.setActive(!hasSignal);
+                // ^ we don't really *need* to disable the speaker, but it can have some
+                // unique interactions when wired up (doubles as a standalone speaker!)
+            }
+        }
+    }
+
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         ItemStack stack = new ItemStack(this);
         BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
