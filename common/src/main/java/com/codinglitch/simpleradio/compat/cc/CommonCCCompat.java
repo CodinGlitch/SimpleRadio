@@ -1,8 +1,8 @@
 package com.codinglitch.simpleradio.compat.cc;
 
+import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Socket;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.events.BufferEvent;
 import com.codinglitch.simpleradio.radio.Message;
 import com.codinglitch.simpleradio.routers.Router;
@@ -51,7 +51,7 @@ public class CommonCCCompat { // thats a lot of Cs
     }
 
     public static void postInitialize() {
-        ClientRadioManager.getInstance().listen(BufferEvent.Emptied.class, (event) -> {
+        SimpleRadioApi.getInstance().listen(BufferEvent.Emptied.class, (event) -> {
             // have to force it to run tick task because it thinks its the same thread?
             event.server.tell(new TickTask(event.server.getTickCount(), () -> emptyBuffer(event)));
         });
