@@ -35,7 +35,7 @@ public class NoiseAudioEffect implements AudioEffect {
 
     @Override
     public void process(float[] data) {
-        float alpha = 0.2f;// severity * 0.0005f;
+        float alpha = severity * 0.05f;
         for (int i = 0; i < data.length; i++) {
             float sample = data[i];
 
