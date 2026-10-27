@@ -91,8 +91,8 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     public static void open(MinecraftServer server) {
         CommonSimpleRadio.info("Starting essentials!");
-        courier = Courier.open(server);
-        dispatcher = Dispatcher.open(server);
+        if (courier == null) courier = Courier.open(server);
+        if (dispatcher == null) dispatcher = Dispatcher.open(server);
     }
 
     public static void close() {
