@@ -71,6 +71,10 @@ public class RadioManager extends ServerSimpleRadioApi {
     public static void load() {}
 
     public static void monitorThreads(MinecraftServer server) {
+        // check if both executors were even able to start
+        if (courier == null) courier = Courier.open(server);
+        if (dispatcher == null) dispatcher = Dispatcher.open(server);
+
         // monitor the courier
         Executor.MonitorState courierState = courier.monitor();
         if (courierState == Executor.MonitorState.DEAD) {
