@@ -1,7 +1,9 @@
 package com.codinglitch.simpleradio.compat;
 
+import com.codinglitch.intermediator.phases.PostInitializePhase;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.Socket;
+import com.codinglitch.simpleradio.compat.cc.CommonCCCompat;
 import com.codinglitch.simpleradio.compat.cc.SocketPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.Direction;
@@ -18,14 +20,11 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-public class CCCompat {
+public class CCCompat extends CommonCCCompat {
     public static void attachPeripherals(AttachCapabilitiesEvent<BlockEntity> event) {
         if (event.getObject() instanceof Socket socket) {
             PeripheralProvider.attach(event, event.getObject(), SocketPeripheral::new);
         }
-    }
-    public static void postInitialize() {
-        MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, CCCompat::attachPeripherals);
     }
 
     public static final Capability<IPeripheral> CAPABILITY_PERIPHERAL = CapabilityManager.get(new CapabilityToken<>() {
@@ -61,5 +60,10 @@ public class CCCompat {
             var peripheral = this.peripheral;
             return (peripheral == null ? (this.peripheral = LazyOptional.of(() -> factory.apply(blockEntity))) : peripheral).cast();
         }
+    }
+
+    @Override
+    public void postInitialize(PostInitializePhase data) {
+        MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, CCCompat::attachPeripherals);
     }
 }

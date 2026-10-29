@@ -1,5 +1,7 @@
 package com.codinglitch.simpleradio.compat;
 
+import com.codinglitch.intermediator.phases.PostInitializePhase;
+import com.codinglitch.simpleradio.compat.phases.RetrieveAccessoryPhase;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -19,9 +21,10 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class CuriosCompat {
+public class CuriosCompat extends AccessoryCompat {
 
-    public static void postInitialize() {
+    @Override
+    public void postInitialize(PostInitializePhase data) {
         AccessoryCompat.makeItems((accessory, ticker) -> {
 
             // we reconstruct the entire item and context to keep it platform-agnostic
@@ -47,7 +50,8 @@ public class CuriosCompat {
         });
     }
 
-    public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
+    @Override
+    public ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
         Optional<ICuriosItemHandler> itemHandler = CuriosApi.getCuriosInventory(player).resolve();
         if (itemHandler.isEmpty()) return ItemStack.EMPTY;
 
@@ -55,6 +59,10 @@ public class CuriosCompat {
         if (result.isEmpty()) return ItemStack.EMPTY;
 
         return result.get().stack();
+    }
+    @Override
+    public void retrieveAccessory(RetrieveAccessoryPhase data) {
+        data.stack = getAccessory(data.player, data.filter);
     }
 
     public static void initialize() {

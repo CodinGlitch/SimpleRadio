@@ -1,9 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.client.core.SimpleRadioArmPoses;
-import com.codinglitch.simpleradio.compat.CuriosCompat;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraftforge.api.distmarker.Dist;
@@ -55,10 +53,6 @@ public class SimpleRadioClient {
         CommonSimpleRadioClient.loadProperties(ItemProperties::register);
 
         event.enqueueWork(CommonSimpleRadioClient::loadScreens);
-
-        if (CompatCore.CURIOS.isLoaded()) {
-            CuriosCompat.initialize();
-        }
 
         for (Map.Entry<String, SimpleRadioArmPoses.Pose> entry : SimpleRadioArmPoses.POSES.entrySet()) {
             SimpleRadioArmPoses.Pose pose = entry.getValue();

@@ -1,13 +1,16 @@
 package com.codinglitch.simpleradio.compat.create;
 
-import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.intermediator.phases.PostInitializePhase;
+import com.codinglitch.intermediator.phases.PostLoadCompatibilityPhase;
+import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.compat.CommonCreateCompat;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
+import com.codinglitch.simpleradio.core.events.CollectionEvent;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
 import com.codinglitch.simpleradio.core.registry.blocks.RadiosmitherBlock;
-import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioManager;
 import com.codinglitch.simpleradio.radio.RadioRouter;
 import com.codinglitch.simpleradio.routers.Router;
@@ -18,7 +21,6 @@ import com.simibubi.create.content.contraptions.Contraption;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,32 +30,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import java.util.List;
 import java.util.UUID;
 
-public class CreateCompat {
+public class CreateCompat extends CommonCreateCompat {
     public static List<Block> CENTRAL_BLOCKS;
-
-    public static void postInitialize() {
-        BlockMovementChecks.registerAttachedCheck((state, level, pos, direction) -> {
-            if (state.is(SimpleRadioBlocks.RADIOSMITHER)) {
-                Direction facing = state.getValue(RadiosmitherBlock.FACING);
-                facing = state.getValue(RadiosmitherBlock.RADIOSMITHER_PART) == RadiosmitherBlock.RadiosmitherPart.MAIN ?
-                        facing.getCounterClockWise() :
-                        facing.getClockWise();
-
-                return BlockMovementChecks.CheckResult.of(direction == facing);
-            }
-
-            return BlockMovementChecks.CheckResult.PASS;
-        });
-
-        CENTRAL_BLOCKS = List.of(
-                SimpleRadioBlocks.RADIO,
-                SimpleRadioBlocks.SPEAKER,
-                SimpleRadioBlocks.MICROPHONE,
-                SimpleRadioBlocks.RECEIVER,
-                SimpleRadioBlocks.TRANSMITTER,
-                SimpleRadioBlocks.INSULATOR
-        );
-    }
 
     public static void contraptionAddBlock(Contraption contraption, BlockPos pos, BlockEntity blockEntity, StructureTemplate.StructureBlockInfo info) {
         if (blockEntity instanceof AuditoryBlockEntity centralBlockEntity) {
@@ -71,7 +49,7 @@ public class CreateCompat {
     private static void resetRouter(Router router, BlockPos pos, Level level) {
         if (router == null) return;
         router.setOwner(null);
-        router.setPosition(CompatCore.modifyPosition(WorldlyPosition.of(pos, level, pos)));
+        router.setPosition(SimpleRadioIntermediary.modifyPosition(WorldlyPosition.of(pos, level, pos)));
     }
 
     public static void contraptionRemoveBlock(Contraption contraption, Level level, BlockPos pos, BlockState state, CompoundTag tag) {
@@ -107,18 +85,43 @@ public class CreateCompat {
         }
     }
 
-    public static RadioManager.CollectionResult verifyContraptionCollection(Entity entity) {
-        if (entity instanceof AbstractContraptionEntity contraptionEntity) {
-            if (contraptionEntity.isRemoved()) return RadioManager.CollectionResult.COLLECT;
+    @Override
+    public void verifyEntityCollection(CollectionEvent.VerifyEntity data) {
+        if (data.entity instanceof AbstractContraptionEntity contraptionEntity) {
+            if (contraptionEntity.isRemoved()) {
+                data.result = CollectionEvent.Result.COLLECT;
+                return;
+            }
 
             Contraption contraption = contraptionEntity.getContraption();
             if (contraption != null) {
-                return contraption.disassembled ? RadioManager.CollectionResult.COLLECT : RadioManager.CollectionResult.IGNORE;
+                data.result = contraption.disassembled ? CollectionEvent.Result.COLLECT : CollectionEvent.Result.IGNORE;
             } else {
-                return RadioManager.CollectionResult.COLLECT;
+                data.result = CollectionEvent.Result.COLLECT;
             }
-        } else {
-            return RadioManager.CollectionResult.PASS;
         }
+    }
+
+    @Override
+    public void postInitialize(PostInitializePhase data) {
+        BlockMovementChecks.registerAttachedCheck((state, level, pos, direction) -> {
+            if (state.is(SimpleRadioBlocks.RADIOSMITHER)) {
+                Direction facing = state.getValue(RadiosmitherBlock.FACING);
+                facing = state.getValue(RadiosmitherBlock.RADIOSMITHER_PART) == RadiosmitherBlock.RadiosmitherPart.MAIN ?
+                        facing.getCounterClockWise() :
+                        facing.getClockWise();
+
+                return BlockMovementChecks.CheckResult.of(direction == facing);
+            }
+
+            return BlockMovementChecks.CheckResult.PASS;
+        });
+
+        CENTRAL_BLOCKS = this.getCentralBlocks();
+    }
+
+    @Override
+    public void postLoadCompatibility(PostLoadCompatibilityPhase data) {
+        registerMovementBehaviours();
     }
 }
