@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.compat;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.phases.OnDataPhase;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
 import com.codinglitch.simpleradio.radio.RadioMessage;
 import com.codinglitch.simpleradio.radio.RadioSpeaker;
@@ -16,10 +17,15 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InteractionCompat {
+public class InteractionCompat extends CommonInteractionCompat {
     private static ConcurrentHashMap<UUID, Long> cooldowns = new ConcurrentHashMap<>();;
 
-    public static void onData(RadioSpeaker channel, RadioMessage message, short[] decodedData) {
+    @Override
+    public void onData(OnDataPhase data) {
+        RadioSpeaker speaker = data.speaker;
+        RadioMessage message = data.message;
+        short[] decodedData = data.decodedData;
+
         UUID sourceOwner = message.getRealOwner();
         VoicechatConnection connection = CommonRadioPlugin.serverApi.getConnectionOf(sourceOwner);
 
@@ -28,11 +34,11 @@ public class InteractionCompat {
         }
 
         if (connection == null) {
-            if (channel.position == null) return;
+            if (speaker.position == null) return;
 
-            WorldlyPosition location = channel.position;
+            WorldlyPosition location = speaker.position;
             location.level.getServer().execute(() -> {
-                if (setCooldown(channel.reference, location.level)) {
+                if (setCooldown(speaker.reference, location.level)) {
                     BlockState state = location.level.getBlockState(location.blockPos());
 
                     location.level.gameEvent(VoicechatInteraction.VOICE_GAME_EVENT, location.blockPos(), GameEvent.Context.of(state));

@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.compat;
 
-import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
-import com.codinglitch.simpleradio.platform.Services;
+import com.codinglitch.intermediator.phases.PostInitializePhase;
+import com.codinglitch.simpleradio.compat.phases.RetrieveAccessoryPhase;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
@@ -21,14 +21,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class TrinketsCompat {
+public class TrinketsCompat extends AccessoryCompat {
 
-    public static void initialize() {
-    }
-
-    public static void postInitialize() {
+    @Override
+    public void postInitialize(PostInitializePhase data) {
         AccessoryCompat.makeItems((accessory, ticker) -> {
-
             TrinketsApi.registerTrinket(accessory, new Trinket() {
                 @Override
                 public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
@@ -51,7 +48,8 @@ public class TrinketsCompat {
         });
     }
 
-    public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
+    @Override
+    public ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
         Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(player);
         if (component.isEmpty()) return ItemStack.EMPTY;
 
@@ -61,6 +59,10 @@ public class TrinketsCompat {
         return result.stream()
                 .findFirst()
                 .get().getB();
+    }
+    @Override
+    public void retrieveAccessory(RetrieveAccessoryPhase data) {
+        data.stack = getAccessory(data.player, data.filter);
     }
 
     public static class GenericTrinketRenderer implements TrinketRenderer {
