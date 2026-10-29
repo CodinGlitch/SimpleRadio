@@ -25,6 +25,8 @@ mixin               = "0.8.5"
 mixin_extras        = "0.4.1"
 voicechat_api       = "2.6.13"
 voicechat           = "2.6.0"
+intermediator_api   = "0.8"
+intermediator       = "0.8-epic"
 lexiconfig_api      = "1.4.21"
 lexiconfig          = "1.4.21-epic"
 
@@ -67,6 +69,7 @@ mixinextras-common = { group = "io.github.llamalad7", name = "mixinextras-common
 
 voicechat_api = { group="de.maxhenkel.voicechat", name="voicechat-api", version.ref="voicechat_api" }
 lexiconfig_api = { group="com.codinglitch.lexiconfig", name="lexiconfig-api", version.ref="lexiconfig_api" }
+intermediator_api = { group="com.codinglitch.intermediator", name="intermediator-api", version.ref="intermediator_api" }
 
 computercraft_common = { group="cc.tweaked", name="cc-tweaked-1.20.1-common-api", version.ref="computercraft" }
 computercraft_core = { group="cc.tweaked", name="cc-tweaked-1.20.1-core-api", version.ref="computercraft" }
@@ -82,6 +85,7 @@ fabric_api = { group="net.fabricmc.fabric-api", name="fabric-api", version.ref="
 
 fabric_minecraft = { group="com.mojang", name="minecraft", version.ref="minecraft" }
 
+fabric_intermediator = { group="com.codinglitch.intermediator", name="intermediator-fabric", version.ref="intermediator" }
 fabric_lexiconfig = { group="com.codinglitch.lexiconfig", name="lexiconfig-fabric", version.ref="lexiconfig" }
 fabric_voicechat = { group="maven.modrinth", name="simple-voice-chat", version.ref="fabric_voicechat" }
 
@@ -105,6 +109,7 @@ fabric_configured = { group="com.mrcrayfish", name="configured-fabric", version.
 fabric_trinkets = { group="dev.emi", name="trinkets", version.ref="trinkets"}
 
 #---- Forge ----#
+forge_intermediator = { group="com.codinglitch.intermediator", name="intermediator-forge", version.ref="intermediator" }
 forge_lexiconfig = { group="com.codinglitch.lexiconfig", name="lexiconfig-forge", version.ref="lexiconfig" }
 forge_voicechat = { group="maven.modrinth", name="simple-voice-chat", version.ref="forge_voicechat" }
 
@@ -143,6 +148,7 @@ fabric_modImpl = [ "fabric", "fabric_api" ]
 # All mods that should be enabled in the Fabric development environment.
 fabric_environment = [
     "fabric_lexiconfig",
+    "fabric_intermediator",
     "fabric_voicechat",
     "fabric_audioplayer",
     "fabric_admiral",
@@ -164,6 +170,7 @@ fabric_environment = [
 # All mods that should be enabled in the Forge development environment.
 forge_environment = [
     "forge_lexiconfig",
+    "forge_intermediator",
     "forge_voicechat",
     "forge_etched",
     "forge_computercraft",

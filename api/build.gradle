@@ -18,10 +18,16 @@ legacyForge {
     parchment.mappingsVersion.set(libs.versions.parchment.mappings.get())
 }
 
+repositories {
+    maven { url "https://maven.codinglitch.com/releases" }
+}
+
 dependencies {
     compileOnly(libs.mixin)
     compileOnly(libs.mixinextras.common)
     //compileOnly project(":common")
+
+    api(libs.intermediator.api)
 }
 
 configurations {

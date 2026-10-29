@@ -116,6 +116,7 @@ dependencies {
 
     api(libs.voicechat.api)
     api(libs.lexiconfig.api)
+    api(libs.intermediator.api)
 
     compileOnly(libs.vibrativevoice.api)
     compileOnly(libs.computercraft.core)
