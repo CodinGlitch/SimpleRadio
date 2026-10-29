@@ -1,18 +1,21 @@
 package com.codinglitch.simpleradio.radio;
 
+import com.codinglitch.intermediator.IntermediatorApi;
+import com.codinglitch.intermediator.Phase;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.ServerSimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Wiring;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.Listeners;
 import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.core.Speakers;
 import com.codinglitch.simpleradio.core.central.Executor;
 import com.codinglitch.simpleradio.core.central.FrequencyChannel;
+import com.codinglitch.simpleradio.core.events.CollectionEvent;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlock;
 import com.codinglitch.simpleradio.core.registry.blocks.InsulatorBlockEntity;
@@ -136,13 +139,20 @@ public class RadioManager extends ServerSimpleRadioApi {
         EVENT_LISTENERS.put(listener, event);
     }
 
-    public static <E extends RadioEvent> void post(E event) {
+    public static <E extends RadioEvent> E post(E event) {
         Class<?> type = event.getClass();
         for (Map.Entry<Consumer<? extends RadioEvent>, Class<? extends RadioEvent>> entry : EVENT_LISTENERS.entrySet()) {
             if (!type.equals(entry.getValue())) continue;
             Consumer<E> listener = (Consumer<E>) entry.getKey();
             listener.accept(event);
         }
+
+        // post the event for everyone if it's also a phase
+        if (event instanceof Phase phase) {
+            IntermediatorApi.INSTANCE.post(phase);
+        }
+
+        return event;
     }
 
     @Override
@@ -412,10 +422,10 @@ public class RadioManager extends ServerSimpleRadioApi {
     public boolean verifyLocationCollection(WorldlyPosition position, Class<?> clazz) {
         BlockPos pos = position.realLocation();
 
-        CollectionResult result = CompatCore.verifyLocationCollection(position, clazz);
-        if (result == CollectionResult.IGNORE) {
+        CollectionEvent.VerifyLocation result = RadioManager.post(new CollectionEvent.VerifyLocation(position, clazz));
+        if (result.result == CollectionEvent.Result.IGNORE) {
             return true;
-        } else if (result == CollectionResult.COLLECT) {
+        } else if (result.result == CollectionEvent.Result.COLLECT) {
             return false;
         }
 
@@ -434,10 +444,10 @@ public class RadioManager extends ServerSimpleRadioApi {
 
     @Override
     public boolean verifyEntityCollection(Entity entity, Predicate<ItemStack> itemCriteria) {
-        CollectionResult result = CompatCore.verifyEntityCollection(entity, itemCriteria);
-        if (result == CollectionResult.IGNORE) {
+        CollectionEvent.VerifyEntity result = RadioManager.post(new CollectionEvent.VerifyEntity(entity, itemCriteria));
+        if (result.result == CollectionEvent.Result.IGNORE) {
             return true;
-        } else if (result == CollectionResult.COLLECT) {
+        } else if (result.result == CollectionEvent.Result.COLLECT) {
             return false;
         }
 
@@ -504,7 +514,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     public void sendRecord(ItemStack stack, WorldlyPosition position, long identifier) {
         RadioManager.getInstance().sendSound(
                 position,
-                CompatCore.getSound(stack),
+                SimpleRadioIntermediary.getSound(stack),
                 1, 1, identifier
         );
     }
@@ -527,7 +537,7 @@ public class RadioManager extends ServerSimpleRadioApi {
     public void updateRecord(ItemStack stack, WorldlyPosition position, float offset, long identifier) {
         RadioManager.getInstance().sendSound(
                 position,
-                CompatCore.getSound(stack),
+                SimpleRadioIntermediary.getSound(stack),
                 1, 1,  offset, identifier
         );
     }

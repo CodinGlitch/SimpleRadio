@@ -1,6 +1,7 @@
 package com.codinglitch.simpleradio.mixin;
 
-import com.codinglitch.simpleradio.CompatCore;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
+import com.codinglitch.simpleradio.compat.phases.BlockEntityRemovedPhase;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinBlockEntity {
     @Inject(method = "setRemoved", at = @At(value = "TAIL"))
     private void simpleradio$setRemoved(CallbackInfo ci) {
-        CompatCore.removeBlockEntity((BlockEntity) (Object) this);
+        SimpleRadioIntermediary.INSTANCE.post(new BlockEntityRemovedPhase((BlockEntity) (Object) this));
     }
 }

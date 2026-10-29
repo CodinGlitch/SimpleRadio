@@ -1,14 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
-import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.central.Receiving;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
-import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
@@ -119,7 +117,7 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     @Override
     public void activate() {
         CommonSimpleRadio.debug("Activating receiver with reference {}", id);
-        WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+        WorldlyPosition location = SimpleRadioIntermediary.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());
         if (!level.isClientSide) {

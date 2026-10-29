@@ -1,12 +1,12 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.AuditoryBlockEntity;
 import com.codinglitch.simpleradio.central.Speaking;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
@@ -91,7 +91,7 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     @Override
     public void activate() {
         CommonSimpleRadio.debug("Activating speaker with reference {}", id);
-        WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
+        WorldlyPosition location = SimpleRadioIntermediary.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
         this.speaker.setPosition(location);

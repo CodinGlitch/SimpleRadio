@@ -2,6 +2,7 @@ package com.codinglitch.simpleradio.client;
 
 import com.codinglitch.simpleradio.ClientSimpleRadioApi;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Frequency;
 import com.codinglitch.simpleradio.central.Listening;
@@ -10,7 +11,6 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.core.central.ChannelHandleWrapper;
 import com.codinglitch.simpleradio.client.core.central.ClientRouterWrapper;
 import com.codinglitch.simpleradio.client.core.central.EffectStream;
-import com.codinglitch.simpleradio.compat.AccessoryCompat;
 import com.codinglitch.simpleradio.core.Frequencies;
 import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
@@ -100,7 +100,7 @@ public class ClientRadioManager extends ClientSimpleRadioApi {
         ItemStack useItem = player.getUseItem();
         if (useItem.getItem() instanceof Listening) return true;
 
-        ItemStack accessory = AccessoryCompat.getAccessory(player, stack -> stack.getItem() instanceof Listening);
+        ItemStack accessory = SimpleRadioIntermediary.getAccessory(player, stack -> stack.getItem() instanceof Listening);
         if (accessory.isEmpty()) return false;
 
         CompoundTag tag = accessory.getTag();

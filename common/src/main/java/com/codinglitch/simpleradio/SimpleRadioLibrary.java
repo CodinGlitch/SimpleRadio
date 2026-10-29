@@ -24,9 +24,6 @@ public class SimpleRadioLibrary extends Library {
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> AntennaBlock.onLexiconRevision());
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> AntennaBlock.onLexiconRevision());
 
-        LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> CompatCore.reloadCompatibilities());
-        LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> CompatCore.spoutCompatibilities());
-
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_REVISION, (event) -> SimpleRadioItems.reload());
         LexiconfigApi.registerListener(LexiconfigApi.EventType.POST_CATALOG, (event) -> SimpleRadioItems.reload());
 

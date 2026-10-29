@@ -1,6 +1,10 @@
 package com.codinglitch.simpleradio.compat;
 
+import com.codinglitch.intermediator.Intermediation;
+import com.codinglitch.intermediator.Mediation;
+import com.codinglitch.intermediator.Subscriber;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.compat.phases.ModifyPhase;
 import net.minecraft.core.BlockPos;
 import org.joml.Matrix4dc;
 import org.joml.Quaternionf;
@@ -8,8 +12,17 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-public class CommonValkyrienCompat {
-    public static WorldlyPosition modifyPosition(WorldlyPosition position) {
+public class CommonValkyrienCompat implements Mediation {
+
+    @Override
+    public void mediate(Intermediation intermediation) {
+        intermediation.subscribe(ModifyPhase.Position.class, Subscriber.Condition.LOADED, this::modifyPosition);
+        intermediation.subscribe(ModifyPhase.Rotation.class, Subscriber.Condition.LOADED, this::modifyRotation);
+    }
+
+    public void modifyPosition(ModifyPhase.Position data) {
+        WorldlyPosition position = data.position;
+
         Ship ship = VSGameUtilsKt.getLoadedShipManagingPos(position.level, position.realLocation());
         if (ship != null) {
             BlockPos realLocation = position.realLocation();
@@ -22,19 +35,16 @@ public class CommonValkyrienCompat {
             position.y = (float) blockOnShip.y;
             position.z = (float) blockOnShip.z;
         }
-
-
-        return position;
     }
 
-    public static Quaternionf modifyRotation(WorldlyPosition position, Quaternionf rotation) {
+    public void modifyRotation(ModifyPhase.Rotation data) {
+        WorldlyPosition position = data.position;
+
         Ship ship = VSGameUtilsKt.getLoadedShipManagingPos(position.level, position.realLocation());
         if (ship != null) {
             Matrix4dc shipToWorld = ship.getTransform().getShipToWorld();
-            rotation = new Quaternionf(shipToWorld.getNormalizedRotation(new Quaternionf()));
+            data.rotation = new Quaternionf(shipToWorld.getNormalizedRotation(new Quaternionf()));
         }
-
-        return rotation;
     }
 
     /*public static Vector3f modifyPosition(Ship ship, BlockPos originalBlockPos) {

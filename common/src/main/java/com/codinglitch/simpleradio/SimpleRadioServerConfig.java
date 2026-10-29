@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio;
 
+import com.codinglitch.intermediator.Intermediation;
 import com.codinglitch.lexiconfig.LexiconfigApi;
 import com.codinglitch.lexiconfig.annotations.Lexicon;
 import com.codinglitch.lexiconfig.annotations.LexiconEntry;
@@ -7,7 +8,6 @@ import com.codinglitch.lexiconfig.annotations.LexiconPage;
 import com.codinglitch.lexiconfig.classes.LexiconData;
 import com.codinglitch.lexiconfig.classes.LexiconPageData;
 import com.codinglitch.simpleradio.central.ConfigHolder;
-import com.codinglitch.simpleradio.compat.CompatibilityInstance;
 
 @Lexicon(name = CommonSimpleRadio.ID+"-server", location = LexiconfigApi.Location.SERVER)
 public class SimpleRadioServerConfig extends LexiconData {
@@ -204,7 +204,7 @@ public class SimpleRadioServerConfig extends LexiconData {
     }
 
     public static class Microphone extends LexiconPageData implements ConfigHolder {
-        @LexiconEntry(comment = "This is the range for the microphone that it can hear from. Defaults to 8.")
+        @LexiconEntry(comment = "This is the range foConfigHolderr the microphone that it can hear from. Defaults to 8.")
         public Integer listeningRange = 8;
 
         @LexiconEntry(comment = "This is how often (in ticks) the microphone will update its redstone signal according to its activity. Defaults to 5.")
@@ -283,7 +283,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Voice Chat Interaction.")
         public VoiceChatInteraction voice_chat_interaction = new VoiceChatInteraction();
 
-        public static class VoiceChatInteraction extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class VoiceChatInteraction extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Voice Chat Interaction. Defaults to false. (NON-FUNCTIONAL)")
             public Boolean enabled = false;
 
@@ -296,7 +296,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Vibrative Voice.")
         public VibrativeVoice vibrative_voice = new VibrativeVoice();
 
-        public static class VibrativeVoice extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class VibrativeVoice extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Vibrative Voice. Defaults to true.")
             public Boolean enabled = true;
 
@@ -309,7 +309,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Valkyrien Skies.")
         public ValkyrienSkies valkyrien_skies = new ValkyrienSkies();
 
-        public static class ValkyrienSkies extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class ValkyrienSkies extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Valkyrien Skies. Defaults to true.")
             public Boolean enabled = true;
 
@@ -322,7 +322,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Create.")
         public Create create = new Create();
 
-        public static class Create extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class Create extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Create. Defaults to true.")
             public Boolean enabled = true;
 
@@ -335,7 +335,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency CC: Tweaked.")
         public CCTweaked cc_tweaked = new CCTweaked();
 
-        public static class CCTweaked extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class CCTweaked extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for CC: Tweaked. Defaults to true.")
             public Boolean enabled = true;
 
@@ -348,7 +348,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Etched.")
         public Etched etched = new Etched();
 
-        public static class Etched extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class Etched extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Etched. Defaults to true.")
             public Boolean enabled = true;
 
@@ -364,7 +364,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency AudioPlayer.")
         public AudioPlayer audioplayer = new AudioPlayer();
 
-        public static class AudioPlayer extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class AudioPlayer extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for AudioPlayer. Defaults to true.")
             public Boolean enabled = true;
 
@@ -377,7 +377,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Sable/Create Aeronautics.")
         public Sable sable = new Sable();
 
-        public static class Sable extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class Sable extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Sable. Defaults to true.")
             public Boolean enabled = true;
 
@@ -390,7 +390,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Curios.")
         public Curios curios = new Curios();
 
-        public static class Curios extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class Curios extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Curios. Defaults to true.")
             public Boolean enabled = true;
 
@@ -403,7 +403,7 @@ public class SimpleRadioServerConfig extends LexiconData {
         @LexiconPage(comment = "These are the configurations for the optional dependency Trinkets.")
         public Trinkets trinkets = new Trinkets();
 
-        public static class Trinkets extends LexiconPageData implements CompatibilityInstance.CompatibilityConfig {
+        public static class Trinkets extends LexiconPageData implements ConfigHolder, Intermediation.Page {
             @LexiconEntry(comment = "When false, removes compatibility for Trinkets. Defaults to true.")
             public Boolean enabled = true;
 

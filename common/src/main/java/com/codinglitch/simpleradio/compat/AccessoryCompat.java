@@ -1,6 +1,13 @@
 package com.codinglitch.simpleradio.compat;
 
+import com.codinglitch.intermediator.Intermediation;
+import com.codinglitch.intermediator.Mediation;
+import com.codinglitch.intermediator.Subscriber;
+import com.codinglitch.intermediator.phases.PostInitializePhase;
 import com.codinglitch.simpleradio.CommonSimpleRadio;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
+import com.codinglitch.simpleradio.compat.phases.RetrieveAccessoryPhase;
+import com.codinglitch.simpleradio.core.events.CollectionEvent;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioItems;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import com.codinglitch.simpleradio.platform.Services;
@@ -21,7 +28,14 @@ import java.util.function.Predicate;
 /**
  * Meant to serve as an abstracted layer between accessory mods of different loaders.
  */
-public class AccessoryCompat {
+public abstract class AccessoryCompat implements Mediation {
+
+    @Override
+    public void mediate(Intermediation intermediation) {
+        intermediation.subscribe(PostInitializePhase.class, Subscriber.Condition.ENABLED, this::postInitialize);
+        intermediation.subscribe(CollectionEvent.VerifyEntity.class, Subscriber.Condition.ENABLED, this::verifyEntityCollection);
+        intermediation.subscribe(RetrieveAccessoryPhase.class, Subscriber.Condition.ENABLED, this::retrieveAccessory);
+    }
 
     public record Context(String identifier, LivingEntity entity, int index, boolean cosmetic, boolean visible) {}
 
@@ -52,13 +66,12 @@ public class AccessoryCompat {
 
     }
 
-    public static ItemStack getAccessory(Player player, Predicate<ItemStack> filter) {
-        return Services.COMPAT.getAccessory(player, filter);
-    }
+    public abstract ItemStack getAccessory(Player player, Predicate<ItemStack> filter);
+    public abstract void retrieveAccessory(RetrieveAccessoryPhase data);
 
     public static void setHandheld(Player player, boolean state) {
         // our getAccessory *should* theoretically yield the same item stack on both sides.. right?
-        ItemStack stack = AccessoryCompat.getAccessory(player, test -> test.getItem() instanceof TransceiverItem);
+        ItemStack stack = SimpleRadioIntermediary.getAccessory(player, test -> test.getItem() instanceof TransceiverItem);
         if (stack.isEmpty()) return;
 
         CommonSimpleRadio.info(state);
@@ -68,6 +81,15 @@ public class AccessoryCompat {
             transceiver.begin(stack, player);
         } else {
             transceiver.end(stack, player);
+        }
+    }
+
+    public abstract void postInitialize(PostInitializePhase data);
+
+    public void verifyEntityCollection(CollectionEvent.VerifyEntity data) {
+        if (SimpleRadioIntermediary.CURIOS.modLoaded() && data.entity instanceof Player player) {
+            ItemStack stack = this.getAccessory(player, data.criteria);
+            if (stack != ItemStack.EMPTY) data.result = CollectionEvent.Result.IGNORE;
         }
     }
 

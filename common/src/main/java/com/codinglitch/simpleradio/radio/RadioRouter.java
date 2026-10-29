@@ -1,9 +1,10 @@
 package com.codinglitch.simpleradio.radio;
 
 import com.codinglitch.simpleradio.CommonSimpleRadio;
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.*;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
+import com.codinglitch.simpleradio.core.events.RouterEvent;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundActivityPacket;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.routers.Receiver;
@@ -288,7 +289,7 @@ public class RadioRouter implements Socket, Router {
 
     @Override
     public void accept(Message message) {
-        CompatCore.acceptSource(this, message);
+        RadioManager.post(new RouterEvent.Messaged(this, message));
         this.take(message);
     }
 
@@ -403,8 +404,8 @@ public class RadioRouter implements Socket, Router {
 
         // Calculate velocity and/or modify position/rotation for things like VS integration
         if (position != null) {
-            this.updateRotation(CompatCore.modifyRotation(position, rotation));
-            this.updateLocation(CompatCore.modifyPosition(position));
+            this.updateRotation(SimpleRadioIntermediary.modifyRotation(position, rotation));
+            this.updateLocation(SimpleRadioIntermediary.modifyPosition(position));
         } else if (owner != null) {
             this.updateLocation(WorldlyPosition.of(owner.position().toVector3f(), owner.level()));
         }

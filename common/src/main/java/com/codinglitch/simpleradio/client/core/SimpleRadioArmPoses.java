@@ -1,6 +1,6 @@
 package com.codinglitch.simpleradio.client.core;
 
-import com.codinglitch.simpleradio.compat.AccessoryCompat;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
 import com.codinglitch.simpleradio.core.registry.items.TransceiverItem;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -77,7 +77,7 @@ public class SimpleRadioArmPoses {
     public static HumanoidModel.ArmPose getPose(AbstractClientPlayer player, InteractionHand hand) {
         if (hand != InteractionHand.OFF_HAND) return null;
 
-        ItemStack stack = AccessoryCompat.getAccessory(player, test -> test.getItem() instanceof TransceiverItem);
+        ItemStack stack = SimpleRadioIntermediary.getAccessory(player, test -> test.getItem() instanceof TransceiverItem);
         if (stack.isEmpty()) return null;
         if (!stack.hasTag()) return null;
         if (!stack.getTag().contains("using")) return null;

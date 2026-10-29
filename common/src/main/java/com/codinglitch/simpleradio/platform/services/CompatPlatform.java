@@ -1,25 +1,4 @@
 package com.codinglitch.simpleradio.platform.services;
 
-import com.codinglitch.simpleradio.central.WorldlyPosition;
-import com.codinglitch.simpleradio.radio.RadioManager;
-import com.codinglitch.simpleradio.radio.RadioMessage;
-import com.codinglitch.simpleradio.radio.RadioSpeaker;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-
-import java.util.function.Predicate;
-
 public interface CompatPlatform {
-    void postInitialize();
-    void postCompatibilityLoad();
-
-    void onData(RadioSpeaker channel, RadioMessage message, short[] decoded);
-
-    RadioManager.CollectionResult verifyLocationCollection(WorldlyPosition location, Class<?> clazz);
-    RadioManager.CollectionResult verifyEntityCollection(Entity entity, Predicate<ItemStack> inventoryCriteria);
-
-    String getSound(ItemStack stack);
-
-	ItemStack getAccessory(Player player, Predicate<ItemStack> filter);
 }

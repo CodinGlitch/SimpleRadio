@@ -1,7 +1,7 @@
 package com.codinglitch.simpleradio.client;
 
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.compat.AccessoryCompat;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
 import com.codinglitch.simpleradio.core.networking.packets.ServerboundUseHandheldPacket;
 import com.codinglitch.simpleradio.platform.ClientServices;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -54,7 +54,7 @@ public class Keybinds {
 
 	private static void handleHandheld(State state) {
 		if (state == State.CLICK) return;
-		if (!CompatCore.TRINKETS.isLoaded && !CompatCore.CURIOS.isLoaded) return;
+		if (!SimpleRadioIntermediary.TRINKETS.modLoaded() && !SimpleRadioIntermediary.CURIOS.modLoaded()) return;
 
 		LocalPlayer player = Minecraft.getInstance().player;
 		if (player == null) return;
@@ -81,7 +81,7 @@ public class Keybinds {
 	}
 
 	public static void register(Consumer<KeyMapping> registry) {
-		if (CompatCore.TRINKETS.isLoaded() || CompatCore.CURIOS.isLoaded()) {
+		if (SimpleRadioIntermediary.TRINKETS.modLoaded() || SimpleRadioIntermediary.CURIOS.modLoaded()) {
 			registry.accept(HANDHELD.mapping);
 		}
 	}

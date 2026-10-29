@@ -1,9 +1,10 @@
 package com.codinglitch.simpleradio.radio;
 
-import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioApi;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
+import com.codinglitch.simpleradio.SimpleRadioIntermediary;
+import com.codinglitch.simpleradio.compat.phases.OnDataPhase;
 import com.codinglitch.simpleradio.core.networking.packets.ClientboundSpeakSoundPacket;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioAudioEffects;
 import com.codinglitch.simpleradio.platform.Services;
@@ -235,11 +236,8 @@ public class RadioSpeaker extends RadioRouter implements Speaker {
         if (!CommonRadioPlugin.isAudioValid(decoded)) return;
         playerPackets.offer(decoded);
 
-        // Loader-specific compat
-        Services.COMPAT.onData(this, (RadioMessage) message, decoded);
-
-        // Common compat
-        CompatCore.onData(this, (RadioMessage) message, decoded);
+        // Compatibility hook
+        SimpleRadioIntermediary.INSTANCE.post(new OnDataPhase(this, (RadioMessage) message, decoded));
 
         if (!isSpeaking)
             open();
