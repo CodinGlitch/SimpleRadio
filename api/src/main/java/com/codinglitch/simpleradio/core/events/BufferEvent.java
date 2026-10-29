@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.events;
 
+import com.codinglitch.intermediator.Phase;
 import com.codinglitch.simpleradio.core.RadioEvent;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.server.MinecraftServer;
@@ -14,7 +15,7 @@ public class BufferEvent extends RadioEvent {
      * <br><br>
      * This event is called on the courier thread; use the server to execute code on the main thread.
      */
-    public static class Emptied extends RadioEvent {
+    public static class Emptied extends RadioEvent implements Phase {
         public final Router router;
         public final MinecraftServer server;
 
