@@ -9,7 +9,6 @@ import com.codinglitch.simpleradio.core.central.WorldTicking;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.radio.CommonRadioPlugin;
-import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import com.codinglitch.simpleradio.routers.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -203,16 +202,18 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
                 }
 
                 if (!tag.contains("reference")) activeRouter = null;
-            }
 
-            // Frequency mutability
-            Transmitter transmitter = (Transmitter) SimpleRadioApi.getRouterSided(
-                    tag.getUUID("reference"), "RadioTransmitter", level.isClientSide
-            );
-            if (transmitter != null && !transmitter.getFrequency().is(frequency, Frequency.modulationOf(modulation))) {
-                Frequency oldFrequency = transmitter.getFrequency();
-                activeRouter = null; // force the routers to reactivate if the frequency has changed
-                inactivate(level, oldFrequency.getFrequency(), oldFrequency.getModulation(), tag.getUUID("reference"));
+                if (activeRouter != null) {
+                    // Frequency mutability
+                    Transmitter transmitter = (Transmitter) SimpleRadioApi.getRouterSided(
+                            tag.getUUID("reference"), "RadioTransmitter", level.isClientSide
+                    );
+                    if (transmitter != null && !transmitter.getFrequency().is(frequency, Frequency.modulationOf(modulation))) {
+                        Frequency oldFrequency = transmitter.getFrequency();
+                        activeRouter = null; // force the routers to reactivate if the frequency has changed
+                        inactivate(level, oldFrequency.getFrequency(), oldFrequency.getModulation(), tag.getUUID("reference"));
+                    }
+                }
             }
         }
 
