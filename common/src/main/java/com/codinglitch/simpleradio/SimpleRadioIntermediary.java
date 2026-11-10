@@ -4,6 +4,7 @@ import com.codinglitch.intermediator.Intermediary;
 import com.codinglitch.intermediator.Intermediation;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.compat.CommonAudioPlayerCompat;
+import com.codinglitch.simpleradio.compat.VibrativeCompat;
 import com.codinglitch.simpleradio.compat.phases.ComputeSoundPhase;
 import com.codinglitch.simpleradio.compat.phases.ModifyPhase;
 import com.codinglitch.simpleradio.compat.phases.RetrieveAccessoryPhase;
@@ -83,6 +84,7 @@ public class SimpleRadioIntermediary extends Intermediary {
     public void intermediate() {
         begin()
                 .add(AUDIO_PLAYER, () -> CommonAudioPlayerCompat::new)
+                .add(VIBRATIVE_VOICE, () -> VibrativeCompat::new)
                 .mediate();
     }
 
