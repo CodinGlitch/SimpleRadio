@@ -25,8 +25,8 @@ mixin               = "0.8.5"
 mixin_extras        = "0.4.1"
 voicechat_api       = "2.6.13"
 voicechat           = "2.6.0"
-intermediator_api   = "0.8"
-intermediator       = "0.8-epic"
+intermediator_api   = "0.9"
+intermediator       = "0.9-epic"
 lexiconfig_api      = "1.4.21"
 lexiconfig          = "1.4.21-epic"
 
@@ -34,6 +34,7 @@ lexiconfig          = "1.4.21-epic"
 fabric_voicechat    = "fabric-1.20.1-2.6.18"
 forge_voicechat     = "forge-1.20.1-2.6.18"
 
+vibrative_voice     = "1.20.1-1.2.0"
 audioplayer         = "fabric-1.20.1-1.13.2"
 admiral             = "0.4.5+1.20.1+fabric"
 
@@ -46,7 +47,7 @@ configured          = "1.20.1-2.2.3"
 #---- Integrations ----#
 computercraft       = "1.116.1"
 
-vibrative_voice     = "1.2.0"
+vibrative_voice_api = "1.2.0"
 
 etched              = "5999495"
 
@@ -73,7 +74,7 @@ intermediator_api = { group="com.codinglitch.intermediator", name="intermediator
 
 computercraft_common = { group="cc.tweaked", name="cc-tweaked-1.20.1-common-api", version.ref="computercraft" }
 computercraft_core = { group="cc.tweaked", name="cc-tweaked-1.20.1-core-api", version.ref="computercraft" }
-vibrativevoice_api = { group="com.codinglitch.vibrativevoice", name="vibrativevoice-api", version.ref="vibrative_voice" }
+vibrativevoice_api = { group="com.codinglitch.vibrativevoice", name="vibrativevoice-api", version.ref="vibrative_voice_api" }
 valkyrienskies_api = { group="org.valkyrienskies.core", name="api", version.ref="valkyrien_skies_api"}
 valkyrienskies_common = { group="org.valkyrienskies", name="valkyrienskies-120-common", version.ref="valkyrien_skies"}
 
@@ -118,6 +119,8 @@ forge_mixinextras = { group="io.github.llamalad7", name="mixinextras-forge", ver
 
 forge_computercraft_api = { group="cc.tweaked", name="cc-tweaked-1.20.1-forge-api", version.ref="computercraft" }
 forge_computercraft = { group="cc.tweaked", name="cc-tweaked-1.20.1-forge", version.ref="computercraft" }
+
+forge_vibrativevoice = { group="com.codinglitch.vibrativevoice", name="vibrativevoice-forge", version.ref="vibrative_voice" }
 
 forge_etched = { group="curse.maven", name="etched-491890", version.ref="etched" }
 
@@ -174,7 +177,7 @@ forge_environment = [
     "forge_voicechat",
     "forge_etched",
     "forge_computercraft",
-    #    "vibrativevoice",
+    "forge_vibrativevoice",
     #    "forge_valkyrienskies",
     #    "forge_create",
 
