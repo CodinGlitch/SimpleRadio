@@ -87,7 +87,9 @@ public abstract class AccessoryCompat implements Mediation {
     public abstract void postInitialize(PostInitializePhase data);
 
     public void verifyEntityCollection(CollectionEvent.VerifyEntity data) {
-        if (SimpleRadioIntermediary.CURIOS.modLoaded() && data.entity instanceof Player player) {
+        // Only exempt accessory-slot radios while their owner is still in the world. A player that logged out
+        // (or is mid dimension change) is removed; without this check their routers are never collected.
+        if (SimpleRadioIntermediary.CURIOS.modLoaded() && data.entity instanceof Player player && !player.isRemoved()) {
             ItemStack stack = this.getAccessory(player, data.criteria);
             if (stack != ItemStack.EMPTY) data.result = CollectionEvent.Result.IGNORE;
         }
