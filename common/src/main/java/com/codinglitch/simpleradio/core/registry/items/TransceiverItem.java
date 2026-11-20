@@ -173,7 +173,23 @@ public class TransceiverItem extends Item implements Listening, Speaking, Receiv
         }
 
         if (activeRouter != null) {
-            if (activeRouter.getOwner() == null) { // Invalid router, not ours
+            Entity routerOwner = activeRouter.getOwner();
+            if (routerOwner == null) { // Invalid router, not ours
+                activeRouter = null;
+            } else if (routerOwner != entity && (routerOwner.isRemoved() || routerOwner.getUUID().equals(entity.getUUID()))) {
+                // Stale router: it belongs to an entity instance that no longer exists, e.g. the
+                // player object from before a relog or respawn (same UUID, different instance).
+                // Tear it down so the routers are rebuilt for the current entity below.
+                UUID reference = tag.getUUID("reference");
+                Transmitter staleTransmitter = (Transmitter) SimpleRadioApi.getRouterSided(
+                        reference, "RadioTransmitter", level.isClientSide
+                );
+                if (staleTransmitter != null && staleTransmitter.getFrequency() != null) {
+                    Frequency staleFrequency = staleTransmitter.getFrequency();
+                    inactivate(level, staleFrequency.getFrequency(), staleFrequency.getModulation(), reference);
+                } else {
+                    inactivate(level, frequency, Frequency.modulationOf(modulation), reference);
+                }
                 activeRouter = null;
             } else if (!activeRouter.getOwner().getUUID().equals(entity.getUUID())) { // Found router does not match ours, discard
                 activeRouter = null;
