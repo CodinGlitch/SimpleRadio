@@ -9,11 +9,9 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -26,20 +24,6 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
     @Override
     public boolean canConnect() {
         return this.getWires().isEmpty();
-    }
-
-    @Override
-    public void setRemoved() {
-        if (level != null && !level.isClientSide && this.speaker != null) {
-            level.playSound(
-                    null, speaker.getPosition().x, speaker.getPosition().y, speaker.getPosition().z,
-                    SimpleRadioSounds.RADIO_CLOSE,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
-
-        super.setRemoved();
     }
 
     @Override
@@ -89,15 +73,6 @@ public class SpeakerBlockEntity extends AuditoryBlockEntity implements Speaking 
 
         this.speaker = SimpleRadioBlocks.SPEAKER.getOrCreateSpeaker(location, id, this.getBlockState());
         this.speaker.setPosition(location);
-
-        if (!level.isClientSide) {
-            level.playSound(
-                    null, location.x, location.y, location.z,
-                    SimpleRadioSounds.RADIO_OPEN,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
 
         // Mark this block as active.
         super.activate();

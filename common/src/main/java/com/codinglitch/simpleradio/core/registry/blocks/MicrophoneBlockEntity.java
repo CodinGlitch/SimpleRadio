@@ -9,14 +9,12 @@ import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.client.ClientRadioManager;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -30,20 +28,6 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
 
     public MicrophoneBlockEntity(BlockPos pos, BlockState state) {
         super(SimpleRadioBlockEntities.MICROPHONE, pos, state);
-    }
-
-    @Override
-    public void setRemoved() {
-        if (level != null && !level.isClientSide && this.listener != null) {
-            level.playSound(
-                    null, listener.getPosition().x, listener.getPosition().y, listener.getPosition().z,
-                    SimpleRadioSounds.RADIO_CLOSE,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
-
-        super.setRemoved();
     }
 
     @Override
@@ -101,15 +85,6 @@ public class MicrophoneBlockEntity extends AuditoryBlockEntity implements Listen
 
         this.listener = SimpleRadioBlocks.MICROPHONE.getOrCreateListener(location, this.id, this.getBlockState());
         this.listener.setActive(this.listening);
-
-        if (!level.isClientSide) {
-            level.playSound(
-                    null, location.x, location.y, location.z,
-                    SimpleRadioSounds.RADIO_OPEN,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
 
         // Mark this block as active.
         super.activate();

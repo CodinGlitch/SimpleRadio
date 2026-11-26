@@ -7,14 +7,12 @@ import com.codinglitch.simpleradio.central.Receiving;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioReceiver;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,20 +28,6 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
     @Override
     public BlockPos getAdaptorLocation() {
         return getBlockPos().relative(getBlockState().getValue(ReceiverBlock.FACING).getOpposite());
-    }
-
-    @Override
-    public void setRemoved() {
-        if (level != null && !level.isClientSide && this.receiver != null) {
-            level.playSound(
-                    null, receiver.getPosition().x, receiver.getPosition().y, receiver.getPosition().z,
-                    SimpleRadioSounds.RADIO_CLOSE,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
-
-        super.setRemoved();
     }
 
     @Override
@@ -116,14 +100,6 @@ public class ReceiverBlockEntity extends CatalyzingBlockEntity implements Receiv
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.receiver = SimpleRadioBlocks.RECEIVER.getOrCreateReceiver(location, frequency, id, this.getBlockState());
-        if (!level.isClientSide) {
-            level.playSound(
-                    null, location.x, location.y, location.z,
-                    SimpleRadioSounds.RADIO_OPEN,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
 
         // Mark this block as active.
         super.activate();

@@ -1,12 +1,15 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.central.*;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioFrequencing;
+import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.routers.Receiver;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -126,9 +129,36 @@ public class ReceiverBlock extends BaseEntityBlock implements Routing, Receiving
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
         if (blockEntity instanceof AuditoryBlockEntity auditoryBlockEntity) {
             auditoryBlockEntity.loadFromItem(stack);
+            if (!level.isClientSide && auditoryBlockEntity.frequency != null) {
+                WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(blockPos, level, blockPos));
+                level.playSound(
+                        null, location.x, location.y, location.z,
+                        SimpleRadioSounds.RADIO_OPEN,
+                        SoundSource.PLAYERS,
+                        1f, 1f
+                );
+            }
         }
 
         super.setPlacedBy(level, blockPos, blockState, entity, stack);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && !level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof ReceiverBlockEntity receiver && receiver.receiver != null) {
+                WorldlyPosition location = receiver.receiver.getPosition();
+                level.playSound(
+                        null, location.x, location.y, location.z,
+                        SimpleRadioSounds.RADIO_CLOSE,
+                        SoundSource.PLAYERS,
+                        1f, 1f
+                );
+            }
+        }
+
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override
