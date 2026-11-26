@@ -1,5 +1,6 @@
 package com.codinglitch.simpleradio.core.registry.blocks;
 
+import com.codinglitch.simpleradio.CompatCore;
 import com.codinglitch.simpleradio.SimpleRadioLibrary;
 import com.codinglitch.simpleradio.central.Listening;
 import com.codinglitch.simpleradio.central.Routing;
@@ -197,9 +198,36 @@ public class MicrophoneBlock extends BaseEntityBlock implements Routing, Listeni
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
         if (blockEntity instanceof MicrophoneBlockEntity microphoneBlockEntity) {
             microphoneBlockEntity.loadFromItem(stack);
+            if (!level.isClientSide) {
+                WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(blockPos, level, blockPos));
+                level.playSound(
+                        null, location.x, location.y, location.z,
+                        SimpleRadioSounds.RADIO_OPEN,
+                        SoundSource.PLAYERS,
+                        1f, 1f
+                );
+            }
         }
 
         super.setPlacedBy(level, blockPos, blockState, entity, stack);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock()) && !level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof MicrophoneBlockEntity mic && mic.listener != null) {
+                WorldlyPosition location = mic.listener.getPosition();
+                level.playSound(
+                        null, location.x, location.y, location.z,
+                        SimpleRadioSounds.RADIO_CLOSE,
+                        SoundSource.PLAYERS,
+                        1f, 1f
+                );
+            }
+        }
+
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Nullable

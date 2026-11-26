@@ -7,14 +7,12 @@ import com.codinglitch.simpleradio.central.Transmitting;
 import com.codinglitch.simpleradio.central.WorldlyPosition;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlockEntities;
 import com.codinglitch.simpleradio.core.registry.SimpleRadioBlocks;
-import com.codinglitch.simpleradio.core.registry.SimpleRadioSounds;
 import com.codinglitch.simpleradio.platform.Services;
 import com.codinglitch.simpleradio.radio.RadioTransmitter;
 import com.codinglitch.simpleradio.routers.Router;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,20 +28,6 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
     @Override
     public BlockPos getAdaptorLocation() {
         return getBlockPos().relative(getBlockState().getValue(TransmitterBlock.FACING).getOpposite());
-    }
-
-    @Override
-    public void setRemoved() {
-        if (level != null && !level.isClientSide && this.transmitter != null) {
-            level.playSound(
-                    null, transmitter.getPosition().x, transmitter.getPosition().y, transmitter.getPosition().z,
-                    SimpleRadioSounds.RADIO_CLOSE,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
-
-        super.setRemoved();
     }
 
     @Override
@@ -115,14 +99,6 @@ public class TransmitterBlockEntity extends CatalyzingBlockEntity implements Tra
         WorldlyPosition location = CompatCore.modifyPosition(WorldlyPosition.of(worldPosition, level, worldPosition));
 
         this.transmitter = SimpleRadioBlocks.TRANSMITTER.getOrCreateTransmitter(location, frequency, id, this.getBlockState());
-        if (!level.isClientSide) {
-            level.playSound(
-                    null, location.x, location.y, location.z,
-                    SimpleRadioSounds.RADIO_OPEN,
-                    SoundSource.PLAYERS,
-                    1f, 1f
-            );
-        }
 
         // Mark this block as active.
         super.activate();
